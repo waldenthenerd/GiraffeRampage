@@ -112,6 +112,7 @@
     return o;
   };
   /* her head lands: the ground answers (sound and, in water and snow, a few things thrown up) */
+  window.groundStateNow = groundNow;                      /* for gear effects that care about water (js/36p-gear-fx.js) */
   const ns = window.neckStretchLanded;
   window.neckStretchLanded = function(){
     const o = SFX.groundImpact(); if (ns) ns();

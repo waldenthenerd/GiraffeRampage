@@ -84,3 +84,8 @@
 @keyframes crspark{from{transform:rotate(var(--a)) translateX(10px);opacity:1}to{transform:rotate(var(--a)) translateX(230px);opacity:0}}
 @keyframes crrise{from{transform:translateY(40px) scale(.8);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.crevl.ph0 .crbox{animation:none}}
+/* special effects */
+.gfx{margin:0 0 8px;padding:6px 8px;border-radius:4px;background:rgba(255,216,77,.08);border:1px solid rgba(255,216,77,.3);color:#F2DFA0;font-size:12px;line-height:1.45}
+.gfx b{color:#FFD84D}
+.gfxb{position:absolute;top:3px;left:6px;color:#FFD84D;font-size:11px}
+.crfx{margin-top:8px;padding:6px 10px;border-radius:5px;background:rgba(255,216,77,.1);border:1px solid rgba(255,216,77,.35);color:#F2DFA0;font-size:12.5px}

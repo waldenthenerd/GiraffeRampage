@@ -37,7 +37,7 @@ try {
 
   if (st === 'compare'){
     var rc0 = 0, rs = recalcStats; recalcStats = function(){ rc0++; return rs.apply(this, arguments); };
-    grantGear('thornweave:armor'); grantGear('stoneplate:armor'); grantGear('twinsoul:weapon');
+    grantGear('thornweave:armor'); grantGear('stoneplate:armor'); grantGear('leviathan:cape'); grantGear('twinsoul:weapon');
     /* completes a set: cape + armor worn, hooves not equipped -> pointing at it completes Herdhide */
     unequipSlot('weapon'); rc0 = 0; gearPage.slot = 'weapon'; showShop('gear');
     gearPage.hover = 'herdhide:weapon'; gearSyncSelection();
@@ -58,7 +58,7 @@ try {
     }
     var snap = JSON.stringify(P.stats); recalcStats(); out.rapid = snap === JSON.stringify(P.stats) && (gearEquipped('armor') === 'sunforged:armor' || gearEquipped('armor') === null);
     recalcStats = rs;
-    gearPage.selected = null; gearPage.hover = 'herdhide:weapon'; gearPage.slot = 'weapon'; unequipSlot('weapon'); showShop('gear'); gearPage.hover = 'herdhide:weapon'; gearSyncSelection();
+    gearPage.selected = null; gearPage.slot = QA.params.slot || 'weapon'; if (!QA.params.hover) unequipSlot('weapon'); showShop('gear'); gearPage.hover = QA.params.hover || 'herdhide:weapon'; gearSyncSelection();
   }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
 out.pass = !!(out.hasPreview && !out.errs.length && (st !== 'compare' || (out.completes && out.noRecalcOnTryon && out.red > 0 && out.green > 0 && out.sideHasEquip && out.persist && out.rapid)) && (st === 'sets' ? out.tiles === 48 && out.noSearch : (out.slotBtns === 3 && out.hatIsWardrobe && out.noSearch && out.drew && out.pixels > 800)));

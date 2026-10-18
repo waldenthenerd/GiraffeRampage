@@ -17,6 +17,7 @@ function gaPiecesOf(slot){
   GEAR_SETS.forEach(function(s){ if (s.pieces[slot]) out.push(GEAR_INDEX[s.id + ':' + slot]); });
   return out.sort(function(a, b){ const oa = gearOwned(a.id) ? 0 : 1, ob = gearOwned(b.id) ? 0 : 1; return oa - ob || RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity]; });
 }
+function gaFx(id){ return typeof GEAR_FX !== 'undefined' ? GEAR_FX[id] || null : null; }
 function gaPips(lv){ let s = ''; for (let i = 1; i < lv; i++) s += '●'; return s; }
 /* what the picture shows: what she wears, with the piece being pointed at or selected swapped in */
 function gearTryon(){
@@ -133,7 +134,7 @@ function gearPickerHTML(){
     gaPiecesOf(slot).map(function(p){
       const owned = gearOwned(p.id), lv = gearLevel(p.id);
       return (owned ? '<button class="gp ' + p.rarity + (eq === p.id ? ' on' : '') + (gearPage.selected === p.id ? ' sel' : '') + '" data-a="gear-pick-' + p.id + '" data-gh="' + p.id + '">' : '<div class="gp ' + p.rarity + ' locked">') +
-        '<img src="' + gearIcon(p.id, 72, { locked: !owned, level: lv }) + '" alt="">' +
+        (owned && gaFx(p.id) ? '<span class="gfxb" title="' + gaFx(p.id).name + ': ' + gaFx(p.id).desc + '">\u2726</span>' : '') + '<img src="' + gearIcon(p.id, 72, { locked: !owned, level: lv }) + '" alt="">' +
         '<b>' + (owned ? p.name : '???') + '</b><small>' + (owned ? p.setName + ' · ' + p.rarity : 'not found yet') + '</small>' +
         (eq === p.id ? '<em>Equipped</em>' : '') + (owned ? '</button>' : '</div>');
     }).join('') + '</div>';
@@ -184,7 +185,8 @@ function gearComparePanel(slot, id){
   const p = GEAR_INDEX[id]; if (!p) return gearBuildHTML();
   const lv = gearLevel(id), on = gearEquipped(slot) === id, rows = on ? [] : gearDelta(slot, id);
   let html = '<div class="gcmp ' + p.rarity + '"><h4>' + p.name + (lv > 1 ? ' <span class="glv">+' + (lv - 1) + '</span>' : '') + '</h4>' +
-    '<div class="gsub">' + p.setName + ' · ' + p.rarity + ' · ' + SLOT_LABEL[slot] + '</div><p class="gdesc">' + gaDesc(p) + '</p>';
+    '<div class="gsub">' + p.setName + ' · ' + p.rarity + ' · ' + SLOT_LABEL[slot] + '</div><p class="gdesc">' + gaDesc(p) + '</p>' +
+    (gaFx(id) ? '<div class="gfx"><b>\u2726 ' + gaFx(id).name + '</b> ' + gaFx(id).desc + '</div>' : '');
   const setRow = rows.filter(function(r){ return r.key === 'set'; })[0], stat = rows.filter(function(r){ return r.key !== 'set'; });
   if (on) html += '<p class="gnote">Equipped now.</p>';
   else if (!stat.length) html += '<p class="gnote">No change to her stats.</p>';
@@ -227,7 +229,7 @@ function gearRevealStart(res){
   el.innerHTML = '<div class="crbox">' + ico(res.rarity === 'epic' || res.rarity === 'legendary' ? '@t-x-gift' : '@t-x-box') + '</div><div class="crburst"></div>' +
     (fx > 0 ? '<div class="crsparks">' + [0, 1, 2, 3, 4, 5, 6, 7].map(function(i){ return '<i style="--a:' + i * 45 + 'deg"></i>'; }).join('') + '</div>' : '') +
     '<div class="crcard"><img class="crimg" src="' + gearIcon(p.id, 128, { level: res.levelUp || gearLevel(p.id) }) + '" alt=""><div class="crk">' + k + (res.pity ? ' · pity' : '') + '</div>' +
-    '<div class="crn">' + p.name + '</div><div class="crs">' + p.setName + ' · ' + SLOT_LABEL[p.slot] + ' · ' + res.rarity + '</div><div class="crd">' + gearResultLine(res) + '</div>' +
+    '<div class="crn">' + p.name + '</div><div class="crs">' + p.setName + ' · ' + SLOT_LABEL[p.slot] + ' · ' + res.rarity + '</div><div class="crd">' + gearResultLine(res) + '</div>' + (gaFx(p.id) ? '<div class="crfx">\u2726 ' + gaFx(p.id).name + ': ' + gaFx(p.id).desc + '</div>' : '') +
     '<div class="crhint">Click to continue</div></div>';
   OV.appendChild(el);
   gearReveal.el = el; gearReveal.active = true; gearReveal.res = res; gearRevealPhase(0);
