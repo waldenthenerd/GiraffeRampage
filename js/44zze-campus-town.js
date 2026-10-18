@@ -346,7 +346,7 @@ function uniShowCafe(){
 
 /* ---- the journal gets a Study tab: rank, IQ, every faculty, degrees and badges, and the notebook count ---- */
 function uniShowJournalTab(){
-  const u = uniData(), r = uniRankIndex(), tabs = [['errands', 'Errands'], ['finds', 'Finds'], ['friends', 'Friends'], ['tracks', 'Tracks'], ['gear', 'Gear'], ['study', 'Study']];
+  const u = uniData(), r = uniRankIndex(), tabs = [['errands', 'Errands'], ['finds', 'Finds'], ['friends', 'Friends'], ['tracks', 'Tracks'], ['gear', 'Gear'], ['study', 'Study'], ['book', 'Book']];
   let th = '<div class="jtabs">'; tabs.forEach(function(x){ th += '<button class="jtab' + (x[0] === 'study' ? ' on' : '') + '" data-a="town-jt-' + x[0] + '">' + x[1] + '</button>'; }); th += '</div>';
   const bar = function(a, m){ return '<span class="ink-bar"><i style="width:' + Math.round(100 * Math.min(1, a / Math.max(1, m))) + '%"></i></span>'; };
   let b = '<p class="jh">' + UNI_RANKS[r].n + ' · IQ ' + uniIQ() + '</p><p class="jt">' + uniTotal() + ' levels studied. Study energy ' + uniEnergy() + ' of ' + uniEnergyMax() + ' today. ' + Object.keys(u.facts).length + ' of ' + (UNI_BOOKS.length + UNI_LECTURES.length) + ' notebook entries.</p>';
