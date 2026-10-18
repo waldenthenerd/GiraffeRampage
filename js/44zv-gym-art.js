@@ -152,9 +152,9 @@ const GYM_KINDS = {
       const x = b.x, W = b.w, h = b.h, x0 = x - W / 2;
       c.save();
       tEll(c, 'rgba(0,0,0,.2)', x, TG + 6, W / 2 + 14, 8);
-      tRect(c, '#3A4256', x0, TG - h, W, h); for (let i = 0; i < 16; i++) tRect(c, 'rgba(255,255,255,.05)', x0 + i * (W / 16), TG - h, 2, h);
-      tRect(c, '#2B3040', x0, TG - h, W, 40); tRect(c, '#FF8A3D', x0, TG - h + 40, W, 8);                                                                       /* the roofline and the orange stripe */
-      tRect(c, '#1E2230', x0 - 10, TG - h - 14, W + 20, 16); tRect(c, 'rgba(255,255,255,.12)', x0 - 10, TG - h - 14, W + 20, 2);
+      tRect(c, '#B26A46', x0, TG - h, W, h); if (window.townDetailKit) townDetailKit.bricks(c, x0, TG - h, W, h, 9, 22, 77);                       /* brick, like the rest of the street */
+      tRect(c, '#8A4A32', x0, TG - h, W, 40); tRect(c, '#E8B83A', x0, TG - h + 40, W, 8);                                                                       /* the roofline and the orange stripe */
+      tRect(c, '#5A3022', x0 - 10, TG - h - 14, W + 20, 16); tRect(c, 'rgba(255,255,255,.12)', x0 - 10, TG - h - 14, W + 20, 2);
       /* the neon sign */
       tRound(c, '#12141C', x - 250, TG - h + 4, 500, 34, 8); c.save(); c.shadowColor = '#FF8A3D'; c.shadowBlur = 14; ivText(c, 'LONGNECK FITNESS', x, TG - h + 30, 26, '#FFB070'); c.restore();
       /* a barbell on the roof */
@@ -170,14 +170,14 @@ const GYM_KINDS = {
       }
       /* the entrance: glass doors under an orange awning */
       const dx = x0 + 28 + 2 * 118 - 4;
-      tAwning(c, dx - 14, wy - 8, 140, 22, '#FF8A3D', '#F4F1E8');
+      tAwning(c, dx - 14, wy - 8, 140, 22, '#2F7A5A', '#F4F1E8');
       tRect(c, '#12141C', dx, wy + 22, 112, TG - wy - 22); tRect(c, '#9FD0E8', dx + 6, wy + 28, 48, TG - wy - 28); tRect(c, '#9FD0E8', dx + 58, wy + 28, 48, TG - wy - 28);
       tRect(c, 'rgba(255,255,255,.3)', dx + 12, wy + 34, 10, TG - wy - 40); tRect(c, '#C9CDD9', dx + 50, wy + 110, 4, 40); tRect(c, '#C9CDD9', dx + 58, wy + 110, 4, 40);
-      tRect(c, '#3A4256', dx - 20, TG - 6, 152, 6);
+      tRect(c, '#9A9078', dx - 20, TG - 6, 152, 6);
       tRound(c, '#FFF6E0', dx + 36, wy + 44, 40, 16, 4); ivText(c, 'OPEN', dx + 56, wy + 56, 11, '#D5352B');
       /* flags and a poster either side */
-      ivLine(c, '#8A8E98', 4, x0 + 12, TG - h - 8, x0 + 12, TG - h - 70); tPoly(c, '#FF8A3D', [x0 + 14, TG - h - 70, x0 + 56, TG - h - 58, x0 + 14, TG - h - 46]);
-      ivLine(c, '#8A8E98', 4, x0 + W - 12, TG - h - 8, x0 + W - 12, TG - h - 70); tPoly(c, '#4DB8FF', [x0 + W - 14, TG - h - 70, x0 + W - 56, TG - h - 58, x0 + W - 14, TG - h - 46]);
+      ivLine(c, '#8A8E98', 4, x0 + 12, TG - h - 8, x0 + 12, TG - h - 70); tPoly(c, '#C9503C', [x0 + 14, TG - h - 70, x0 + 56, TG - h - 58, x0 + 14, TG - h - 46]);
+      ivLine(c, '#8A8E98', 4, x0 + W - 12, TG - h - 8, x0 + W - 12, TG - h - 70); tPoly(c, '#2F7A5A', [x0 + W - 14, TG - h - 70, x0 + W - 56, TG - h - 58, x0 + W - 14, TG - h - 46]);
       tRound(c, '#12141C', x0 + W - 98, wy + 14, 80, 100, 4); tRect(c, '#FFC83D', x0 + W - 92, wy + 20, 68, 14); ivText(c, 'DAY PASS', x0 + W - 58, wy + 32, 11, '#2B3040'); ivText(c, 'DESK', x0 + W - 58, wy + 62, 20, '#FF8A3D'); ivText(c, 'INSIDE', x0 + W - 58, wy + 84, 13, '#FFF6E0');
       c.restore(); return true;
     }

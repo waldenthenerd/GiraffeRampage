@@ -155,6 +155,8 @@ function gymQuit(msg){
   if (msg) townToast(msg, '#FFB89A');
 }
 function gymLevelNow(g){ return gymSkill(g.m).l; }
+/* the timed, moving games (the treadmill and bike beats, the bench and pull-up dials, the punch strings, the sauna balance) start the next rep at once: only the first one of a visit says "Get set..." */
+const GYM_CONT = { rhythm: 1, dial: 1, balance: 1, combo: 1 };
 function gymRepInit(g){
   const S = GYM_BY_ID[g.m], lv = gymLevelNow(g), df = S.diff;
   g.phase = 'rep'; g.t = 0; g.fb = null;
@@ -245,10 +247,10 @@ function gymStep(dt){
       }
       break;
     case 'result':
-      if (g.t > 0.75){ g.rep++; if (g.rep >= GYM_SETS){ g.phase = 'rest'; g.t = 0; g.sets++; const d = townData(); d.n.gymSets = (d.n.gymSets | 0) + 1; Save.write(); } else { g.phase = 'ready'; g.t = 0.5; } }
+      if (g.t > 0.75){ g.rep++; if (g.rep >= GYM_SETS){ g.phase = 'rest'; g.t = 0; g.sets++; const d = townData(); d.n.gymSets = (d.n.gymSets | 0) + 1; Save.write(); } else if (GYM_CONT[S.pat]) gymRepInit(g); else { g.phase = 'ready'; g.t = 0.5; } }
       break;
     case 'rest':
-      if (pressed && g.t > 0.5){ g.rep = 0; g.perfect = g.good = g.miss = 0; g.setXp = 0; g.streak = 0; g.phase = 'ready'; g.t = 0; }
+      if (pressed && g.t > 0.5){ g.rep = 0; g.perfect = g.good = g.miss = 0; g.setXp = 0; g.streak = 0; if (GYM_CONT[S.pat]) gymRepInit(g); else { g.phase = 'ready'; g.t = 0; } }
       break;
   }
 }

@@ -28,9 +28,9 @@ TOWN_ROOM.ucafe    = { wall: '#EAD6B0', wains: '#7A4A2A', stripe: 'rgba(150,100,
 /* ---- the district ---- */
 (function(){
   const S = TOWN_DIST.square;
-  S.b.push({ id: 'cgate', kind: 'u_gate', x: 2000, w: 200, h: 190, label: 'The University', act: 'campus', gate: function(){ return townDoneCh(1); }, gateText: 'An iron gate, and a sign: LONGNECK UNIVERSITY. Opening after you finish Chapter 1.' });
+  S.b.push({ id: 'cgate', kind: 'u_gate', x: 1960, w: 140, h: 190, label: 'The University', act: 'campus', gate: function(){ return townDoneCh(1); }, gateText: 'An iron gate, and a sign: LONGNECK UNIVERSITY. Opening after you finish Chapter 1.' });
   S.p = S.p.filter(function(p){ return !(p.k === 'lamp' && p.x === 1920) && !(p.k === 'tree' && p.x === 2060); });
-  S.p.push({ k: 'lamp', x: 1860 }, { k: 'tree', x: 2330, s: 0.9 });
+  S.p.push({ k: 'lamp', x: 1846 }, { k: 'tree', x: 2330, s: 0.9 });
   const b = [
     { id: 'cexit', kind: 'u_arch', x: 150, w: 170, h: 200, label: 'Back to Town Square', act: 'campus-out' },
     { id: 'chall', kind: 'u_hall', x: 760, w: 440, h: 300, label: 'Registrar’s Hall', act: 'house', to: 'in_uhall' },
