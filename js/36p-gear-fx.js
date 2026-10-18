@@ -56,15 +56,8 @@ const GEAR_FX = {
       });
     } },
   'sunforged:armor': { name: 'Sun ward', desc: 'Every 12s a flare shield soaks the next hit, up to 20 damage.',
-    ward(sc, amount){                                                                         /* returns the damage left after the shield, and uses it up */
-      if (!GearFx.ward.ready) return amount;
-      GearFx.ward.ready = false; GearFx.ward.cd = 12;
-      const dr = P.stats ? P.stats.dr : 0, cap = 20 * sc, eff = amount * (1 - dr);
-      addText(P.x, P.y - 34, 'SUN WARD', '#FFD27A', 16, true);
-      if (gfxParticles()){ addParticle(P.x, P.y, 0, 0, 14, 0.5, 'rgba(255,210,120,.9)', { shape: 'wake', drag: 0, shrink: false }); burstParticles(P.x, P.y, 10, '#FFD27A', 160, 3.5, { glow: true }); }
-      if (eff <= cap){ P.invuln = Math.max(P.invuln, 0.45); return 0; }
-      return Math.max(1, amount - cap / Math.max(0.05, 1 - dr));
-    } },
+    soak(sc){ return 20 * sc; }
+  },
   'aurora:cape': { name: 'Aurora drift', desc: 'Standing still for 2s gives +10% XP for 6s.',
     onTick(sc, dt){
       if (GearFx.auroraT > 0){ GearFx.auroraT -= dt; if (GearFx.auroraT <= 0){ GearFx.auroraT = 0; recalcStats(); } }
@@ -119,10 +112,20 @@ function gearFxTick(dt){
   const h = hurtPlayer;
   hurtPlayer = function(amount, sx, sy){
     if (G.attract || P.invuln > 0 || P.dead || G.state !== 'playing') return h.apply(this, arguments);
-    const hp0 = P.hp, ward = gfxWorn('sunforged:armor');
-    let amt = amount;
-    if (ward){ amt = GEAR_FX['sunforged:armor'].ward(ward, amount); if (amt <= 0) return; }
-    const r = h.call(this, amt, sx, sy);
+    const hp0 = P.hp, tk0 = G.runTaken || 0, ward = gfxWorn('sunforged:armor') && GearFx.ward.ready ? GEAR_FX['sunforged:armor'].soak(gfxWorn('sunforged:armor')) : 0;
+    /* the ward soaks what the hit would really do, after her damage reduction and the per-hit cap: it lends her `cap` health for the hit, then takes back what was soaked */
+    if (ward) P.hp += ward;
+    const r = h.call(this, amount, sx, sy);
+    if (ward){
+      const dealt = hp0 + ward - P.hp, soak = Math.min(ward, Math.max(0, dealt));
+      P.hp = P.hp - ward + soak; G.runTaken = Math.max(tk0, (G.runTaken || 0) - soak);
+      if (dealt > 0){                                                                        /* the hit landed (and the ward was used) */
+        GearFx.ward.ready = false; GearFx.ward.cd = 12;
+        addText(P.x, P.y - 34, 'SUN WARD', '#FFD27A', 16, true);
+        if (gfxParticles()){ addParticle(P.x, P.y, 0, 0, 14, 0.5, 'rgba(255,210,120,.9)', { shape: 'wake', drag: 0, shrink: false }); burstParticles(P.x, P.y, 10, '#FFD27A', 160, 3.5, { glow: true }); }
+        if (soak >= dealt){ P.hurtT = 0; P.invuln = Math.max(P.invuln, 0.45); }
+      }
+    }
     if (P.hp < hp0 && !P.dead) gearFxEvent('onHurt', amount);
     return r;
   };

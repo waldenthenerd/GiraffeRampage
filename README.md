@@ -14,12 +14,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 151 | 50,969 | 3.81 MiB (3,992,757 bytes) |
+| JavaScript (`js/`) | 151 | 50,973 | 3.81 MiB (3,993,104 bytes) |
 | Styles (`css/`) | 5 | 1,351 | 121 KiB (124,266 bytes) |
 | Page (`index.html`) | 1 | 198 | 8.4 KiB (8,645 bytes) |
-| **Whole game** | **157** | **52,518** | **3.93 MiB (4,125,668 bytes)** |
+| **Whole game** | **157** | **52,522** | **3.93 MiB (4,126,015 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **51,950 lines, 3.89 MiB (4,082,193 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **51,954 lines, 3.89 MiB (4,082,540 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -111,7 +111,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/41-qol.js` | 842 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
 | `js/42-run-hud.js` | 234 | Run lifecycle and the HUD. |
 | `js/43-input.js` | 374 | Input: keyboard, mouse, touch, gamepad. |
-| `js/41a-gear-page.js` | 280 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, and the crate reveal (`gearReveal`). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
+| `js/41a-gear-page.js` | 281 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, and the crate reveal (`gearReveal`). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
 | `js/44-loop-boot.js` | 114 | The main loop, resize, and the boot function. |
 | `js/44b-feedback.js` | 229 | Pacing and presentation: title splash, one-time hints, fades, boss entrance, wave-clear beat, number count-ups, overlay fade-out, text size, the kick wind-up. |
 | `js/44c-perf.js` | 170 | The slow-device governor: times each frame's work and, if the game cannot keep up, lowers the canvas sharpness and then the effects (`PERF_STEPS`); shows a notice with a "Back to full quality" button when it does (`perfNotice`; that button turns "Adapt to slow devices" off), counts minigames as play, and the minigame polish layers follow the effects level; brings them back when there is room. Off with Settings, Adapt to slow devices. Also the statistics panel (the `\` key). |
@@ -180,7 +180,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zzo-town-sound.js` | 114 | The rest of the town's sound: a footstep for every floor (`townStepSound`), door sounds going in and out (bells, creaks, the gym thud), and ambience beds and one-shots for the rooms and streets that had none (the tailor, hall, studio, farm and isle rooms, gym, campus and its six rooms). |
 | `js/36n-neck-stretch.js` | 88 | **The neck whip, animated.** Every kick lashes the neck out to about three times its length on a bending S-curve (`neckProfile`, `neckCurve`), with motion-blur ghost frames of the neck and head, a squash in the body when the head lands (a damped spring, `GF.land`), a ring of dust at the hooves and a nudge of shake. A Neck Whip card makes the neck longer and swing with its arms. `33-giraffe-art.js` draws the curved neck and the squash. Presentation only. |
 | `js/36o-cloud-fronts.js` | 69 | **Weather that arrives.** Cloud shadows drift across the ground, thickening and tinting as a front nears (`WxE.front`, `WxE.pend` from `36j`); thin clouds drift in calm weather in the open-sky chapters. The weather itself builds from a few drops to a full fall over 14 seconds and eases off over 10 (`weatherDraw` takes a `frac`). |
-| `js/36p-gear-fx.js` | 133 | **Eight pieces with a playstyle.** `GEAR_FX`: Thorns, Dust cloak, Cold snap, Sun ward, Aurora drift, Star crack, Undertow, Tidal wake, each tied to one piece and scaled by its level; hooks on `doKick`, `hurtPlayer`, `updatePlayer` and `applyGear`. State in `GearFx`. |
+| `js/36p-gear-fx.js` | 136 | **Eight pieces with a playstyle.** `GEAR_FX`: Thorns, Dust cloak, Cold snap, Sun ward, Aurora drift, Star crack, Undertow, Tidal wake, each tied to one piece and scaled by its level; hooks on `doKick`, `hurtPlayer`, `updatePlayer` and `applyGear`. State in `GearFx`. |
 | `js/02d-ground-sounds.js` | 125 | **What the ground sounds like.** Replaces `SFX.foot`: mud, snow, ice, metal (the Moon, Mars, the space centre), shallow water, dust, sand, leaf, asphalt, cinders and rock, changed by rain, blizzards, sandstorms and acid (`groundNow`), plus `SFX.groundImpact` and a ground answer when the head lands in a lunge. |
 | `js/44zzp-photo-looks.js` | 215 | **The photo studio's look and light.** A Look and light tab: filters (Sepia, Noir, Glitch, Painterly), seven frames, a time-of-day slider, and a freeze-all-creatures toggle; twelve stickers in the Effects tab. All saved with the picture; photo code version 5 is written only when one is used (older codes are unchanged). |
 | `js/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |

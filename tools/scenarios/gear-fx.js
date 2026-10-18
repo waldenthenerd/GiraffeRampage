@@ -20,6 +20,9 @@ try {
   P.invuln = 0; hurtPlayer(15, P.x + 30, P.y); out.wardSpent = P.hp < hp0;
   GearFx.ward.cd = 0.05; steps(10); out.wardBack = GearFx.ward.ready === true;
   P.invuln = 0; P.hp = P.maxHp; hp0 = P.hp; GearFx.ward.ready = true; hurtPlayer(60, P.x + 30, P.y); out.wardPartial = P.hp < hp0 && hp0 - P.hp < 60;
+  /* 3b. the ward works after the per-hit cap: a 200 hit is capped to 41 (34% of 120), the ward soaks 20 of that */
+  wear(['sunforged:armor']); gfxReset(); P.maxHp = 120; P.hp = 120; P.stats.dr = 0; P.invuln = 0; hurtPlayer(200, P.x + 30, P.y); out.wardCapped = P.hp === 120 - 21;
+  gfxReset(); P.hp = 120; P.invuln = 0; P.hurtT = 0; var tk0 = G.runTaken || 0; hurtPlayer(15, P.x + 30, P.y); out.wardFullNoHurt = P.hp === 120 && (G.runTaken || 0) === tk0 && P.hurtT === 0;
   /* 4. aurora: still for 2s, then +10% xp */
   wear(['aurora:cape']); P.invuln = 99; gfxReset(); clear(); P.vx = 0; P.vy = 0; var xp0 = P.stats.xpMul; steps(135); out.aurora = GearFx.auroraT > 0 && Math.abs(P.stats.xpMul - xp0 - 0.10) < 0.005;
   GearFx.auroraT = 0.02; steps(5); out.auroraEnds = GearFx.auroraT === 0 && Math.abs(P.stats.xpMul - xp0) < 0.005;
@@ -59,7 +62,7 @@ try {
     if (QA.params.show === 'star'){ for (k = 0; k < 5; k++){ P.kickCd = 0; doKick(); if (k < 4) steps(1); } steps(5); }
     if (QA.params.show === 'ward'){ P.invuln = 0; hurtPlayer(10, P.x + 40, P.y); steps(4); P.invuln = 99; } }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-var keys = ['thorns', 'thornsOff', 'deadQuiet', 'wardSoaked', 'wardSpent', 'wardBack', 'wardPartial', 'aurora', 'auroraEnds', 'starCrack', 'undertow', 'undertowDry', 'frost', 'trail', 'dust', 'wakePts', 'wake', 'both', 'thornsLv5', 'catalog'];
+var keys = ['thorns', 'thornsOff', 'deadQuiet', 'wardSoaked', 'wardSpent', 'wardBack', 'wardPartial', 'wardCapped', 'wardFullNoHurt', 'aurora', 'auroraEnds', 'starCrack', 'undertow', 'undertowDry', 'frost', 'trail', 'dust', 'wakePts', 'wake', 'both', 'thornsLv5', 'catalog'];
 out.failed = keys.filter(function(k){ return !out[k]; });
 out.pass = !out.failed.length && !out.errs.length;
 QA.done(out);

@@ -174,7 +174,8 @@ function gearTabHTML(){
 /* ---------- compare before equipping ---------- */
 function gearFmtVal(key, v){
   const f = GEAR_STAT_LABELS[key] ? GEAR_STAT_LABELS[key].fmt : 'flat', r = function(x, d){ const m = Math.pow(10, d || 0); return Math.round(x * m) / m; };
-  if (f === 'pct' || f === 'pctless') return r(v * 100, 1) + '%';
+  if (f === 'pctless') return (v > 0 ? '\u2212' : '') + r(v * 100, 1) + '%';                 /* a cut to damage taken: 0% to \u22126% */
+  if (f === 'pct') return r(v * 100, 1) + '%';
   if (f === 'pctmul') return (v >= 1 ? '+' : '') + r((v - 1) * 100, 1) + '%';
   if (f === 'sec') return r(v, 2) + '/s';
   if (f === 'secs') return r(v, 2) + 's';

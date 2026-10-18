@@ -47,6 +47,7 @@ try {
     equipGear('sunforged:armor'); gearPage.slot = 'armor'; showShop('gear'); gearPage.hover = 'herdhide:armor'; gearSyncSelection();
     out.red = document.querySelectorAll('.grow.down').length;
     equipGear('herdhide:armor'); gearPage.hover = 'sunforged:armor'; gearSyncSelection(); out.green = document.querySelectorAll('.grow.up').length;
+    out.fmtLess = gearFmtVal('dr', 0.06) === '\u22126%' && gearFmtVal('dr', 0) === '0%' && gearFmtVal('oceanDr', 0.04) === '\u22124%' && gearFmtVal('crit', 0.05) === '5%';
     var dr = document.querySelector('.grow span'); out.firstRow = dr ? dr.textContent : null;
     gearPage.hover = null; gearPage.selected = 'sunforged:armor'; gearSyncSelection(); out.sideHasEquip = !!document.querySelector('#gearSide [data-equip="sunforged:armor"]');
     /* the try-on does not persist */
@@ -61,5 +62,5 @@ try {
     gearPage.selected = null; gearPage.slot = QA.params.slot || 'weapon'; if (!QA.params.hover) unequipSlot('weapon'); showShop('gear'); gearPage.hover = QA.params.hover || 'herdhide:weapon'; gearSyncSelection();
   }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-out.pass = !!(out.hasPreview && !out.errs.length && (st !== 'compare' || (out.completes && out.noRecalcOnTryon && out.red > 0 && out.green > 0 && out.sideHasEquip && out.persist && out.rapid)) && (st === 'sets' ? out.tiles === 48 && out.noSearch : (out.slotBtns === 3 && out.hatIsWardrobe && out.noSearch && out.drew && out.pixels > 800)));
+out.pass = !!(out.hasPreview && !out.errs.length && (st !== 'compare' || (out.completes && out.noRecalcOnTryon && out.red > 0 && out.green > 0 && out.sideHasEquip && out.persist && out.rapid && out.fmtLess)) && (st === 'sets' ? out.tiles === 48 && out.noSearch : (out.slotBtns === 3 && out.hatIsWardrobe && out.noSearch && out.drew && out.pixels > 800)));
 QA.done(out);
