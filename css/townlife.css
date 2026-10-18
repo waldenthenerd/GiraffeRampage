@@ -1,0 +1,12 @@
+/* Longneck Town: the collection book, the better tram map and the little extras (44zzl and friends). */
+.tp-journal .jtabs{flex-wrap:wrap;row-gap:2px}.tp-journal .jtab{padding-left:9px;padding-right:9px;font-size:13px}
+.cb-bar{display:block;height:9px;border-radius:6px;background:rgba(80,50,20,.18);overflow:hidden;margin:4px 0}.cb-bar i{display:block;height:100%;background:linear-gradient(90deg,#B5502A,#E8A93C)}
+.cbtab{width:100%;border-collapse:collapse;margin:12px 0;font-size:12.5px}.cbtab th{font:700 10px Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#7A5A3A;text-align:center;padding:4px 2px;border-bottom:2px solid #B59A6A}.cbtab th:first-child,.cbtab td:first-child{text-align:left}
+.cbtab td{text-align:center;padding:4px 3px;border-bottom:1px dotted rgba(90,60,30,.3);color:#3A2A1E}.cbtab td.ok{color:#2F7A4A;font-weight:700}.cbtab tr.off td{opacity:.45}.cbtab tr.done td:first-child{font-weight:700;color:#2F7A4A}
+.cbcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:8px}.cbc{padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.55);border:1px solid rgba(90,60,30,.25)}.cbc.done{border-color:#2F7A4A;background:rgba(120,200,140,.2)}
+.cbc b{display:block;font-size:13px;color:#4A2A12}.cbc span{font:700 16px Georgia,serif;color:#8E2F2A}.cbc small{display:block;font-size:10.5px;color:#7A6A52}
+/* the map */
+.tp-map .stn .sbd{display:flex;gap:3px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:3px;min-height:12px}.tp-map .gd{display:inline-block;width:11px;height:11px;border-radius:50%;border:1.5px solid #1E3A5A;box-sizing:border-box}.tp-map .gd.ask{box-shadow:0 0 0 2px #F2C230}.tp-map .gd.busy{box-shadow:0 0 0 2px #6BBB45}.tp-map .sbd em{font:700 10px Arial,sans-serif;font-style:normal;color:#B5802A}
+.mapx{margin-top:10px;text-align:left}.mapx h4{margin:10px 0 6px;font:700 12px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#1E3A5A;border-bottom:1px solid #9AB0C8}
+.whos{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:4px 14px}.who{display:flex;align-items:center;gap:6px;font-size:12.5px;padding:2px 0;border-bottom:1px dotted #B8C8D8}.who b{color:#1E3A5A}.who span{color:#4A5A6A;flex:1}.who em{font:700 9px Arial,sans-serif;font-style:normal;padding:1px 6px;border-radius:8px;background:#F2C230;color:#4A3008;text-transform:uppercase}.who em.doing{background:#9AD8A8;color:#134A24}.who .btn.sm{padding:2px 10px;font-size:11px}
+.tp-map .tbranch{margin-bottom:26px}
