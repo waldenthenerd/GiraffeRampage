@@ -104,11 +104,48 @@ const WEAPONS = {
     shock: { rad: 160, dmgMul: 0.6, kb: 380 },
     pull: { rad: 220, force: 260 },
     blurb: 'A full spinning strike that drags the tide itself inward, hauling anything nearby into range.'
+  },
+  embers: {
+    id: 'embers', name: 'Emberspurs', color: '#FF8A4A',
+    cd: 0.32, dmg: 24, range: 96, arc: 1.5, kb: 230, arcs: [0],
+    bleed: 0.6, bleedT: 3.0,
+    blurb: 'Glowing spurs that leave everything they cut smouldering.'
+  },
+  rebar: {
+    id: 'rebar', name: 'Rebar Kickers', color: '#B9BEC6',
+    cd: 0.34, dmg: 26, range: 100, arc: 1.6, kb: 400, arcs: [0],
+    blurb: 'Steel bars strapped to the hooves. Quick, and they shove hard.'
+  },
+  regolith: {
+    id: 'regolith', name: 'Regolith Hammer', color: '#C9CCD6',
+    cd: 0.62, dmg: 56, range: 110, arc: 1.85, kb: 760, arcs: [0],
+    shock: { rad: 140, dmgMul: 0.5, kb: 320 },
+    blurb: 'A moon-dust slam: slow, and the ground ripples out around it.'
+  },
+  ironclad: {
+    id: 'ironclad', name: 'Ironclad Hooves', color: '#C0643A',
+    cd: 0.5, dmg: 50, range: 112, arc: 1.7, kb: 640, arcs: [0],
+    stun: 0.3,
+    blurb: 'Red-iron horseshoes that ring like a bell and rattle what they hit.'
+  },
+  tranq: {
+    id: 'tranq', name: 'Tranq Prod', color: '#7CFFB0',
+    cd: 0.38, dmg: 32, range: 118, arc: 1.5, kb: 300, arcs: [0],
+    chain: { count: 2, range: 180, falloff: 0.78 }, slow: 0.4, slowT: 1.8,
+    blurb: 'A quiet jab that arcs to a second target and leaves both groggy.'
+  },
+  worldspire: {
+    id: 'worldspire', name: 'Worldspire', color: '#FF6BD6',
+    cd: 0.46, dmg: 74, range: 150, arc: TAU, kb: 620, arcs: [0], spin: true,
+    shock: { rad: 190, dmgMul: 0.65, kb: 380 },
+    chain: { count: 3, range: 240, falloff: 0.85 },
+    meteor: { chance: 0.2, dmgMul: 1.6, rad: 130 },
+    blurb: 'The first spire: a full sweep that arcs on to the rest of the herd and sometimes drops a star.'
   }
 };
 
 /* ========================= 30c. GEAR SETS ========================= */
-/* Three slots. Sixteen sets: 6 common, 5 rare, 3 epic, 2 legendary.
+/* Three slots. Twenty-two sets: 8 common, 7 rare, 4 epic, 2 legendary and 1 mythical (only from crates, at 0.02% and 0.1%).
    Wearing all three pieces of one set adds a set bonus on top. */
 const GEAR_SETS = [
   {
@@ -270,17 +307,77 @@ const GEAR_SETS = [
       weapon: { name: 'Leviathan\u2019s Maw',    desc: 'Full spin that drags the tide inward with it', weapon: 'leviathan' },
       armor:  { name: 'Leviathan Scale',         desc: 'Damage taken -12%, regenerate 0.7/s', apply(s){ s.dr += 0.12; s.regen += 0.7; } }
     }
+  },
+  {
+    id: 'cinder', name: 'Cinderhide', rarity: 'common', color: '#C0502A',
+    setDesc: 'Damage taken -6% and regeneration +0.4/s',
+    setApply(s){ s.dr += 0.06; s.regen += 0.4; },
+    pieces: {
+      cape:   { name: 'Ashen Mantle',   desc: 'Max health +8, move speed +3%',        apply(s){ s.maxHpAdd += 8; s.speedMul += 0.03; } },
+      weapon: { name: 'Emberspurs',     desc: 'Fast cuts that leave burns',           weapon: 'embers' },
+      armor:  { name: 'Cinderplate',    desc: 'Damage taken -4%, regenerate 0.3/s',   apply(s){ s.dr += 0.04; s.regen += 0.3; } }
+    }
+  },
+  {
+    id: 'rooftop', name: 'Rooftop Runner', rarity: 'common', color: '#8E96A3',
+    setDesc: 'Move speed +10%',
+    setApply(s){ s.speedMul += 0.10; },
+    pieces: {
+      cape:   { name: 'Runner\u2019s Windbreaker', desc: 'Move speed +4%, pickup range +10%', apply(s){ s.speedMul += 0.04; s.pickupMul += 0.10; } },
+      weapon: { name: 'Rebar Kickers',   desc: 'Quick kicks that shove hard',          weapon: 'rebar' },
+      armor:  { name: 'Hi-Vis Vest',     desc: 'Damage taken -4%, max health +8',      apply(s){ s.dr += 0.04; s.maxHpAdd += 8; } }
+    }
+  },
+  {
+    id: 'moondust', name: 'Moondust', rarity: 'rare', color: '#C9CCD6',
+    setDesc: 'Move speed +8% and pickup range +25%',
+    setApply(s){ s.speedMul += 0.08; s.pickupMul += 0.25; },
+    pieces: {
+      cape:   { name: 'Moondust Cloak',   desc: 'Move speed +5%, pickup range +12%',  apply(s){ s.speedMul += 0.05; s.pickupMul += 0.12; } },
+      weapon: { name: 'Regolith Hammer',  desc: 'Slow slam, the ground ripples out',  weapon: 'regolith' },
+      armor:  { name: 'Pressure Plate',   desc: 'Damage taken -7%, max health +14',   apply(s){ s.dr += 0.07; s.maxHpAdd += 14; } }
+    }
+  },
+  {
+    id: 'rustwalker', name: 'Rustwalker', rarity: 'rare', color: '#C0643A',
+    setDesc: 'Max health +20 and all damage +6%',
+    setApply(s){ s.maxHpAdd += 20; s.allDmgMul += 0.06; },
+    pieces: {
+      cape:   { name: 'Rust-Red Shawl',   desc: 'Max health +12, regenerate 0.3/s',   apply(s){ s.maxHpAdd += 12; s.regen += 0.3; } },
+      weapon: { name: 'Ironclad Hooves',  desc: 'Heavy kicks that rattle what they hit', weapon: 'ironclad' },
+      armor:  { name: 'Ironbound Plate',  desc: 'Damage taken -7%, all damage +3%',   apply(s){ s.dr += 0.07; s.allDmgMul += 0.03; } }
+    }
+  },
+  {
+    id: 'sitezero', name: 'Site Zero', rarity: 'epic', color: '#7CFFB0',
+    setDesc: 'Crit chance +10% and crit damage +25%',
+    setApply(s){ s.crit += 0.10; s.critMul += 0.25; },
+    pieces: {
+      cape:   { name: 'Black-Ops Cape',     desc: 'Crit chance +5%, move speed +4%',  apply(s){ s.crit += 0.05; s.speedMul += 0.04; } },
+      weapon: { name: 'Tranq Prod',         desc: 'Arcs to a second target and slows both', weapon: 'tranq' },
+      armor:  { name: 'Night-Vision Rig',   desc: 'Damage taken -9%, crit chance +3%, pickup range +15%', apply(s){ s.dr += 0.09; s.crit += 0.03; s.pickupMul += 0.15; } }
+    }
+  },
+  {
+    id: 'worldspire', name: 'Worldspire', rarity: 'mythical', color: '#FF6BD6',
+    setDesc: 'All damage +20%, move speed +10%, experience +15% and one extra reroll',
+    setApply(s){ s.allDmgMul += 0.20; s.speedMul += 0.10; s.xpMul += 0.15; s.bonusRerolls += 1; },
+    pieces: {
+      cape:   { name: 'Mantle of the First Dawn', desc: 'All damage +8%, move speed +6%, experience +8%', apply(s){ s.allDmgMul += 0.08; s.speedMul += 0.06; s.xpMul += 0.08; } },
+      weapon: { name: 'Worldspire',               desc: 'Full spin, arcs to the herd, calls stars', weapon: 'worldspire' },
+      armor:  { name: 'Aegis of Ages',            desc: 'Damage taken -15%, regenerate 1/s, max health +30', apply(s){ s.dr += 0.15; s.regen += 1.0; s.maxHpAdd += 30; } }
+    }
   }
 ];
 
 /* Every equippable weapon reaches further than having none at all, scaled by
-   its set's rarity: common +25%, rare +42%, epic +58%, legendary +75%, all
+   its set's rarity: common +25%, rare +42%, epic +58%, legendary +75%, mythical +100%, all
    measured against the no-weapon baseline (104). This SETS each weapon's
    range to its tier's target rather than multiplying whatever range it was
    originally designed with -- otherwise a weapon built with unusually long
    or short reach (the Lance, the Spurs) would land far outside the intended
    band once the rarity bonus stacked on top of its own design. */
-const RANGE_RARITY_MUL = { common: 1.25, rare: 1.42, epic: 1.58, legendary: 1.75 };
+const RANGE_RARITY_MUL = { common: 1.25, rare: 1.42, epic: 1.58, legendary: 1.75, mythical: 2.0 };
 GEAR_SETS.forEach(set => {
   const wp = set.pieces.weapon && WEAPONS[set.pieces.weapon.weapon];
   if (!wp) return;
@@ -292,7 +389,7 @@ GEAR_SETS.forEach(set => {
 
 const GEAR_SLOTS = ['cape', 'weapon', 'armor'];
 const SLOT_LABEL = { cape: 'Cape', weapon: 'Weapon', armor: 'Armor' };
-const RARITY_ORDER = { common: 0, rare: 1, epic: 2, legendary: 3 };
+const RARITY_ORDER = { common: 0, rare: 1, epic: 2, legendary: 3, mythical: 4 };
 
 /* flat lookup: "setid:slot" -> piece, with set metadata attached */
 const GEAR_INDEX = {};
@@ -505,11 +602,11 @@ function equippedArmorInfo(){
 /* ========================= 30e. CRATES ========================= */
 const CRATES = {
   normal: { id:'normal', name:'Supply Crate', cost:25,
-    weights: { common: 70, rare: 24, epic: 5, legendary: 1 },
-    blurb: 'Mostly common gear, with a slim chance of something better.' },
+    weights: { common: 69.98, rare: 24, epic: 5, legendary: 1, mythical: 0.02 },
+    blurb: 'Mostly common gear, with a slim chance of something better, and a one in five thousand chance of a mythical.' },
   rare:   { id:'rare',   name:'Prime Crate',  cost:70,
-    weights: { common: 32, rare: 42, epic: 20, legendary: 6 },
-    blurb: 'Much better odds of rare, epic and legendary gear.' }
+    weights: { common: 31.9, rare: 42, epic: 20, legendary: 6, mythical: 0.1 },
+    blurb: 'Much better odds of rare, epic and legendary gear, and a one in a thousand chance of a mythical.' }
 };
 const DUPE_REFUND = 18;
 

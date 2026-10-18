@@ -9,15 +9,16 @@ try {
     grantGear('stoneplate:cape'); grantGear('herdhide:cape'); grantGear('herdhide:armor'); grantGear('herdhide:weapon'); grantGear('frostbite:weapon'); grantGear('sunforged:armor'); grantGear('starborn:cape'); grantGear('glacierguard:weapon');
     Save.data.gearLv['starborn:cape'] = 3; Save.data.gearLv['sunforged:armor'] = 1;
   }
+  if (st === 'mythic' || st === 'mythicsets'){ ['cape', 'weapon', 'armor'].forEach(function(sl){ grantGear('worldspire:' + sl); equipGear('worldspire:' + sl); }); Save.data.gearLv['worldspire:weapon'] = 2; }
   if (st === 'one') equipGear('stoneplate:cape');
   if (st === 'set' || st === 'kick'){ equipGear('herdhide:cape'); equipGear('herdhide:armor'); equipGear('herdhide:weapon'); }
   if (st === 'compare'){ equipGear('herdhide:cape'); equipGear('herdhide:armor'); equipGear('herdhide:weapon'); }
   recalcStats();
-  gearPage.view = st === 'sets' ? 'sets' : 'doll'; gearPage.slot = st === 'compare' ? 'weapon' : 'cape'; gearPage.selected = null; gearPage.hover = null;
+  gearPage.view = (st === 'sets' || st === 'mythicsets') ? 'sets' : 'doll'; if (st === 'mythicsets') gearSearchQuery = 'worldspire'; else gearSearchQuery = ''; gearPage.slot = st === 'compare' ? 'weapon' : (st === 'mythic' ? 'weapon' : 'cape'); gearPage.selected = null; gearPage.hover = null;
   showShop('gear');
   var cv = document.getElementById('gearPreview');
-  out.hasPreview = st === 'sets' ? !cv : !!cv;
-  if (st !== 'sets'){
+  out.hasPreview = (st === 'sets' || st === 'mythicsets') ? !cv : !!cv;
+  if (st !== 'sets' && st !== 'mythicsets'){
     out.slotBtns = document.querySelectorAll('[data-a^="gear-slot-"]').length;
     var hb = [].slice.call(OV.querySelectorAll('button')).filter(function(b){ return /\bhats?\b|\bboots?\b/i.test(b.textContent); });
     out.hatBtns = hb.length; out.hatIsWardrobe = hb.length === 1 && hb[0].getAttribute('data-a') === 'wardrobe';
@@ -30,6 +31,7 @@ try {
     var tile = OV.querySelector('[data-a="gear-pick-herdhide:cape"]');
     if (tile && st === 'one'){ var before = gearEquipped('cape'); tile.click(); out.selected = gearPage.selected === 'herdhide:cape'; out.notEquipped = gearEquipped('cape') === before; gearPreviewDraw(cv, performance.now() + 80); }
     out.capeAfterTryon = P.capeSet;
+    if (st === 'mythic'){ gearPage.hover = 'worldspire:weapon'; gearSyncSelection(); gearPreviewDraw(cv, performance.now() + 50); }
   } else { out.noSearch = !!document.getElementById('gearSearch'); out.tiles = document.querySelectorAll('.gtile').length; }
   out.locks = document.querySelectorAll('.gp.locked,.gtile.locked').length;
   out.prevErr = gearPreview.err || null; out.hScroll = document.documentElement.scrollWidth <= window.innerWidth + 1;
@@ -62,5 +64,5 @@ try {
     gearPage.selected = null; gearPage.slot = QA.params.slot || 'weapon'; if (!QA.params.hover) unequipSlot('weapon'); showShop('gear'); gearPage.hover = QA.params.hover || 'herdhide:weapon'; gearSyncSelection();
   }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-out.pass = !!(out.hasPreview && !out.errs.length && (st !== 'compare' || (out.completes && out.noRecalcOnTryon && out.red > 0 && out.green > 0 && out.sideHasEquip && out.persist && out.rapid && out.fmtLess)) && (st === 'sets' ? out.tiles === 48 && out.noSearch : (out.slotBtns === 3 && out.hatIsWardrobe && out.noSearch && out.drew && out.pixels > 800)));
+out.pass = !!(out.hasPreview && !out.errs.length && (st !== 'compare' || (out.completes && out.noRecalcOnTryon && out.red > 0 && out.green > 0 && out.sideHasEquip && out.persist && out.rapid && out.fmtLess)) && ((st === 'sets' || st === 'mythicsets') ? (st === 'mythicsets' || out.tiles === GEAR_SETS.length * 3) && out.noSearch : (out.slotBtns === 3 && out.hatIsWardrobe && out.noSearch && out.drew && out.pixels > 800)));
 QA.done(out);

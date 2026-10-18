@@ -10,10 +10,12 @@
      starborn:weapon    Star crack   every 5th headbutt sends out a star shockwave (radius 140, 60% of the kick's damage)
      riptide:armor      Undertow     a hit taken in water pulls enemies within 160 toward her by 40
      leviathan:cape     Tidal wake   a wake of drops trails her; enemies in it take 4 damage a second
+   and three for the mythical Worldspire set: Dawnlight (cape, heals 6% every 12s), Falling spire (weapon, every 4th headbutt) and Aegis
+   (armor, a ward that soaks 35 and recharges in 7s).
    Hooks: doKick (onKick), hurtPlayer (onHurt and the ward), updatePlayer (onTick), applyGear (the XP buff). Not in the attract demo, not while
    dead. At Visual effects "off" the effects still work and only the particles are left out. State: GearFx.
    ============================================================================================================================= */
-const GearFx = { trail: [], wake: [], dustT: 0, wakeT: 0, dustHitT: 0, wakeHitT: 0, kicks: 0, ward: { ready: true, cd: 0 }, still: 0, auroraT: 0, pending: [], lastTime: 0 };
+const GearFx = { trail: [], wake: [], dustT: 0, wakeT: 0, dustHitT: 0, wakeHitT: 0, kicks: 0, dawnT: 12, spireKicks: 0, ward: { ready: true, cd: 0 }, still: 0, auroraT: 0, pending: [], lastTime: 0 };
 function gfxWorn(id){ const p = GEAR_INDEX[id]; return p && gearEquipped(p.slot) === id ? gearLevelScale(gearLevel(id)) : 0; }      /* 0 when not worn, else the level scale */
 function gfxParticles(){ return typeof fxLevelNow !== 'function' || fxLevelNow() > 0; }
 function gfxInWater(){ return G.biome === 'ocean' || !!(window.groundStateNow && groundStateNow().pond); }
@@ -22,7 +24,7 @@ function gfxHit(e, dmg){                                                        
 }
 function gfxWithin(r){ const out = []; for (let i = 0; i < G.enemies.length; i++){ const e = G.enemies[i]; if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) <= r + e.r) out.push(e); } return out; }
 function gfxReset(){
-  GearFx.trail.length = 0; GearFx.wake.length = 0; GearFx.pending.length = 0; GearFx.dustT = GearFx.wakeT = GearFx.dustHitT = GearFx.wakeHitT = 0; GearFx.kicks = 0;
+  GearFx.trail.length = 0; GearFx.wake.length = 0; GearFx.pending.length = 0; GearFx.dustT = GearFx.wakeT = GearFx.dustHitT = GearFx.wakeHitT = 0; GearFx.kicks = 0; GearFx.dawnT = 12; GearFx.spireKicks = 0;
   GearFx.ward.ready = true; GearFx.ward.cd = 0; GearFx.still = 0;
   if (GearFx.auroraT > 0){ GearFx.auroraT = 0; recalcStats(); }
 }
@@ -56,7 +58,7 @@ const GEAR_FX = {
       });
     } },
   'sunforged:armor': { name: 'Sun ward', desc: 'Every 12s a flare shield soaks the next hit, up to 20 damage.',
-    soak(sc){ return 20 * sc; }
+    cd: 12, soak(sc){ return 20 * sc; }
   },
   'aurora:cape': { name: 'Aurora drift', desc: 'Standing still for 2s gives +10% XP for 6s.',
     onTick(sc, dt){
@@ -90,7 +92,26 @@ const GEAR_FX = {
         for (let i = 0; i < G.enemies.length; i++){ const e = G.enemies[i]; if (e.dead) continue;
           for (let j = 0; j < GearFx.wake.length; j++){ const t = GearFx.wake[j]; if (Math.hypot(e.x - t.x, e.y - t.y) < 20 + e.r * 0.5){ gfxHit(e, 1 * sc); break; } } }
       }
-    } }
+    } },
+  'worldspire:cape': { name: 'Dawnlight', desc: 'Every 12s a ring of light heals 6% of her max health.',
+    onTick(sc, dt){
+      GearFx.dawnT -= dt; if (GearFx.dawnT > 0) return; GearFx.dawnT = 12;
+      const heal = Math.max(1, Math.round(P.maxHp * 0.06 * sc)); P.hp = Math.min(P.maxHp, P.hp + heal);
+      addText(P.x, P.y - 34, '+' + heal, '#9BFFB0', 18, true);
+      if (gfxParticles()){ addParticle(P.x, P.y, 0, 0, 16, 0.7, 'rgba(255,233,160,.85)', { shape: 'wake', drag: 0, shrink: false }); burstParticles(P.x, P.y - 6, 10, '#FFE9A0', 120, 3, { glow: true }); }
+    } },
+  'worldspire:weapon': { name: 'Falling spire', desc: 'Every 4th headbutt calls a spire of light down on the nearest enemy (radius 90, 150% damage).',
+    onKick(sc){
+      let best = null, bd = 420 * 420;
+      for (let i = 0; i < G.enemies.length; i++){ const e = G.enemies[i]; if (e.dead) continue; const d = (e.x - P.x) * (e.x - P.x) + (e.y - P.y) * (e.y - P.y); if (d < bd){ bd = d; best = e; } }
+      if (!best) return;                                                                      /* nothing to strike: the count waits */
+      GearFx.spireKicks++; if (GearFx.spireKicks % 4) return;
+      const s = P.stats, w = P.weapon || DEFAULT_WEAPON, keep = dmgSrc; dmgSrc = 'gear';
+      try { addShock(best.x, best.y, 90, 0.3, w.dmg * s.kickDmgMul * s.allDmgMul * 1.5 * sc, '#FF6BD6', { width: 12, kb: 260 }); } finally { dmgSrc = keep; }
+      if (gfxParticles()){ burstParticles(best.x, best.y, 14, '#FF9AE8', 240, 3.5, { glow: true }); for (let i = 0; i < 8; i++) addParticle(best.x + rand(-6, 6), best.y - i * 14, 0, rand(-30, 30), 4, 0.5, 'rgba(255,200,245,.8)', { drag: 2, shrink: true, glow: true }); }
+    } },
+  'worldspire:armor': { name: 'Aegis', desc: 'Every 7s a shield of light soaks the next hit, up to 35 damage.',
+    cd: 7, soak(sc){ return 35 * sc; } }
 };
 
 function gearFxEvent(name, a, b){
@@ -112,7 +133,7 @@ function gearFxTick(dt){
   const h = hurtPlayer;
   hurtPlayer = function(amount, sx, sy){
     if (G.attract || P.invuln > 0 || P.dead || G.state !== 'playing') return h.apply(this, arguments);
-    const hp0 = P.hp, tk0 = G.runTaken || 0, ward = gfxWorn('sunforged:armor') && GearFx.ward.ready ? GEAR_FX['sunforged:armor'].soak(gfxWorn('sunforged:armor')) : 0;
+    const hp0 = P.hp, tk0 = G.runTaken || 0, wid = GearFx.ward.ready ? Object.keys(GEAR_FX).filter(function(id){ return GEAR_FX[id].soak && gfxWorn(id); })[0] : null, ward = wid ? GEAR_FX[wid].soak(gfxWorn(wid)) : 0;
     /* the ward soaks what the hit would really do, after her damage reduction and the per-hit cap: it lends her `cap` health for the hit, then takes back what was soaked */
     if (ward) P.hp += ward;
     const r = h.call(this, amount, sx, sy);
@@ -120,8 +141,8 @@ function gearFxTick(dt){
       const dealt = hp0 + ward - P.hp, soak = Math.min(ward, Math.max(0, dealt));
       P.hp = P.hp - ward + soak; G.runTaken = Math.max(tk0, (G.runTaken || 0) - soak);
       if (dealt > 0){                                                                        /* the hit landed (and the ward was used) */
-        GearFx.ward.ready = false; GearFx.ward.cd = 12;
-        addText(P.x, P.y - 34, 'SUN WARD', '#FFD27A', 16, true);
+        GearFx.ward.ready = false; GearFx.ward.cd = GEAR_FX[wid].cd || 12;
+        addText(P.x, P.y - 34, GEAR_FX[wid].name.toUpperCase(), wid === 'worldspire:armor' ? '#FF9AE8' : '#FFD27A', 16, true);
         if (gfxParticles()){ addParticle(P.x, P.y, 0, 0, 14, 0.5, 'rgba(255,210,120,.9)', { shape: 'wake', drag: 0, shrink: false }); burstParticles(P.x, P.y, 10, '#FFD27A', 160, 3.5, { glow: true }); }
         if (soak >= dealt){ P.hurtT = 0; P.invuln = Math.max(P.invuln, 0.45); }
       }

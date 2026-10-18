@@ -26,5 +26,5 @@ try {
   });
   document.body.appendChild(cv);
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-out.pass = !!(out.n === 48 && out.bad && !out.bad.length && out.cached && out.differs && out.lvDiffers && out.badId && out.frame && !out.errs.length);
+out.pass = !!(out.n === GEAR_SETS.length * 3 && out.bad && !out.bad.length && out.cached && out.differs && out.lvDiffers && out.badId && out.frame && !out.errs.length);
 QA.done(out);

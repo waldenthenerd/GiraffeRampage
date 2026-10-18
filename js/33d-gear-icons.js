@@ -10,7 +10,8 @@ const GEAR_FRAMES = {
   common:    { border: '#A9997F', glow: 'rgba(169,153,127,.22)', bg: ['#3A2B20', '#241B15'] },
   rare:      { border: '#7E9B4E', glow: 'rgba(126,155,78,.30)',  bg: ['#33402A', '#1F2619'] },
   epic:      { border: '#9A5BD6', glow: 'rgba(154,91,214,.34)',  bg: ['#3B2850', '#221730'] },
-  legendary: { border: '#FFD84D', glow: 'rgba(255,216,77,.40)',  bg: ['#4D3F1C', '#2A210E'] }
+  legendary: { border: '#FFD84D', glow: 'rgba(255,216,77,.40)',  bg: ['#4D3F1C', '#2A210E'] },
+  mythical:  { border: '#FF6BD6', glow: 'rgba(255,107,214,.50)', bg: ['#4A1F45', '#25102A'] }
 };
 function gearFrame(rarity){ return GEAR_FRAMES[rarity] || GEAR_FRAMES.common; }
 

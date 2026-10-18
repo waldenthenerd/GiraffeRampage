@@ -53,7 +53,15 @@ try {
   out.both = a.hp < ah && b.hp < bh;
   /* levels: thorns at level 5 hits for 14 */
   Save.data.gearLv['thornweave:armor'] = 4; wear(['thornweave:armor']); clear(); near = foe(40, 0); n0 = near.hp; P.invuln = 0; P.hp = P.maxHp; hurtPlayer(10, near.x, near.y); out.thornsLv5 = n0 - near.hp === 14;
-  out.catalog = Object.keys(GEAR_FX).length === 8 && Object.keys(GEAR_FX).every(function(id){ return !!GEAR_INDEX[id] && GEAR_FX[id].name && GEAR_FX[id].desc; });
+  /* 12. the mythical set: Aegis (35 soaked, back in 7s), Dawnlight (heals 6%), Falling spire (every 4th kick on a foe) */
+  wear(['worldspire:armor']); gfxReset(); P.maxHp = 200; P.hp = 200; P.stats.dr = 0; P.invuln = 0; P.hurtT = 0; hurtPlayer(30, P.x + 30, P.y); out.aegisSoaks = P.hp === 200 && GearFx.ward.ready === false && GearFx.ward.cd === 7;
+  P.invuln = 0; P.hurtT = 0; GearFx.ward.ready = true; hurtPlayer(60, P.x + 30, P.y); out.aegisCap = 200 - P.hp === 25;                                                        /* 60 taken, 35 soaked */
+  wear(['worldspire:cape']); gfxReset(); P.maxHp = 200; P.hp = 100; P.invuln = 99; GearFx.dawnT = 0.02; steps(4); out.dawn = P.hp === 112;
+  wear(['worldspire:weapon']); P.invuln = 99; gfxReset(); clear(); var sp = foe(150, 0), spk = [];
+  for (k = 1; k <= 4; k++){ P.kickCd = 0; doKick(); spk.push(G.shocks.filter(function(x){ return x.src === 'gear'; }).length); }
+  out.spire = spk[2] === 0 && spk[3] === 1;
+  clear(); gfxReset(); for (k = 1; k <= 4; k++){ P.kickCd = 0; doKick(); } out.spireNeedsFoe = G.shocks.filter(function(x){ return x.src === 'gear'; }).length === 0 && GearFx.spireKicks === 0;
+  out.catalog = Object.keys(GEAR_FX).length === 11 && Object.keys(GEAR_FX).every(function(id){ return !!GEAR_INDEX[id] && GEAR_FX[id].name && GEAR_FX[id].desc; });
   /* a shot of the visible ones */
   if (QA.params.show){ P.invuln = 99; clear(); var who = { wake: ['leviathan:cape'], dust: ['stoneplate:cape'], frost: ['frostbite:weapon'], star: ['starborn:weapon'], ward: ['sunforged:armor'] }[QA.params.show]; wear(who); gfxReset();
     var f1 = foe(80, 10), f2 = foe(-70, 30), f3 = foe(30, -70);
@@ -62,7 +70,7 @@ try {
     if (QA.params.show === 'star'){ for (k = 0; k < 5; k++){ P.kickCd = 0; doKick(); if (k < 4) steps(1); } steps(5); }
     if (QA.params.show === 'ward'){ P.invuln = 0; hurtPlayer(10, P.x + 40, P.y); steps(4); P.invuln = 99; } }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-var keys = ['thorns', 'thornsOff', 'deadQuiet', 'wardSoaked', 'wardSpent', 'wardBack', 'wardPartial', 'wardCapped', 'wardFullNoHurt', 'aurora', 'auroraEnds', 'starCrack', 'undertow', 'undertowDry', 'frost', 'trail', 'dust', 'wakePts', 'wake', 'both', 'thornsLv5', 'catalog'];
+var keys = ['thorns', 'thornsOff', 'deadQuiet', 'wardSoaked', 'wardSpent', 'wardBack', 'wardPartial', 'wardCapped', 'wardFullNoHurt', 'aurora', 'auroraEnds', 'starCrack', 'undertow', 'undertowDry', 'frost', 'trail', 'dust', 'wakePts', 'wake', 'both', 'thornsLv5', 'aegisSoaks', 'dawn', 'spire', 'spireNeedsFoe', 'catalog'];
 out.failed = keys.filter(function(k){ return !out[k]; });
 out.pass = !out.failed.length && !out.errs.length;
 QA.done(out);
