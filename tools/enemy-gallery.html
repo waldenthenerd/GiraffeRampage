@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Enemy gallery</title>
+<style>
+html,body{margin:0;background:#2a2218;color:#eee;font:12px sans-serif}
+#hud,#touch,#pausebtn,#overlay,#stage{display:none!important}
+#gal{display:grid;gap:6px;padding:6px}
+.cell{background:#3a3024;border:1px solid #1a140e;text-align:center;padding:2px}
+.cell canvas{display:block;margin:0 auto}
+.cell b{display:block;font-size:11px}
+h2{margin:6px;font-size:14px}
+</style></head><body>
+<canvas id="stage"></canvas><div id="hud"></div><div id="touch"></div><div id="pausebtn"></div><div id="overlay"></div>
+<h2 id="title"></h2><div id="gal"></div>
+<!-- scripts:begin -->
+<script src="../js/00-icons.js"></script>
+<script src="../js/01-core.js"></script>
+<script src="../js/02-music.js"></script>
+<script src="../js/02b-ambience.js"></script>
+<script src="../js/03-combat-core.js"></script>
+<script src="../js/04-cards.js"></script>
+<script src="../js/05-gear.js"></script>
+<script src="../js/06-player.js"></script>
+<script src="../js/07-enemies.js"></script>
+<script src="../js/08-hazards-marines.js"></script>
+<script src="../js/09-enemy-ai.js"></script>
+<script src="../js/10-settings.js"></script>
+<script src="../js/11-ants.js"></script>
+<script src="../js/12-bestiary.js"></script>
+<script src="../js/13-forage.js"></script>
+<script src="../js/14-menu.js"></script>
+<script src="../js/15-buildings-space.js"></script>
+<script src="../js/16-film-moon.js"></script>
+<script src="../js/17-film-venus.js"></script>
+<script src="../js/18-chapter-moon.js"></script>
+<script src="../js/19-venus-outpost.js"></script>
+<script src="../js/20-chapters-9-10.js"></script>
+<script src="../js/21-film-homecoming.js"></script>
+<script src="../js/22-film-area51.js"></script>
+<script src="../js/23-film-short.js"></script>
+<script src="../js/24-mars-outpost.js"></script>
+<script src="../js/25-lab.js"></script>
+<script src="../js/26-dust-squad.js"></script>
+<script src="../js/27-film-mars.js"></script>
+<script src="../js/28-spaceplane.js"></script>
+<script src="../js/29-city.js"></script>
+<script src="../js/30-chapters-11-13.js"></script>
+<script src="../js/31-waves-update.js"></script>
+<script src="../js/32-render.js"></script>
+<script src="../js/33-giraffe-art.js"></script>
+<script src="../js/34a-art-helpers.js"></script>
+<script src="../js/34b-art-arctic.js"></script>
+<script src="../js/34c-art-swamp.js"></script>
+<script src="../js/34d-art-ocean.js"></script>
+<script src="../js/34e-art-jungle.js"></script>
+<script src="../js/35a-art-city.js"></script>
+<script src="../js/35b-art-space.js"></script>
+<script src="../js/35c-art-marines.js"></script>
+<script src="../js/35d-art-aliens.js"></script>
+<script src="../js/35e-art-inferno.js"></script>
+<script src="../js/35f-art-a51.js"></script>
+<script src="../js/35g-art-dust.js"></script>
+<script src="../js/35h-draw-enemy.js"></script>
+<script src="../js/36a-scenery-core.js"></script>
+<script src="../js/36c-scenery-savanna.js"></script>
+<script src="../js/36d-scenery-arctic-swamp.js"></script>
+<script src="../js/36e-scenery-ocean-jungle.js"></script>
+<script src="../js/36f-scenery-city-space.js"></script>
+<script src="../js/36g-scenery-moon-venus-inferno.js"></script>
+<script src="../js/36h-scenery-area51-mars.js"></script>
+<script src="../js/36-atmosphere.js"></script>
+<script src="../js/36i-lighting.js"></script>
+<script src="../js/36j-weather-events.js"></script>
+<script src="../js/36k-water-depth.js"></script>
+<script src="../js/36l-combat-fx.js"></script>
+<script src="../js/36m-giraffe-fx.js"></script>
+<script src="../js/37-frame-transitions.js"></script>
+<script src="../js/38-overlays-cards.js"></script>
+<script src="../js/39-run-report.js"></script>
+<script src="../js/40-fusion.js"></script>
+<script src="../js/41-qol.js"></script>
+<script src="../js/42-run-hud.js"></script>
+<script src="../js/43-input.js"></script>
+<script src="../js/44-loop-boot.js"></script>
+<script src="../js/44b-feedback.js"></script>
+<script src="../js/45-test-exports.js"></script>
+<script src="../js/45b-dev-panel.js"></script>   <!-- developer panel: testing only, never ship to the website (see LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md) -->
+<script src="../js/46-main.js"></script>
+<!-- scripts:end -->
+<script>
+/* Enemy gallery: ?ch=1..13  &scale=3  &cols=6  &only=hyena,lion  &anim=1.2  &state=idle|wind  &bg=chapter(default: that chapter's ground colour)|dark|light|mid|RRGGBB
+   Draws every creature of one chapter with the game's own drawEnemy, so art changes can be checked without playing. */
+(function(){
+  var q = new URLSearchParams(location.search);
+  var ch = +q.get('ch') || 1, scale = +q.get('scale') || 3, cols = +q.get('cols') || 6, state = q.get('state') || 'idle', bg = q.get('bg') || 'chapter';
+  var CH_BG = { 1: '#7F6C45', 2: '#C3D6E0', 3: '#3E4A2C', 4: '#0F3A52', 5: '#2A3A1C', 6: '#6A6862', 7: '#5F7F3C', 8: '#8D8C88', 9: '#8A5028', 10: '#4A2A1A', 11: '#7F6C45', 12: '#C2A573', 13: '#B4552F' };
+  var bgc = /^[0-9a-fA-F]{6}$/.test(bg) ? '#' + bg : ({ dark: '#241A12', light: '#E8E0D0', mid: '#808080' }[bg] || CH_BG[ch] || '#7F6C45');
+  var table = GR.bestiaryTable(ch), names = Object.keys(table);
+  document.getElementById('title').textContent = 'Chapter ' + ch + ' - ' + names.length + ' creatures - state ' + state + ' - scale ' + scale + ' - bg ' + bg;
+  var gal = document.getElementById('gal'); gal.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+  var only = q.get('only'); if (only) names = names.filter(function(n){ return only.split(',').indexOf(n) >= 0; });
+  var animv = parseFloat(q.get('anim')); if (!isFinite(animv)) animv = 1.2;
+  names.forEach(function(type){
+    var def = table[type], cell = document.createElement('div'); cell.className = 'cell';
+    var sc = Math.min(scale, 80 / def.r), box = Math.round(Math.max(150, def.r * sc * 3.2 + 20)), cv = document.createElement('canvas'); cv.width = box; cv.height = box;
+    cv.style.background = bgc;
+    var c = cv.getContext('2d'); c.translate(box / 2, box / 2); c.scale(sc, sc);
+    var e = { portrait: true, def: def, type: type, x: 0, y: 0, r: def.r, ang: 0, flash: 0, state: state, anim: animv, hp: 1, maxHp: 1, big: def.big, kx: 0, ky: 0, stunT: 0, burnT: 0, slowT: 0, slowMul: 1 };
+    try { GR.drawEnemy(c, e); } catch (err) { c.setTransform(1,0,0,1,0,0); c.fillStyle = '#f00'; c.fillText('ERR ' + err.message, 4, 14); }
+    var label = document.createElement('b'); label.textContent = type + ' / ' + (def.look || 'base') + (def.big ? ' (boss)' : '');
+    cell.appendChild(cv); cell.appendChild(label); gal.appendChild(cell);
+  });
+})();
+</script></body></html>

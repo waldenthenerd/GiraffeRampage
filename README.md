@@ -1,0 +1,196 @@
+# Giraffe Rampage
+
+A single-page canvas game. Open `index.html` in a browser; there is no build step.
+
+## Layout
+
+- `index.html` holds the page markup (canvas, HUD, touch controls, overlay) and loads the styles and scripts.
+- `css/style.css` holds all styles.
+- `js/` holds the game code, split from the old single file along its existing section boundaries.
+
+## Size
+
+Counted from the files in this folder, with the developer panel included:
+
+| | Files | Lines | Size |
+|---|---|---|---|
+| JavaScript (`js/`) | 121 | 44,436 | 3.17 MiB (3,319,193 bytes) |
+| Styles (`css/`) | 2 | 1,130 | 91 KiB (93,401 bytes) |
+| Page (`index.html`) | 1 | 165 | 7.1 KiB (7,224 bytes) |
+| **Whole game** | **124** | **45,731** | **3.26 MiB (3,419,818 bytes)** |
+
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **43,868 lines, 3.22 MiB (3,375,784 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+## How the files fit together
+
+The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
+
+Two rules follow from that:
+
+1. **Load order matters for code that runs while a file loads.** A constant or a top-level statement can only use things defined in earlier files. Function bodies are fine, because they run later. (This is why `recalcStats()` is first called from `46-main.js`.)
+2. **New files go into `index.html` in the right place**, before `46-main.js`, which starts the game.
+
+Every file starts with `'use strict';` except `00-icons.js`, which was outside strict mode in the original.
+
+## Files
+
+| File | Lines | What is in it |
+|---|---|---|
+| `js/00-icons.js` | 105 | Icon tables (Material + Tabler) and the icon helpers. Runs outside strict mode, as it always did. |
+| `js/00b-icons-custom.js` | 149 | Every icon in the game other than the stock Tabler set is drawn here (Tabler-style 24x24 outlines, written `'@t-x-name'`). The old filled Material icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
+| `js/01-core.js` | 315 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. |
+| `js/01b-savepack.js` | 127 | Save compression: the save is stored as a JSON string holding `GR2:` + Base64 of an LZW-packed copy of its JSON (about 42 to 58 percent of the size). Old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `stats`). Format in the file header and in `lovable.md`. |
+| `js/02-music.js` | 309 | Procedural background music: themes, the 16-bar sequencer (A, A, B, A), key climb through a chapter, boss second phase, theme fade-in, stingers. |
+| `js/02b-ambience.js` | 130 | Extra sounds (card pick, wave clear, heartbeat, heavy thump), the per-chapter ambient bed that follows the weather, gamepad rumble. |
+| `js/02c-audio-mix.js` | 329 | Sound design on top of the synth: a reverb that follows the place (`MIX_ENV`), a hit sound per element, a death sound per kind of creature, an attack sound per kind of enemy (`Mix.variant`), boss roar, death and half-health growl, footsteps by ground, the music stingers, and the ambience extras (thunder with a delay, sweeping wind gusts, far-off calls). |
+| `js/03-combat-core.js` | 346 | Particles, zones, shockwaves, projectiles, pickups, damage and death, player damage, draw helpers, targeting. |
+| `js/04-cards.js` | 1,149 | The card registry: every card and its forms. |
+| `js/05-gear.js` | 553 | Weapons, gear sets, ownership and equipping, trinkets, prize wheel, crates. |
+| `js/06-player.js` | 275 | Derived player stats and the player. |
+| `js/07-enemies.js` | 357 | Enemy types for chapters 1-7 and habitat looks. |
+| `js/08-hazards-marines.js` | 783 | Hostile hazards and the Space Marine AI (chapter 8). |
+| `js/09-enemy-ai.js` | 352 | Enemy update and movement. |
+| `js/10-settings.js` | 44 | Settings object (volumes, speed, layout, keys). |
+| `js/11-ants.js` | 400 | The ant colony. |
+| `js/12-bestiary.js` | 211 | Bestiary. |
+| `js/13-forage.js` | 207 | Foraging minigame. |
+| `js/14-menu.js` | 164 | Main menu chapter selector and the speed slider. |
+| `js/15-buildings-space.js` | 532 | Buildings (chapter 6) and the Space Center (chapter 7). |
+| `js/16-film-moon.js` | 966 | The ending cutscene (the launch and the Moon landing). |
+| `js/17-film-venus.js` | 426 | The Venus film (end of chapter 8). |
+| `js/18-chapter-moon.js` | 80 | The Moon (chapter 8). |
+| `js/19-venus-outpost.js` | 852 | The Venus outpost (shop, scouting, ship). |
+| `js/20-chapters-9-10.js` | 188 | Chapters 9 and 10, and the Deflector pulse. |
+| `js/21-film-homecoming.js` | 349 | The homecoming film. |
+| `js/22-film-area51.js` | 295 | The Area 51 film. |
+| `js/23-film-short.js` | 141 | The short travel films between chapters. |
+| `js/24-mars-outpost.js` | 606 | The Mars outpost. |
+| `js/25-lab.js` | 89 | The Giraffe Lab (Mutation Vial). |
+| `js/26-dust-squad.js` | 135 | The dust squad (alliance after chapter 13). |
+| `js/27-film-mars.js` | 204 | The Mars films. |
+| `js/28-spaceplane.js` | 102 | The spaceplane. |
+| `js/29-city.js` | 123 | The Underground Giraffe City. |
+| `js/30-chapters-11-13.js` | 754 | Chapters 11, 12 and 13. |
+| `js/31-waves-update.js` | 679 | Banners, the wave director, entity updates, the main update. |
+| `js/32-render.js` | 739 | Ground textures and the render pass. |
+| `js/33-giraffe-art.js` | 496 | Drawing the giraffe and armour designs. |
+| `js/34a-art-helpers.js` | 125 | Shared drawing helpers for enemies: per-chapter mutation kits (frost, swamp, ocean) and the lk* shape helpers. |
+| `js/34b-art-arctic.js` | 613 | Enemy art, Chapter 2: the Arctic (ARCTIC_DRAW). |
+| `js/34c-art-swamp.js` | 589 | Enemy art, Chapter 3: the swamp (SWAMP_DRAW). |
+| `js/34d-art-ocean.js` | 747 | Enemy art, Chapter 4: the open ocean (OCEAN_DRAW). |
+| `js/34e-art-jungle.js` | 814 | Enemy art, Chapter 5: the Amazon canopy (JUNGLE_DRAW). |
+| `js/35a-art-city.js` | 693 | Enemy art, Chapter 6: Houston (CITY_DRAW). |
+| `js/35b-art-space.js` | 592 | Enemy art, Chapter 7: Johnson Space Center (SPACE_DRAW). |
+| `js/35c-art-marines.js` | 478 | Enemy art, Chapter 8: Space Marines (MARINE_DRAW). Chapters 12 and 13 reuse this code. |
+| `js/35d-art-aliens.js` | 616 | Enemy art, Chapter 9: the fire aliens of Venus (ALIEN_DRAW). |
+| `js/35e-art-inferno.js` | 580 | Enemy art, Chapter 10: the Inferno (INFERNO_DRAW). |
+| `js/35f-art-a51.js` | 41 | Enemy art, Chapter 12: Area 51 camouflage and night-vision gear on top of the Marine drawing code (A51_ALIAS, a51Gear). |
+| `js/35g-art-dust.js` | 418 | Enemy art, Chapter 13: the dust aliens (DUST_DRAW). |
+| `js/35h-draw-enemy.js` | 941 | Assembles ENEMY_LOOK_DRAW from every chapter table and draws an enemy (the Chapter 1 / Savannah creatures live in the switch inside drawEnemy). |
+| `js/36a-scenery-core.js` | 186 | Scenery system: large ground patches, themed props and landmarks, ground decals, ambient life and light gameplay terrain, per chapter. |
+| `js/36-atmosphere.js` | 303 | Light, weather and depth: per-chapter base weather, time of day, night, fog, the intro card. |
+| `js/36i-lighting.js` | 250 | Lighting: per-chapter colour grade (GRADE), the sun and soft shadows (`softShadow`), light pools around bright things (PROP_LIGHT, PICKUP_LIGHT), sun shafts, ocean caustics. |
+| `js/36j-weather-events.js` | 156 | Weather events (storms, blizzards, meteor showers...), lightning with thunder, rain ripples, fireflies and stars at dusk (WX_EVENTS, WX_TOD). |
+| `js/36k-water-depth.js` | 192 | Moving water and wet or icy ground, wakes, and depth sorting so tall scenery overlaps creatures (SCEN_TALL). |
+| `js/36l-combat-fx.js` | 214 | Combat feedback: hit sparks and flashes, a death effect per kind of creature (`deathStyle`), stains and debris on the ground, damage-number sizing. |
+| `js/36m-giraffe-fx.js` | 136 | The giraffe's presentation: stride stretch, breathing, head sway, blinking, hoof dust, power glow, afterimages, level-up pulse (GF). |
+| `js/36c-scenery-savanna.js` | 345 | Scenery definitions: savanna (see js/36a-scenery-core.js for the format). Chapter 1 the dry savanna, chapter 11 the Changed Savannah. |
+| `js/36d-scenery-arctic-swamp.js` | 404 | Scenery definitions: arctic-swamp (see js/36a-scenery-core.js for the format). Chapter 2 = Arctic (ar_), chapter 3 = Swamp (sw_). |
+| `js/36e-scenery-ocean-jungle.js` | 457 | Scenery definitions: ocean-jungle (see js/36a-scenery-core.js for the format). Chapter 4 = open ocean, chapter 5 = Amazon canopy. |
+| `js/36f-scenery-city-space.js` | 438 | Scenery definitions: city-space (see js/36a-scenery-core.js for the format). Chapter 6 Houston, chapter 7 Johnson Space Center. |
+| `js/36g-scenery-moon-venus-inferno.js` | 542 | Scenery definitions: moon-venus-inferno (see js/36a-scenery-core.js for the format). |
+| `js/36h-scenery-area51-mars.js` | 424 |  |
+| `js/37-frame-transitions.js` | 396 | Frame composition, transform sequence, chapter transitions. |
+| `js/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
+| `js/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
+| `js/40-fusion.js` | 881 | Card fusion: combos, the machine screen, the film. |
+| `js/41-qol.js` | 841 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
+| `js/42-run-hud.js` | 234 | Run lifecycle and the HUD. |
+| `js/43-input.js` | 373 | Input: keyboard, mouse, touch, gamepad. |
+| `js/44-loop-boot.js` | 114 | The main loop, resize, and the boot function. |
+| `js/44b-feedback.js` | 229 | Pacing and presentation: title splash, one-time hints, fades, boss entrance, wave-clear beat, number count-ups, overlay fade-out, text size, the kick wind-up. |
+| `js/44c-perf.js` | 170 | The slow-device governor: times each frame's work and, if the game cannot keep up, lowers the canvas sharpness and then the effects (`PERF_STEPS`); shows a notice with a "Back to full quality" button when it does (`perfNotice`; that button turns "Adapt to slow devices" off), counts minigames as play, and the minigame polish layers follow the effects level; brings them back when there is room. Off with Settings, Adapt to slow devices. Also the statistics panel (the `\` key). |
+| `js/44d-visual-extras.js` | 419 | Second visual pass, added from the outside (it wraps functions from earlier files): extra Chapter 1 and 2 scenery, time-of-day colour (and the cycle for Chapters 5, 7 and 13), heat haze, footprints and trampled grass, elite and varied creatures (`ELITE`), the iris and biome screen edges at chapter changes, the run map on the death screen (`RunMap`), and moving bestiary portraits. |
+| `js/44e-wardrobe.js` | 277 | Coat colours and patterns: one colour and one spot pattern per finished chapter (`WARD`, `WARD_PATTERNS`), separate choices for skin, spots, pattern and gear accent, `wardSpot()` (draws a spot in the chosen pattern, used by every giraffe drawing), the Coat colours screen and the unlock note. `giraffeColours()`, `giraffePattern()`, `giraffeAccent()` and `giraffeCustom()` are what the drawing code asks for. |
+| `js/44f-minigames.js` | 1,010 | Minigames, core: the 120-second cooldown, the chapter-end popup (`miniOffer`, hooked into `beginChapterTransition` in `37-frame-transitions.js`), the run loop and results, the accessory wheel, and the 23 hats and boots (`ACC`, `ACC_SLICES`, including the Paper Bag) with their art for top-down and side views, `drawTopGiraffe` and `drawSideGiraffe`, and the hat and boot rows of the wardrobe. |
+| `js/44g-minigames-a.js` | 360 | The rules of the minigames for Chapters 1 to 6: Watering Hole Dash, Ice Slide, Lily-Pad Hop, Tide Surf, Vine Swing, Rooftop Dash. Each is one `registerMini({...})` call; the drawing is in `44i`. |
+| `js/44h-minigames-b.js` | 341 | The rules of the minigames for Chapters 7 to 13: Asteroid Slalom, Low-Gravity Bounce, Acid-Rain Shelter, Cool-Down Relay, Echo Crystals, Hack the Grid, Sandworm Escape; the drawing is in `44j`. |
+| `js/44i-minigame-art-a.js` | 434 | How the Chapter 1 to 6 minigames look: each `MINI[n].draw` paints a pre-rendered backdrop (`miniBg`) and the moving parts, and sets `m.focus` (where she is on the screen, for the paper bag). |
+| `js/44j-minigame-art-b.js` | 406 | The same for Chapters 7 to 13. |
+| `js/44k-minigame-rewards.js` | 322 | Minigame rewards: three stars per minigame (`MINI_STAR`; 20 gems per new star), the wheel odds by stars (`miniSlicesFor`; rare hats 5, 7, 10, 15 percent, duplicates rolled again from two stars), pickup streaks and edge flashes, best-score and star HUD, the slow last second of a win, the celebration before the result, win and lose stingers, and the Collection screen. Its own minigame music loop is the `minigame` theme in `02-music.js`. |
+| `js/44l-minigame-polish.js` | 411 | Minigame visual polish, all by wrapping the drawing: ambient life per scene (`POL_AMB`), gentle parallax on static backdrops (`miniLayer`), a colour grade per scene (`POL_GRADE`), squash, stretch, afterimages, footprints and landing puffs (wrappers around `drawSideGiraffe` and `drawTopGiraffe`), the camera push-in and GO! flash, the eased intro card, and the top bar with an icon badge, stars, timer and best score (`miniHud`). |
+| `js/44m-accessory-extras.js` | 89 | Hat and boot colours (a 'color' blend tint over the worn item, `Save.data.mini.hatCol` and `bootCol`, saved in outfits as `hc` and `bc`), and the one-time tips (the Photo screen is in `44n`) (`tipOnce`, `Save.data.mini.tips`). |
+| `js/44n-photo-studio.js` | 471 | The Photo screen in the wardrobe: backdrops, ten poses, fifteen draggable effects (`PHOTO_FXDRAW`) and draggable creatures from the Bestiary (only ones with `Save.data.bestiary.creatures[ch:type] > 0` can be placed; the rest show as silhouettes). Items are picked and dragged with pointer events on the canvas; Save and Copy re-draw the picture without the selection ring. |
+| `js/44o-photo-scenes.js` | 302 | Sixteen more photo backdrops: Chapters 3 to 13 (Murkfen to Mars) and five extras (Sunny meadow, Beach sunset, Rainy day, Mountain peak, Autumn forest), each with its own light point for the shadows. Add one by pushing a painter onto `PHOTO_SCENES`, a name onto `PHOTO_SCENE_NAMES` and a light position onto `PHOTO_SCENE_SUN`. |
+| `js/44p-photo-share.js` | 315 | Photo sharing and the album. A photo is described as data (backdrop, pose, her position and size, her look, every effect and creature) and packed into bits (version 2: about 100 characters of Base64 for a busy photo, against about 1,700 for the version 1 JSON text; both are read). Format in the file header. Get code / Open buttons, a size comparison line, the popup for creatures not yet in this save's Bestiary, and the Album tab: up to 48 photos in `Save.data.album` (`[{ c: code, t: time }]`) with thumbnails, open and delete. A shared look is shown as shared even if not earned (`PHOTO.look`). |
+| `js/44q-photo-book.js` | 150 | The album as a book (opened from the Photo screen or the wardrobe): a red cover with sewn patches and "My Adventures" in black marker, which opens to taped-in photos, four to a page, six spreads for 48, with 3D page-flip animations (a rotating "leaf" over half the book). Clicking a photo opens it in the studio. Pure HTML and CSS (`.book` rules in `polish.css`); the photos are painted from `Save.data.album`. |
+| `js/44r-guide.js` | 221 | The Guide (replaces the old How to Play page; `showHelp()` is reassigned here, and the quick settings of the old page are at its end). A list of fold-out topics (`GUIDE_TOPICS`), each with a `show()` test that is the same unlock test the game uses (for example `venusUnlocked()`, `Save.data.antsUnlocked`, `cityUnlocked()`, `marsUnlocked()`, `labUnlocked()`, `squadAvailable()`), so nothing is mentioned before it is unlocked. When a new feature is added, add a topic here with the same test. |
+| `js/44s-wave-pace.js` | 50 | Shorter waves at the same difficulty. Waves have 40% fewer enemies at the same arrival rate (`WAVE_COUNT_MUL` in `31-waves-update.js`), each remaining enemy is worth 1/0.6 in experience, score and drops (`KILL_VALUE`, applied in `killEnemy`, bosses unchanged), an empty field brings the next arrival forward, the ends of a wave are shorter (`WAVE_INTRO_S`, `WAVE_CLEAR_S`, `WAVE_PATIENCE_S`), and this file adds the "Call the next wave" button and key (N, rebindable). To change the pace, change `WAVE_COUNT_MUL` (it is the one number; `KILL_VALUE` follows it). |
+| `js/44t-enemy-sprites.js` | 161 | A picture cache for the creatures (`EnemySprite`). `drawEnemy` (35h) calls `EnemySprite.draw` first; a creature's body is rendered once per animation phase (16 per turn of its loop, loops of 1 to 5 turns) into a cropped offscreen canvas and the picture is drawn instead. A kind of creature is only cached after a probe shows its drawing is a pure function of kind, state, size and animation (it reads no other property, uses no random, particles or blend modes, loops exactly and does not depend on the clock); anything else, and bosses and portraits, stay on the live path. Hit flashes are a second, coarser set. New pictures are made 3 per frame at most. `EnemySprite.report()` says why a kind was not cached, `EnemySprite.on = false` turns it off, and the stats panel shows the share drawn from the cache. In the 163 creature kinds, about 100 are cached. |
+| `js/44u-town-data.js` | 350 | **Longneck Town, data.** The seven districts (`TOWN_DIST`: Harbour, Market Street, Town Square, Willow Park, Rooftops, Launchpad, the Burrows; each has an `open()` test, its buildings `b` with the screen each door opens, scenery `p`, lights `L`, residents and daily dig spots), the 54 things to find (`TOWN_ITEMS`: coins, stars, gems, hats, boots, five coat colours, creature tracks; `h` is how high, over 60 needs the neck), the eleven giraffes (`TOWN_NPCS`: look, habit, favourite gift, best-friend gift, lines), the 31 errands (`TOWN_ERRANDS`, each with a `need` evaluated by `townNeed`), friendship levels and the save shape (`Save.data.town`). Add a place, thing, giraffe or errand by adding a row. |
+| `js/44v-town-art.js` | 521 | **Longneck Town, art.** `townGiraffe` (the side view with a neck that stretches, other giraffes' colours, hats and boots), the sky by hour, three painted layers per district (far, middle, street: `townPaintFar/Mid/Field`), every building kind (`townBuilding`) and prop (`townProp`), things to find (`townItemArt`) and the digging patch. Windows record their boxes so they can glow at night. |
+| `js/44w-town-engine.js` | 609 | **Longneck Town, engine.** `Town` state, `townEnter/Go/Resume/Exit`, `townLeaveFor` (a door opens one of the game's own screens; `showMenu()` is wrapped to come back), input (keys, pad, finger), walking and the neck, pickups and rewards (`townCollect`, `townPay`), the herd's habits, today's dig spots and Dot (seeded by date), the day and night (12 real minutes) and rain, drawing and the HUD. `step`, `render`, `showMenu` and `startRun` are wrapped at the end of the file. `Town.fixHour = n` fixes the time for tests. |
+| `js/44x-town-ui.js` | 421 | **Longneck Town, interface.** The conversation card (`townSay`, `#townDlg`), errands (offer, progress, hand in), friendship (`townAddBond`), gifts, hints, the panels (journal, map and tram, herd hall, notice board, high scores, library, Mission Control) in the game's own overlay, `handleTownAction`, the main-menu button and the Guide page. |
+| `js/44y-town-gear.js` | 191 | Town-only hats and boots (`ACC.townHats`, `ACC.townBoots`): drawn by wrapping the four `drawHat*` and `drawBoot*` functions of 44f, appended to `ACC_ITEMS` and left off the wheel (`miniSlicesFor` skips `.town`). Loads before 44m. `ACC_ITEMS` is at 43 (photo codes number it with 6 bits since format 3, up to 63); every one of the sixteen people gives one different hat, boots or colour as a best friend (`TOWN_GIFT_OF` in 44zb). |
+| `js/44z-town-bread-car.js` | 163 | Bread and the car. Bread: stock, price, `breadEat` (heal 5%, 15 s cooldown), auto-eat (`Settings.autoBread`), key B, the on-screen button. Car: ownership, paint, `townCarSide` (town) and `townCarTop` (under her in Chapter 6), `townCarRunMul` used by `06-player.js`, `townCarToggle` and `townDrawPlayer`. |
+| `js/44zb-town-interiors.js` | 483 | Rooms (`townRoomDef`, `indoor:true`), a room painter and the new kinds of building and scenery (`townBuildingX`, `townPropX`), longer streets and more finds appended to the 44u tables, five more people and eight more errands, new need kinds (`stat`, `car`, `bestiary`). |
+| `js/44zc-town-life.js` | 364 | Walkers (`townSpawnWalkers`), the tram (`townTramState` / `townDrawTram`, 40 s timetable), the ride (`townRide`), scenery animation (`townDynX`), room interactions (`townUseX`) and the wrappers for `townUse`, `townNearest`, `updateTown`, `renderTown` and `townDynamic`. |
+| `js/44zd-town-panels.js` | 299 | The themed panels (`townPanelT` and each `townShow*`), bakery and garage, `handleTownAction` additions, speech (`TOWN_LINES`, `TOWN_REPLY`, `townLine`) and the Guide page's additions. |
+| `js/44ze-town-runway.js` | 749 | The Old Runway district (always open; far right of town, painted like the homecoming film's airfield), the hangar and plane shop (`planeBuy`, `planePaint`, `townShowHangar`), `flyPlane` (the plane art, her neck through the cockpit), and flight: `Fly` state, the model in `updateFly` (thrust, drag, lift against airspeed, stall, rotation, crash rules, constants in `FV`), `flyCrash` and its rescue scene (`flyDrawCrash`), `flyTakeoff` / `flyLand`, `renderFly` (regions from `flyRegions()`: town, Chapters 1 to 7, 11 after 10, 12 after 11; rings pay a little gold). |
+| `js/44zf-town-economy.js` | 334 | Fleet and money sinks: `PLANES`/`CARS`, `planeFleet`/`carFleet` (migrating the single plane and car of older saves), `townShowHangar`/`townShowGarage` as card lists, the oven (`ovenLevel`, `breadCap`, `breadHeal`), Her Home (`HOME_SLOTS`, `homeBuy`, `townShowDecor`; the room paints from `homeData()` and its layer signature `D.sig`) and the gallery (`galData`, `townShowFrame`). |
+| `js/44zg-town-activities.js` | 273 | Cafe shift (`townShowCafeGame`), tournament (`townTour`, `townTourRecord`), fishing (`FISH`, `townFishCast`), post (`townMailToday`, `townMailTake`). |
+| `js/44zh-town-qol.js` | 119 | `townLeftText` (HUD), `townHintExact`, `townShowGear`, tap-to-walk (`townAutoMx`) and the `touch` body class. |
+| `js/44zi-town-atmosphere.js` | 233 | `TOWN_AMB` and `townChirp`, footsteps, `townNpcSlot` / `townApplyRoutines` (schedules), `townWeatherType` and `townWeatherFX`, `townAuroraNow`, `flyNightFX`. `Town.fixWeather` / `Town.fixAurora` / `Town.fixHour` fix them for tests. |
+| `js/44zj-town-home.js` | 291 | Her Home in detail: `homePaintBase` (window, clock, bed, hooks, souvenir shelf), live pets, `Town.seat` (sit on the sofa/armchair/hammock, lie in the bed), `homeInteract` (pet, parrot, goldfish, lamp, plant, window), first pet of the day gives 5 gems. |
+| `js/44zk-town-interiors2.js` | 443 | Interiors redrawn: `IV_KINDS` (door, counter, oven, table, bar, turntable, tool bench, shelves, mirror, mannequins, cases, statue, cabinets, score board, camera, sofa, fireplace/stove, bed) and `IV_ROOMS` (each room's wall furniture, curtains, baseboard). Rule: everything stands on the floor or hangs from something visible. `townBuildingX`, `townPropX` (statue) and `townRoomProps` wrappers. |
+| `js/44zl-photo-props.js` | 111 | Photo props: 4 cars, 4 planes and 9 things (bread, balloon, tree, lamp, bench, rocket, saucer, chest, present) appended to `PHOTO_FX` / `PHOTO_FXDRAW`. Boats (side view) took it past 32, so photo codes are now version 4 with a 6-bit effect index (up to 64; versions 2 and 3 still read). The Effects tab groups them as Effects, Vehicles (cars, planes, boats) and Things. |
+| `js/44zm-close-x.js` | 65 | An X button in the corner of every panel that has a back/close/resume/done button (it clicks that button), and on the town conversation card. A MutationObserver on the overlay adds them; none on the title menu, level-up, death screen or cutscenes. |
+| `js/44zn-savanna-flight.js` | 272 | The flight covers only Longneck Town and the Savannah (plus the Changed Savannah after Chapter 10): `flyRegions` override, `szBuildHerd` / `szDrawAnimal` (Bestiary creatures walking about), `szLandmark` / `szSmall`, rivers in the ground, and a map HUD. Wraps `flyFeatures`, `flyGroundDetail`, `flyTakeoff`, `renderFly`. |
+| `js/44zo-town-farm.js` | 476 | Hayfield Village: the farm region and dirt strip with hay-bale stop (`flyRegions`, `flyOnRunway`, `updateFly`, `flyLand`, `flyCrash`, `flyPlane`, `renderFly` wrapped), district `farm` (not in `TOWN_IDS`), Hollis and Marge, corn (`Corn`, V key, +15% speed 60 s / 60 s cooldown via `townCarRunMul`), cargo (`FARM_JOBS`, `farmDeliver`), daily eggs, two hats. Save: `town.farm`. |
+| `js/44zp-tram-ride.js` | 136 | The tram ride picture (`townDrawRide`, replacing 44zc's): carriage interior, route map, rail and straps, window scenery in four layers blending the two streets' colours, passengers; 3.4 s. |
+| `js/44zq-sea.js` | 706 | Boats and the sea: `BOATS`, Saltwind Boats and the mooring in the Harbour, `G.state === 'sail'` (`updateSea` / `renderSea`: top-down noise-field sea of islands, shallows, reefs, rocks, weather, loot, shoals, docks), the persistent sea chart (`seaMapSave`, `town.sea.map`), district `isle` (Driftwood Cove: Brine's fish, Pearl's crab, two hats), and fish / crab run items (G and H). |
+| `js/44zr-interiors-farm-isle.js` | 314 | Eight interiors (corn stand, barn, hen coop, farmhouse, cottage, fish stall, crab shack, lighthouse) for Hayfield Village and Driftwood Cove (`townRoomDef`, `FR_KINDS`, `FR_PROPS`, `IV_ROOMS` entries), the lighthouse climb that fills the sea chart (`seaRevealAround`), and carrying upgrades `CARRY_UP` (corn basket, fish cooler, crab pot: two levels each, +5 per level, 60k to 190k gold; `cornCap()`, `seaCap(k)`). Needs 44zk (IV_ROOMS, ivShadow...) loaded first: the script order in index.html is now 44zj, zk, zl, zm, zn, zo, zp, zq, zr. |
+| `js/44zs-explore-rewards.js` | 176 | Explorer's finds: 4 hats, 4 boots and 6 colours (WARD 36 to 41, `WARD_MAX` now 41) hidden in the air (gift balloons, `AIR_FINDS`), at sea (islet chests, `SEA_FINDS`, gold stars on the sea chart) and in the two villages (`TOWN_ITEMS` with `d` farm / isle). `TOWN_SPECIAL_SRC` tells the Gear page where the air and sea ones are. |
+| `js/44zt-sea-deep.js` | 213 | The Deep: the sea has no wall. The water deepens toward every edge (`seaDeepF`, `seaLevel` and the colour table in `44zq-sea.js`; the last 300 units slip under too, so the map ends in open water everywhere), past the edge is open water, and the deep has sharks that stalk, lunge and bite. One bite destroys the boat and plays a cutscene (shark breaches, planks scatter, life ring, a rescue boat tows her home; repair costs 5% of the boat's price, the boat is kept). Sharks only live in deep water. Wraps `updateSea`, `seaDrawFeatures`, `seaDrawBoat`, `renderSea`, `seaMapColour`, `seaStart`. |
+| `js/44zu-training-gym.js` | 494 | Longneck Fitness, the training gym at the end of Market Street (the street is longer; `in_gym` is the long gym floor). Day passes (`GYM_PASSES`: Basic 20k, Plus 80k, Pro 240k, Longneck 600k, Legend 2M gold; each expires at midnight, local time, and is locked behind chapter 1/3/6/9/12), ten machines (`GYM_SKILLS`) each training one skill through a short minigame per rep (seven types, none on more than two machines: sweep, pulse, hold, dial, rhythm, combo, balance; sets of eight), skill levels to 15 with log-scaled xp (`gymNeed`) and bonuses at levels 5/10/15 applied through `applyCityStats`, the Gains Board and front-desk panels, and a gym rank that pays out the Sweatband, Trainers, Boxing Boots, Champion's Laurel and the Gold Medal coat colour. Save: `town.gym`. Wraps `updateTown`, `townDrawPlayer`, `townDynamic`, `townDrawHud`, `townUse`, `townNearest`, `handleTownAction`, `townEnter`. |
+| `js/44zv-gym-art.js` | 352 | The gym's painting: the building front on Market Street, the gym floor (mirror wall, tier banners, rubber mats), every machine (`GYM_KINDS`: desk, board, weights, treadmill, bench, punch bag, rower, yoga mats, pull-up tower, spin bike, ring, sauna), the live moving parts (`gymMachineDraw`) and the four gym hats and boots. |
+| `js/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
+| `js/45b-dev-panel.js` | 568 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| `js/46-main.js` | 4 | Starts the game. |
+
+## Tests
+
+`window.GR` (in `45-test-exports.js`) exposes the game's internals for the automated play-tests. The tests drive the game with `GR.step(dt)`, `GR.handleAction(...)`, `GR.startRun(chapter, wave)` and so on. If you add a function the tests need, add it to that object.
+
+## Where to look
+
+- **Maps and terrain:** `js/36a-scenery-core.js` is the system (format documented at its top); each chapter's patches, props, landmarks, decals, ambient life and terrain live in `js/36c` to `js/36h`. Preview with `tools/shot-scenery.ps1`.
+- **Look and feel:** `js/36i`-`js/36m` (lighting, weather events, water and depth, combat feedback, the giraffe) and `css/polish.css` (cards, buttons, HUD, menu). All of it is gated by the Visual effects setting (`Settings.fxLevel`, 0 off, 1 medium, 2 high); the stylesheet is layered over `css/style.css` and changes appearance only.
+- **Sound and feel:** card, wave and heartbeat sounds plus the ambient bed per chapter are in `js/02b-ambience.js` (profiles in `AMB_PROFILES`); the title splash, one-time hints (`HINTS`), boss entrance, wave-clear beat, fades and count-ups are in `js/44b-feedback.js`. Settings added: Adapt to slow devices (`Settings.autoPerf`, on by default; see Performance below), Reduce flashes, Text size, Ambience volume and Level-up delay (`Settings.levelGap`, 0 to 20 seconds, default 5: the wait after a round of card picks before the next one opens) (`Settings.calmFlash`, `Settings.textScale`). Screen shake has no setting on purpose; the Steady Eyes and City upgrades handle it.
+- **Enemy art:** one file per chapter, `js/34b`-`js/35g` (the `ENEMY_LOOK_DRAW` assembly and the Savannah creatures are in `js/35h-draw-enemy.js`). Preview them with `tools/enemy-gallery.html` (see below).
+- **Add or change a card:** `js/04-cards.js`. Card fusion and combos: `js/40-fusion.js`.
+- **Gear, weapons, trinkets:** `js/05-gear.js`.
+- **A new enemy type or chapter roster:** `js/07-enemies.js` (1-7), `js/08-hazards-marines.js`, `js/20-chapters-9-10.js`, `js/30-chapters-11-13.js`. Their drawing code is in `js/34-enemy-art-1.js` and `js/35-enemy-art-2.js`.
+- **Cutscenes:** the `16`-`17`, `21`-`23`, `27` files, plus the fusion film in `40-fusion.js`.
+- **Shops and outposts:** `19` (Venus), `24` (Mars), `25` (lab), `26` (dust squad), `28` (spaceplane), `29` (city).
+- **Settings screens, developer panel, the action dispatcher:** `js/41-qol.js`.
+- **Music:** `js/02-music.js`. Audio effects: `js/01-core.js`. Sound design (reverb per place, element and creature sounds, boss voices, footsteps, stingers): `js/02c-audio-mix.js`; the master limiter, voice cap and stereo placement (`SFX.at`, or `sfx(name, ms, x, y)`) are in `js/01-core.js`. Reverb and stereo placement switch off at Visual effects Low. Enemy sounds: any `sfx()` call made while an enemy is being updated is placed on that enemy and turned into its own kind of sound (`Mix.src`, `Mix.variant`), so new enemy AI gets it for free. Settings added: Ambience volume (`Settings.ambVol`).
+## Tools
+
+- `tools/enemy-gallery.html?ch=1..13` draws every creature of a chapter with the game's own `drawEnemy` on that chapter's ground colour. Options: `&scale=3 &cols=6 &state=idle|wind &bg=chapter|dark|light|mid|RRGGBB &only=hyena,lion &anim=1.2`. Open it in a browser through a local server or from the file system.
+- `tools/shot.ps1 -Ch 3 [-State wind] [-Scale 3] [-Out file.png]` renders that gallery headlessly with Edge and saves a PNG (Windows).
+- `tools/scenery-preview.html?ch=1..13&zoom=0.33&px=2100&py=1575` shows a chapter's whole arena (or a close-up with `zoom=1`), and `tools/shot-scenery.ps1 -Ch 3 [-Zoom 1 -Px x -Py y] [-Out file.png]` saves it as a PNG headlessly with Edge.
+- `tools/sync-gallery.ps1` refreshes the script lists of both tool pages from `index.html`; run it after adding or renaming a js file.
+- `tools/qa-run.ps1 -Scenario file.js [-Shot out.png] [-Params "a=1&b=2"] [-W 1280 -H 720] [-WaitMs 20000]` runs a scenario script in the real game inside headless Edge (`tools/qa.html` is the harness) and prints its `QA.done(...)` result and any script errors as JSON, with an optional screenshot. `tools/QA-GUIDE.md` explains how to write scenarios. Run them one at a time.
+
+## Performance
+
+- **Frame cost:** the main cost is drawing creatures (the vector art of each enemy); the update itself is a few milliseconds.
+- **Slow devices:** js/44c-perf.js times every frame's update and draw. If it averages over 20 ms it steps down: sharpness to 85%, then 70%, then effects one level, then 55% and effects off; it comes back up after about ten calm seconds. It never changes the player's own Visual effects setting (xLevelSetting()) and shows a one-time note when it first acts. xLevelNow() is the level actually running.
+- **High-refresh screens:** `frame()` carries time over so a 120 or 144 Hz display does not run the whole game twice as often (about 60-72 updates a second).
+- **Audio:** a voice cap and a limiter in js/01-core.js; the convolver reverb is disconnected at effects Low.
+- **Statistics panel:** press `\` in the game to show or hide frame rate, frame time, update and draw cost, the share of a 60 fps budget used, long frames, what is on the field (enemies, shots, particles, texts), canvas size and sharpness, effects chosen and running, the governor's step, audio state and voices, and memory (Chrome only). Implemented in `js/44c-perf.js` (`Stats`).
+- **Opaque canvas and HUD writes:** the game canvas is created with `alpha: false` (`STAGE_BG` in `js/38-overlays-cards.js` is painted first, the same colour as `--night`), and `updateHUD` writes each DOM value only when it changes (`hudTxt`, `hudW`, `hudCls` in `js/42-run-hud.js`). New HUD elements should use those helpers.
+- **Second visual pass:** `js/44d-visual-extras.js` and `js/44e-wardrobe.js` (see the file table). Everything that is only for looks is gated by Visual effects (haze needs High). Elites are the one part that changes play: from wave 6 about 6% of ordinary enemies are elite (at most 4 alive): 1.9x health, 1.2x damage, 2.2x XP, 2x score, bigger, with a gold ring and crown, and they drop extra gold. Tune with `ELITE`. Save.data fields added: `skinCol`, `spotCol`, `wardSeen`.
+- **Where the coat choices show:** the field and menu giraffe, the outposts and the short travel films (all through `drawPlayer`), the astronaut giraffe in the longer films (`csGiraffe`, `16-film-moon.js`), the forage minigame, the pod in the Venus film, and a small portrait on the death screen. Save.data fields: `skinCol`, `spotCol`, `patCol`, `gearCol` (0 or a chapter number). Skin, spots and gear also accept 14 to 26: the thirteen minigame colours (`WARD_STAR` in `44e-wardrobe.js`), where 13 + n is the colour of the minigame after Chapter n, unlocked by three stars in it (`Save.data.mini.stars[n] >= 3`). Patterns stay 0 to 13.
+- **Outfits:** the Coat colours screen has six slots (`OUTFIT_SLOTS`, `outfitsHTML()` in `js/44e-wardrobe.js`). Save current stores skin, spots, pattern, gear accent, hat and boots; Wear restores them (anything no longer earned or owned is dropped); the x empties the slot. Save.data field: `outfits` (six entries, each null or `{s, p, t, g, hat, boot}`).
+- **Minigames and accessories:** one minigame after each chapter (`js/44f`-`44h`). Finishing a chapter opens a popup with the minigame or the next chapter; either way the next chapter follows, and a minigame's score is saved win or lose. Every finished minigame spins the wheel: 65% a hat, 30% boots, 5% a rare hat (the slices are exactly the odds, so there is one place to change them: `ACC_ODDS`). A duplicate pays gems instead. One play per 120 seconds across all of them (`MINI_COOLDOWN_MS`). Hats sit set back and tipped back so they never cover her eyes (`drawHatOnHeadTop`, `drawHatOnHeadSide`). The Paper Bag is the joke one: it covers her face and, while worn, everything on the canvas is seen through brown paper with only a small window round her (`drawBagVision`, the `render` wrapper at the end of `44f`); menus stay clear and Wardrobe has the None button. The minigames share particles, screen shake and a vignette (`miniBurst`, `miniRing`, `miniVignette`). Hats and boots are cosmetic: `drawPlayer` draws them, they show in the Coat colours screen, and the minigames use them. Save.data field: `mini` (`own`, `hat`, `boot`, `best`, `last`, `plays`). Add a new minigame by copying one `registerMini` block; `MINI[ch]` is looked up by chapter number.

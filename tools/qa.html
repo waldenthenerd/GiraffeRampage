@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#14100E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
+<title>QA harness</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/polish.css">
+</head>
+<body>
+<canvas id="stage"></canvas>
+
+<div id="hud">
+  <div class="hudtop">
+    <div class="stat wave">Wave<b id="hWave">1</b><em id="hChapter" class="chaptag"></em><em id="hSpeed" class="chaptag speed"></em></div>
+    <div class="stat">Score<b id="hScore">0</b></div>
+    <div class="stat">Kills<b id="hKills">0</b></div>
+    <div class="spacer"></div>
+    <div id="bars">
+      <div class="bar"><i id="hpfill"></i><span id="hpTxt">100 / 100</span></div>
+      <div class="bar"><i id="xpfill"></i><span id="xpTxt">Level 1</span></div>
+      <div id="loadout"></div>
+    </div>
+  </div>
+  <div id="hudbot"><div id="tips"></div></div>
+</div>
+
+<div id="touch">
+  <div id="joy"><i></i></div>
+  <div id="kickbtn">KICK</div>
+  <div id="slowbtn">SLOW</div>
+  <div id="roverbtn">ROVER</div>
+</div>
+<div id="pausebtn">II</div>
+
+<div id="overlay"></div>
+
+<script src="../js/00-icons.js"></script>
+<script src="../js/01-core.js"></script>
+<script src="../js/02-music.js"></script>
+<script src="../js/02b-ambience.js"></script>
+<script src="../js/03-combat-core.js"></script>
+<script src="../js/04-cards.js"></script>
+<script src="../js/05-gear.js"></script>
+<script src="../js/06-player.js"></script>
+<script src="../js/07-enemies.js"></script>
+<script src="../js/08-hazards-marines.js"></script>
+<script src="../js/09-enemy-ai.js"></script>
+<script src="../js/10-settings.js"></script>
+<script src="../js/11-ants.js"></script>
+<script src="../js/12-bestiary.js"></script>
+<script src="../js/13-forage.js"></script>
+<script src="../js/14-menu.js"></script>
+<script src="../js/15-buildings-space.js"></script>
+<script src="../js/16-film-moon.js"></script>
+<script src="../js/17-film-venus.js"></script>
+<script src="../js/18-chapter-moon.js"></script>
+<script src="../js/19-venus-outpost.js"></script>
+<script src="../js/20-chapters-9-10.js"></script>
+<script src="../js/21-film-homecoming.js"></script>
+<script src="../js/22-film-area51.js"></script>
+<script src="../js/23-film-short.js"></script>
+<script src="../js/24-mars-outpost.js"></script>
+<script src="../js/25-lab.js"></script>
+<script src="../js/26-dust-squad.js"></script>
+<script src="../js/27-film-mars.js"></script>
+<script src="../js/28-spaceplane.js"></script>
+<script src="../js/29-city.js"></script>
+<script src="../js/30-chapters-11-13.js"></script>
+<script src="../js/31-waves-update.js"></script>
+<script src="../js/32-render.js"></script>
+<script src="../js/33-giraffe-art.js"></script>
+<script src="../js/34a-art-helpers.js"></script>
+<script src="../js/34b-art-arctic.js"></script>
+<script src="../js/34c-art-swamp.js"></script>
+<script src="../js/34d-art-ocean.js"></script>
+<script src="../js/34e-art-jungle.js"></script>
+<script src="../js/35a-art-city.js"></script>
+<script src="../js/35b-art-space.js"></script>
+<script src="../js/35c-art-marines.js"></script>
+<script src="../js/35d-art-aliens.js"></script>
+<script src="../js/35e-art-inferno.js"></script>
+<script src="../js/35f-art-a51.js"></script>
+<script src="../js/35g-art-dust.js"></script>
+<script src="../js/35h-draw-enemy.js"></script>
+<script src="../js/36a-scenery-core.js"></script>
+<script src="../js/36c-scenery-savanna.js"></script>
+<script src="../js/36d-scenery-arctic-swamp.js"></script>
+<script src="../js/36e-scenery-ocean-jungle.js"></script>
+<script src="../js/36f-scenery-city-space.js"></script>
+<script src="../js/36g-scenery-moon-venus-inferno.js"></script>
+<script src="../js/36h-scenery-area51-mars.js"></script>
+<script src="../js/36-atmosphere.js"></script>
+<script src="../js/36i-lighting.js"></script>
+<script src="../js/36j-weather-events.js"></script>
+<script src="../js/36k-water-depth.js"></script>
+<script src="../js/36l-combat-fx.js"></script>
+<script src="../js/36m-giraffe-fx.js"></script>
+<script src="../js/37-frame-transitions.js"></script>
+<script src="../js/38-overlays-cards.js"></script>
+<script src="../js/39-run-report.js"></script>
+<script src="../js/40-fusion.js"></script>
+<script src="../js/41-qol.js"></script>
+<script src="../js/42-run-hud.js"></script>
+<script src="../js/43-input.js"></script>
+<script src="../js/44-loop-boot.js"></script>
+<script src="../js/44b-feedback.js"></script>
+<script src="../js/45-test-exports.js"></script>
+<script src="../js/45b-dev-panel.js"></script>   <!-- developer panel: testing only, never ship to the website (see LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md) -->
+<script src="../js/46-main.js"></script>
+<script>
+/* QA harness: the real game plus a scenario script. Query: s=<scenario file url>, seed=<n>, plus any params the scenario reads from QA.params. */
+(function(){
+  var q = new URLSearchParams(location.search);
+  window.QA = { params: {}, errors: [], result: null, logs: [],
+    log: function(){ QA.logs.push(Array.prototype.slice.call(arguments).map(String).join(' ')); },
+    done: function(r){ QA.result = r; QA.flush(); QA.hold(); },
+    /* after the scenario: keep drawing the final state (and nothing else changes), so a screenshot shows it */
+    hold: function(){ if (QA._held) return; QA._held = true; (function l(){ try { GR.render(); } catch (e) {} realRAF(l); })(); },
+    flush: function(){
+      var pre = document.getElementById('qa-out');
+      if (!pre){ pre = document.createElement('pre'); pre.id = 'qa-out'; pre.style.cssText = 'position:fixed;left:-99999px;top:0'; document.body.appendChild(pre); }
+      var js = JSON.stringify({ done: QA.result !== null, result: QA.result, errors: QA.errors, logs: QA.logs }); pre.textContent = js; try { console.log('QA_JSON:' + js); } catch (e) {}
+    } };
+  q.forEach(function(v, k){ QA.params[k] = v; });
+  /* the game's own frame loop is stopped: the scenario steps and renders the game itself, so the screenshot shows exactly its end state */
+  var realRAF = window.requestAnimationFrame.bind(window);
+  window.requestAnimationFrame = function(){ return 0; };
+  window.addEventListener('error', function(e){ QA.errors.push(String(e.message) + ' @' + String(e.filename || '').split('/').pop() + ':' + e.lineno); QA.flush(); });
+  window.addEventListener('unhandledrejection', function(e){ QA.errors.push('promise: ' + String(e.reason)); QA.flush(); });
+  /* the same random numbers every run, so a screenshot run matches the data run */
+  var s = (parseInt(q.get('seed'), 10) || 12345) >>> 0;
+  Math.random = function(){ s = (s + 0x6D2B79F5) >>> 0; var t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  window.addEventListener('load', function(){
+    var f = q.get('s');
+    if (!f){ QA.flush(); return; }
+    var sc = document.createElement('script'); sc.src = f;
+    sc.onerror = function(){ QA.errors.push('could not load scenario ' + f); QA.flush(); };
+    document.body.appendChild(sc);
+  });
+})();
+</script>
+</body>
+</html>

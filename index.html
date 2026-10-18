@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#14100E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
+<title>Giraffe Rampage</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/polish.css">
+</head>
+<body>
+<canvas id="stage"></canvas>
+
+<div id="hud">
+  <div class="hudtop">
+    <div class="stat wave">Wave<b id="hWave">1</b><em id="hChapter" class="chaptag"></em><em id="hSpeed" class="chaptag speed"></em></div>
+    <div class="stat">Score<b id="hScore">0</b></div>
+    <div class="stat">Kills<b id="hKills">0</b></div>
+    <div class="spacer"></div>
+    <div id="bars">
+      <div class="bar"><i id="hpfill"></i><span id="hpTxt">100 / 100</span></div>
+      <div class="bar"><i id="xpfill"></i><span id="xpTxt">Level 1</span></div>
+      <div id="loadout"></div>
+    </div>
+  </div>
+  <div id="hudbot"><div id="tips"></div></div>
+</div>
+
+<div id="touch">
+  <div id="joy"><i></i></div>
+  <div id="kickbtn">KICK</div>
+  <div id="slowbtn">SLOW</div>
+  <div id="roverbtn">ROVER</div>
+</div>
+<div id="pausebtn">II</div>
+
+<div id="overlay"></div>
+
+<script src="js/00-icons.js"></script>
+<script src="js/00b-icons-custom.js"></script>
+<script src="js/01-core.js"></script>
+<script src="js/01b-savepack.js"></script>
+<script src="js/02-music.js"></script>
+<script src="js/02b-ambience.js"></script>
+<script src="js/02c-audio-mix.js"></script>
+<script src="js/03-combat-core.js"></script>
+<script src="js/04-cards.js"></script>
+<script src="js/05-gear.js"></script>
+<script src="js/06-player.js"></script>
+<script src="js/07-enemies.js"></script>
+<script src="js/08-hazards-marines.js"></script>
+<script src="js/09-enemy-ai.js"></script>
+<script src="js/10-settings.js"></script>
+<script src="js/11-ants.js"></script>
+<script src="js/12-bestiary.js"></script>
+<script src="js/13-forage.js"></script>
+<script src="js/14-menu.js"></script>
+<script src="js/15-buildings-space.js"></script>
+<script src="js/16-film-moon.js"></script>
+<script src="js/17-film-venus.js"></script>
+<script src="js/18-chapter-moon.js"></script>
+<script src="js/19-venus-outpost.js"></script>
+<script src="js/20-chapters-9-10.js"></script>
+<script src="js/21-film-homecoming.js"></script>
+<script src="js/22-film-area51.js"></script>
+<script src="js/23-film-short.js"></script>
+<script src="js/24-mars-outpost.js"></script>
+<script src="js/25-lab.js"></script>
+<script src="js/26-dust-squad.js"></script>
+<script src="js/27-film-mars.js"></script>
+<script src="js/28-spaceplane.js"></script>
+<script src="js/29-city.js"></script>
+<script src="js/30-chapters-11-13.js"></script>
+<script src="js/31-waves-update.js"></script>
+<script src="js/32-render.js"></script>
+<script src="js/33-giraffe-art.js"></script>
+<script src="js/34a-art-helpers.js"></script>
+<script src="js/34b-art-arctic.js"></script>
+<script src="js/34c-art-swamp.js"></script>
+<script src="js/34d-art-ocean.js"></script>
+<script src="js/34e-art-jungle.js"></script>
+<script src="js/35a-art-city.js"></script>
+<script src="js/35b-art-space.js"></script>
+<script src="js/35c-art-marines.js"></script>
+<script src="js/35d-art-aliens.js"></script>
+<script src="js/35e-art-inferno.js"></script>
+<script src="js/35f-art-a51.js"></script>
+<script src="js/35g-art-dust.js"></script>
+<script src="js/35h-draw-enemy.js"></script>
+<script src="js/36a-scenery-core.js"></script>
+<script src="js/36c-scenery-savanna.js"></script>
+<script src="js/36d-scenery-arctic-swamp.js"></script>
+<script src="js/36e-scenery-ocean-jungle.js"></script>
+<script src="js/36f-scenery-city-space.js"></script>
+<script src="js/36g-scenery-moon-venus-inferno.js"></script>
+<script src="js/36h-scenery-area51-mars.js"></script>
+<script src="js/36-atmosphere.js"></script>
+<script src="js/36i-lighting.js"></script>
+<script src="js/36j-weather-events.js"></script>
+<script src="js/36k-water-depth.js"></script>
+<script src="js/36l-combat-fx.js"></script>
+<script src="js/36m-giraffe-fx.js"></script>
+<script src="js/37-frame-transitions.js"></script>
+<script src="js/38-overlays-cards.js"></script>
+<script src="js/39-run-report.js"></script>
+<script src="js/40-fusion.js"></script>
+<script src="js/41-qol.js"></script>
+<script src="js/42-run-hud.js"></script>
+<script src="js/43-input.js"></script>
+<script src="js/44-loop-boot.js"></script>
+<script src="js/44b-feedback.js"></script>
+<script src="js/44c-perf.js"></script>
+<script src="js/44d-visual-extras.js"></script>
+<script src="js/44e-wardrobe.js"></script>
+<script src="js/44f-minigames.js"></script>
+<script src="js/44g-minigames-a.js"></script>
+<script src="js/44h-minigames-b.js"></script>
+<script src="js/44i-minigame-art-a.js"></script>
+<script src="js/44j-minigame-art-b.js"></script>
+<script src="js/44k-minigame-rewards.js"></script>
+<script src="js/44l-minigame-polish.js"></script>
+<script src="js/44y-town-gear.js"></script>
+<script src="js/44m-accessory-extras.js"></script>
+<script src="js/44n-photo-studio.js"></script>
+<script src="js/44o-photo-scenes.js"></script>
+<script src="js/44p-photo-share.js"></script>
+<script src="js/44q-photo-book.js"></script>
+<script src="js/44r-guide.js"></script>
+<script src="js/44s-wave-pace.js"></script>
+<script src="js/44t-enemy-sprites.js"></script>
+<script src="js/44u-town-data.js"></script>
+<script src="js/44v-town-art.js"></script>
+<script src="js/44w-town-engine.js"></script>
+<script src="js/44x-town-ui.js"></script>
+<script src="js/44z-town-bread-car.js"></script>
+<script src="js/44zb-town-interiors.js"></script>
+<script src="js/44zc-town-life.js"></script>
+<script src="js/44zd-town-panels.js"></script>
+<script src="js/44ze-town-runway.js"></script>
+<script src="js/44zf-town-economy.js"></script>
+<script src="js/44zg-town-activities.js"></script>
+<script src="js/44zh-town-qol.js"></script>
+<script src="js/44zi-town-atmosphere.js"></script>
+<script src="js/44zj-town-home.js"></script>
+<script src="js/44zk-town-interiors2.js"></script>
+<script src="js/44zl-photo-props.js"></script>
+<script src="js/44zm-close-x.js"></script>
+<script src="js/44zn-savanna-flight.js"></script>
+<script src="js/44zo-town-farm.js"></script>
+<script src="js/44zp-tram-ride.js"></script>
+<script src="js/44zq-sea.js"></script>
+<script src="js/44zr-interiors-farm-isle.js"></script>
+<script src="js/44zs-explore-rewards.js"></script>
+<script src="js/44zt-sea-deep.js"></script>
+<script src="js/44zu-training-gym.js"></script>
+<script src="js/44zv-gym-art.js"></script>
+<script src="js/45-test-exports.js"></script>
+<script src="js/45b-dev-panel.js"></script>   <!-- developer panel: testing only, never ship to the website (see LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md) -->
+<script src="js/46-main.js"></script>
+</body>
+</html>
