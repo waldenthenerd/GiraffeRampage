@@ -81,3 +81,10 @@ Your scenario files and screenshots stay in your scratch folder; mention their n
 - Panels: `uniShowRegistrar()`, `uniShowFaculties()`, `uniShowDegrees()`, `uniShowRanks()`, `uniShowNotebook()`, `uniShowCafe()`, `uniShowJournalTab()`. Pickers: `uniBeginAct({ act: 'uni-lec' | 'uni-shelf' | 'uni-read' | 'uni-hw' | 'uni-exam', m: facultyId })`.
 - Sessions are driven by actions through `handleTownAction`: `town-uq-lec-<id>`, `town-uq-book-<id>`, `town-uq-hw-<faculty>`, `town-uq-exam-<faculty>`, then `town-uq-next` / `town-uq-prev` (slides), `town-uq-a-<n>` or `-t` / `-f` (multiple choice, true or false), `town-uq-o-<i>` (order), `town-uq-ml-<i>` then `town-uq-mr-<j>` (match), `town-uq-est` (estimate, reads `#uq-slider`), `town-uq-q-next`, `town-uq-done`. To see a given question format, empty `UNI_Q` (`UNI_Q.length = 0`) and push the question you want, set its `f` to the faculty and `t` to 1, then start homework.
 - A level-up with a fourth card: `UNI_EXTRA_CHOICE.fill(1)`, rank high enough, then `G.pendingLevels = 1; G.levelGate = 0;` and step.
+
+## Neck stretch, weather fronts, music stems, ground sounds, photo looks
+- Neck stretch: `doKick()` then step a few frames; read `GF.neck.ext` (0 to about 90), `GF.neck.bend`, `GF.land` (the squash) and `NS.ghosts`. Fx level off (`Settings.fxLevel = 0`) turns it all off.
+- Weather fronts: `WxE.pend = WX_EVENTS[ch][i]; WxE.next = WxE.t + 9; WxE.front = 0.65;` shows the clouds coming; `WxE.cur = ev; WxE.k = 0.3` is the first drops, `WxE.k = 1` the full fall.
+- Music stems: `Music.stems` ({ bass, drums, lead, near, spike, low }) and `Music.stemOn` (true only in a normal run). Put enemies near her for the bass, 20+ enemies out for the drums, `P.hp` under 40% for the lead.
+- Ground sounds: `groundNow()` says what she stands on and the weather's effect; `SFX.foot()` and `SFX.groundImpact()` play it. A pond: `G.water = { x: P.x, y: P.y, r: 150 }`.
+- Photo studio: `PHOTO.filter` (0 to 4), `PHOTO.frame` (0 to 7), `PHOTO.tod` (-1 or 0 to 47, half hours), `PHOTO.freeze`, then `photoRender(canvas, false)`; `photoToCode()` writes code version 5 only if one is set.

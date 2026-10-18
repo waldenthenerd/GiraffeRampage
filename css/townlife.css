@@ -10,3 +10,5 @@
 .mapx{margin-top:10px;text-align:left}.mapx h4{margin:10px 0 6px;font:700 12px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#1E3A5A;border-bottom:1px solid #9AB0C8}
 .whos{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:4px 14px}.who{display:flex;align-items:center;gap:6px;font-size:12.5px;padding:2px 0;border-bottom:1px dotted #B8C8D8}.who b{color:#1E3A5A}.who span{color:#4A5A6A;flex:1}.who em{font:700 9px Arial,sans-serif;font-style:normal;padding:1px 6px;border-radius:8px;background:#F2C230;color:#4A3008;text-transform:uppercase}.who em.doing{background:#9AD8A8;color:#134A24}.who .btn.sm{padding:2px 10px;font-size:11px}
 .tp-map .tbranch{margin-bottom:26px}
+/* the photo studio's Look and light tab (44zzp) */
+.ptod{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0}.ptod input[type=range]{flex:1 1 240px;accent-color:#FFB84A;height:26px}.ptod b{min-width:96px;font-size:13px;color:#FFE9A0}
