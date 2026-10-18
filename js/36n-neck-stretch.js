@@ -44,6 +44,7 @@ function neckStretchUpdate(dt){
         addParticle(P.x, by, 0, 0, 12, 0.5, 'rgba(' + key + ',0.55)', { shape: 'wake', drag: 0, shrink: false });
         for (let i = 0; i < 14; i++){ const a = i / 14 * TAU + rand(-0.15, 0.15), s = rand(70, 150); addParticle(P.x + Math.cos(a) * 12, by + Math.sin(a) * 6, Math.cos(a) * s, Math.sin(a) * s * 0.55, rand(3, 5.5), rand(0.35, 0.6), 'rgba(' + key + ',0.75)', { shape: 'puff', drag: 3, shrink: false }); }
         try { abilityShake(3.2, P.aim + Math.PI); } catch (e2) {}
+        if (typeof neckStretchLanded === 'function') neckStretchLanded();                    /* the ground answers (02d-ground-sounds.js) */
       }
     }
   } else { G0.ext = NS.boost; G0.bend = Math.sin(G.time * 1.3) * NS.boost * 0.12; }
