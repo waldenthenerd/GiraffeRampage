@@ -606,7 +606,11 @@ const CRATES = {
     blurb: 'Mostly common gear, with a slim chance of something better, and a one in five thousand chance of a mythical.' },
   rare:   { id:'rare',   name:'Prime Crate',  cost:70,
     weights: { common: 31.9, rare: 42, epic: 20, legendary: 6, mythical: 0.1 },
-    blurb: 'Much better odds of rare, epic and legendary gear, and a one in a thousand chance of a mythical.' }
+    blurb: 'Much better odds of rare, epic and legendary gear, and a one in a thousand chance of a mythical.' },
+  /* costs food as well as gems (Save.data.food, from foraging and the ant colony): the best odds in the game, with a 2% chance of a mythical */
+  spotted:{ id:'spotted', name:'Spotted Crate', cost:1000, food:50,
+    weights: { common: 10, rare: 28, epic: 36, legendary: 24, mythical: 2 },
+    blurb: 'Hide-wrapped and hard to come by. Epic and legendary gear is common here, and one in fifty is mythical.' }
 };
 const DUPE_REFUND = 18;
 

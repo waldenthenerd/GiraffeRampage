@@ -75,7 +75,9 @@ function gearPreviewMount(){
 
 /* ---------- the page ---------- */
 function gearPityText(kind){
-  const pc = CRATE_PITY[kind], left = pc.every - cratePityCount(kind);
+  const pc = CRATE_PITY[kind];
+  if (!pc) return 'Food: you have ' + (Math.round((+Save.data.food || 0) * 10) / 10) + '. One in ' + Math.round(100 / CRATES[kind].weights.mythical) + ' is a mythical.';
+  const left = pc.every - cratePityCount(kind);
   return left <= 1 ? pc.floor.charAt(0).toUpperCase() + pc.floor.slice(1) + ' or better is guaranteed on the next open.' : pc.floor.charAt(0).toUpperCase() + pc.floor.slice(1) + ' or better is guaranteed within ' + left + ' opens.';
 }
 function gearResultLine(res){
@@ -84,15 +86,15 @@ function gearResultLine(res){
 }
 function gearCratesHTML(){
   const gems = Save.data.gems | 0; let crates = '<div class="crates">';
-  ['normal', 'rare'].forEach(function(k){
-    const c = CRATES[k], can = gems >= c.cost;
+  ['normal', 'rare', 'spotted'].forEach(function(k){
+    const c = CRATES[k], food = +Save.data.food || 0, can = gems >= c.cost && (!c.food || food + 1e-9 >= c.food), price = fmt(c.cost) + ' gems' + (c.food ? ' + ' + c.food + ' food' : '');
     crates +=
-      '<div class="crate' + (k === 'rare' ? ' prime' : '') + '">' +
-        '<div class="cratetop">' + ico(k === 'rare' ? '@t-x-gift' : '@t-x-box') + '</div>' +
+      '<div class="crate' + (k === 'rare' ? ' prime' : k === 'spotted' ? ' spotted' : '') + '">' +
+        '<div class="cratetop">' + ico(k === 'rare' ? '@t-x-gift' : k === 'spotted' ? '@t-x-badge' : '@t-x-box') + '</div>' +
         '<div class="nm">' + c.name + '</div><div class="ds">' + c.blurb + '</div>' +
         '<div class="odds">' + ['common', 'rare', 'epic', 'legendary', 'mythical'].map(function(r){ return '<span class="o ' + r + '">' + r.charAt(0).toUpperCase() + r.slice(1) + ' ' + c.weights[r] + '%</span>'; }).join('') + '</div>' +
         '<div class="pity">' + gearPityText(k) + '</div>' +
-        '<button class="btn sm' + (can ? '' : ' ghost') + '" data-crate="' + k + '"' + (can ? '' : ' disabled') + '>' + (can ? 'Open for ' + c.cost + ' gems' : c.cost + ' gems') + '</button>' +
+        '<button class="btn sm' + (can ? '' : ' ghost') + '" data-crate="' + k + '"' + (can ? '' : ' disabled') + '>' + (can ? 'Open for ' + price : price) + '</button>' +
       '</div>';
   });
   return crates + '</div>';
@@ -242,7 +244,7 @@ function gearRevealStart(res){
 function buyCrate(kind){                                                                    /* replaces 43-input.js: the reveal takes the place of the old redraw-and-sound */
   const c = CRATES[kind];
   if (!c || gearReveal.active) return;
-  if ((Save.data.gems | 0) < c.cost){ SFX.deny(); return; }
+  if ((Save.data.gems | 0) < c.cost || (c.food && (+Save.data.food || 0) + 1e-9 < c.food)){ SFX.deny(); return; }
   const res = openCrate(kind);
   if (!res){ SFX.deny(); return; }
   crateResult = res;

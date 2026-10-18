@@ -14,12 +14,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 152 | 51,285 | 3.83 MiB (4,020,374 bytes) |
-| Styles (`css/`) | 5 | 1,363 | 122 KiB (125,406 bytes) |
+| JavaScript (`js/`) | 152 | 51,292 | 3.84 MiB (4,021,488 bytes) |
+| Styles (`css/`) | 5 | 1,367 | 123 KiB (126,016 bytes) |
 | Page (`index.html`) | 1 | 199 | 8.5 KiB (8,693 bytes) |
-| **Whole game** | **158** | **52,847** | **3.96 MiB (4,154,473 bytes)** |
+| **Whole game** | **158** | **52,858** | **3.96 MiB (4,156,197 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,279 lines, 3.92 MiB (4,110,998 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,290 lines, 3.92 MiB (4,112,722 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -44,8 +44,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/02c-audio-mix.js` | 329 | Sound design on top of the synth: a reverb that follows the place (`MIX_ENV`), a hit sound per element, a death sound per kind of creature, an attack sound per kind of enemy (`Mix.variant`), boss roar, death and half-health growl, footsteps by ground, the music stingers, and the ambience extras (thunder with a delay, sweeping wind gusts, far-off calls). |
 | `js/03-combat-core.js` | 346 | Particles, zones, shockwaves, projectiles, pickups, damage and death, player damage, draw helpers, targeting. |
 | `js/04-cards.js` | 1149 | The card registry: every card and its forms. |
-| `js/05-gear.js` | 650 | Weapons, gear sets (22: 8 common, 7 rare, 4 epic, 2 legendary, 1 mythical), ownership and equipping, trinkets, prize wheel, crates (the mythical Worldspire set drops at 0.02% from Supply Crates and 0.1% from Prime Crates). |
-| `js/05a-gear-levels.js` | 172 | **Gear levels and the crate rules.** A piece goes from level 1 to 5 (`gearLevel`, `gearLevelUp`; each level adds 10% to what the piece gives, a weapon also 6% damage), `gearStatsFor()` and `gearDelta()` say what a loadout or a swap would change without touching the save, crate pity (`CRATE_PITY`: rare or better within 10 Supply Crate opens, epic or better within 8 Prime Crate opens; a mythical roll never turns into something lesser) and `openCrate()` replaced so a duplicate levels the piece up. Save keys `gearLv` and `cratePity` sit beside `gear`. |
+| `js/05-gear.js` | 654 | Weapons, gear sets (22: 8 common, 7 rare, 4 epic, 2 legendary, 1 mythical), ownership and equipping, trinkets, prize wheel, crates (the mythical Worldspire set drops at 0.02% from Supply Crates, 0.1% from Prime Crates and 2% from Spotted Crates, which cost 1,000 gems and 50 food). |
+| `js/05a-gear-levels.js` | 173 | **Gear levels and the crate rules.** A piece goes from level 1 to 5 (`gearLevel`, `gearLevelUp`; each level adds 10% to what the piece gives, a weapon also 6% damage), `gearStatsFor()` and `gearDelta()` say what a loadout or a swap would change without touching the save, crate pity (`CRATE_PITY`: rare or better within 10 Supply Crate opens, epic or better within 8 Prime Crate opens; a mythical roll never turns into something lesser; the Spotted Crate costs food too and has no pity) and `openCrate()` replaced so a duplicate levels the piece up. Save keys `gearLv` and `cratePity` sit beside `gear`. |
 | `js/06-player.js` | 275 | Derived player stats and the player. |
 | `js/07-enemies.js` | 357 | Enemy types for chapters 1-7 and habitat looks. |
 | `js/08-hazards-marines.js` | 783 | Hostile hazards and the Space Marine AI (chapter 8). |
@@ -112,7 +112,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/41-qol.js` | 842 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
 | `js/42-run-hud.js` | 234 | Run lifecycle and the HUD. |
 | `js/43-input.js` | 374 | Input: keyboard, mouse, touch, gamepad. |
-| `js/41a-gear-page.js` | 282 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, and the crate reveal (`gearReveal`). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
+| `js/41a-gear-page.js` | 284 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, and the crate reveal (`gearReveal`). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
 | `js/44-loop-boot.js` | 114 | The main loop, resize, and the boot function. |
 | `js/44b-feedback.js` | 229 | Pacing and presentation: title splash, one-time hints, fades, boss entrance, wave-clear beat, number count-ups, overlay fade-out, text size, the kick wind-up. |
 | `js/44c-perf.js` | 170 | The slow-device governor: times each frame's work and, if the game cannot keep up, lowers the canvas sharpness and then the effects (`PERF_STEPS`); shows a notice with a "Back to full quality" button when it does (`perfNotice`; that button turns "Adapt to slow devices" off), counts minigames as play, and the minigame polish layers follow the effects level; brings them back when there is room. Off with Settings, Adapt to slow devices. Also the statistics panel (the `\` key). |

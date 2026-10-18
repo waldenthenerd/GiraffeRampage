@@ -101,3 +101,7 @@
 .crevl.r-mythical .crk{background:linear-gradient(90deg,#ff6bd6,#ffd84d,#6bffd6,#6b9bff);-webkit-background-clip:text;background-clip:text;color:transparent}
 @keyframes mythborder{0%{background-position:0 0,0% 50%}100%{background-position:0 0,300% 50%}}
 @keyframes crhue{from{filter:drop-shadow(0 0 14px #FF6BD6) hue-rotate(0)}to{filter:drop-shadow(0 0 14px #FF6BD6) hue-rotate(360deg)}}
+/* three crates side by side; the Spotted Crate wears a hide */
+.crates{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.crate.spotted{border-top-color:#E8B648;background:radial-gradient(circle at 7% 8%,rgba(122,74,33,.32) 0 8px,transparent 9px),radial-gradient(circle at 93% 9%,rgba(122,74,33,.3) 0 10px,transparent 11px),radial-gradient(circle at 95% 90%,rgba(122,74,33,.32) 0 9px,transparent 10px),radial-gradient(circle at 5% 93%,rgba(122,74,33,.28) 0 7px,transparent 8px),linear-gradient(180deg,#3A2B18,#241A10);box-shadow:inset 0 0 0 1px rgba(232,182,72,.28)}
+.crate.spotted .nm{color:#F4D27A}
