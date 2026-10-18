@@ -360,6 +360,7 @@ function drawPlayer(ctx){
   if (Settings.showGear && P.armorInfo && ARMOR_DESIGNS[P.armorInfo.setId]){
     ARMOR_DESIGNS[P.armorInfo.setId](ctx, gAcc || P.armorInfo.color, G.time);
   }
+  if (typeof weaponArtBody === 'function') weaponArtBody(ctx, legs, sw, ke);          /* hoof and body weapons (js/33b-gear-art-weapons.js) */
   ctx.restore();
 
   /* neck + head, aimed at the cursor */
@@ -497,6 +498,7 @@ function drawPlayer(ctx){
     ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(2, 0, 11, Math.PI * 1.05, Math.PI * 1.45); ctx.stroke();
     fillCircle(ctx, -8, 0, 1.4, '#FF5A4A');
   }
+  if (typeof weaponArtHead === 'function'){ if (rim) ctx.shadowBlur = 0; weaponArtHead(ctx); }       /* fangs, lances and clubs, in the head's space */
   ctx.restore();
 
   if (rim){ ctx.shadowBlur = 0; ctx.shadowColor = 'rgba(0,0,0,0)'; }

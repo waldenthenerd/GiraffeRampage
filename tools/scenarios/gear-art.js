@@ -34,6 +34,37 @@ try {
     });
     out.pass = !bad.length;
   }
+
+  if (view === 'weapons'){
+    var pg = parseInt(QA.params.page || '0', 10), ids = sets.filter(function(id){ return GEAR_INDEX[id + ':weapon']; });
+    var badw = [];
+    ids.forEach(function(sid){
+      var wid = GEAR_INDEX[sid + ':weapon'].weapon, art = WEAPON_ART[wid];
+      if (!art) { badw.push(wid + ':missing'); return; }
+      [0, 1].forEach(function(sw){
+        ['hoof', 'body', 'head'].forEach(function(k){
+          if (!art[k]) return;
+          var cv = document.createElement('canvas'); cv.width = cv.height = 160; var c = cv.getContext('2d'); c.translate(60, 80);
+          art[k](c, { e: sw ? 0.27 : -1, swing: sw, t: 1, color: WEAPONS[wid].color, level: 1, side: 1 });
+          var d = c.getImageData(0, 0, 160, 160).data, n = 0; for (var q = 3; q < d.length; q += 4) if (d[q] > 10) n++;
+          if (n < 25 && !(wid === 'hooves' && !sw)) badw.push(wid + ':' + k + ':' + sw + ':' + n);
+        });
+      });
+    });
+    out.bad = badw; out.pass = !badw.length; out.count = ids.length;
+    var c2 = sheet(4, 4, 300, 160), sc2 = parseFloat(QA.params.zoom || '1.35');
+    ids.slice(pg * 8, pg * 8 + 8).forEach(function(sid, i){
+      var piece = GEAR_INDEX[sid + ':weapon']; grantGear(piece.id); Save.data.gearLv = Save.data.gearLv || {}; Save.data.gearLv[piece.id] = LV - 1; equipGear(piece.id);
+      [0, 1].forEach(function(pose){
+        var cell = i * 2 + pose, col = cell % 4, row = Math.floor(cell / 4);
+        P.vx = 0; P.vy = 0; P.aim = 0; P.face = 0; P.x = 0; P.y = 0; P.walk = 1; G.time = 3 + i * 0.3; P.kickAnim = pose ? 0.30 * (1 - 0.27) : 0; NS.prevAnim = P.kickAnim;
+        GF.neck.ext = 0; GF.neck.bend = 0; NS.ghosts.length = 0; if (pose){ var pr = neckProfile(0.27); GF.neck.ext = pr.k * NS_REACH; GF.neck.bend = pr.w * 30; }
+        c2.save(); c2.beginPath(); c2.rect(col * 300, row * 160, 300, 160); c2.clip(); c2.translate(col * 300 + 70, row * 160 + 84); c2.scale(sc2, sc2); drawPlayer(c2); c2.restore();
+        c2.fillStyle = '#fff'; c2.font = '12px sans-serif'; c2.fillText(piece.name + (pose ? ' (strike)' : '') + (LV > 1 ? ' +' + (LV - 1) : ''), col * 300 + 8, row * 160 + 16);
+      });
+    });
+    P.kickAnim = 0;
+  }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
 out.pass = !!out.pass && !out.errs.length;
 QA.done(out);
