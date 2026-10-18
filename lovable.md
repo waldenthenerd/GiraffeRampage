@@ -59,7 +59,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (152 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (153 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -137,6 +137,7 @@ game. This is the complete list for this version (152 scripts; the developer pan
 | 72 | `js/44-loop-boot.js` | The main loop, resize, and the boot function. |
 | 73 | `js/44b-feedback.js` | Pacing and presentation: title splash, one-time hints, fades, boss entrance, wave-clear beat, number count-ups, overlay fade-out, text size, the kick wind-up. |
 | 74 | `js/44c-perf.js` | The slow-device governor: times each frame's work and, if the game cannot keep up, lowers the canvas sharpness and then the effects (`PERF_STEPS`); shows a notice with a "Back to full quality" button when it does (`perfNotice`; that button turns "Adapt to slow devices" off), counts minigames as play, and the minigame polish layers follow the effects level; brings them back when there is room. Off with Settings, Adapt to slow devices. Also the statistics panel (the `\` key). |
+| - | `js/44ca-ground-cache.js` | The ground painted once into tiles for the menu, Low and Medium effects, and after the governor's first step down. Wraps `drawGround`; load it after `js/44c-perf.js`. |
 | 75 | `js/44d-visual-extras.js` | Second visual pass, added from the outside (it wraps functions from earlier files): extra Chapter 1 and 2 scenery, time-of-day colour (and the cycle for Chapters 5, 7 and 13), heat haze, footprints and trampled grass, elite and varied creatures (`ELITE`), the iris and biome screen edges at chapter changes, the run map on the death screen (`RunMap`), and moving bestiary portraits. |
 | 76 | `js/44e-wardrobe.js` | Coat colours and patterns: one colour and one spot pattern per finished chapter (`WARD`, `WARD_PATTERNS`), separate choices for skin, spots, pattern and gear accent, `wardSpot()` (draws a spot in the chosen pattern, used by every giraffe drawing), the Coat colours screen and the unlock note. `giraffeColours()`, `giraffePattern()`, `giraffeAccent()` and `giraffeCustom()` are what the drawing code asks for. |
 | 77 | `js/44f-minigames.js` | Minigames, core: the 120-second cooldown, the chapter-end popup (`miniOffer`, hooked into `beginChapterTransition` in `37-frame-transitions.js`), the run loop and results, the accessory wheel, and the 23 hats and boots (`ACC`, `ACC_SLICES`, including the Paper Bag) with their art for top-down and side views, `drawTopGiraffe` and `drawSideGiraffe`, and the hat and boot rows of the wardrobe. |

@@ -123,7 +123,7 @@ const WEAPON_ART = {
     head(ctx, o){
       const p = 0.6 + 0.4 * Math.sin(o.t * 3), sx = 12 + o.swing * 6, sy = -2 - o.swing * 2;
       ctx.strokeStyle = '#1E3B3A'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(-1, -3); ctx.quadraticCurveTo(8, -16, 20 + o.swing * 4, -11 + sy); ctx.stroke();
-      ctx.save(); ctx.shadowColor = o.color; ctx.shadowBlur = 9 + 5 * p; ctx.fillStyle = 'rgba(190,255,235,' + (0.6 + 0.4 * p) + ')'; ctx.beginPath(); ctx.arc(20 + o.swing * 4, -11 + sy, 3, 0, TAU); ctx.fill(); ctx.restore();
+      ctx.save(); gaGlow(ctx, o.color, 9 + 5 * p); ctx.fillStyle = 'rgba(190,255,235,' + (0.6 + 0.4 * p) + ')'; ctx.beginPath(); ctx.arc(20 + o.swing * 4, -11 + sy, 3, 0, TAU); ctx.fill(); ctx.restore();
       ctx.fillStyle = '#DFF6F0'; for (let i = 0; i < 4; i++){ wpSpike(ctx, 14 + i * 0.4, -3.4 + i * 2.3, 2.6 + o.swing * 1.4, 0.8, 0); }
     }
   },
@@ -157,7 +157,7 @@ function weaponArtParts(){
   const sw = weaponSwing();
   return { art: WEAPON_ART[P.weapon.id], o: { e: sw.e, swing: sw.swing, t: G.time, color: P.weapon.color, level: P.weaponLevel || 1, side: 1 } };
 }
-function weaponGlow(ctx, o){ if (o.level >= 4){ ctx.shadowColor = o.color; ctx.shadowBlur = 5 + (o.level - 4) * 3; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0; } }
+function weaponGlow(ctx, o){ if (o.level >= 4){ gaGlow(ctx, o.color, 5 + (o.level - 4) * 3); ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0; } }
 /* in the body's own space (the legs array and stride come from drawPlayer): hooves, and anything on the body */
 function weaponArtBody(ctx, legs, sw, ke){
   const w = weaponArtParts(); if (!w) return;

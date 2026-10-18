@@ -7,6 +7,12 @@
    glint (5). The old plain cape is still the fallback when no design is found.
    P.capeSet / P.capeLevel / P.weaponLevel / P.armorLevel are kept up to date here (a wrapper on recalcStats).
    ============================================================================================================================= */
+/* A glow costs a blur pass on every draw it touches, so it is only used at full effects (the slow-device governor and the Effects setting turn it off);
+   below that the draw is plain. Switching it off also drops the dark rim the giraffe carries, which these glows would otherwise inherit. */
+function gaGlow(ctx, color, blur){
+  if (typeof fxLevelNow === 'function' && fxLevelNow() >= 2){ ctx.shadowColor = color; ctx.shadowBlur = blur; }
+  else ctx.shadowBlur = 0;
+}
 
 /* the cloth as a surface: F(u, v) is the point u along the cape (0 at the collar, 1 at the tip, more past it) and v across it (-1 to 1) */
 function capeFrame(o){
@@ -189,7 +195,7 @@ const CAPE_DESIGNS = {
     const F = capeFrame(o), c = o.color, hem = function(v){ return Math.sin(v * 5) * 0.05; };
     capeBase(ctx, F, blendHex('#0B1A1C', c, 0.16), hem, 0.97);
     const pulse = 0.55 + 0.45 * Math.sin(o.t * 2.4);
-    ctx.save(); ctx.shadowColor = c; ctx.shadowBlur = 5; ctx.strokeStyle = c; ctx.lineWidth = 1.1; ctx.globalAlpha = 0.5 + pulse * 0.5;
+    ctx.save(); gaGlow(ctx, c, 5); ctx.strokeStyle = c; ctx.lineWidth = 1.1; ctx.globalAlpha = 0.5 + pulse * 0.5;
     capeLine(ctx, F, 0.06, -0.35, 0.96, -0.45, 4); ctx.stroke(); capeLine(ctx, F, 0.06, 0.35, 0.96, 0.45, 4); ctx.stroke(); ctx.restore();
     for (let i = 0; i < 6; i++) capeDot(ctx, F, 0.2 + i * 0.14, ((i * 7) % 5 - 2) * 0.3, 1 + (i % 2) * 0.4, 'rgba(160,255,230,' + (0.35 + 0.5 * Math.sin(o.t * 3 + i)) + ')');
     return hem;
@@ -233,6 +239,7 @@ function capeDraw(ctx, setId, o){
   const d = CAPE_DESIGNS[setId]; if (!d) return false;
   ctx.save();
   const hem = d(ctx, o), F = capeFrame(o), lv = o.level || 1;
+  ctx.shadowBlur = 0;                                                          /* the rim is for the cloth; trim and glint are drawn plain */
   if (lv >= 3) capeTrim(ctx, F, hem, shade(o.color, 0.45));
   if (lv >= 5) capeGlint(ctx, F, o);
   ctx.restore();

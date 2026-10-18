@@ -92,12 +92,12 @@
 /* the mythical tier: shifting colours */
 .odds .o.mythical,.gsetrarity.mythical{color:#FF6BD6}
 .crateresult.mythical{border-left-color:#FF6BD6;box-shadow:0 0 18px rgba(255,107,214,.25)}
-.gp.mythical{border:2px solid transparent;background:linear-gradient(#4A1F45,#25102A) padding-box,linear-gradient(120deg,#ff6bd6,#ffd84d,#6bffd6,#6b9bff,#ff6bd6) border-box;background-size:100% 100%,300% 300%;animation:mythborder 5s linear infinite;box-shadow:0 0 14px rgba(255,107,214,.28)}
-.gp.mythical.locked{animation:none}
+.gp.mythical{border:2px solid transparent;background:linear-gradient(#4A1F45,#25102A) padding-box,linear-gradient(120deg,#ff6bd6,#ffd84d,#6bffd6,#6b9bff,#ff6bd6) border-box;background-size:100% 100%,300% 300%;box-shadow:0 0 14px rgba(255,107,214,.28)}
+.gp.mythical:hover,.gp.mythical.sel{animation:mythborder 5s linear infinite}      /* the border only moves on the card you point at: a repaint every frame on each mythical card is not worth it */
 .gset2.mythical{border-color:rgba(255,107,214,.55);box-shadow:0 0 14px rgba(255,107,214,.12)}
 .gcmp.mythical{border-color:rgba(255,107,214,.7)}
 .crevl.r-mythical{--rc:#FF6BD6}
-.crevl.r-mythical .crimg{animation:crhue 3s linear infinite}
+.crevl.r-mythical .crimg{animation:crhue 3s linear 3}.crevl.multi .crimg{animation:none}      /* three turns of colour, not forever; none when ten are on screen */
 .crevl.r-mythical .crk{background:linear-gradient(90deg,#ff6bd6,#ffd84d,#6bffd6,#6b9bff);-webkit-background-clip:text;background-clip:text;color:transparent}
 @keyframes mythborder{0%{background-position:0 0,0% 50%}100%{background-position:0 0,300% 50%}}
 @keyframes crhue{from{filter:drop-shadow(0 0 14px #FF6BD6) hue-rotate(0)}to{filter:drop-shadow(0 0 14px #FF6BD6) hue-rotate(360deg)}}

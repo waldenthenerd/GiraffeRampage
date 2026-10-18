@@ -56,16 +56,25 @@ Object.keys(ARMOR_DESIGNS).forEach(function(id){ ARMOR_ORIG[id] = ARMOR_DESIGNS[
 /* what the piece is worth, on top of the design: pips for levels, a glint for rarity */
 function armorDecorate(ctx, setId, color, rarity, level, t){
   ctx.save();
+  ctx.shadowBlur = 0;                                                         /* the giraffe's dark rim is for her outline; pips and sparkles are drawn plain */
   for (let i = 0; i < level - 1; i++){ ctx.fillStyle = '#FFD84D'; ctx.beginPath(); ctx.arc(-14 + i * 3.6, 12.2, 1.35, 0, TAU); ctx.fill(); ctx.strokeStyle = '#8A6A12'; ctx.lineWidth = 0.5; ctx.stroke(); }
   if (rarity === 'rare'){ ctx.globalAlpha = 0.3; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 0.9; ctx.beginPath(); ctx.ellipse(-2, -1, 17.4, 10.2, 0, 0, TAU); ctx.stroke(); }
   else if (rarity === 'epic'){
     for (let i = 0; i < 3; i++){ const p = 0.5 + 0.5 * Math.sin(t * 3 + i * 2.1), a = i * 2.1 + t * 0.3; ctx.globalAlpha = 0.3 + p * 0.6; ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); ctx.arc(-2 + Math.cos(a) * 11, -1 + Math.sin(a) * 5.8, 0.8 + p * 0.9, 0, TAU); ctx.fill(); }
   } else if (rarity === 'mythical'){
-    ctx.shadowColor = '#FF6BD6'; ctx.shadowBlur = 7;
-    for (let i = 0; i < 7; i++){ const a = i / 7 * TAU - t * 1.1, k = 0.55 + 0.45 * Math.sin(t * 4 + i * 1.7); ctx.globalAlpha = 0.5 + 0.5 * k; ctx.fillStyle = 'hsl(' + Math.round((i * 51 + t * 90) % 360) + ',85%,72%)'; ctx.beginPath(); ctx.arc(-2 + Math.cos(a) * 20, -1 + Math.sin(a) * 12.4, 1.2 + k * 0.8, 0, TAU); ctx.fill(); }
+    const glow = fxLevelNow() >= 2 ? lightSprite([255, 107, 214]) : null;      /* a cached soft halo per mote instead of a blur pass on each */
+    for (let i = 0; i < 7; i++){
+      const a = i / 7 * TAU - t * 1.1, k = 0.55 + 0.45 * Math.sin(t * 4 + i * 1.7), mx = -2 + Math.cos(a) * 20, my = -1 + Math.sin(a) * 12.4, r = 1.2 + k * 0.8;
+      ctx.globalAlpha = 0.5 + 0.5 * k; ctx.fillStyle = 'hsl(' + Math.round((i * 51 + t * 90) % 360) + ',85%,72%)'; ctx.beginPath(); ctx.arc(mx, my, r, 0, TAU); ctx.fill();
+      if (glow){ ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.35 * k; ctx.drawImage(glow, mx - 7, my - 7, 14, 14); ctx.globalCompositeOperation = 'source-over'; }
+    }
   } else if (rarity === 'legendary'){
-    ctx.shadowColor = color; ctx.shadowBlur = 5;
-    for (let i = 0; i < 5; i++){ const a = i / 5 * TAU + t * 0.9; ctx.globalAlpha = 0.85; ctx.fillStyle = '#FFF6C0'; ctx.beginPath(); ctx.arc(-2 + Math.cos(a) * 19, -1 + Math.sin(a) * 11.4, 1.3, 0, TAU); ctx.fill(); }
+    const glow = fxLevelNow() >= 2 ? lightSprite([255, 230, 140]) : null;
+    for (let i = 0; i < 5; i++){
+      const a = i / 5 * TAU + t * 0.9, mx = -2 + Math.cos(a) * 19, my = -1 + Math.sin(a) * 11.4;
+      ctx.globalAlpha = 0.85; ctx.fillStyle = '#FFF6C0'; ctx.beginPath(); ctx.arc(mx, my, 1.3, 0, TAU); ctx.fill();
+      if (glow){ ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.3; ctx.drawImage(glow, mx - 6, my - 6, 12, 12); ctx.globalCompositeOperation = 'source-over'; }
+    }
   }
   ctx.restore();
 }

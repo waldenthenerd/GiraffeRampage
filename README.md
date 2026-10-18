@@ -14,12 +14,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 152 | 51,340 | 3.84 MiB (4,026,019 bytes) |
-| Styles (`css/`) | 5 | 1,399 | 126 KiB (128,815 bytes) |
-| Page (`index.html`) | 1 | 199 | 8.5 KiB (8,693 bytes) |
-| **Whole game** | **158** | **52,938** | **3.97 MiB (4,163,527 bytes)** |
+| JavaScript (`js/`) | 153 | 51,409 | 3.84 MiB (4,031,715 bytes) |
+| Styles (`css/`) | 5 | 1,399 | 126 KiB (129,038 bytes) |
+| Page (`index.html`) | 1 | 200 | 8.5 KiB (8,741 bytes) |
+| **Whole game** | **159** | **53,008** | **3.98 MiB (4,169,494 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,370 lines, 3.93 MiB (4,120,052 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,440 lines, 3.93 MiB (4,126,019 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -74,10 +74,10 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/31-waves-update.js` | 679 | Banners, the wave director, entity updates, the main update. |
 | `js/32-render.js` | 739 | Ground textures and the render pass. |
 | `js/33-giraffe-art.js` | 510 | Drawing the giraffe and armour designs. |
-| `js/33a-gear-art-capes.js` | 250 | **Twenty-two capes.** One design per gear set (`CAPE_DESIGNS`) on a shared cloth frame (`capeFrame`) so the wind and flutter are the same; `capeDraw()` is called by `drawPlayer`; level 3 adds a trim, level 5 a glint. Also keeps `P.capeSet`, `P.capeLevel`, `P.weaponLevel`, `P.armorLevel` up to date. |
+| `js/33a-gear-art-capes.js` | 257 | **Twenty-two capes.** One design per gear set (`CAPE_DESIGNS`) on a shared cloth frame (`capeFrame`) so the wind and flutter are the same; `capeDraw()` is called by `drawPlayer`; level 3 adds a trim, level 5 a glint. Also keeps `P.capeSet`, `P.capeLevel`, `P.weaponLevel`, `P.armorLevel` up to date. |
 | `js/33b-gear-art-weapons.js` | 176 | **Twenty-one weapons you can see.** `WEAPON_ART` draws each weapon on her: hoof pieces, head pieces (fangs, lances, a maul, a trident, an anglerfish lure) and body pieces (twin tails, a spinning maw ring), timed to the neck lunge. Level 4 and up glows. |
-| `js/33c-gear-art-armor.js` | 79 | **The armor pass.** Four armors redrawn (`ARMOR_REDRAW`: Herdhide, Tideshell, Riptide, Twinsoul); every armor gains a rarity glint and level pips (`armorDecorate`, `armorDraw`). |
-| `js/33e-gear-art-more.js` | 189 | **The art for six more sets.** Cinderhide and Rooftop Runner (common), Moondust and Rustwalker (rare), Site Zero (epic) and the mythical Worldspire: each a cape, a weapon and an armor, added to `CAPE_DESIGNS`, `WEAPON_ART` and `ARMOR_REDRAW`/`ARMOR_DESIGNS`. Worldspire is the showpiece: a cape of turning dawn colours, a spire of light with a halo, and a plate ringed by a constellation. |
+| `js/33c-gear-art-armor.js` | 88 | **The armor pass.** Four armors redrawn (`ARMOR_REDRAW`: Herdhide, Tideshell, Riptide, Twinsoul); every armor gains a rarity glint and level pips (`armorDecorate`, `armorDraw`). |
+| `js/33e-gear-art-more.js` | 190 | **The art for six more sets.** Cinderhide and Rooftop Runner (common), Moondust and Rustwalker (rare), Site Zero (epic) and the mythical Worldspire: each a cape, a weapon and an armor, added to `CAPE_DESIGNS`, `WEAPON_ART` and `ARMOR_REDRAW`/`ARMOR_DESIGNS`. Worldspire is the showpiece: a cape of turning dawn colours, a spire of light with a halo, and a plate ringed by a constellation. |
 | `js/33d-gear-icons.js` | 70 | **A drawn icon for every piece.** `gearIcon(id, size, {locked, level})` returns a cached PNG data URL (dark silhouette when not found yet); `gearFrame(rarity)` gives the four rarity looks. |
 | `js/34a-art-helpers.js` | 125 | Shared drawing helpers for enemies: per-chapter mutation kits (frost, swamp, ocean) and the lk* shape helpers. |
 | `js/34b-art-arctic.js` | 613 | Enemy art, Chapter 2: the Arctic (ARCTIC_DRAW). |
@@ -113,9 +113,10 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/42-run-hud.js` | 234 | Run lifecycle and the HUD. |
 | `js/43-input.js` | 374 | Input: keyboard, mouse, touch, gamepad. |
 | `js/41a-gear-page.js` | 332 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, the crate reveal (`gearReveal`) and Buy 5 / Buy 10 on every crate (`gearBuyMany`: all the openings play at once, five to a row). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
-| `js/44-loop-boot.js` | 114 | The main loop, resize, and the boot function. |
+| `js/44-loop-boot.js` | 115 | The main loop, resize, and the boot function. |
 | `js/44b-feedback.js` | 229 | Pacing and presentation: title splash, one-time hints, fades, boss entrance, wave-clear beat, number count-ups, overlay fade-out, text size, the kick wind-up. |
 | `js/44c-perf.js` | 170 | The slow-device governor: times each frame's work and, if the game cannot keep up, lowers the canvas sharpness and then the effects (`PERF_STEPS`); shows a notice with a "Back to full quality" button when it does (`perfNotice`; that button turns "Adapt to slow devices" off), counts minigames as play, and the minigame polish layers follow the effects level; brings them back when there is room. Off with Settings, Adapt to slow devices. Also the statistics panel (the `\` key). |
+| `js/44ca-ground-cache.js` | 51 | The ground, painted once: while the menu is behind the title, at Low or Medium effects, or after the governor's first step down, each biome's ground (drawn by the ordinary `drawGround`) is painted into 512-unit tiles and only the tiles on screen are copied each frame, instead of hundreds of fills and strokes (up to about 800 a frame in the jungle). Tiles are keyed by biome, decor, pool, sharpness and zoom, built three a frame, and capped at 16 (`GroundCache`). Full effects draw the ground live so the fern sway and drifting leaves still move. |
 | `js/44d-visual-extras.js` | 419 | Second visual pass, added from the outside (it wraps functions from earlier files): extra Chapter 1 and 2 scenery, time-of-day colour (and the cycle for Chapters 5, 7 and 13), heat haze, footprints and trampled grass, elite and varied creatures (`ELITE`), the iris and biome screen edges at chapter changes, the run map on the death screen (`RunMap`), and moving bestiary portraits. |
 | `js/44e-wardrobe.js` | 277 | Coat colours and patterns: one colour and one spot pattern per finished chapter (`WARD`, `WARD_PATTERNS`), separate choices for skin, spots, pattern and gear accent, `wardSpot()` (draws a spot in the chosen pattern, used by every giraffe drawing), the Coat colours screen and the unlock note. `giraffeColours()`, `giraffePattern()`, `giraffeAccent()` and `giraffeCustom()` are what the drawing code asks for. |
 | `js/44f-minigames.js` | 1010 | Minigames, core: the 120-second cooldown, the chapter-end popup (`miniOffer`, hooked into `beginChapterTransition` in `37-frame-transitions.js`), the run loop and results, the accessory wheel, and the 23 hats and boots (`ACC`, `ACC_SLICES`, including the Paper Bag) with their art for top-down and side views, `drawTopGiraffe` and `drawSideGiraffe`, and the hat and boot rows of the wardrobe. |
