@@ -145,9 +145,10 @@ function cratePityBump(kind, gotGood){
    the piece one level (up to 5) and refunds nothing; only a piece already at level 5 refunds DUPE_REFUND gems. */
 function openCrate(kind){
   const crate = CRATES[kind];
-  if (!crate || !Save.data || (Save.data.gems | 0) < crate.cost) return null;
+  if (!crate || !Save.data || (Save.data.gems | 0) < crate.cost || (crate.food && (+Save.data.food || 0) + 1e-9 < crate.food)) return null;          /* gems, and food too for a Spotted Crate */
   if (typeof gearReveal !== 'undefined' && gearReveal.active) return null;                         /* one crate at a time while the reveal plays */
   Save.data.gems -= crate.cost;
+  if (crate.food) Save.data.food = Math.round(((+Save.data.food || 0) - crate.food) * 10) / 10;
   const pc = CRATE_PITY[kind], onPity = !!pc && cratePityCount(kind) + 1 >= pc.every;
   let rarity = rollRarity(crate.weights), pity = false;
   if (onPity && RARITY_ORDER[rarity] < RARITY_ORDER[pc.floor]){ rarity = pc.floor; pity = true; }
@@ -165,7 +166,7 @@ function openCrate(kind){
     piece = pick(grow.length ? grow : pool); dupe = true;
     if (gearLevelUp(piece.id)) levelUp = gearLevel(piece.id); else { refund = DUPE_REFUND; Save.data.gems += refund; }
   }
-  cratePityBump(kind, RARITY_ORDER[piece.rarity] >= (pc ? RARITY_ORDER[pc.floor] : 0) && !!pc);
+  if (pc) cratePityBump(kind, RARITY_ORDER[piece.rarity] >= RARITY_ORDER[pc.floor]);                  /* the Spotted Crate has no pity: its odds are the point */
   Save.data.cratesOpened = (Save.data.cratesOpened | 0) + 1;
   Save.write();
   return { piece: piece, dupe: dupe, refund: refund, rarity: piece.rarity, levelUp: levelUp, pity: pity };
