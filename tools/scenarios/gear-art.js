@@ -65,6 +65,22 @@ try {
     });
     P.kickAnim = 0;
   }
+
+  if (view === 'armor'){
+    var c3 = sheet(4, 4, 300, 160), badA = [];
+    sets.forEach(function(sid, i){
+      var piece = GEAR_INDEX[sid + ':armor']; grantGear(piece.id); Save.data.gearLv = Save.data.gearLv || {}; Save.data.gearLv[piece.id] = LV - 1; equipGear(piece.id);
+      P.vx = 0; P.vy = 0; P.aim = 0; P.face = 0; P.x = 0; P.y = 0; P.walk = 1; G.time = 3 + i * 0.3; P.kickAnim = 0; GF.neck.ext = 0; GF.neck.bend = 0;
+      c3.save(); c3.beginPath(); c3.rect((i % 4) * 300, Math.floor(i / 4) * 160, 300, 160); c3.clip(); c3.translate((i % 4) * 300 + 110, Math.floor(i / 4) * 160 + 86); c3.scale(2.6, 2.6); drawPlayer(c3); c3.restore();
+      c3.fillStyle = '#fff'; c3.font = '12px sans-serif'; c3.fillText(piece.name + (LV > 1 ? ' +' + (LV - 1) : ''), (i % 4) * 300 + 8, Math.floor(i / 4) * 160 + 16);
+      /* the armor painted alone, level 1 versus 5, must differ when decorations exist */
+      if (typeof armorDecorate === 'function'){
+        var px = []; [1, 5].forEach(function(lv){ var cv = document.createElement('canvas'); cv.width = cv.height = 100; var cc = cv.getContext('2d'); cc.translate(50, 50); armorDraw(cc, sid, piece.color, piece.rarity, lv, 1); var d = cc.getImageData(0, 0, 100, 100).data, n = 0; for (var q = 3; q < d.length; q += 4) if (d[q] > 10) n++; px.push(n); });
+        if (!(px[1] > px[0])) badA.push(sid + ':' + px.join('/'));
+      }
+    });
+    out.bad = badA; out.pass = !badA.length;
+  }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
 out.pass = !!out.pass && !out.errs.length;
 QA.done(out);
