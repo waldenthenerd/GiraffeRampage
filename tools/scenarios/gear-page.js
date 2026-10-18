@@ -32,8 +32,34 @@ try {
     out.capeAfterTryon = P.capeSet;
   } else { out.noSearch = !!document.getElementById('gearSearch'); out.tiles = document.querySelectorAll('.gtile').length; }
   out.locks = document.querySelectorAll('.gp.locked,.gtile.locked').length;
-  out.hScroll = document.documentElement.scrollWidth <= window.innerWidth + 1;
+  out.prevErr = gearPreview.err || null; out.hScroll = document.documentElement.scrollWidth <= window.innerWidth + 1;
   out.pageText = (txt('.gslots') || '').slice(0, 80);
+
+  if (st === 'compare'){
+    var rc0 = 0, rs = recalcStats; recalcStats = function(){ rc0++; return rs.apply(this, arguments); };
+    grantGear('thornweave:armor'); grantGear('stoneplate:armor'); grantGear('twinsoul:weapon');
+    /* completes a set: cape + armor worn, hooves not equipped -> pointing at it completes Herdhide */
+    unequipSlot('weapon'); rc0 = 0; gearPage.slot = 'weapon'; showShop('gear');
+    gearPage.hover = 'herdhide:weapon'; gearSyncSelection();
+    var cs = document.querySelector('.gcset'); out.completes = !!(cs && cs.className.indexOf('done') >= 0 && /Completes/.test(cs.textContent));
+    out.noRecalcOnTryon = rc0 === 0; gearPage.hover = null; gearSyncSelection();
+    /* green and red */
+    equipGear('sunforged:armor'); gearPage.slot = 'armor'; showShop('gear'); gearPage.hover = 'herdhide:armor'; gearSyncSelection();
+    out.red = document.querySelectorAll('.grow.down').length;
+    equipGear('herdhide:armor'); gearPage.hover = 'sunforged:armor'; gearSyncSelection(); out.green = document.querySelectorAll('.grow.up').length;
+    var dr = document.querySelector('.grow span'); out.firstRow = dr ? dr.textContent : null;
+    gearPage.hover = null; gearPage.selected = 'sunforged:armor'; gearSyncSelection(); out.sideHasEquip = !!document.querySelector('#gearSide [data-equip="sunforged:armor"]');
+    /* the try-on does not persist */
+    var eqBefore = JSON.stringify(Save.data.equipped); showShop('gear'); out.persist = JSON.stringify(Save.data.equipped) === eqBefore;
+    /* rapid clicks: 20 alternating equip / take off through the real buttons, then stats match a fresh recalc */
+    for (var i = 0; i < 20; i++){
+      gearPage.selected = 'sunforged:armor'; gearSyncSelection();
+      var b = document.querySelector('#gearSide [data-equip="sunforged:armor"]'); if (b) b.click(); else { var t = document.querySelector('[data-unequip="armor"]'); if (t) t.click(); }
+    }
+    var snap = JSON.stringify(P.stats); recalcStats(); out.rapid = snap === JSON.stringify(P.stats) && (gearEquipped('armor') === 'sunforged:armor' || gearEquipped('armor') === null);
+    recalcStats = rs;
+    gearPage.selected = null; gearPage.hover = 'herdhide:weapon'; gearPage.slot = 'weapon'; unequipSlot('weapon'); showShop('gear'); gearPage.hover = 'herdhide:weapon'; gearSyncSelection();
+  }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-out.pass = !!(out.hasPreview && !out.errs.length && (st === 'sets' ? out.tiles === 48 && out.noSearch : (out.slotBtns === 3 && out.hatIsWardrobe && out.noSearch && out.drew && out.pixels > 800)));
+out.pass = !!(out.hasPreview && !out.errs.length && (st !== 'compare' || (out.completes && out.noRecalcOnTryon && out.red > 0 && out.green > 0 && out.sideHasEquip && out.persist && out.rapid)) && (st === 'sets' ? out.tiles === 48 && out.noSearch : (out.slotBtns === 3 && out.hatIsWardrobe && out.noSearch && out.drew && out.pixels > 800)));
 QA.done(out);

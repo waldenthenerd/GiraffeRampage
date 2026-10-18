@@ -64,10 +64,10 @@ function gearPreviewStop(){ if (gearPreview.raf) cancelAnimationFrame(gearPrevie
 function gearPreviewMount(){
   gearPreviewStop();
   const cv = document.getElementById('gearPreview'); if (!cv) return;
-  const me = gearPreview.id; gearPreview.last = 0;
+  const me = gearPreview.id; gearPreview.last = 0; gearPreview.lastDraw = 0; gearPreview.err = null;
   (function loop(ts){
     if (me !== gearPreview.id || !document.body.contains(cv)) return;                         /* left the tab, or the page was drawn again: this loop ends */
-    if (!gearPreview.lastDraw || ts - gearPreview.lastDraw >= 32){ gearPreview.lastDraw = ts; try { gearPreviewDraw(cv, ts); } catch (e) { return; } }
+    if (!gearPreview.lastDraw || ts - gearPreview.lastDraw >= 32){ gearPreview.lastDraw = ts; try { gearPreviewDraw(cv, ts); } catch (e) { gearPreview.err = e.message; return; } }
     gearPreview.raf = requestAnimationFrame(loop);
   })(performance.now());
 }
@@ -159,6 +159,31 @@ function gearTabHTML(){
       '<div class="gview"><canvas id="gearPreview" width="440" height="250"></canvas><button class="btn sm ghost gkick" data-a="gear-demo-kick">Kick</button></div>' +
       '<div class="gcolR" id="gearSide">' + gearSideHTML() + '</div></div>' +
     gearPickerHTML() + '<h3 class="gh">Crates</h3>' + gearCratesHTML() + gearCrateResultHTML() + trinkets;
+}
+
+/* ---------- compare before equipping ---------- */
+function gearFmtVal(key, v){
+  const f = GEAR_STAT_LABELS[key] ? GEAR_STAT_LABELS[key].fmt : 'flat', r = function(x, d){ const m = Math.pow(10, d || 0); return Math.round(x * m) / m; };
+  if (f === 'pct' || f === 'pctless') return r(v * 100, 1) + '%';
+  if (f === 'pctmul') return (v >= 1 ? '+' : '') + r((v - 1) * 100, 1) + '%';
+  if (f === 'sec') return r(v, 2) + '/s';
+  if (f === 'secs') return r(v, 2) + 's';
+  if (f === 'deg') return r(v * 180 / Math.PI) + '°';
+  return String(r(v, 1));
+}
+function gearComparePanel(slot, id){
+  const p = GEAR_INDEX[id]; if (!p) return gearBuildHTML();
+  const lv = gearLevel(id), on = gearEquipped(slot) === id, rows = on ? [] : gearDelta(slot, id);
+  let html = '<div class="gcmp ' + p.rarity + '"><h4>' + p.name + (lv > 1 ? ' <span class="glv">+' + (lv - 1) + '</span>' : '') + '</h4>' +
+    '<div class="gsub">' + p.setName + ' · ' + p.rarity + ' · ' + SLOT_LABEL[slot] + '</div><p class="gdesc">' + gaDesc(p) + '</p>';
+  const setRow = rows.filter(function(r){ return r.key === 'set'; })[0], stat = rows.filter(function(r){ return r.key !== 'set'; });
+  if (on) html += '<p class="gnote">Equipped now.</p>';
+  else if (!stat.length) html += '<p class="gnote">No change to her stats.</p>';
+  else html += '<div class="grows">' + stat.map(function(r){ return '<div class="grow ' + (r.better ? 'up' : 'down') + '"><span>' + r.label + '</span><b>' + gearFmtVal(r.key, r.from) + ' → ' + gearFmtVal(r.key, r.to) + '</b></div>'; }).join('') + '</div>';
+  if (setRow) html += '<div class="gcset' + (setRow.completes ? ' done' : '') + '">' + setRow.label + ' ' + setRow.from + '/3 → ' + setRow.to + '/3' + (setRow.completes ? '<br><b>Completes it: ' + setRow.setDesc + '</b>' : (setRow.to === 3 ? '' : '')) + '</div>';
+  if (lv > 1) html += '<p class="gnote">Level ' + lv + ': its effects are ' + Math.round((gearLevelScale(lv) - 1) * 100) + '% stronger.</p>';
+  if (!on) html += '<button class="btn sm" data-equip="' + id + '">Equip</button>';
+  return html + '</div>';
 }
 
 /* ---------- actions ---------- */
