@@ -420,6 +420,9 @@ function drawPlayer(ctx){
     const mx = bx + Math.cos(midA) * len * 0.55, my = by + Math.sin(midA) * len * 0.55;
     const spread = 11 + Math.sin(windT * 1.5) * 2.2;
     const ppx = -Math.sin(tipA), ppy = Math.cos(tipA);
+    /* the set's own cape (js/33a-gear-art-capes.js); the plain cloth below is the fallback */
+    const designed = typeof capeDraw === 'function' && P.capeSet && capeDraw(ctx, P.capeSet, { bx: bx, by: by, tipA: tipA, tx: tx, ty: ty, mx: mx, my: my, len: len, spread: spread, px: px, py: py, ppx: ppx, ppy: ppy, a: a, moving: moving, color: gAcc || P.capeColor, t: G.time, level: P.capeLevel || 1 });
+    if (!designed){
     ctx.fillStyle = gAcc || P.capeColor;
     ctx.globalAlpha = 0.92;
     ctx.beginPath();
@@ -441,6 +444,7 @@ function drawPlayer(ctx){
     /* collar clasp at the shoulders */
     fillCircle(ctx, bx, by, 3.4, gAcc || P.capeColor);
     fillCircle(ctx, bx, by, 1.6, '#FFF3CC');
+    }
   }
 
   /* head */
