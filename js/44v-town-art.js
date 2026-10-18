@@ -143,7 +143,7 @@ function townPaintFar(c, D, W, H, R){
     c.fillStyle = P.far; c.beginPath(); c.moveTo(0, TG);
     for (let x = 0; x <= W + 80; x += 80) c.lineTo(x, TG - 90 - r() * 130 - Math.sin(x * 0.004) * 40);
     c.lineTo(W, TG); c.closePath(); c.fill();
-    for (let i = 0; i < 5; i++){ const x = r() * W; tRect(c, '#8E99BD', x, TG - 230 - r() * 70, 14, 300); for (let y = 0; y < 5; y++) tRect(c, '#7A86A8', x - 12, TG - 220 + y * 40, 38, 5); }
+    for (let i = 0; i < 5; i++){ const x = r() * W; const gy = TG - 230 - r() * 70; tRect(c, '#8E99BD', x, gy, 14, 300); for (let y = 0; y < 5; y++) tRect(c, '#7A86A8', x - 12, TG - 220 + y * 40, 38, 5); if (typeof townGantryDetail === 'function') townGantryDetail(c, x, gy); }
     return;
   }
   if (D.theme === 'harbour'){                                                /* sea, and the skyline of the far shore */
@@ -169,6 +169,7 @@ function townPaintFar(c, D, W, H, R){
     tRect(c, P.far, x, TG - 20 - h, w, h + 20);
     c.fillStyle = 'rgba(255,255,255,.16)';
     for (let wy = TG - 4 - h; wy < TG - 30; wy += 26) for (let wx = x + 8; wx < x + w - 10; wx += 18) c.fillRect(wx, wy, 8, 12);
+    if (typeof townFarBlockDetail === 'function') townFarBlockDetail(c, D, x, TG - 20 - h, w, h + 20);       /* js/44zw-town-detail.js */
     c.fillStyle = P.far; x += w + 4 + r() * 8;
   }
 }
@@ -199,6 +200,7 @@ function townPaintMid(c, D, W, H, R){
     const w = 70 + r() * 80, h = 70 + r() * 70, wall = P.walls[Math.floor(r() * P.walls.length)], roof = P.roofs[Math.floor(r() * P.roofs.length)];
     tRect(c, tShade(wall, 0.9), x, TG - 10 - h, w, h + 10); tPoly(c, roof, [x - 6, TG - 10 - h, x + w / 2, TG - 38 - h, x + w + 6, TG - 10 - h]);
     c.fillStyle = 'rgba(80,110,140,.5)'; for (let wx = x + 10; wx < x + w - 14; wx += 24) c.fillRect(wx, TG - h + 6, 12, 16);
+    if (typeof townMidHouseDetail === 'function') townMidHouseDetail(c, D, x, TG - 10 - h, w, h + 10, wall, roof);       /* js/44zw-town-detail.js */
     x += w + 10 + r() * 14;
   }
 }
