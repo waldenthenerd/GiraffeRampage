@@ -480,7 +480,7 @@
   };
 
   /* ---------- props ---------- */
-  const PROP_THEMES = { square: 1, market: 1, park: 1, harbour: 1, roofs: 1, launch: 1, burrows: 1 };
+  const PROP_THEMES = { square: 1, market: 1, park: 1, harbour: 1, roofs: 1, launch: 1, burrows: 1, campus: 1 };
   const _tProp = townProp;
   townProp = function(c, D, p, P, r){
     if (D.indoor || !PROP_THEMES[D.theme]) return _tProp(c, D, p, P, r);

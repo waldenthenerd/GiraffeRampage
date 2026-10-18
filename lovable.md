@@ -44,7 +44,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 ### How to apply an update
 
 1. Take the files in `index.html` order (section 3), **except `js/45b-dev-panel.js`**.
-2. Put `css/style.css` first and `css/polish.css` after it into the page as `<style>` blocks (or keep them as two linked
+2. Put `css/style.css` first, `css/polish.css` after it and `css/campus.css` last into the page as `<style>` blocks (or keep them as two linked
    files). `polish.css` is layered over `style.css`; the order matters.
 3. Put each script in its **own** `<script>` block (or keep separate `<script src>` tags), in the same order. Do **not**
    concatenate everything into one script block: every file begins with `'use strict';` except `js/00-icons.js`, which was never
@@ -59,7 +59,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (124 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (134 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -184,6 +184,16 @@ game. This is the complete list for this version (124 scripts; the developer pan
 | - | `js/44zw-town-detail.js` | The small parts of Longneck Town (brick, roof tiles, shutters, ground detail, backdrops). Load it right after `44zv-gym-art.js`. |
 | - | `js/44zx-farm-isle-detail.js` | The small parts of Hayfield Village and Driftwood Cove. Load it right after `44zw-town-detail.js`. |
 | - | `js/44zy-sea-detail.js` | The small parts of the open sea (terrain, docks, village, boats). Load it right after `44zx-farm-isle-detail.js`. |
+| - | `js/44zz-campus.js` | **Longneck University, the rules.** The eight faculties (`UNI_FAC`: Giraffe Studies, Earth & Weather, Biology, Chemistry, Maths, Physics, Space, History & Geography, each opening after a chapter), levels 1 to 15 (`uniNeed`), the energy (`uniEnergy`, refills at midnight, drinks can push it to twice the most), `uniAddXp`, degrees, the rank ladder (`UNI_RANKS`: Fresher to Chancellor, with a mortarboard, loafers and three coat colours), the smart-giraffe stats (`uniApply` through `applyCityStats`) and the run hooks (dodge in `hurtPlayer`, card cooldowns in `haste`, boss damage in `damageEnemy`, free rerolls in `startRun`, a fourth card in `rollOffer`, Eureka in `chooseCard`, one more slot in `maxCards`), the IQ chip over the HUD bars, and the fix for the gym's Haste stat. Saved in `Save.data.town.uni`. |
+| - | `js/44zza-campus-questions.js` | The question bank, part 1: the question types (`mc`, `tf`, `ord`, `match`, `est`), `uqFactory`, and 160 questions for Giraffe Studies, Earth & Weather, Biology and Chemistry (tiers 1 to 3, with a short explanation each). |
+| - | `js/44zzb-campus-questions2.js` | The question bank, part 2: 160 questions for Maths, Physics, Space and History & Geography. `UNI_Q` and `UNI_Q_BY_ID` hold all 320. |
+| - | `js/44zzc-campus-lectures.js` | `UNI_LECTURES`: 32 lectures (four per faculty), each four slides with a picture key and four questions (three are asked). |
+| - | `js/44zzd-campus-books.js` | `UNI_BOOKS`: 24 books (three per faculty, one per tier), each five pages, three questions (two are asked) and a fact for the notebook. |
+| - | `js/44zze-campus-town.js` | **The Campus district and its people.** The `campus` district (reached through an iron gate in the Town Square once Chapter 1 is done), six interiors (Registrar's Hall, Lecture Theatre, Library, Homework Hall, Exam Hall, Campus Café), nine giraffes, ten errands (the `uni` need kind), five finds, the door and action wrappers, the café shop (`UNI_SHOP`; food from the satchel gives energy too), and the panels (registrar, faculties, degrees, ranks, notebook, café, and a Study tab in the journal). |
+| - | `js/44zzf-campus-study.js` | **The four things to do.** Lecture (2 energy), reading (1), homework (1) and exam (3): the pickers, the slides and pages, the question card in all five formats, the 30-second exam timer (7 of 10 passes), flashcards, first-time bonuses, repeat decay, degrees and badges, and the errand counters. |
+| - | `js/44zzg-campus-art.js` | The Campus painting outdoors: the spires, hills and trees, lawns and paving, the iron gate, the arch and the six street buildings, the hedge, notice board, bikes, founder's statue, fountain and faculty banners (`uniEmblem`), and the mortarboard and loafers. |
+| - | `js/44zzh-campus-rooms.js` | The six rooms of the university: walls (`IV_ROOMS.uhall` and the rest) and every piece of furniture (`UNI_FURN` by `u_` kind: the registrar's desk, faculty board, hall of degrees, rank cabinet, stage, seats, the eight faculty bookcases, reading table, desks, results board, café bar and tables). |
+| - | `js/44zzi-campus-pics.js` | `UNI_PICS`: the 49 pictures on the lecture slides (a giraffe in profile, the layers of the Earth, an atom, the solar system, the Colosseum and so on). |
 | 90 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
 | 91 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | 92 | `js/46-main.js` | Starts the game. |
