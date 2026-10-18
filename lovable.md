@@ -59,7 +59,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (122 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (124 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -182,6 +182,8 @@ game. This is the complete list for this version (122 scripts; the developer pan
 | - | `js/44zu-training-gym.js` | Longneck Fitness, the training gym at the end of Market Street: daily passes (five tiers, each locked behind a chapter), ten machines with seven kinds of minigame (none on more than two machines), skill levels with bonuses at 5/10/15 through `applyCityStats`, and a gym rank with rewards. Also edits `44zb-town-interiors.js` and `44zk-town-interiors2.js` (no generic windows in the gym) and `44e-wardrobe.js` (the Gold Medal colour, `WARD_MAX` 42). Must load after `44zs-explore-rewards.js`. |
 | - | `js/44zv-gym-art.js` | The gym's painting (building, floor, machines, hats and boots). Load it right after `44zu-training-gym.js`. |
 | - | `js/44zw-town-detail.js` | The small parts of Longneck Town (brick, roof tiles, shutters, ground detail, backdrops). Load it right after `44zv-gym-art.js`. |
+| - | `js/44zx-farm-isle-detail.js` | The small parts of Hayfield Village and Driftwood Cove. Load it right after `44zw-town-detail.js`. |
+| - | `js/44zy-sea-detail.js` | The small parts of the open sea (terrain, docks, village, boats). Load it right after `44zx-farm-isle-detail.js`. |
 | 90 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
 | 91 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | 92 | `js/46-main.js` | Starts the game. |

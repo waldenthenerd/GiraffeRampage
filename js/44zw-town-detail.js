@@ -114,7 +114,7 @@
   tRect = function(c, col, x, y, w, h){
     _tRect(c, col, x, y, w, h);
     const g = curG;
-    if (g && !g.wall && x === g.x0 && y === g.top && w === g.w && h === g.wallH){            /* the main wall of the building: give it its material */
+    if (g && !g.wall && x === g.x0 && y === g.wallTop && w === g.w && h === g.wallH){            /* the main wall of the building: give it its material */
       g.wall = true;
       const s = Math.round(g.x0 * 3 + g.w);
       switch (g.kind){
@@ -135,6 +135,7 @@
           c.fillStyle = '#E3B93C'; for (let xx = x; xx < x + w; xx += 24) c.fillRect(xx, TG - 10, 12, 10);     /* hazard stripe at the foot */
           c.fillStyle = 'rgba(0,0,0,.8)'; for (let xx = x + 12; xx < x + w; xx += 24) c.fillRect(xx, TG - 10, 12, 10);
           break;
+        default: if (TOWN_WALL_TEXTURE[g.kind]) TOWN_WALL_TEXTURE[g.kind](c, x, y, w, h, s);
       }
       wallShade(c, x, y, w, h);
     }
@@ -144,7 +145,7 @@
     const g = curG;
     if (g && g.kind !== 'hall' && pts.length >= 6 && Math.abs(pts[pts.length - 1] - pts[1]) < 70){
       let ok = true, wd = 0, mn = 1e9, mx = -1e9;
-      for (let i = 0; i < pts.length; i += 2){ if (pts[i + 1] > g.top + 2) ok = false; mn = Math.min(mn, pts[i]); mx = Math.max(mx, pts[i]); }
+      for (let i = 0; i < pts.length; i += 2){ if (pts[i + 1] > g.wallTop + 2) ok = false; mn = Math.min(mn, pts[i]); mx = Math.max(mx, pts[i]); }
       wd = mx - mn;
       if (ok && wd > 60) tiles(c, pts, Math.round(pts[0] * 5 + pts[3]));
     }
@@ -355,9 +356,11 @@
   townBuilding = function(c, D, b, P, r){
     if (D.indoor || D.theme === 'runway') return _tBuilding(c, D, b, P, r);
     groundOnce(c, D);
-    curG = { kind: b.kind, x0: b.x - b.w / 2, top: TG - b.h, w: b.w, h: b.h, wallH: b.kind === 'hall' ? b.h - 34 : b.h, doors: [], wall: false };
+    curG = { kind: b.kind, x0: b.x - b.w / 2, top: TG - b.h, wallTop: TG - b.h, w: b.w, h: b.h, wallH: b.kind === 'hall' ? b.h - 34 : b.h, doors: [], wall: false };
+    if (TOWN_WALL_BOX[b.kind]){ const wb = TOWN_WALL_BOX[b.kind](b); curG.wallTop = TG - wb.h; curG.wallH = wb.h; }
     try { _tBuilding(c, D, b, P, r); } finally { var g = curG; curG = null; }
-    if (WALL_KINDS[b.kind]) buildingExtras(c, D, b, g);
+    if (TOWN_BUILD_EXTRAS[b.kind]) TOWN_BUILD_EXTRAS[b.kind](c, D, b, g);
+    else if (WALL_KINDS[b.kind]) buildingExtras(c, D, b, g);
     else if (otherKinds) otherKinds(c, D, b, g);
   };
 
@@ -440,7 +443,7 @@
         for (let i = 0; i < 4; i++){ const wy = TG - 120 - i * 74, hw = 5; c.fillStyle = '#2A3A4A'; c.beginPath(); c.roundRect(x - hw, wy, hw * 2, 18, [hw, hw, 1, 1]); c.fill(); c.fillStyle = 'rgba(255,255,255,.3)'; c.fillRect(x - hw + 1, wy + 2, 2, 12); c.fillStyle = '#B5AC9C'; c.fillRect(x - hw - 2, wy + 18, hw * 2 + 4, 3); }
         for (let xx = x - 52; xx < x + 52; xx += 7) ln(c, '#3A3A44', 1.2, xx, top + 38, xx, top + 50);
         ln(c, '#3A3A44', 2, x - 54, top + 38, x + 54, top + 38);
-        c.fillStyle = 'rgba(255,248,200,.2)'; c.beginPath(); c.moveTo(x, top + 33); c.lineTo(x - 320, top + 8); c.lineTo(x - 320, top + 56); c.closePath(); c.fill(); c.beginPath(); c.moveTo(x, top + 33); c.lineTo(x + 320, top + 8); c.lineTo(x + 320, top + 56); c.closePath(); c.fill();
+        [-1, 1].forEach(function(sd){ const bg = c.createLinearGradient(x, 0, x + sd * 340, 0); bg.addColorStop(0, 'rgba(255,248,200,.34)'); bg.addColorStop(1, 'rgba(255,248,200,0)'); c.fillStyle = bg; c.beginPath(); c.moveTo(x, top + 33); c.lineTo(x + sd * 340, top + 4); c.lineTo(x + sd * 340, top + 60); c.closePath(); c.fill(); });
         glow(c, x, top + 33, 50, '255,245,170', 0.4); ln(c, '#3A3A44', 2, x, top - 26, x, top - 44); dot(c, '#3A3A44', x, top - 46, 3); ln(c, '#3A3A44', 1.6, x - 8, top - 40, x + 8, top - 40);
         [[x - 92, 26, 16], [x + 80, 30, 18], [x - 112, 16, 10]].forEach(function(rk){ c.fillStyle = '#6A6A74'; c.beginPath(); c.ellipse(rk[0], TG - 2, rk[1], rk[2], 0, Math.PI, TAU); c.fill(); c.fillStyle = 'rgba(255,255,255,.2)'; c.beginPath(); c.ellipse(rk[0] - 6, TG - 2 - rk[2] * 0.6, rk[1] * 0.4, rk[2] * 0.3, 0, 0, TAU); c.fill(); });
         break;
@@ -787,5 +790,10 @@
     }
   };
 
-  /* @@END@@ */
+  /* what the later districts (farm, isle) use: the small painters, and three tables to fill in by building kind */
+  window.TOWN_WALL_TEXTURE = {};                     /* kind -> function(c, x, y, w, h, seed): the material of its main wall */
+  window.TOWN_WALL_BOX = {};                         /* kind -> function(b) -> { h }: the wall's height, when it is not the building's */
+  window.TOWN_BUILD_EXTRAS = {};                     /* kind -> function(c, D, b, g): the parts added after the building is drawn (g: x0, top, w, h, doors) */
+  window.townDetailKit = { hash: hash, bricks: bricks, boards: boards, stucco: stucco, blocks: blocks, tiles: tiles, rope: rope, leafBlob: leafBlob, pot: pot, glow: glow, dot: dot, ln: ln,
+    foundation: foundation, drainpipe: drainpipe, stringLights: stringLights, wallShade: wallShade, quoins: quoins };
 })();
