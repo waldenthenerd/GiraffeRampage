@@ -1,0 +1,8 @@
+{
+  "name": "giraffe-rampage-qa",
+  "private": true,
+  "type": "module",
+  "description": "Headless QA runner for Giraffe Rampage (cloud/Linux friendly). The game itself has no build step.",
+  "scripts": { "setup": "playwright install --with-deps chromium" },
+  "dependencies": { "playwright": "1.49.1" }
+}
