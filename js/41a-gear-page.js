@@ -90,7 +90,7 @@ function gearCratesHTML(){
       '<div class="crate' + (k === 'rare' ? ' prime' : '') + '">' +
         '<div class="cratetop">' + ico(k === 'rare' ? '@t-x-gift' : '@t-x-box') + '</div>' +
         '<div class="nm">' + c.name + '</div><div class="ds">' + c.blurb + '</div>' +
-        '<div class="odds">' + ['common', 'rare', 'epic', 'legendary'].map(function(r){ return '<span class="o ' + r + '">' + r.charAt(0).toUpperCase() + r.slice(1) + ' ' + c.weights[r] + '%</span>'; }).join('') + '</div>' +
+        '<div class="odds">' + ['common', 'rare', 'epic', 'legendary', 'mythical'].map(function(r){ return '<span class="o ' + r + '">' + r.charAt(0).toUpperCase() + r.slice(1) + ' ' + c.weights[r] + '%</span>'; }).join('') + '</div>' +
         '<div class="pity">' + gearPityText(k) + '</div>' +
         '<button class="btn sm' + (can ? '' : ' ghost') + '" data-crate="' + k + '"' + (can ? '' : ' disabled') + '>' + (can ? 'Open for ' + c.cost + ' gems' : c.cost + ' gems') + '</button>' +
       '</div>';
@@ -211,9 +211,10 @@ function gearRevealEnd(){
 }
 function gearRevealSound(res){
   try {
-    const n = { common: 1, rare: 2, epic: 3, legendary: 4 }[res.rarity] || 1, base = [523, 659, 784, 1047];
+    const n = { common: 1, rare: 2, epic: 3, legendary: 4, mythical: 5 }[res.rarity] || 1, base = [523, 659, 784, 1047, 1319];
     for (let i = 0; i < n; i++) SFX.tone('triangle', base[i], base[i], 0.24, 0.1, i * 0.09);
-    if (res.rarity === 'legendary') SFX.tone('sine', 1568, 2093, 0.7, 0.07, 0.36);
+    if (res.rarity === 'legendary' || res.rarity === 'mythical') SFX.tone('sine', 1568, 2093, 0.7, 0.07, 0.36);
+    if (res.rarity === 'mythical'){ SFX.tone('sine', 784, 2349, 1.1, 0.06, 0.5); SFX.tone('triangle', 1047, 1568, 0.9, 0.05, 0.62); }
   } catch (e) {}
 }
 function gearRevealPhase(n){
@@ -227,7 +228,7 @@ function gearRevealStart(res){
   const fx = typeof fxLevelNow === 'function' ? fxLevelNow() : 1, p = res.piece;
   const k = res.dupe ? (res.levelUp ? 'Level up' : 'Duplicate') : 'New gear';
   const el = document.createElement('button'); el.id = 'crateReveal'; el.setAttribute('data-a', 'gear-reveal-close');
-  el.innerHTML = '<div class="crbox">' + ico(res.rarity === 'epic' || res.rarity === 'legendary' ? '@t-x-gift' : '@t-x-box') + '</div><div class="crburst"></div>' +
+  el.innerHTML = '<div class="crbox">' + ico(RARITY_ORDER[res.rarity] >= 2 ? '@t-x-gift' : '@t-x-box') + '</div><div class="crburst"></div>' +
     (fx > 0 ? '<div class="crsparks">' + [0, 1, 2, 3, 4, 5, 6, 7].map(function(i){ return '<i style="--a:' + i * 45 + 'deg"></i>'; }).join('') + '</div>' : '') +
     '<div class="crcard"><img class="crimg" src="' + gearIcon(p.id, 128, { level: res.levelUp || gearLevel(p.id) }) + '" alt=""><div class="crk">' + k + (res.pity ? ' · pity' : '') + '</div>' +
     '<div class="crn">' + p.name + '</div><div class="crs">' + p.setName + ' · ' + SLOT_LABEL[p.slot] + ' · ' + res.rarity + '</div><div class="crd">' + gearResultLine(res) + '</div>' + (gaFx(p.id) ? '<div class="crfx">\u2726 ' + gaFx(p.id).name + ': ' + gaFx(p.id).desc + '</div>' : '') +

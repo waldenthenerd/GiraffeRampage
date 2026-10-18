@@ -89,3 +89,15 @@
 .gfx b{color:#FFD84D}
 .gfxb{position:absolute;top:3px;left:6px;color:#FFD84D;font-size:11px}
 .crfx{margin-top:8px;padding:6px 10px;border-radius:5px;background:rgba(255,216,77,.1);border:1px solid rgba(255,216,77,.35);color:#F2DFA0;font-size:12.5px}
+/* the mythical tier: shifting colours */
+.odds .o.mythical,.gsetrarity.mythical{color:#FF6BD6}
+.crateresult.mythical{border-left-color:#FF6BD6;box-shadow:0 0 18px rgba(255,107,214,.25)}
+.gp.mythical{border:2px solid transparent;background:linear-gradient(#4A1F45,#25102A) padding-box,linear-gradient(120deg,#ff6bd6,#ffd84d,#6bffd6,#6b9bff,#ff6bd6) border-box;background-size:100% 100%,300% 300%;animation:mythborder 5s linear infinite;box-shadow:0 0 14px rgba(255,107,214,.28)}
+.gp.mythical.locked{animation:none}
+.gset2.mythical{border-color:rgba(255,107,214,.55);box-shadow:0 0 14px rgba(255,107,214,.12)}
+.gcmp.mythical{border-color:rgba(255,107,214,.7)}
+.crevl.r-mythical{--rc:#FF6BD6}
+.crevl.r-mythical .crimg{animation:crhue 3s linear infinite}
+.crevl.r-mythical .crk{background:linear-gradient(90deg,#ff6bd6,#ffd84d,#6bffd6,#6b9bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes mythborder{0%{background-position:0 0,0% 50%}100%{background-position:0 0,300% 50%}}
+@keyframes crhue{from{filter:drop-shadow(0 0 14px #FF6BD6) hue-rotate(0)}to{filter:drop-shadow(0 0 14px #FF6BD6) hue-rotate(360deg)}}

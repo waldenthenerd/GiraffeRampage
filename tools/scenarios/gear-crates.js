@@ -46,7 +46,7 @@ try {
   /* Visual effects off: one short timer, no sparks */
   var fx0 = Settings.fxLevel; Settings.fxLevel = 0; reset(); rollRarity = function(){ return 'rare'; }; Save.data.gems = 100; showShop('gear'); buyCrate('normal');
   out.fxOff = gearReveal.timers.length === 1 && !document.querySelector('#crateReveal .crsparks'); gearRevealEnd(); Settings.fxLevel = fx0; rollRarity = realRoll;
-  if (QA.params.shot){ reset(); rollRarity = function(){ return 'legendary'; }; Save.data.gems = 100; showShop('gear'); buyCrate('rare'); if (ph === 'result') gearRevealSkip(); if (ph === 'burst') gearRevealPhase(1); rollRarity = realRoll; }
+  if (QA.params.shot){ reset(); rollRarity = function(){ return QA.params.rar || 'legendary'; }; Save.data.gems = 100; showShop('gear'); buyCrate('rare'); if (ph === 'result') gearRevealSkip(); if (ph === 'burst') gearRevealPhase(1); rollRarity = realRoll; }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
 out.pass = !!(out.pityGood && out.pityFlag && out.pityReset && out.rareResets && out.commonBumps && out.primeEpic && out.pityDupe && out.dupeLevel && out.dupeNoRefund && out.maxedRefund && out.lvStat && out.weaponDmg && out.revealActive && out.secondIgnored && out.spentOnce && out.endedOnTabChange && out.noRegress && out.fxOff && !out.errs.length);
 QA.done(out);

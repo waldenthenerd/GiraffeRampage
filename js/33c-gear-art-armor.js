@@ -3,7 +3,7 @@
    33c-gear-art-armor.js  --  THE ARMOR PASS. The sixteen armors in ARMOR_DESIGNS (33-giraffe-art.js) were checked at three times their size;
    four were weak (the Herdhide Vest was a smudge, the Tideshell and Riptide plates thin, the Twinsoul harness a plain cross) and are redrawn
    here (ARMOR_REDRAW). Every armor also gets what its piece is worth: a glint by rarity (rare: a faint rim, epic: pulsing sparkles,
-   legendary: motes circling it) and one gold pip per level above the first. The original functions stay in place and are wrapped, so
+   legendary: motes circling it, mythical: a ring of shifting colours) and one gold pip per level above the first. The original functions stay in place and are wrapped, so
    drawPlayer() is untouched; armorDraw() is the single entry point (the Gear page icons and the preview use it too).
    P.armorLevel is kept up to date by 33a-gear-art-capes.js.
    ============================================================================================================================= */
@@ -60,6 +60,9 @@ function armorDecorate(ctx, setId, color, rarity, level, t){
   if (rarity === 'rare'){ ctx.globalAlpha = 0.3; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 0.9; ctx.beginPath(); ctx.ellipse(-2, -1, 17.4, 10.2, 0, 0, TAU); ctx.stroke(); }
   else if (rarity === 'epic'){
     for (let i = 0; i < 3; i++){ const p = 0.5 + 0.5 * Math.sin(t * 3 + i * 2.1), a = i * 2.1 + t * 0.3; ctx.globalAlpha = 0.3 + p * 0.6; ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); ctx.arc(-2 + Math.cos(a) * 11, -1 + Math.sin(a) * 5.8, 0.8 + p * 0.9, 0, TAU); ctx.fill(); }
+  } else if (rarity === 'mythical'){
+    ctx.shadowColor = '#FF6BD6'; ctx.shadowBlur = 7;
+    for (let i = 0; i < 7; i++){ const a = i / 7 * TAU - t * 1.1, k = 0.55 + 0.45 * Math.sin(t * 4 + i * 1.7); ctx.globalAlpha = 0.5 + 0.5 * k; ctx.fillStyle = 'hsl(' + Math.round((i * 51 + t * 90) % 360) + ',85%,72%)'; ctx.beginPath(); ctx.arc(-2 + Math.cos(a) * 20, -1 + Math.sin(a) * 12.4, 1.2 + k * 0.8, 0, TAU); ctx.fill(); }
   } else if (rarity === 'legendary'){
     ctx.shadowColor = color; ctx.shadowBlur = 5;
     for (let i = 0; i < 5; i++){ const a = i / 5 * TAU + t * 0.9; ctx.globalAlpha = 0.85; ctx.fillStyle = '#FFF6C0'; ctx.beginPath(); ctx.arc(-2 + Math.cos(a) * 19, -1 + Math.sin(a) * 11.4, 1.3, 0, TAU); ctx.fill(); }

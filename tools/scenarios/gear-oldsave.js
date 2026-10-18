@@ -12,7 +12,7 @@ try {
   out.art = P.capeSet === 'herdhide' && P.capeLevel === 1 && P.armorInfo.setId === 'herdhide';
   showShop('gear'); var cv = document.getElementById('gearPreview'); out.page = !!cv; gearPreviewDraw(cv, performance.now());
   out.tabs = ['upgrades', 'ants', 'wheel'].every(function(t){ showShop(t); return !!document.querySelector('.tabs'); });
-  showShop('gear'); gearPage.view = 'sets'; showShop('gear'); out.sets = document.querySelectorAll('.gtile').length === 48; gearPage.view = 'doll';
+  showShop('gear'); gearPage.view = 'sets'; showShop('gear'); out.sets = document.querySelectorAll('.gtile').length === GEAR_SETS.length * 3; gearPage.view = 'doll';
   Save.write(); var back = GRSave.read(); out.roundTrip = !!back && back.gearLv && back.best === 1234;
   out.bridge = typeof window.GR === 'object' && typeof GRSave.decode === 'function';
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }

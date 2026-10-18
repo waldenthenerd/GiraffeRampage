@@ -141,7 +141,7 @@ function cratePityBump(kind, gotGood){
    Replaces openCrate() from 05-gear.js. Returns { piece, dupe, refund, rarity, levelUp, pity } or null when the purchase could not happen.
    The rarity is rolled as before; if this is the open that pity guarantees (Supply Crate: the 10th without a rare or better, Prime Crate: the
    8th without an epic or better) and the roll fell short, it is raised to the floor. A rarity with nothing left to find gives, in order: an
-   unowned piece of that floor or better when pity is on, an unowned piece of any rarity otherwise, and then a duplicate. A duplicate raises
+   unowned piece of that floor or better when pity is on, an unowned piece of any rarity otherwise (not for a mythical roll), and then a duplicate. A duplicate raises
    the piece one level (up to 5) and refunds nothing; only a piece already at level 5 refunds DUPE_REFUND gems. */
 function openCrate(kind){
   const crate = CRATES[kind];
@@ -154,7 +154,7 @@ function openCrate(kind){
   const all = Object.keys(GEAR_INDEX).map(function(id){ return GEAR_INDEX[id]; }), floorN = pc ? RARITY_ORDER[pc.floor] : 0;
   const atRarity = all.filter(function(p){ return p.rarity === rarity; });
   let candidates = atRarity.filter(function(p){ return !gearOwned(p.id); });
-  if (!candidates.length) candidates = all.filter(function(p){ return !gearOwned(p.id) && (!onPity || RARITY_ORDER[p.rarity] >= floorN); });
+  if (!candidates.length && rarity !== 'mythical') candidates = all.filter(function(p){ return !gearOwned(p.id) && (!onPity || RARITY_ORDER[p.rarity] >= floorN); });      /* a mythical roll never turns into something lesser: with the set complete it levels a piece up */
   let piece, dupe = false, refund = 0, levelUp = 0;
   if (candidates.length){
     piece = pick(candidates); grantGear(piece.id);
