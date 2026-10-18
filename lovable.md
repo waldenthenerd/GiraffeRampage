@@ -59,7 +59,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (134 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (135 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -194,6 +194,7 @@ game. This is the complete list for this version (134 scripts; the developer pan
 | - | `js/44zzg-campus-art.js` | The Campus painting outdoors: the spires, hills and trees, lawns and paving, the iron gate, the arch and the six street buildings, the hedge, notice board, bikes, founder's statue, fountain and faculty banners (`uniEmblem`), and the mortarboard and loafers. |
 | - | `js/44zzh-campus-rooms.js` | The six rooms of the university: walls (`IV_ROOMS.uhall` and the rest) and every piece of furniture (`UNI_FURN` by `u_` kind: the registrar's desk, faculty board, hall of degrees, rank cabinet, stage, seats, the eight faculty bookcases, reading table, desks, results board, café bar and tables). |
 | - | `js/44zzi-campus-pics.js` | `UNI_PICS`: the 49 pictures on the lecture slides (a giraffe in profile, the layers of the Earth, an atom, the solar system, the Colosseum and so on). |
+| - | `js/44zzj-window-glow.js` | **Lit windows only where the glass shows.** Keeps a copy of each recorded window (`D._win`) while a street is painted (`townPaintField` wrapper) and, once it is finished, lights only the pixels that are still glass, so awnings, columns, signs and props in front of a window stay dark; arched windows are clipped to the arch. `townDrawWindows` (in `44w`) draws the glow before the herd and the player, not after them. |
 | 90 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
 | 91 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | 92 | `js/46-main.js` | Starts the game. |

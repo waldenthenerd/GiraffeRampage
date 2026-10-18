@@ -139,13 +139,30 @@
       '<button class="tbtn go" data-a="town-uq-next">' + (last ? 'Take the quiz' : 'Next slide') + '</button></div></div>', { w: 980, back: 'Leave' });
     paintPic(sl.pic, F);
   }
+  /* the book: a real one. A cover, then leaves that turn. Leaf 0 is the cover (its back is the endpaper), leaf 1 carries pages 1 and 2,
+     leaf 2 pages 3 and 4, leaf 3 page 5 and "The End". S.slide counts the leaves already turned (0 closed, 4 all turned). */
+  function bookFace(B, F, leaf, back){
+    if (leaf === 0 && !back) return '<div class="bk-cover" style="--b:' + B.col + '"><i class="bk-band"></i><b>' + esc(B.title) + '</b><span class="bk-orn">&#10086;</span><small>' + esc(B.author) + '</small><em>' + esc(F.name) + '</em></div>';
+    if (leaf === 0) return '<div class="bk-page endpaper"><div class="bk-plate"><small>THIS BOOK BELONGS TO</small><b>The Longneck University Library</b><span class="bk-orn">&#10086;</span></div></div>';
+    const n = back ? leaf * 2 : leaf * 2 - 1;                                           /* page number, 1 to 6 */
+    if (n > B.pages.length) return '<div class="bk-page"><div class="bk-end"><span class="bk-orn">&#10086;</span><b>The End</b><small>' + esc(B.author) + '</small></div><small class="bk-pn">' + n + '</small></div>';
+    return '<div class="bk-page' + (n === 1 ? ' first' : '') + '"><p>' + esc(B.pages[n - 1]) + '</p><small class="bk-pn">' + n + '</small></div>';
+  }
   function showPage(){
-    const B = S.book, F = UNI_BY_ID[S.fid], last = S.slide === B.pages.length - 1;
-    townPanelT('uni', '<div class="uq" style="--c:' + F.col + '"><div class="uq-head"><b>' + esc(B.title) + '</b><small>' + esc(B.author) + ' · page ' + (S.slide + 1) + ' of ' + B.pages.length + '</small></div>' +
-      '<div class="uq-book"><div class="uq-cover" style="--b:' + B.col + '"><b>' + esc(B.title) + '</b><small>' + esc(B.author) + '</small></div><div class="uq-page"><p>' + esc(B.pages[S.slide]) + '</p><small class="uq-pn">' + (S.slide + 1) + '</small></div></div>' +
-      '<div class="uq-nav"><button class="tbtn"' + (S.slide ? '' : ' disabled') + ' data-a="town-uq-prev">Back</button>' +
-      '<span class="uq-dots">' + B.pages.map(function(_, i){ return '<i' + (i === S.slide ? ' class="on"' : '') + '></i>'; }).join('') + '</span>' +
-      '<button class="tbtn go" data-a="town-uq-next">' + (last ? 'Take the quiz' : 'Turn the page') + '</button></div></div>', { w: 900, back: 'Leave' });
+    const B = S.book, F = UNI_BY_ID[S.fid], s = S.slide, dir = S.dir || ''; S.dir = '';
+    const last = s === B.pages.length - 1, maxLeaf = 3;
+    const left = function(k){ return k > 0 ? bookFace(B, F, k - 1, true) : ''; };               /* what lies on the left after k leaves are turned */
+    const right = function(k){ return k <= maxLeaf ? bookFace(B, F, k, false) : '<div class="bk-page back-cover"></div>'; };
+    let leafHtml = '', baseL = left(s), baseR = right(s);
+    if (dir === 'fwd'){ leafHtml = '<div class="bk-leaf fwd"><div class="face front">' + right(s - 1) + '</div><div class="face back">' + left(s) + '</div></div>'; baseL = left(s - 1); }
+    else if (dir === 'back'){ leafHtml = '<div class="bk-leaf back"><div class="face front">' + right(s) + '</div><div class="face back">' + left(s + 1) + '</div></div>'; baseR = right(s + 1); }
+    const label = s === 0 ? 'the cover' : last ? 'page 5, the end' : 'pages ' + (s * 2 - 1) + ' and ' + (s * 2);
+    townPanelT('uni', '<div class="uq" style="--c:' + F.col + '"><div class="uq-head"><b>' + esc(B.title) + '</b><small>' + esc(B.author) + ' · ' + label + '</small></div>' +
+      '<div class="bk' + (s === 0 && dir !== 'back' ? ' closed' : '') + (dir === 'fwd' && s === 1 ? ' opening' : '') + (dir === 'back' && s === 0 ? ' closing' : '') + '" style="--b:' + B.col + '"><div class="bk-shell"><div class="bk-l">' + baseL + '</div><div class="bk-r">' + baseR + '</div>' + leafHtml + '</div></div>' +
+      '<div class="uq-nav"><button class="tbtn"' + (s ? '' : ' disabled') + ' data-a="town-uq-prev">' + (s === 1 ? 'Close the book' : 'Turn back') + '</button>' +
+      '<span class="uq-dots">' + B.pages.map(function(_, i){ return '<i' + (i === s ? ' class="on"' : '') + '></i>'; }).join('') + '</span>' +
+      '<button class="tbtn go" data-a="town-uq-next">' + (last ? 'Take the quiz' : s === 0 ? 'Open the book' : 'Turn the page') + '</button></div></div>', { w: 940, back: 'Leave' });
+    if (dir) try { SFX.click(); } catch (e) {}
   }
   function paintPic(key, F){
     const cv = document.getElementById('uq-pic'); if (!cv) return;
@@ -323,10 +340,10 @@
     if ((m = /^town-uq-exam-(\w+)$/.exec(a))){ startExam(m[1]); return true; }
     if (!S) return true;
     const p = S.qs[S.i];
-    if (a === 'town-uq-prev'){ if (S.slide > 0){ S.slide--; (S.lec ? showSlide : showPage)(); } return true; }
+    if (a === 'town-uq-prev'){ if (S.slide > 0){ S.slide--; S.dir = 'back'; (S.lec ? showSlide : showPage)(); } return true; }
     if (a === 'town-uq-next'){
       const len = S.lec ? S.lec.slides.length : S.book.pages.length;
-      if (S.slide < len - 1){ S.slide++; (S.lec ? showSlide : showPage)(); } else { S.i = 0; S.answered = false; showQ(); }
+      if (S.slide < len - 1){ S.slide++; S.dir = 'fwd'; (S.lec ? showSlide : showPage)(); } else { S.i = 0; S.answered = false; showQ(); }
       return true;
     }
     if (a === 'town-uq-q-next'){ if (S.answered) nextQ(); return true; }

@@ -212,7 +212,7 @@ function townMailTake(){
 (function(){
   const H = TOWN_DIST.harbour, S = TOWN_DIST.square;
   H.b.push({ id: 'fishspot', kind: 'fishspot', x: 1010, w: 120, h: 0, label: 'The end of the pier', act: 'fish' });
-  S.b.push({ id: 'postbox', kind: 'postbox', x: 2030, w: 70, h: 100, label: 'The post box', act: 'mail' });
+  S.b.push({ id: 'postbox', kind: 'postbox', x: 2098, w: 70, h: 100, label: 'The post box', act: 'mail' });
   const bx = townBuildingX;
   townBuildingX = function(c, D, b, P, r){
     if (b.kind === 'fishspot') return true;
@@ -268,6 +268,6 @@ function townMailTake(){
   const dyx = townDynX;
   townDynX = function(ctx, D, t, dark){
     dyx(ctx, D, t, dark);
-    if (D.id === 'square'){ const m = townMailToday(); if (!m.got){ const f = Math.sin(t * 4) * 0.5 + 0.5; tRect(ctx, '#F2C230', 2030 + 20, TG - 100 - f * 4, 12, 8); tRect(ctx, '#8A6A2A', 2030 + 26, TG - 92, 2, 14); } }
+    if (D.id === 'square'){ const m = townMailToday(); if (!m.got){ const f = Math.sin(t * 4) * 0.5 + 0.5; tRect(ctx, '#F2C230', 2098 + 20, TG - 100 - f * 4, 12, 8); tRect(ctx, '#8A6A2A', 2098 + 26, TG - 92, 2, 14); } }
   };
 })();
