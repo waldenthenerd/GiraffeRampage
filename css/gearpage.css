@@ -128,3 +128,12 @@
   .crgrid{gap:4px}.crc{min-height:128px}.crc .crimg{width:46px;height:46px}.crc .crn{font-size:9.5px}.crc .crs{display:none}.crc .crk{font-size:8.5px}.crc .crbox{font-size:32px}
   .crsum{font-size:11.5px}
 }
+/* the side panel is a fixed-size scroll window: it takes the height of the picture beside it and never changes the page's height */
+.gcolR{position:relative;min-height:190px;align-self:stretch}
+.gcolR>.gbuild,.gcolR>.gcmp{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--bark2) transparent}
+.gcolR>.gbuild::-webkit-scrollbar,.gcolR>.gcmp::-webkit-scrollbar{width:6px}
+.gcolR>.gbuild::-webkit-scrollbar-thumb,.gcolR>.gcmp::-webkit-scrollbar-thumb{background:var(--bark2);border-radius:3px}
+@media (max-width:760px){
+  .gcolR{min-height:0;height:240px;align-self:auto}                                       /* one column: a fixed window below the picture, so tapping gear does not move the page either */
+}
+.gcolR.more::after{content:'';position:absolute;left:1px;right:1px;bottom:1px;height:36px;pointer-events:none;border-radius:0 0 6px 6px;background:linear-gradient(rgba(36,27,21,0),rgba(36,27,21,.97))}
