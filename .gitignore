@@ -26,3 +26,4 @@ desktop.ini
 # Environment / secrets
 .env
 .env.*
+.superpowers/
