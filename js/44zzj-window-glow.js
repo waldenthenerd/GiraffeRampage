@@ -33,7 +33,14 @@
         }
         w.cov = n / (s.w * s.h);
         if (n < s.w * s.h * 0.2){ w.hide = true; return; }                       /* covered: no glow */
-        const cv = document.createElement('canvas'); cv.width = s.w; cv.height = s.h; cv.getContext('2d').putImageData(out, 0, 0); w.cv = cv;
+        const cv = document.createElement('canvas'); cv.width = s.w; cv.height = s.h; const g = cv.getContext('2d'); g.putImageData(out, 0, 0);
+        if (w.round || w.poly){                                                  /* a window that is not a box: keep only what is inside its outline */
+          g.globalCompositeOperation = 'destination-in'; g.fillStyle = '#000'; g.beginPath();
+          if (w.round) g.ellipse(s.w / 2, s.h / 2, s.w / 2, s.h / 2, 0, 0, Math.PI * 2);
+          else w.poly.forEach(function(q, k){ if (k) g.lineTo(q[0] * s.w, q[1] * s.h); else g.moveTo(q[0] * s.w, q[1] * s.h); });
+          g.fill();
+        }
+        w.cv = cv;
       } catch (e) {}
     });
   }

@@ -188,7 +188,7 @@
       /* a high central gable with a round window and an owl */
       tPoly(c, STONE, [x - 90, top + 50, x + 90, top + 50, x, top - 60]); tPoly(c, STONE_D, [x - 74, top + 46, x + 74, top + 46, x, top - 44]); K.blocks(c, x - 74, top - 4, 148, 50, 28, 12, 152);
       tCircle(c, STONE, x, top + 6, 24); tCircle(c, '#2B3A5A', x, top + 6, 19); tCircle(c, '#FFE7A8', x, top + 6, 16);
-      c.strokeStyle = '#3A2A1E'; c.lineWidth = 2; c.beginPath(); c.moveTo(x - 16, top + 6); c.lineTo(x + 16, top + 6); c.moveTo(x, top - 10); c.lineTo(x, top + 22); c.stroke(); D._win.push({ x: x - 14, y: top - 8, w: 28, h: 28 });
+      c.strokeStyle = '#3A2A1E'; c.lineWidth = 2; c.beginPath(); c.moveTo(x - 16, top + 6); c.lineTo(x + 16, top + 6); c.moveTo(x, top - 10); c.lineTo(x, top + 22); c.stroke(); D._win.push({ x: x - 16, y: top - 10, w: 32, h: 32, round: true });
       tEll(c, '#8A7A5A', x, top - 66, 8, 10); tCircle(c, '#FFD84D', x - 3, top - 68, 2.4); tCircle(c, '#FFD84D', x + 3, top - 68, 2.4); tPoly(c, '#C9772E', [x - 1.4, top - 65, x + 1.4, top - 65, x, top - 61]);
       /* tall windows with books on show, two columns and a studded oak door */
       for (let i = 0; i < 4; i++){ const wx = x0 + [22, 84, 284, 346][i]; archWin(c, D, wx, top + 82, 32, 94, true);
@@ -204,7 +204,7 @@
       tRect(c, '#B8452F', x0, top + 36, W, TG - top - 36); K.bricks(c, x0, top + 36, W, TG - top - 36, 9, 22, 171);
       tRect(c, '#6A6A74', x0, TG - 14, W, 14);
       /* a sawtooth roof with glazed north lights */
-      for (let i = 0; i < 3; i++){ const sx = x0 + i * (W / 3); tPoly(c, SLATE, [sx, top + 36, sx + W / 3, top + 36, sx + W / 3, top - 14, sx, top + 36]); tPoly(c, '#9DCBEA', [sx + W / 3 - 4, top + 34, sx + W / 3 - 4, top - 8, sx + W / 3 - 34, top + 34]); ln(c, '#4B5568', 2, sx + W / 3 - 20, top + 34, sx + W / 3 - 4, top - 4); D._win.push({ x: sx + W / 3 - 30, y: top + 4, w: 24, h: 28 }); }
+      for (let i = 0; i < 3; i++){ const sx = x0 + i * (W / 3); tPoly(c, SLATE, [sx, top + 36, sx + W / 3, top + 36, sx + W / 3, top - 14, sx, top + 36]); tPoly(c, '#9DCBEA', [sx + W / 3 - 4, top + 34, sx + W / 3 - 4, top - 8, sx + W / 3 - 34, top + 34]); ln(c, '#4B5568', 2, sx + W / 3 - 20, top + 34, sx + W / 3 - 4, top - 4); D._win.push({ x: sx + W / 3 - 34, y: top - 8, w: 30, h: 42, poly: [[1, 1], [1, 0], [0, 1]] }); }
       tRect(c, '#4B5568', x0 - 4, top + 34, W + 8, 5);
       /* big workroom windows, each with a lamp and a desk inside */
       for (let i = 0; i < 4; i++){ if (i === 2 || i === 1 && false) continue; const wx = x0 + 22 + i * 74 - (i > 1 ? 0 : 0); if (Math.abs(wx + 28 - x) < 50) continue;

@@ -14,12 +14,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 135 | 48,736 | 3.61 MiB (3,788,573 bytes) |
-| Styles (`css/`) | 3 | 1,241 | 109 KiB (111,486 bytes) |
+| JavaScript (`js/`) | 135 | 48,743 | 3.61 MiB (3,789,135 bytes) |
+| Styles (`css/`) | 3 | 1,245 | 110 KiB (112,879 bytes) |
 | Page (`index.html`) | 1 | 180 | 7.6 KiB (7,792 bytes) |
-| **Whole game** | **139** | **50,157** | **3.73 MiB (3,907,851 bytes)** |
+| **Whole game** | **139** | **50,168** | **3.73 MiB (3,909,806 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **49,590 lines, 3.69 MiB (3,864,376 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **49,601 lines, 3.69 MiB (3,866,331 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -166,7 +166,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zzg-campus-art.js` | 437 | The Campus painting outdoors: the spires, hills and trees, lawns and paving, the iron gate, the arch and the six street buildings, the hedge, notice board, bikes, founder's statue, fountain and faculty banners (`uniEmblem`), and the mortarboard and loafers. |
 | `js/44zzh-campus-rooms.js` | 294 | The six rooms of the university: walls (`IV_ROOMS.uhall` and the rest) and every piece of furniture (`UNI_FURN` by `u_` kind: the registrar's desk, faculty board, hall of degrees, rank cabinet, stage, seats, the eight faculty bookcases, reading table, desks, results board, café bar and tables). |
 | `js/44zzi-campus-pics.js` | 100 | `UNI_PICS`: the 49 pictures on the lecture slides (a giraffe in profile, the layers of the Earth, an atom, the solar system, the Colosseum and so on). |
-| `js/44zzj-window-glow.js` | 66 | **Lit windows only where the glass shows.** Keeps a copy of each recorded window (`D._win`) while a street is painted (`townPaintField` wrapper) and, once it is finished, lights only the pixels that are still glass, so awnings, columns, signs and props in front of a window stay dark; arched windows are clipped to the arch. `townDrawWindows` (in `44w`) draws the glow before the herd and the player, not after them. |
+| `js/44zzj-window-glow.js` | 73 | **Lit windows only where the glass shows.** Keeps a copy of each recorded window (`D._win`) while a street is painted (`townPaintField` wrapper) and, once it is finished, lights only the pixels that are still glass, so awnings, columns, signs and props in front of a window stay dark; arched, round and triangular windows keep only what is inside their outline. `townDrawWindows` (in `44w`) draws the glow before the herd and the player, not after them. |
 | `js/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/45b-dev-panel.js` | 567 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/46-main.js` | 4 | Starts the game. |
