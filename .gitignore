@@ -27,3 +27,4 @@ desktop.ini
 .env
 .env.*
 .superpowers/
+tools/scenarios/*.js.json
