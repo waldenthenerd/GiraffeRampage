@@ -44,7 +44,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 ### How to apply an update
 
 1. Take the files in `index.html` order (section 3), **except `js/45b-dev-panel.js`**.
-2. Put `css/style.css` first, `css/polish.css` after it, then `css/campus.css` and `css/townlife.css` into the page as `<style>` blocks (or keep them as two linked
+2. Put `css/style.css` first, `css/polish.css` after it, then `css/campus.css`, `css/townlife.css` and `css/gearpage.css` into the page as `<style>` blocks (or keep them as two linked
    files). `polish.css` is layered over `style.css`; the order matters.
 3. Put each script in its **own** `<script>` block (or keep separate `<script src>` tags), in the same order. Do **not**
    concatenate everything into one script block: every file begins with `'use strict';` except `js/00-icons.js`, which was never
@@ -59,7 +59,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (144 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (151 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -204,6 +204,13 @@ game. This is the complete list for this version (144 scripts; the developer pan
 | - | `js/36o-cloud-fronts.js` | **Weather that arrives.** Cloud shadows drift across the ground, thickening and tinting as a front nears (`WxE.front`, `WxE.pend` from `36j`); thin clouds drift in calm weather in the open-sky chapters. The weather itself builds from a few drops to a full fall over 14 seconds and eases off over 10 (`weatherDraw` takes a `frac`). |
 | - | `js/02d-ground-sounds.js` | **What the ground sounds like.** Replaces `SFX.foot`: mud, snow, ice, metal (the Moon, Mars, the space centre), shallow water, dust, sand, leaf, asphalt, cinders and rock, changed by rain, blizzards, sandstorms and acid (`groundNow`), plus `SFX.groundImpact` and a ground answer when the head lands in a lunge. |
 | - | `js/44zzp-photo-looks.js` | **The photo studio's look and light.** A Look and light tab: filters (Sepia, Noir, Glitch, Painterly), seven frames, a time-of-day slider, and a freeze-all-creatures toggle; twelve stickers in the Effects tab. All saved with the picture; photo code version 5 is written only when one is used (older codes are unchanged). |
+| - | `js/05a-gear-levels.js` | **Gear levels and the crate rules.** A piece goes from level 1 to 5 (`gearLevel`, `gearLevelUp`; each level adds 10% to what the piece gives, a weapon also 6% damage), `gearStatsFor()` and `gearDelta()` say what a loadout or a swap would change without touching the save, crate pity (`CRATE_PITY`: rare or better within 10 Supply Crate opens, epic or better within 8 Prime Crate opens) and `openCrate()` replaced so a duplicate levels the piece up. Save keys `gearLv` and `cratePity` sit beside `gear`. |
+| - | `js/33a-gear-art-capes.js` | **Sixteen capes.** One design per gear set (`CAPE_DESIGNS`) on a shared cloth frame (`capeFrame`) so the wind and flutter are the same; `capeDraw()` is called by `drawPlayer`; level 3 adds a trim, level 5 a glint. Also keeps `P.capeSet`, `P.capeLevel`, `P.weaponLevel`, `P.armorLevel` up to date. |
+| - | `js/33b-gear-art-weapons.js` | **Sixteen weapons you can see.** `WEAPON_ART` draws each weapon on her: hoof pieces, head pieces (fangs, lances, a maul, a trident, an anglerfish lure) and body pieces (twin tails, a spinning maw ring), timed to the neck lunge. Level 4 and up glows. |
+| - | `js/33c-gear-art-armor.js` | **The armor pass.** Four armors redrawn (`ARMOR_REDRAW`: Herdhide, Tideshell, Riptide, Twinsoul); every armor gains a rarity glint and level pips (`armorDecorate`, `armorDraw`). |
+| - | `js/33d-gear-icons.js` | **A drawn icon for every piece.** `gearIcon(id, size, {locked, level})` returns a cached PNG data URL (dark silhouette when not found yet); `gearFrame(rarity)` gives the four rarity looks. |
+| - | `js/36p-gear-fx.js` | **Eight pieces with a playstyle.** `GEAR_FX`: Thorns, Dust cloak, Cold snap, Sun ward, Aurora drift, Star crack, Undertow, Tidal wake, each tied to one piece and scaled by its level; hooks on `doKick`, `hurtPlayer`, `updatePlayer` and `applyGear`. State in `GearFx`. |
+| - | `js/41a-gear-page.js` | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, and the crate reveal (`gearReveal`). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
 | 90 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
 | 91 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | 92 | `js/46-main.js` | Starts the game. |

@@ -88,3 +88,12 @@ Your scenario files and screenshots stay in your scratch folder; mention their n
 - Music stems: `Music.stems` ({ bass, drums, lead, near, spike, low }) and `Music.stemOn` (true only in a normal run). Put enemies near her for the bass, 20+ enemies out for the drums, `P.hp` under 40% for the lead.
 - Ground sounds: `groundNow()` says what she stands on and the weather's effect; `SFX.foot()` and `SFX.groundImpact()` play it. A pond: `G.water = { x: P.x, y: P.y, r: 150 }`.
 - Photo studio: `PHOTO.filter` (0 to 4), `PHOTO.frame` (0 to 7), `PHOTO.tod` (-1 or 0 to 47, half hours), `PHOTO.freeze`, then `photoRender(canvas, false)`; `photoToCode()` writes code version 5 only if one is set.
+
+## Gear page, gear art, levels, crates, effects
+Scenarios are in `tools/scenarios/` (run each with `node tools/qa-cloud.mjs tools/scenarios/<name>.js --wait 25000`, add `--shot x.png` and the params below to see it):
+- `gear-levels.js`: levels (`gearLevel(id)`, `gearLevelUp(id)`, `gearLevelScale(n)`), `gearStatsFor({cape, weapon, armor})`, `gearDelta(slot, id)`, `cratePityCount(kind)` / `cratePityBump(kind, good)`.
+- `gear-art.js`: `view=capes|weapons|armor`, `lv=1..5`, `page=0|1` (weapons), `zoom=1.9`. Draws a contact sheet of all 16 over the page (capes by `drawPlayer` with each equipped); also checks that every design paints pixels.
+- `gear-icons.js`: `size=64|128`. All 48 `gearIcon(id, size, {locked, level})` data URLs, cached (`gearIcon._draws`), `gearFrame(rarity)`, and a sheet of unlocked and locked icons.
+- `gear-page.js`: `state=empty|one|set|kick|sets|compare` (+ `slot=`, `hover=` for compare). `showShop('gear')`, `gearPage` ({ slot, selected, hover, view }), `gearSyncSelection()`, `gearPreviewDraw(canvas, ms)` (the headless browser throttles `requestAnimationFrame`, so draw the picture by hand before a screenshot), `gearPreview.frames`. `phone`: add `--w 390 --h 844`.
+- `gear-crates.js`: pity (`CRATE_PITY`), duplicates levelling a piece up, the reveal (`gearReveal`: `active`, `phase`, `timers`; `gearRevealSkip()`, `gearRevealPhase(n)`, `gearRevealEnd()`). Force a roll by replacing `rollRarity`. Add `--params "shot=1&phase=shake|burst|result"` for the screens.
+- `gear-fx.js`: the eight effects (`GEAR_FX`, `GearFx`) through the real hooks: `wear([ids])`, `hurtPlayer(n, x, y)`, `doKick()`, `GR.step`. `show=wake|dust|frost|star|ward` stages a screenshot of one. Enemies are found with a loop over `G.enemies` (the spatial grid does not hold just-spawned ones), and `e.stunT = 99` keeps a test enemy still.
