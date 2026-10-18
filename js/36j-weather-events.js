@@ -47,30 +47,34 @@ const WX_EVENTS = {
 const WX_TOD = { 1: ['fireflies', 0.55], 2: ['stars', 0.6], 3: ['fireflies', 0.55], 6: ['stars', 0.62], 11: ['sparkles', 0.55] };
 
 const WxE = {
-  t: 0, next: 30, chOf: 0, cur: null, age: 0, dur: 0, k: 0,
+  t: 0, next: 30, chOf: 0, cur: null, age: 0, dur: 0, k: 0, pend: null, front: 0,
   wx: makeWeather(), tod: makeWeather(), todKey: '', todK: 0,
   flash: 0, dbl: 0, boltT: 6, bolt: null, boltA: 0, thunder: 0,
   rip: [], ripAcc: 0, rainy: 0,
 
   update(dt, ch, S){
     const fx = fxLevelNow();
-    if (fx <= 0){ this.cur = null; this.k = 0; this.todK = 0; this.flash = 0; this.rip.length = 0; return; }
+    if (fx <= 0){ this.cur = null; this.pend = null; this.front = 0; this.k = 0; this.todK = 0; this.flash = 0; this.rip.length = 0; return; }
     const W = G.W, H = G.H, dens = fx >= 2 ? 1 : 0.6;
     this.t += dt;
     if (this.chOf !== ch){
-      this.chOf = ch; this.cur = null; this.k = 0; this.next = this.t + rand(26, 46);
+      this.chOf = ch; this.cur = null; this.pend = null; this.front = 0; this.k = 0; this.next = this.t + rand(26, 46);
       this.wx.key = ''; this.wx.list.length = 0; this.tod.key = ''; this.tod.list.length = 0;
     }
     /* start, run and end an event */
     const defs = WX_EVENTS[ch];
+    /* the front arrives first: 16 seconds before the weather itself, the next event is chosen and its clouds start to drift in (36o draws them) */
+    if (!this.cur && defs && !this.pend && this.t >= this.next - 16) this.pend = defs[(Math.random() * defs.length) | 0];
     if (!this.cur && defs && this.t >= this.next && G.state !== 'paused'){
-      this.cur = defs[(Math.random() * defs.length) | 0];
+      this.cur = this.pend || defs[(Math.random() * defs.length) | 0]; this.pend = null;
       this.age = 0; this.dur = rand(this.cur.dur[0], this.cur.dur[1]); this.boltT = rand(1.5, 4);
     }
+    const wantFront = (this.cur || this.pend) && defs ? 1 : 0;
+    this.front = clamp(this.front + (wantFront > this.front ? dt / 9 : -dt / 12), 0, 1);               /* the clouds come in over 9 seconds and linger 12 after */
     if (this.cur){
       this.age += dt;
       const target = this.age < this.dur ? 1 : 0;
-      this.k = clamp(this.k + (target > this.k ? dt / 3 : -dt / 3), 0, 1);
+      this.k = clamp(this.k + (target > this.k ? dt / 14 : -dt / 10), 0, 1);                           /* it builds over 14 seconds and eases off over 10 */
       if (target === 0 && this.k <= 0){ this.cur = null; this.next = this.t + rand(55, 100); this.wx.key = ''; this.wx.list.length = 0; }
     }
     this.rainy = 0;
@@ -128,7 +132,7 @@ const WxE = {
   draw(ctx, t, S){
     if (fxLevelNow() <= 0) return;
     if (this.todK > 0.01 && this.todKey) weatherDraw(ctx, this.tod, this.todKey, S.accent, t, this.todK);
-    if (this.cur && this.k > 0.01) weatherDraw(ctx, this.wx, this.cur.weather, S.accent, t, this.k);
+    if (this.cur && this.k > 0.01) weatherDraw(ctx, this.wx, this.cur.weather, S.accent, t, Math.min(1, this.k * 1.6), Math.pow(this.k, 1.8));      /* a few drops first, then the full fall */
     if (this.rip.length){
       ctx.save(); ctx.lineWidth = 1.2;
       for (let i = 0; i < this.rip.length; i++){

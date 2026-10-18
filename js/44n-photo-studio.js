@@ -4,7 +4,7 @@
 /* ========================= 44n. PHOTO STUDIO ========================= */
 /* PHOTO.items = [{ t:'fx'|'foe', id, ch, x, y, s, f, r }] in picture coordinates (960 x 540). PHOTO.sel is -1 for her, an index into
    items, or -2 for nothing. The picture on screen is drawn with a selection ring; saving and copying draw it again without. */
-const PHOTO = { bg: 0, pose: 0, flip: false, gx: 480, gy: 453.6, gs: 1, moved: false, tab: 'scene', foeCh: 1, items: [], sel: -2 };
+const PHOTO = { bg: 0, pose: 0, flip: false, gx: 480, gy: 453.6, gs: 1, moved: false, tab: 'scene', foeCh: 1, items: [], sel: -2, filter: 0, frame: 0, tod: -1, freeze: false };      /* filter, frame, tod (the time of day in half hours, -1 = the backdrop's own light) and freeze: 44zzp-photo-looks.js */
 const PHOTO_BG = ['Golden savanna', 'Snowfield', 'Night sky', 'Neon city', 'Studio'];
 const PHOTO_POSE = [
   { n: 'Standing', o: {} },
@@ -342,7 +342,7 @@ function photoThumbs(){
 function showPhoto(){
   G.state = 'help'; G.attract = true; G.subScreen = 'photo';
   const chips = function(list, cur, pre){ return list.map(function(nm, i){ return '<button class="pchip' + (i === cur ? ' on' : '') + '" data-a="' + pre + i + '">' + nm + '</button>'; }).join(''); };
-  const tabs = [['scene', 'Scene and pose'], ['fx', 'Effects'], ['foes', 'Creatures'], ['album', 'Album']].map(function(t){
+  const tabs = [['scene', 'Scene and pose'], ['look', 'Look and light'], ['fx', 'Effects'], ['foes', 'Creatures'], ['album', 'Album']].map(function(t){
     return '<button class="pchip' + (PHOTO.tab === t[0] ? ' on' : '') + '" data-a="ward-photo-tab-' + t[0] + '">' + t[1] + '</button>'; }).join('');
   let body = '';
   const lab = function(txt){ return '<div class="plabel">' + txt + '</div>'; };
@@ -357,9 +357,11 @@ function showPhoto(){
       lab('Direction') + '<div class="pchips"><button class="pchip' + (PHOTO.flip ? ' on' : '') + '" data-a="ward-photo-flip">Turn her around</button></div>';
   } else if (PHOTO.tab === 'fx'){
     const chipsOf = function(list){ return '<div class="pchips">' + list.map(function(f){ return '<button class="pchip" data-a="ward-photo-fx-' + f[0] + '">' + f[1] + '</button>'; }).join('') + '</div>'; };
-    const veh = PHOTO_FX.filter(function(f, i){ return i >= 15 && /^(car|plane|boat)_/.test(f[0]); }), things = PHOTO_FX.filter(function(f, i){ return i >= 15 && !/^(car|plane|boat)_/.test(f[0]); });
+    const veh = PHOTO_FX.filter(function(f, i){ return i >= 15 && /^(car|plane|boat)_/.test(f[0]); }), things = PHOTO_FX.filter(function(f, i){ return i >= 15 && !/^(car|plane|boat|st)_/.test(f[0]); }), stickers = PHOTO_FX.filter(function(f){ return /^st_/.test(f[0]); });
     body = '<div class="sub" style="margin:2px 0">Click one to add it to the picture, then drag it where you want it.</div>' +
-      lab('Effects') + chipsOf(PHOTO_FX.slice(0, 15)) + (veh.length ? lab('Vehicles') + chipsOf(veh) : '') + (things.length ? lab('Things') + chipsOf(things) : '');  } else if (PHOTO.tab === 'album'){
+      lab('Effects') + chipsOf(PHOTO_FX.slice(0, 15)) + (veh.length ? lab('Vehicles') + chipsOf(veh) : '') + (things.length ? lab('Things') + chipsOf(things) : '') + (stickers.length ? lab('Stickers') + chipsOf(stickers) : '');  } else if (PHOTO.tab === 'look'){
+    body = typeof photoLookBody === 'function' ? photoLookBody() : '';
+  } else if (PHOTO.tab === 'album'){
     body = typeof photoAlbumHTML === 'function' ? photoAlbumHTML() : '';
   } else {
     const t = bestiaryTable(PHOTO.foeCh); let found = 0, cells = '';
@@ -423,7 +425,7 @@ function photoAct(kind){
 }
 function photoAction(a){
   if (a === 'ward-photo'){ SFX.click(); showPhoto(); return true; }
-  let m = /^ward-photo-tab-(scene|fx|foes|album)$/.exec(a);
+  let m = /^ward-photo-tab-(scene|look|fx|foes|album)$/.exec(a);
   if (m){ PHOTO.tab = m[1]; SFX.click(); showPhoto(); return true; }
   m = /^ward-photo-(bg|pose)-(\d+)$/.exec(a);
   if (m){ PHOTO[m[1]] = +m[2]; if (m[1] === 'pose') PHOTO.sel = -1; SFX.click(); showPhoto(); return true; }

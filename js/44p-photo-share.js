@@ -45,11 +45,11 @@ function photoLookNow(){
     finally { giraffeColours = gc; giraffePattern = gp; accEquipped = ae; _accOv = ov; }
   };
 })();
-const PHOTO_KEYS = ['bg', 'pose', 'flip', 'gx', 'gy', 'gs', 'moved', 'items', 'look', 'sel'];
+const PHOTO_KEYS = ['bg', 'pose', 'flip', 'gx', 'gy', 'gs', 'moved', 'items', 'look', 'sel', 'filter', 'frame', 'tod', 'freeze'];
 function photoRenderState(st, cv){                                         /* draw a decoded photo without disturbing the studio */
   const keep = {}; PHOTO_KEYS.forEach(function(k){ keep[k] = PHOTO[k]; });
   PHOTO.bg = st.bg; PHOTO.pose = st.pose; PHOTO.flip = st.flip; PHOTO.gx = st.gx; PHOTO.gy = st.gy; PHOTO.gs = st.gs; PHOTO.moved = true;
-  PHOTO.items = st.items; PHOTO.look = st.look; PHOTO.sel = -2;
+  PHOTO.items = st.items; PHOTO.look = st.look; PHOTO.sel = -2; PHOTO.filter = st.filter | 0; PHOTO.frame = st.frame | 0; PHOTO.tod = st.tod === undefined ? -1 : st.tod; PHOTO.freeze = !!st.freeze;
   try { photoRender(cv, false); } finally { PHOTO_KEYS.forEach(function(k){ PHOTO[k] = keep[k]; }); }
 }
 
@@ -78,6 +78,7 @@ function photoData(){
   const L = photoLookNow(), r = function(v){ return Math.round(v * 10) / 10; };
   return {
     v: 1, bg: PHOTO.bg, pose: PHOTO.pose, flip: !!PHOTO.flip,
+    grade: { filter: PHOTO.filter | 0, frame: PHOTO.frame | 0, tod: PHOTO.tod === undefined ? -1 : PHOTO.tod, freeze: !!PHOTO.freeze },
     giraffe: { x: r(PHOTO.gx), y: r(PHOTO.gy), s: Math.round(PHOTO.gs * 100) / 100 },
     look: { skin: L.s, spots: L.p, pattern: L.t, gear: L.g, hat: L.hat || '', boots: L.boot || '', hatColour: L.hc | 0, bootColour: L.bc | 0 },
     items: PHOTO.items.map(function(it){
@@ -106,8 +107,10 @@ function photoPack(d){
     w.w(it.x + 100, 11); w.w(it.y + 100, 10); w.w(it.scale * 50, 8); w.w(it.flip ? 1 : 0, 1);
     w.w((((it.tilt % TAU) + TAU) % TAU) / TAU * 128, 7);
   });
+  const gr = d.grade || {}, ext = (gr.filter | 0) || (gr.frame | 0) || (gr.tod >= 0) || gr.freeze, ver = ext ? 5 : 4;                /* version 5 only when a filter, frame, time of day or freeze is used: every older photo keeps its old code */
+  if (ext){ w.w(gr.filter | 0, 3); w.w(gr.frame | 0, 4); w.w(gr.tod >= 0 ? Math.min(47, gr.tod) : 63, 6); w.w(gr.freeze ? 1 : 0, 1); }
   const body = w.done();
-  return [4, photoCheck(body, 0)].concat(body);
+  return [ver, photoCheck(body, 0)].concat(body);
 }
 function photoUnpack(bytes){
   if (bytes.length < 4 || photoCheck(bytes, 2) !== bytes[1]) throw new Error('damaged');
@@ -124,6 +127,7 @@ function photoUnpack(bytes){
     const x = r.r(11) - 100, y = r.r(10) - 100, s = r.r(8) / 50, f = !!r.r(1), t = r.r(7) / 128 * TAU;
     d.items.push({ type: foe ? 'creature' : 'fx', id: id, chapter: ch, x: x, y: y, scale: s, flip: f, tilt: t });
   }
+  if (bytes[0] >= 5){ const fl = r.r(3), fr = r.r(4), td = r.r(6), fz = r.r(1); d.grade = { filter: fl, frame: fr, tod: td === 63 ? -1 : td, freeze: !!fz }; }
   return d;
 }
 function photoToCode(){ return photoB64(photoPack(photoData())); }
@@ -137,7 +141,7 @@ function photoFromCode(text){
     while (s.length % 4) s += '=';
     const bin = atob(s), bytes = [];
     for (let i = 0; i < bin.length; i++) bytes.push(bin.charCodeAt(i));
-    data = (bytes[0] >= 2 && bytes[0] <= 4) ? photoUnpack(bytes) : JSON.parse(decodeURIComponent(escape(bin)));
+    data = (bytes[0] >= 2 && bytes[0] <= 5) ? photoUnpack(bytes) : JSON.parse(decodeURIComponent(escape(bin)));
   } catch (e) { return { ok: false, why: 'That does not look like a photo code. Check that the whole code was copied.' }; }
   if (!data || typeof data !== 'object' || data.v !== 1) return { ok: false, why: 'This photo code is from a different version of the game.' };
   const num = function(v, lo, hi, d){ v = +v; return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
@@ -146,6 +150,7 @@ function photoFromCode(text){
   st.bg = int(data.bg, 0, PHOTO_BG.length - 1);
   st.pose = int(data.pose, 0, PHOTO_POSE.length - 1);
   st.flip = !!data.flip;
+  { const g = data.grade || {}; st.filter = int(g.filter, 0, 4); st.frame = int(g.frame, 0, 7); st.tod = isFinite(+g.tod) && +g.tod >= 0 ? Math.min(47, Math.round(+g.tod)) : -1; st.freeze = !!g.freeze; }
   st.gx = num(gi.x, 0, 960, 480); st.gy = num(gi.y, 140, 540, 453.6); st.gs = num(gi.s, 0.5, 1.7, 1);
   const hat = typeof lk.hat === 'string' && ACC_BY_ID[lk.hat] && ACC_BY_ID[lk.hat].kind === 'hat' ? lk.hat : '';
   const boot = typeof lk.boots === 'string' && ACC_BY_ID[lk.boots] && ACC_BY_ID[lk.boots].kind === 'boot' ? lk.boots : '';
@@ -246,7 +251,7 @@ function photoAlbumPaint(){
 function photoApply(res, srcText){
   const s = res.state;
   PHOTO.bg = s.bg; PHOTO.pose = s.pose; PHOTO.flip = s.flip; PHOTO.gx = s.gx; PHOTO.gy = s.gy; PHOTO.gs = s.gs; PHOTO.moved = true;
-  PHOTO.items = s.items; PHOTO.sel = -2; PHOTO.look = s.look; PHOTO.code = srcText;
+  PHOTO.items = s.items; PHOTO.sel = -2; PHOTO.look = s.look; PHOTO.code = srcText; PHOTO.filter = s.filter | 0; PHOTO.frame = s.frame | 0; PHOTO.tod = s.tod === undefined ? -1 : s.tod; PHOTO.freeze = !!s.freeze;
 }
 
 /* ---- the buttons on the photo screen ---- */
