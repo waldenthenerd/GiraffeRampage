@@ -167,8 +167,6 @@ function renderForage(ctx){
   const cx = g.sx + (f.hx - g.sx) * 0.15, cy = (g.sy + f.hy) / 2;
   ctx.strokeStyle = coat; ctx.lineCap = 'round'; ctx.lineWidth = 18 * gs;
   ctx.beginPath(); ctx.moveTo(g.sx, g.sy); ctx.quadraticCurveTo(cx, cy, f.hx, f.hy); ctx.stroke();
-  ctx.strokeStyle = '#8A5A24'; ctx.lineWidth = 3 * gs;   /* the short mane down the back of the neck */
-  ctx.beginPath(); ctx.moveTo(g.sx - 8 * gs, g.sy); ctx.quadraticCurveTo(cx - 8 * gs, cy, f.hx - 6 * gs, f.hy + 4 * gs); ctx.stroke();
   ctx.lineCap = 'butt';
   for (let k = 1; k < 8; k++){
     const t = k / 8, a = (1 - t) * (1 - t), b = 2 * (1 - t) * t, c = t * t;

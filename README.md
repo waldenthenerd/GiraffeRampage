@@ -14,12 +14,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 135 | 48,752 | 3.61 MiB (3,790,479 bytes) |
+| JavaScript (`js/`) | 135 | 48,750 | 3.61 MiB (3,790,240 bytes) |
 | Styles (`css/`) | 3 | 1,245 | 110 KiB (112,879 bytes) |
 | Page (`index.html`) | 1 | 180 | 7.6 KiB (7,792 bytes) |
-| **Whole game** | **139** | **50,177** | **3.73 MiB (3,911,150 bytes)** |
+| **Whole game** | **139** | **50,175** | **3.73 MiB (3,910,911 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **49,610 lines, 3.69 MiB (3,867,675 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **49,608 lines, 3.69 MiB (3,867,436 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -52,7 +52,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/10-settings.js` | 44 | Settings object (volumes, speed, layout, keys). |
 | `js/11-ants.js` | 400 | The ant colony. |
 | `js/12-bestiary.js` | 211 | Bestiary. |
-| `js/13-forage.js` | 207 | Foraging minigame. |
+| `js/13-forage.js` | 205 | Foraging minigame. |
 | `js/14-menu.js` | 164 | Main menu chapter selector and the speed slider. |
 | `js/15-buildings-space.js` | 532 | Buildings (chapter 6) and the Space Center (chapter 7). |
 | `js/16-film-moon.js` | 966 | The ending cutscene (the launch and the Moon landing). |
