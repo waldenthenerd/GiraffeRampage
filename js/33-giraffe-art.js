@@ -303,7 +303,7 @@ function drawPlayer(ctx){
 
   /* legs -- a paddling stroke, mostly awash, when swimming */
   ctx.save(); ctx.translate(P.x, P.y + bob); ctx.rotate(f);
-  ctx.scale(1 + GF.sq, 1 - GF.sq * 0.7 + GF.breath);      /* stretches along the stride, breathes when still */
+  ctx.scale(1 + GF.sq + (GF.land || 0) * 0.2, 1 - GF.sq * 0.7 + GF.breath - (GF.land || 0) * 0.24);      /* stretches along the stride, breathes when still, squashes when her head lands (36n) */
   const sw = Math.sin(P.walk * (swimming ? 3.4 : 2.2)) * (swimming ? 10 : 6);
   const bootAcc = typeof accEquipped === 'function' && !swimming ? accEquipped('boot') : null;     /* boots won from the minigames (js/44f-minigames.js) */
   const bootMove = bootAcc && Math.hypot(P.vx, P.vy) > 40;
@@ -364,23 +364,30 @@ function drawPlayer(ctx){
 
   /* neck + head, aimed at the cursor */
   const shx = P.x + Math.cos(a) * 11, shy = P.y + Math.sin(a) * 11 + bob;
-  const nlen = 40 + ke * 22 + GF.reach;
-  let hx = shx + Math.cos(a) * nlen, hy = shy + Math.sin(a) * nlen;
+  const nk = GF.neck || { ext: 0, bend: 0 };                  /* the lunge: the neck lengthens and whips (36n-neck-stretch.js) */
+  const nlen = 40 + ke * 22 * (nk.ext ? 0 : 1) + GF.reach + nk.ext;
+  const cv = typeof neckCurve === 'function' ? neckCurve(shx, shy, a, nlen, nk.bend, 9) : null;
   const px = -Math.sin(a), py = Math.cos(a);
+  let hx = cv ? cv.hx : shx + Math.cos(a) * nlen, hy = cv ? cv.hy : shy + Math.sin(a) * nlen;
   hx += px * GF.sway; hy += py * GF.sway;                  /* the head sways when idle and nods when running */
+  if (typeof neckGhostsDraw === 'function') neckGhostsDraw(ctx, coat);           /* motion-blur frames of the lunge */
   ctx.fillStyle = coat;
-  ctx.beginPath();
-  ctx.moveTo(shx + px * 8.5, shy + py * 8.5);
-  ctx.lineTo(hx + px * 5.5, hy + py * 5.5);
-  ctx.lineTo(hx - px * 5.5, hy - py * 5.5);
-  ctx.lineTo(shx - px * 8.5, shy - py * 8.5);
-  ctx.closePath(); ctx.fill();
+  if (cv){ neckPath(ctx, cv.pts); ctx.fill(); }
+  else {
+    ctx.beginPath();
+    ctx.moveTo(shx + px * 8.5, shy + py * 8.5);
+    ctx.lineTo(hx + px * 5.5, hy + py * 5.5);
+    ctx.lineTo(hx - px * 5.5, hy - py * 5.5);
+    ctx.lineTo(shx - px * 8.5, shy - py * 8.5);
+    ctx.closePath(); ctx.fill();
+  }
   /* neck spots */
   ctx.fillStyle = spot;
   if (rim) ctx.shadowBlur = 0;
   for (let i = 1; i <= 4; i++){
     const t = i / 5;
-    const nx = lerp(shx, hx, t), ny = lerp(shy, hy, t);
+    const cp = cv ? cv.pts[Math.round(t * 9)] : null;
+    const nx = cp ? cp.x : lerp(shx, hx, t), ny = cp ? cp.y : lerp(shy, hy, t);
     const off = (i % 2 ? 1 : -1) * 2.4;
     if (spPat) wardSpot(ctx, spPat, nx + px * off, ny + py * off, 3.4 - t * 1.1, 2.8 - t * 0.9, a);
     else { ctx.beginPath(); ctx.ellipse(nx + px * off, ny + py * off, 3.4 - t * 1.1, 2.8 - t * 0.9, a, 0, TAU); ctx.fill(); }
@@ -390,9 +397,9 @@ function drawPlayer(ctx){
   ctx.strokeStyle = '#7A4A21'; ctx.lineWidth = 2;
   ctx.beginPath();
   for (let i = 0; i <= 5; i++){
-    const t = i / 5;
-    ctx.moveTo(lerp(shx, hx, t) + px * 6.5, lerp(shy, hy, t) + py * 6.5);
-    ctx.lineTo(lerp(shx, hx, t) + px * 9.5, lerp(shy, hy, t) + py * 9.5);
+    const t = i / 5, cp = cv ? cv.pts[Math.round(t * 9)] : null, mx = cp ? cp.x : lerp(shx, hx, t), my = cp ? cp.y : lerp(shy, hy, t);
+    ctx.moveTo(mx + px * 6.5, my + py * 6.5);
+    ctx.lineTo(mx + px * 9.5, my + py * 9.5);
   }
   ctx.stroke();
 
@@ -437,7 +444,7 @@ function drawPlayer(ctx){
   }
 
   /* head */
-  ctx.save(); ctx.translate(hx, hy); ctx.rotate(a);
+  ctx.save(); ctx.translate(hx, hy); ctx.rotate(a + (cv ? cv.turn * 0.6 : 0));
   ctx.fillStyle = coat;
   ctx.beginPath(); ctx.ellipse(2, 0, 11, 7.6, 0, 0, TAU); ctx.fill();
   ctx.fillStyle = dark;
