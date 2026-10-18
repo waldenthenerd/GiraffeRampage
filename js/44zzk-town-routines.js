@@ -12,20 +12,30 @@
    townNpcNow(id) says where a giraffe is right now ({ d, x, act, habit }); the tram map and the collection book use it.
    Only the ten street giraffes and Dot keep to this; the people who work indoors (and the campus) stay put.
    ============================================================================================================================= */
+/* This replaces the older keeper routines in 44zi (lunch at the café, evening by the fountain, away at night): those three rules are kept here and the
+   day between them is new. (44zi's townApplyRoutines is switched off at the bottom of this file; townNpcSlot below is the one that counts.) */
 const TOWN_ROUTINES = {
   mayor:    [[6, 9, 'square', 1000, 'stroll', 'taking the morning air'], [9, 12, 'market', 1500, 'stand', 'inspecting the stalls'], [12, 16, 'park', 1750, 'stroll', 'a turn round the park'], [16, 22, 'square', 1000, 'stroll', 'doing the rounds']],
   tilly:    [[6, 10, 'square', 560, 'stand', 'minding the shop'], [10, 13, 'park', 900, 'sit', 'sketching on a bench'], [13, 22, 'square', 560, 'stand', 'minding the shop']],
   barnaby:  [[6, 9, 'market', 800, 'stroll', 'on his rounds'], [9, 12, 'square', 1500, 'stroll', 'looking for a good book'], [12, 15, 'park', 1300, 'sit', 'reading on a bench'], [15, 22, 'market', 800, 'stroll', 'on his rounds']],
-  penny:    [[6, 11, 'market', 1260, 'stand', 'opening the café'], [11, 13, 'square', 1700, 'sit', 'having lunch'], [13, 22, 'market', 1260, 'stand', 'serving customers']],
+  penny:    [[6, 22, 'market', 1260, 'stand', 'serving customers']],
   rio:      [[6, 10, 'park', 2000, 'stand', 'watching the pond'], [10, 14, 'harbour', 1400, 'sit', 'by the water'], [14, 22, 'park', 2000, 'stand', 'watching the pond']],
   gus:      [[6, 10, 'market', 1000, 'stroll', 'a morning jog'], [10, 17, 'park', 700, 'dance', 'dancing'], [17, 22, 'square', 700, 'dance', 'dancing under the lamps']],
   marina:   [[6, 16, 'harbour', 1010, 'fish', 'fishing off the pier'], [16, 19, 'market', 2000, 'stroll', 'selling the catch'], [19, 22, 'harbour', 1010, 'fish', 'an evening line']],
   skye:     [[6, 11, 'roofs', 1020, 'tinker', 'tinkering'], [11, 14, 'park', 2300, 'stroll', 'hunting for spare parts'], [14, 22, 'roofs', 1020, 'tinker', 'tinkering']],
   nova:     [[6, 18, 'launch', 1380, 'stargaze', 'watching for rockets'], [18, 22, 'roofs', 600, 'stargaze', 'waiting for the stars']]
 };
+const TOWN_KEEPERS_L = ['mayor', 'tilly', 'barnaby', 'penny', 'rio', 'gus', 'skye'];             /* the same seven as 44zi's TOWN_KEEPERS */
 function townNpcSlot(id, h){
   const R = TOWN_ROUTINES[id], d = TOWN_NPCS[id]; if (!R || !d) return null;
+  if (typeof h !== 'number') h = townHour();
   h = ((h % 24) + 24) % 24;
+  const ki = TOWN_KEEPERS_L.indexOf(id);
+  if (ki >= 0){
+    if (h >= 21 || h < 6.5){ if (id === 'skye' && h >= 21 && h < 23) return { d: d.d, x: d.x, habit: d.habit, act: 'putting the tools away', night: false }; return null; }          /* the keepers are away for the night */
+    if (h >= 12 && h < 13.5 && ['tilly', 'barnaby', 'mayor', 'penny'].indexOf(id) >= 0) return { d: 'in_cafe', x: 340 + ki * 90, habit: 'stand', act: 'having lunch at the café', night: false, i: 90 };
+    if (h >= 18 && h < 21 && id !== 'skye') return { d: 'square', x: 820 + ki * 70, habit: 'stand', act: 'by the fountain', night: false, i: 91 };
+  }
   if (h >= 22 || h < 6) return { d: d.d, x: d.x, habit: d.habit, act: 'at home for the night', night: true };
   for (let i = 0; i < R.length; i++){
     const s = R[i]; if (h >= s[0] && h < s[1]){
@@ -37,7 +47,8 @@ function townNpcSlot(id, h){
 }
 function townNpcNow(id){
   if (id === 'dot'){ const dt = typeof townDotSpot === 'function' ? townDotSpot() : null; return dt ? { d: dt.d, x: dt.x, habit: 'hide', act: 'hiding' } : null; }
-  return townNpcSlot(id, townHour()) || (TOWN_NPCS[id] ? { d: TOWN_NPCS[id].d, x: TOWN_NPCS[id].x, habit: TOWN_NPCS[id].habit, act: '' } : null);
+  const sl = townNpcSlot(id, townHour()); if (!sl && TOWN_NPCS[id] && TOWN_ROUTINES[id]) return { d: TOWN_NPCS[id].d, x: TOWN_NPCS[id].x, habit: 'sit', act: 'asleep at home', away: true };
+  return sl || (TOWN_NPCS[id] ? { d: TOWN_NPCS[id].d, x: TOWN_NPCS[id].x, habit: TOWN_NPCS[id].habit, act: '' } : null);
 }
 (function(){
   const ts = townSpawnNpcs, un = townNpcStep;
@@ -82,7 +93,7 @@ function townNpcNow(id){
       const s = townNpcSlot(id, h); if (!s) return;
       const n = Town.npcs.filter(function(q){ return q.id === id; })[0], nm = TOWN_NPCS[id].name.split(' ')[0];
       if (n && !n.leaving && s.d !== Town.d){                                      /* her slot has moved on: off to the edge she will leave by */
-        const toRight = TOWN_ORDER.indexOf(s.d) > TOWN_ORDER.indexOf(Town.d);
+        const toRight = TOWN_ORDER.indexOf(s.d) > TOWN_ORDER.indexOf(Town.d) && TOWN_ORDER.indexOf(s.d) >= 0;
         n.leaving = true; n.walkTo = toRight ? D.w - 20 : 20; n.tx = n.walkTo;
         if (Math.abs(Town.x - n.x) < 600) townToast(nm + ' heads off, ' + s.act + '.', '#E8D8B0');
       } else if (n && !n.leaving && s.d === Town.d && n.slot !== (s.i === undefined ? -1 : s.i)){   /* same place, a new thing to do */
@@ -97,3 +108,4 @@ function townNpcNow(id){
     return r;
   };
 })();
+townApplyRoutines = function(){};                                                    /* 44zi's version: replaced by the timetable above */

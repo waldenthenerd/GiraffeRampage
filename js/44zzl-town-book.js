@@ -84,7 +84,7 @@
     const here = {}, errand = {};
     TOWN_NPC_LIST.forEach(function(id){
       const n = safe(function(){ return townNpcNow(id); }, null); if (!n) return;
-      (here[n.d] = here[n.d] || []).push(id);
+      if (!n.away) (here[n.d] = here[n.d] || []).push(id);
       const e = safe(function(){ return townErrandFor(id); }, null);
       if (e && townErrandAvailable(e) && townErrState(e.id) < 2) errand[id] = townErrState(e.id) === 1 ? 'doing' : 'new';
     });

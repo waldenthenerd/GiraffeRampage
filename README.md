@@ -5,7 +5,7 @@ A single-page canvas game. Open `index.html` in a browser; there is no build ste
 ## Layout
 
 - `index.html` holds the page markup (canvas, HUD, touch controls, overlay) and loads the styles and scripts.
-- `css/style.css` holds the base styles, `css/polish.css` is layered over it, and `css/campus.css` holds the Longneck University panels and study card.
+- `css/style.css` holds the base styles, `css/polish.css` is layered over it, and `css/campus.css` holds the Longneck University panels and study card, and `css/townlife.css` the collection book and the tram map extras.
 - `js/` holds the game code, split from the old single file along its existing section boundaries.
 
 ## Size
@@ -14,12 +14,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 135 | 48,750 | 3.61 MiB (3,790,508 bytes) |
-| Styles (`css/`) | 3 | 1,245 | 110 KiB (112,879 bytes) |
-| Page (`index.html`) | 1 | 180 | 7.6 KiB (7,792 bytes) |
-| **Whole game** | **139** | **50,175** | **3.73 MiB (3,911,179 bytes)** |
+| JavaScript (`js/`) | 140 | 49,250 | 3.66 MiB (3,840,593 bytes) |
+| Styles (`css/`) | 4 | 1,257 | 113 KiB (115,419 bytes) |
+| Page (`index.html`) | 1 | 186 | 7.9 KiB (8,081 bytes) |
+| **Whole game** | **145** | **50,693** | **3.78 MiB (3,964,093 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **49,608 lines, 3.69 MiB (3,867,704 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **50,126 lines, 3.74 MiB (3,920,618 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -139,7 +139,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zf-town-economy.js` | 334 | Fleet and money sinks: `PLANES`/`CARS`, `planeFleet`/`carFleet` (migrating the single plane and car of older saves), `townShowHangar`/`townShowGarage` as card lists, the oven (`ovenLevel`, `breadCap`, `breadHeal`), Her Home (`HOME_SLOTS`, `homeBuy`, `townShowDecor`; the room paints from `homeData()` and its layer signature `D.sig`) and the gallery (`galData`, `townShowFrame`). |
 | `js/44zg-town-activities.js` | 273 | Cafe shift (`townShowCafeGame`), tournament (`townTour`, `townTourRecord`), fishing (`FISH`, `townFishCast`), post (`townMailToday`, `townMailTake`). |
 | `js/44zh-town-qol.js` | 119 | `townLeftText` (HUD), `townHintExact`, `townShowGear`, tap-to-walk (`townAutoMx`) and the `touch` body class. |
-| `js/44zi-town-atmosphere.js` | 232 | `TOWN_AMB` and `townChirp`, footsteps, `townNpcSlot` / `townApplyRoutines` (schedules), `townWeatherType` and `townWeatherFX`, `townAuroraNow`, `flyNightFX`. `Town.fixWeather` / `Town.fixAurora` / `Town.fixHour` fix them for tests. |
+| `js/44zi-town-atmosphere.js` | 233 | `TOWN_AMB` and `townChirp`, footsteps, `townNpcSlot` / `townApplyRoutines` (schedules), `townWeatherType` and `townWeatherFX`, `townAuroraNow`, `flyNightFX`. `Town.fixWeather` / `Town.fixAurora` / `Town.fixHour` fix them for tests. |
 | `js/44zj-town-home.js` | 291 | Her Home in detail: `homePaintBase` (window, clock, bed, hooks, souvenir shelf), live pets, `Town.seat` (sit on the sofa/armchair/hammock, lie in the bed), `homeInteract` (pet, parrot, goldfish, lamp, plant, window), first pet of the day gives 5 gems. |
 | `js/44zk-town-interiors2.js` | 443 | Interiors redrawn: `IV_KINDS` (door, counter, oven, table, bar, turntable, tool bench, shelves, mirror, mannequins, cases, statue, cabinets, score board, camera, sofa, fireplace/stove, bed) and `IV_ROOMS` (each room's wall furniture, curtains, baseboard). Rule: everything stands on the floor or hangs from something visible. `townBuildingX`, `townPropX` (statue) and `townRoomProps` wrappers. |
 | `js/44zl-photo-props.js` | 110 | Photo props: 4 cars, 4 planes and 9 things (bread, balloon, tree, lamp, bench, rocket, saucer, chest, present) appended to `PHOTO_FX` / `PHOTO_FXDRAW`. Boats (side view) took it past 32, so photo codes are now version 4 with a 6-bit effect index (up to 64; versions 2 and 3 still read). The Effects tab groups them as Effects, Vehicles (cars, planes, boats) and Things. |
@@ -167,6 +167,11 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zzh-campus-rooms.js` | 294 | The six rooms of the university: walls (`IV_ROOMS.uhall` and the rest) and every piece of furniture (`UNI_FURN` by `u_` kind: the registrar's desk, faculty board, hall of degrees, rank cabinet, stage, seats, the eight faculty bookcases, reading table, desks, results board, café bar and tables). |
 | `js/44zzi-campus-pics.js` | 100 | `UNI_PICS`: the 49 pictures on the lecture slides (a giraffe in profile, the layers of the Earth, an atom, the solar system, the Colosseum and so on). |
 | `js/44zzj-window-glow.js` | 73 | **Lit windows only where the glass shows.** Keeps a copy of each recorded window (`D._win`) while a street is painted (`townPaintField` wrapper) and, once it is finished, lights only the pixels that are still glass, so awnings, columns, signs and props in front of a window stay dark; arched, round and triangular windows keep only what is inside their outline. `townDrawWindows` (in `44w`) draws the glow before the herd and the player, not after them. |
+| `js/44zzk-town-routines.js` | 111 | **The herd's day.** `TOWN_ROUTINES`: a timetable for each street giraffe (nine of them move between districts by the hour: the Mayor, Tilly, Barnaby, Penny, Rio, Gus, Marina, Skye, Nova). They walk off the edge of the street when their slot changes and walk in from the side they came from. Keeps the old rules (lunch at the café 12:00-13:30, the fountain 18:00-21:00, away at night for the seven keepers) and replaces 44zi's `townNpcSlot` and `townApplyRoutines`. `townNpcNow(id)` says where one is right now. |
+| `js/44zzl-town-book.js` | 117 | **The collection book and the tram map.** `townShowBook` (a Book tab in the journal, a Collection button on the town menu): every district's coins, stars, gems, hats, boots, colours and tracks, plus cards for hats and boots, colours, photos, errands, friends, creatures, minigame stars, the gym and the university. Also wraps `townShowMap` to show who is at each stop, who has an errand, how many finds are left, and a Who is where list. |
+| `js/44zzm-home-trophies.js` | 66 | Her home shows what she has done: framed diplomas for every university degree, a bookshelf of the books she has read, notebooks, and a trophy cabinet with a cup for every gym rank and a mounted fish, crab and shell from the sea. Painted into the cached room (`homePaintBase` wrapper); `homeTrophySig` refreshes it. |
+| `js/44zzn-room-detail.js` | 91 | The older interiors in the campus rooms' detail: wall flecks and shadows, cobwebs, wainscot panels, floor grain and nail heads, window light shafts with dust, a switch and a socket by the door, bare walls given a picture, and floor-level props. Wraps `townRoomProps`; skips the gym and the campus rooms. |
+| `js/44zzo-town-sound.js` | 114 | The rest of the town's sound: a footstep for every floor (`townStepSound`), door sounds going in and out (bells, creaks, the gym thud), and ambience beds and one-shots for the rooms and streets that had none (the tailor, hall, studio, farm and isle rooms, gym, campus and its six rooms). |
 | `js/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/45b-dev-panel.js` | 567 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/46-main.js` | 4 | Starts the game. |

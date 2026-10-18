@@ -44,7 +44,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 ### How to apply an update
 
 1. Take the files in `index.html` order (section 3), **except `js/45b-dev-panel.js`**.
-2. Put `css/style.css` first, `css/polish.css` after it and `css/campus.css` last into the page as `<style>` blocks (or keep them as two linked
+2. Put `css/style.css` first, `css/polish.css` after it, then `css/campus.css` and `css/townlife.css` into the page as `<style>` blocks (or keep them as two linked
    files). `polish.css` is layered over `style.css`; the order matters.
 3. Put each script in its **own** `<script>` block (or keep separate `<script src>` tags), in the same order. Do **not**
    concatenate everything into one script block: every file begins with `'use strict';` except `js/00-icons.js`, which was never
@@ -59,7 +59,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (135 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (140 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -195,6 +195,11 @@ game. This is the complete list for this version (135 scripts; the developer pan
 | - | `js/44zzh-campus-rooms.js` | The six rooms of the university: walls (`IV_ROOMS.uhall` and the rest) and every piece of furniture (`UNI_FURN` by `u_` kind: the registrar's desk, faculty board, hall of degrees, rank cabinet, stage, seats, the eight faculty bookcases, reading table, desks, results board, café bar and tables). |
 | - | `js/44zzi-campus-pics.js` | `UNI_PICS`: the 49 pictures on the lecture slides (a giraffe in profile, the layers of the Earth, an atom, the solar system, the Colosseum and so on). |
 | - | `js/44zzj-window-glow.js` | **Lit windows only where the glass shows.** Keeps a copy of each recorded window (`D._win`) while a street is painted (`townPaintField` wrapper) and, once it is finished, lights only the pixels that are still glass, so awnings, columns, signs and props in front of a window stay dark; arched, round and triangular windows keep only what is inside their outline. `townDrawWindows` (in `44w`) draws the glow before the herd and the player, not after them. |
+| - | `js/44zzk-town-routines.js` | **The herd's day.** `TOWN_ROUTINES`: a timetable for each street giraffe (nine of them move between districts by the hour: the Mayor, Tilly, Barnaby, Penny, Rio, Gus, Marina, Skye, Nova). They walk off the edge of the street when their slot changes and walk in from the side they came from. Keeps the old rules (lunch at the café 12:00-13:30, the fountain 18:00-21:00, away at night for the seven keepers) and replaces 44zi's `townNpcSlot` and `townApplyRoutines`. `townNpcNow(id)` says where one is right now. |
+| - | `js/44zzl-town-book.js` | **The collection book and the tram map.** `townShowBook` (a Book tab in the journal, a Collection button on the town menu): every district's coins, stars, gems, hats, boots, colours and tracks, plus cards for hats and boots, colours, photos, errands, friends, creatures, minigame stars, the gym and the university. Also wraps `townShowMap` to show who is at each stop, who has an errand, how many finds are left, and a Who is where list. |
+| - | `js/44zzm-home-trophies.js` | Her home shows what she has done: framed diplomas for every university degree, a bookshelf of the books she has read, notebooks, and a trophy cabinet with a cup for every gym rank and a mounted fish, crab and shell from the sea. Painted into the cached room (`homePaintBase` wrapper); `homeTrophySig` refreshes it. |
+| - | `js/44zzn-room-detail.js` | The older interiors in the campus rooms' detail: wall flecks and shadows, cobwebs, wainscot panels, floor grain and nail heads, window light shafts with dust, a switch and a socket by the door, bare walls given a picture, and floor-level props. Wraps `townRoomProps`; skips the gym and the campus rooms. |
+| - | `js/44zzo-town-sound.js` | The rest of the town's sound: a footstep for every floor (`townStepSound`), door sounds going in and out (bells, creaks, the gym thud), and ambience beds and one-shots for the rooms and streets that had none (the tailor, hall, studio, farm and isle rooms, gym, campus and its six rooms). |
 | 90 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
 | 91 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | 92 | `js/46-main.js` | Starts the game. |

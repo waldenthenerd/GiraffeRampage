@@ -30,6 +30,12 @@ const TOWN_AMB = {
   in_house1: { chirp: ['crackle', 0.5, 1.8] }, in_house2: { chirp: ['crackle', 0.5, 1.8] },
   in_hangar: { wind: 0.02, windF: 300, hum: 0.015, chirp: ['clank', 5, 12] }
 };
+function townStepSound(D){                                                          /* one footstep; 44zzo-town-sound.js gives every floor its own */
+  if (D.indoor){ SFX.tone('triangle', 150 + Math.random() * 40, 90, 0.06, 0.035, 0, 0, SFX.eventGain); SFX.burst(0.04, 0.02, 900, 500, 0.8, 0, 'lowpass', SFX.eventGain); }
+  else if (D.cave){ SFX.tone('sine', 110, 70, 0.08, 0.04, 0, 0, SFX.eventGain); SFX.burst(0.05, 0.03, 1200, 600, 0.8, 0, 'bandpass', SFX.eventGain); }
+  else if (Town.d === 'park' || Town.d === 'runway') SFX.burst(0.05, 0.022, 900, 400, 0.7, 0, 'lowpass', SFX.eventGain);
+  else SFX.burst(0.035, 0.035, 1800 + Math.random() * 700, 1000, 0.9, 0, 'bandpass', SFX.eventGain);
+}
 const TownSound = { chirpT: 2, stepT: 0, engT: 0, lightT: 6, flash: 0, fogK: 0 };
 function townChirp(kind){
   const B = Amb.bus, s = SFX;
@@ -83,12 +89,7 @@ function townThunder(delay){
       TownSound.stepT -= dt * (v / 235);
       if (TownSound.stepT <= 0){
         TownSound.stepT = 0.34;
-        try {
-          if (D.indoor){ SFX.tone('triangle', 150 + Math.random() * 40, 90, 0.06, 0.035, 0, 0, SFX.eventGain); SFX.burst(0.04, 0.02, 900, 500, 0.8, 0, 'lowpass', SFX.eventGain); }
-          else if (D.cave){ SFX.tone('sine', 110, 70, 0.08, 0.04, 0, 0, SFX.eventGain); SFX.burst(0.05, 0.03, 1200, 600, 0.8, 0, 'bandpass', SFX.eventGain); }
-          else if (Town.d === 'park' || Town.d === 'runway') SFX.burst(0.05, 0.022, 900, 400, 0.7, 0, 'lowpass', SFX.eventGain);
-          else SFX.burst(0.035, 0.035, 1800 + Math.random() * 700, 1000, 0.9, 0, 'bandpass', SFX.eventGain);
-        } catch (e) {}
+        try { townStepSound(D);         } catch (e) {}
       }
     }
   };
