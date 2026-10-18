@@ -3,7 +3,10 @@
 /* ========================= 2b. MUSIC (procedural, no audio files) ========================= */
 /* A small step sequencer on the same audio context as SFX. Each theme is a key,
    scale and chord loop; the layers (pad, bass, arp, lead, drums) switch on with an
-   intensity level: 0 calm (menus), 1 in a run, 2 while a boss is alive. */
+   intensity level: 0 calm (menus), 1 in a run, 2 while a boss is alive.
+   In a normal run the bass, the drums and the lead are STEMS, each on its own fader that follows the fight (Music.stem, Music.stems):
+   the bass comes in when enemies are close, the drums when the number of enemies spikes, the lead melody when she is low on health.
+   A boss brings all three up, and everywhere outside a run they are fully open, as before. */
 const MUSIC_SCALES = { dorian:[0,2,3,5,7,9,10], minor:[0,2,3,5,7,8,10], phrygian:[0,1,3,5,7,8,10], lydian:[0,2,4,6,7,9,11], pent:[0,2,4,7,9], mpent:[0,3,5,7,10], harm:[0,2,3,5,7,8,11], major:[0,2,4,5,7,9,11] };
 const MUSIC_THEMES = {
   menu:     { bpm: 84,  root: 50, scale: 'pent',     prog: [0,5,3,7],   minor: false, bass: 'triangle', lead: 'triangle', drum: 'tribal' },
@@ -56,7 +59,7 @@ const MUSIC_THEMES = {
 };
 const MUSIC_BY_CHAPTER = [null, 'savanna', 'frost', 'swamp', 'ocean', 'jungle', 'city', 'space', 'moon', 'venus', 'inferno', 'glimmer', 'area51', 'mars'];
 const Music = {
-  gain: null, timer: null, step: 0, nextT: 0, cur: null, want: { theme: 'menu', lvl: 0, tempo: 1 }, duck: 1, started: false,
+  gain: null, stemG: null, stems: { bass: 1, drums: 1, lead: 1, near: 0, spike: 0, low: 0 }, dest: null, stemOn: false, timer: null, step: 0, nextT: 0, cur: null, want: { theme: 'menu', lvl: 0, tempo: 1 }, duck: 1, started: false,
   vol(){ return typeof Settings.musicVol === 'number' ? Settings.musicVol : 0.6; },
   hash(n){ n = (n ^ 61) ^ (n >>> 16); n = n + (n << 3); n = n ^ (n >>> 4); n = Math.imul(n, 0x27d4eb2d); n = n ^ (n >>> 15); return (n >>> 0) / 4294967296; },
   start(){
@@ -69,6 +72,8 @@ const Music = {
     /* a gain between the music and the filter dips and swells back when the theme changes, so a new theme fades in */
     this.xf = SFX.ctx.createGain(); this.xf.gain.value = 1;
     this.gain.connect(this.xf); this.xf.connect(this.lp); this.lp.connect(SFX.master);
+    this.stemG = {};                                                            /* one fader per stem, all feeding the music bus */
+    ['bass', 'drums', 'lead'].forEach(function(k){ const g = SFX.ctx.createGain(); g.gain.value = 1; g.connect(Music.gain); Music.stemG[k] = g; });
     this.nextT = SFX.ctx.currentTime + 0.15;
     const self = this;
     this.timer = setInterval(function(){ self.pump(); }, 90);
@@ -131,6 +136,7 @@ const Music = {
     else if (G.marsScreen) theme = 'mars';
     else if (s === 'shop') theme = 'shop';
     this.want.theme = theme; this.want.lvl = lvl; this.want.dense = dense; this.want.shift = shift;
+    this.updateStems(s === 'playing' && !G.attract && lvl === 1);
     this.want.tempo = (s === 'playing' && !G.attract) ? [1, 1.08, 1.16, 1.24][G.runSpeedLevel | 0] || 1 : 1;
     /* nearly dead: the mix muffles and ducks a little, and opens up again as she recovers */
     const low = (s === 'playing' && !G.attract && P.hp > 0 && P.hp / P.maxHp < 0.3) ? 1 - P.hp / P.maxHp / 0.3 : 0;
@@ -139,6 +145,26 @@ const Music = {
     const v = (SFX.muted || Settings.muted) ? 0 : this.vol() * 0.55 * duck * (1 - 0.3 * low) * (stung ? this.stDepth : 1);
     this.gain.gain.setTargetAtTime(v, SFX.ctx.currentTime, stung ? 0.05 : 0.25);
     if (this.lp) this.lp.frequency.setTargetAtTime(18000 - 17000 * Math.pow(low, 0.7), SFX.ctx.currentTime, 0.3);
+  },
+  /* the stems follow the fight. In a normal run (on): bass = enemies within reach of her; drums = how many enemies are out (and how fast they are falling);
+     lead = low health. Anywhere else, and in a boss fight, all three are open. */
+  updateStems(on){
+    const st = this.stems; this.stemOn = on;
+    let tb = 1, td = 1, tl = 1;
+    if (on){
+      let near = 0, n = 0; const E = G.enemies;
+      for (let i = 0; i < E.length; i++){ const e = E[i]; if (e.dead) continue; n++; const d = Math.hypot(e.x - P.x, e.y - P.y); if (d < 300) near += d < 150 ? 1.6 : 1; }
+      const now = performance.now() / 1000; this.killT = this.killT || []; while (this.killT.length && now - this.killT[0] > 6) this.killT.shift();
+      if ((G.kills | 0) > (this.lastKills | 0)) for (let k = 0; k < Math.min(5, G.kills - this.lastKills); k++) this.killT.push(now);
+      this.lastKills = G.kills | 0;
+      st.near += (clamp(near / 6, 0, 1) - st.near) * 0.08;
+      st.spike += (clamp((n - 14) / 22 + this.killT.length / 28, 0, 1) - st.spike) * 0.05;
+      const hpr = P.maxHp ? P.hp / P.maxHp : 1; st.low += (clamp((0.45 - hpr) / 0.25, 0, 1) - st.low) * 0.1;
+      tb = 0.12 + 0.88 * st.near; td = st.spike; tl = st.low;
+    }
+    const c = SFX.ctx.currentTime, k = on ? 0.5 : 0.25;
+    st.bass = tb; st.drums = td; st.lead = tl;
+    if (this.stemG) for (const key in this.stemG) this.stemG[key].gain.setTargetAtTime(st[key], c, k);
   },
   pump(){
     const c = SFX.ctx;
@@ -156,7 +182,7 @@ const Music = {
       }
       const th = MUSIC_THEMES[this.cur.theme] || MUSIC_THEMES.menu;
       const bpm = th.bpm * (this.cur.lvl === 3 ? 1.07 : 1) * this.cur.tempo;
-      if (this.vol() > 0 && !SFX.muted && !Settings.muted) this.playStep(this.step, this.nextT, th, this.cur.lvl, bpm, this.cur.theme);
+      if (this.vol() > 0 && !SFX.muted && !Settings.muted) { this.playStep(this.step, this.nextT, th, this.cur.lvl, bpm, this.cur.theme); this.dest = null; }
       this.nextT += 60 / bpm / 4;
       this.step++;
     }
@@ -170,7 +196,7 @@ const Music = {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.linearRampToValueAtTime(vol, t + Math.min(0.02, dur * 0.3));
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g); g.connect(this.gain);
+    o.connect(g); g.connect(this.dest || this.gain);
     o.start(t); o.stop(t + dur + 0.03);
   },
   swell(wave, m, t, dur, vol){
@@ -179,11 +205,11 @@ const Music = {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.linearRampToValueAtTime(vol, t + dur * 0.35);
     g.gain.linearRampToValueAtTime(0.0001, t + dur);
-    o.connect(g); g.connect(this.gain);
+    o.connect(g); g.connect(this.dest || this.gain);
     o.start(t); o.stop(t + dur + 0.03);
   },
   drum(kind, t, vol){
-    const c = SFX.ctx, g = this.gain;
+    const c = SFX.ctx, g = this.dest || this.gain;
     if (kind === 'kick'){
       const o = c.createOscillator(), e = c.createGain();
       o.frequency.setValueAtTime(130, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.14);
@@ -214,6 +240,8 @@ const Music = {
     const barLen = 60 / bpm * 4;
     const seed = (key.length * 977 + key.charCodeAt(0) * 131) + bar16 * 16 + i;
     const r = this.hash(seed);
+    const sg = this.stemG, stems = this.stemOn && sg, on = function(k){ return !stems || Music.stems[k] > 0.02; };      /* a stem that is shut is not even scheduled */
+    this.dest = this.gain;
     /* pad: one soft chord per bar */
     if (i === 0){
       for (let k = 0; k < 3; k++) this.swell('sine', root + 12 + tri[k], t, barLen * 1.05, lvl === 0 ? 0.06 : 0.04);
@@ -222,10 +250,12 @@ const Music = {
     /* bass */
     const bassOn = lvl === 0 ? (i === 0 || i === 8) : lvl === 1 ? (sect ? (i === 0 || i === 3 || i === 8 || i === 10) : (i === 0 || i === 6 || i === 8 || i === 11)) : (i % 2 === 0);
     const dense = !!(this.cur && this.cur.dense);
-    if (bassOn){
+    if (bassOn && on('bass')){
+      if (stems) this.dest = sg.bass;
       const bw = hard ? 'sawtooth' : th.bass;
       this.note(bw, root - 12 + (i === 8 || i === 11 ? 7 * (lvl === 1 ? 0 : 0) : 0), t, 60 / bpm * (hard ? 0.45 : 0.8), hard ? 0.11 : 0.15);
       if (lvl === 3 && i % 4 === 0) this.note('square', root, t, 60 / bpm * 0.3, 0.05);
+      this.dest = this.gain;
     }
     /* arp (all levels) and lead (levels 1-2) */
     if (i % 2 === 0){
@@ -233,12 +263,15 @@ const Music = {
       const oct = r < (sect ? 0.55 : 0.25) ? 24 : 12;
       if (lvl === 0 ? (i % 4 === 0 || r < 0.3) : true) this.note(th.lead, root + oct + tone, t, 60 / bpm * 0.5, lvl === 0 ? 0.05 : 0.065);
     }
-    if (lvl >= 1 && i % 2 === 1 && r < (lvl === 3 ? 0.7 : lvl === 2 ? 0.5 : dense ? 0.42 : 0.28)){
+    if (lvl >= 1 && i % 2 === 1 && r < (lvl === 3 ? 0.7 : lvl === 2 ? 0.5 : dense ? 0.42 : 0.28) && on('lead')){           /* the lead melody: a stem */
       const deg = sc[Math.floor(this.hash(seed + 31) * sc.length)];
-      this.note(th.lead, root + 24 + deg, t, 60 / bpm * 0.4, 0.05);
+      if (stems) this.dest = sg.lead;
+      this.note(th.lead, root + 24 + deg, t, 60 / bpm * 0.4, stems ? 0.075 : 0.05);
+      this.dest = this.gain;
     }
     /* drums */
     const style = hard ? 'heavy' : th.drum;
+    if (stems && lvl === 1){ if (i % 4 === 2) this.drum('hat', t, 0.025); if (!on('drums')){ this.dest = this.gain; return; } this.dest = sg.drums; }      /* in a run the lightest hat stays; the rest of the kit is a stem */
     if (lvl === 3 && i === 0 && bar % 4 === 0) this.drum('snare', t, 0.3);
     if (lvl === 0){
       if (style === 'tribal' && (i === 0 || i === 8)) this.drum('tom', t, 0.18);
