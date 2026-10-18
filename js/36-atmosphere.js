@@ -85,9 +85,10 @@ function weatherUpdate(Wx, key, dt, W, H, camX, camY, zoom){
     if (p.y < -90) p.y += H + 180; else if (p.y > H + 90) p.y -= H + 180;
   }
 }
-function weatherDraw(ctx, Wx, key, accent, t, fade){
+function weatherDraw(ctx, Wx, key, accent, t, fade, frac){                                    /* frac: how much of the weather is in the sky (0 to 1); an event builds from a few drops to the full fall */
   const K = WEATHER_KINDS[key], L = Wx.list; if (!K || !L.length) return;
   if (fade === undefined) fade = 1;
+  const N = frac === undefined || frac >= 1 ? L.length : Math.max(1, Math.ceil(L.length * frac));
   if (fade <= 0.01) return;
   const col = K.col === 'accent' ? hexToRgbStr(accent) : K.col;
   ctx.save();
@@ -96,7 +97,7 @@ function weatherDraw(ctx, Wx, key, accent, t, fade){
       ctx.strokeStyle = 'rgba(' + col + ',' + (K.a * (pass ? 1 : 0.55) * fade).toFixed(3) + ')';
       ctx.lineWidth = pass ? 1.6 : 1;
       ctx.beginPath();
-      for (let i = pass; i < L.length; i += 2){
+      for (let i = pass; i < N; i += 2){
         const p = L[i], len = K.len[0] + (K.len[1] - K.len[0]) * p.l, sp = Math.hypot(K.vx, K.vy) || 1, ux = K.vx / sp, uy = K.vy / sp;
         ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - ux * len * p.z, p.y - uy * len * p.z);
       }
@@ -104,14 +105,14 @@ function weatherDraw(ctx, Wx, key, accent, t, fade){
     }
   } else if (K.type === 'dot'){
     ctx.fillStyle = 'rgba(' + col + ',' + K.a + ')';
-    for (let i = 0; i < L.length; i++){
+    for (let i = 0; i < N; i++){
       const p = L[i], r = (K.size[0] + (K.size[1] - K.size[0]) * p.s) * p.z;
       ctx.globalAlpha = (0.45 + 0.55 * p.z) * fade;
       ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, TAU); ctx.fill();
     }
   } else {
     ctx.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < L.length; i++){
+    for (let i = 0; i < N; i++){
       const p = L[i], r = (K.size[0] + (K.size[1] - K.size[0]) * p.s) * p.z, tw = (K.twinkle ? 0.35 + 0.65 * Math.abs(Math.sin(t * 1.6 + p.ph)) : 1) * fade;
       ctx.fillStyle = 'rgba(' + col + ',' + (K.a * 0.18 * tw).toFixed(3) + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, r * 3.2, 0, TAU); ctx.fill();
       ctx.fillStyle = 'rgba(' + col + ',' + (K.a * 0.85 * tw).toFixed(3) + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, TAU); ctx.fill();
