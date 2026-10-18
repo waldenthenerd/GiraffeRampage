@@ -19,7 +19,7 @@ Counted from the files in this folder, with the developer panel included:
 | Page (`index.html`) | 1 | 165 | 7.1 KiB (7,224 bytes) |
 | **Whole game** | **124** | **45,731** | **3.26 MiB (3,419,818 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **43,868 lines, 3.22 MiB (3,375,784 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **43,870 lines, 3.22 MiB (3,376,189 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -72,7 +72,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/30-chapters-11-13.js` | 754 | Chapters 11, 12 and 13. |
 | `js/31-waves-update.js` | 679 | Banners, the wave director, entity updates, the main update. |
 | `js/32-render.js` | 739 | Ground textures and the render pass. |
-| `js/33-giraffe-art.js` | 496 | Drawing the giraffe and armour designs. |
+| `js/33-giraffe-art.js` | 497 | Drawing the giraffe and armour designs. |
 | `js/34a-art-helpers.js` | 125 | Shared drawing helpers for enemies: per-chapter mutation kits (frost, swamp, ocean) and the lk* shape helpers. |
 | `js/34b-art-arctic.js` | 613 | Enemy art, Chapter 2: the Arctic (ARCTIC_DRAW). |
 | `js/34c-art-swamp.js` | 589 | Enemy art, Chapter 3: the swamp (SWAMP_DRAW). |
@@ -103,7 +103,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
 | `js/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
 | `js/40-fusion.js` | 881 | Card fusion: combos, the machine screen, the film. |
-| `js/41-qol.js` | 841 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
+| `js/41-qol.js` | 842 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
 | `js/42-run-hud.js` | 234 | Run lifecycle and the HUD. |
 | `js/43-input.js` | 373 | Input: keyboard, mouse, touch, gamepad. |
 | `js/44-loop-boot.js` | 114 | The main loop, resize, and the boot function. |

@@ -287,6 +287,7 @@ function drawPlayer(ctx){
         rand(-16, 16), rand(-10, 6), rand(1.5, 3), 0.5, '#EAF9FF', { glow: true, drag: 1.4 });
   } else {
     softShadow(ctx, P.x, P.y + 14, 26, 12, 0.32, 14);
+    if (G.chapter === 10 || G.chapter === 13) softShadow(ctx, P.x, P.y + 2, 44, 30, 0.42, 24);       /* a darker pad where the coat matches the orange ground */
   }
   giraffeAuraUnder(ctx);                                  /* power glow and afterimages (36m-giraffe-fx.js) */
 

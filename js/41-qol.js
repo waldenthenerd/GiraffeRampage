@@ -280,6 +280,7 @@ function restoreRun(r){
     }
     const id = r.cards[i][0], lv = Math.max(1, Math.min(10, r.cards[i][1] | 0));
     if (!CARDMAP[id]) continue;
+    if (!ownedCard(id) && visibleCards().length >= maxCards()) continue;           /* a damaged save cannot hold more cards than the slots allow */
     for (let k = 0; k < lv; k++) takeCard(id);
   }
   G.score = r.score; G.kills = r.kills; G.bonusGold = r.bonusGold; G.runTime = r.runTime;

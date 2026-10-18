@@ -556,7 +556,7 @@ function townDrawHud(ctx, D, h){
     ctx.globalAlpha = Math.max(0, a); miniText(ctx, o.txt, W / 2, (narrow ? 150 : 112) * s + i * 24 * s, Math.min(15 * s, (W - 20) / Math.max(12, o.txt.length) * 1.9), o.col); ctx.globalAlpha = 1;
   }
   /* the district banner when she arrives */
-  if (Town.bannerT > 0){ const a = Math.min(1, Town.bannerT, (3.2 - Town.bannerT) * 3); ctx.globalAlpha = a; miniText(ctx, D.name, W / 2, H * 0.3, 40 * s, '#FFF6E0'); ctx.globalAlpha = 1; }
+  if (Town.bannerT > 0){ const a = Math.min(1, Town.bannerT, (3.2 - Town.bannerT) * 3); ctx.globalAlpha = a; miniText(ctx, D.name, W / 2, H * 0.3 + Math.max(0, Town.toasts.length - 2) * 24 * s, 40 * s, '#FFF6E0'); ctx.globalAlpha = 1; }
   /* the prompt for what is in reach */
   if (Town.near && !Town.hold && !Town.panel){
     const label = (Input.hasTouch ? 'Tap: ' : 'E: ') + Town.near.label;
