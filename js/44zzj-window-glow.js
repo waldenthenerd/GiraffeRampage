@@ -5,7 +5,7 @@
    That lit the awnings, columns, signs and props that stand in front of a window, and mullions and curtains too. Now the field painter
    (townPaintField) keeps a copy of each window's pixels at the moment it is recorded and compares it with the finished street: only
    pixels that are still glass get the glow. A window that is mostly covered (less than a fifth of its glass left) gets none.
-   The glow itself is drawn by townDrawWindows (44w), before the herd and the player, so nobody wades through a yellow box.
+   The glow itself is drawn by townDrawWindows (44w) straight after the street and before townDynamic (which draws the roaming herd), the herd and the player, so nobody wades through a yellow box.
    ============================================================================================================================= */
 (function(){
   const tpf = townPaintField;

@@ -428,7 +428,7 @@ function townDynamic(ctx, D, t, dark){
     for (let i = 0; i < 12; i++){ const x = (i * 197 + Math.sin(t * 0.3 + i) * 30) % D.w, y = (t * 14 + i * 53) % 480; ctx.fillStyle = 'rgba(255,240,200,' + (0.08 + 0.08 * Math.sin(t + i)).toFixed(2) + ')'; ctx.fillRect(x, y, 2, 2); }
   }
 }
-function townDrawWindows(ctx, D, dark){                                       /* lit windows: drawn before the herd, so nobody walks behind a yellow box */
+function townDrawWindows(ctx, D, dark){                                       /* lit windows: drawn straight after the street, under everything that moves (the roaming herd is drawn in townDynamic, so it must come before that) */
   const a = D.indoor ? 0.55 : D.cave ? 0.9 : D.fixedDusk ? 0.75 : dark;
   if (a <= 0.03 || !D._win) return;
   ctx.save(); ctx.fillStyle = 'rgba(255,214,120,' + (a * 0.85).toFixed(2) + ')'; D._win.forEach(function(w){ ctx.fillRect(w.x, w.y, w.w, w.h); }); ctx.restore();
@@ -463,6 +463,7 @@ function renderTown(ctx){
   ctx.drawImage(L.far.cv, cam * 0.75, 0, L.far.w, 600);
   ctx.drawImage(L.mid.cv, cam * 0.45, 0, L.mid.w, 600);
   ctx.drawImage(L.field.cv, 0, 0, D.w, 600);
+  townDrawWindows(ctx, D, dark);                                           /* the lit glass sits on the street; everything that moves is drawn over it */
   townDynamic(ctx, D, t, dark);
   /* edge signs: where the street goes on, and what is shut */
   const edge = function(side, nb){
@@ -483,7 +484,6 @@ function renderTown(ctx){
     if (it.x < cam - 40 || it.x > cam + V.vw + 40) continue;
     ctx.save(); ctx.translate(it.x, TG - it.h - 10); townItemArt(ctx, it, t, i * 1.7); ctx.restore();
   }
-  townDrawWindows(ctx, D, dark);
   /* the herd, then her */
   Town.npcs.forEach(function(n){
     if (n.x < cam - 120 || n.x > cam + V.vw + 120) return;

@@ -14,12 +14,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 135 | 48,750 | 3.61 MiB (3,790,240 bytes) |
+| JavaScript (`js/`) | 135 | 48,750 | 3.61 MiB (3,790,508 bytes) |
 | Styles (`css/`) | 3 | 1,245 | 110 KiB (112,879 bytes) |
 | Page (`index.html`) | 1 | 180 | 7.6 KiB (7,792 bytes) |
-| **Whole game** | **139** | **50,175** | **3.73 MiB (3,910,911 bytes)** |
+| **Whole game** | **139** | **50,175** | **3.73 MiB (3,911,179 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **49,608 lines, 3.69 MiB (3,867,436 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **49,608 lines, 3.69 MiB (3,867,704 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
