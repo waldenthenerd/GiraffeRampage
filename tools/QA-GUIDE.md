@@ -74,3 +74,10 @@ Finish with a report of at most about 600 words in exactly these sections:
 - **Not tested / could not tell**
 
 Your scenario files and screenshots stay in your scratch folder; mention their names so they can be found.
+
+## The university (Campus)
+- Districts and rooms: `townGo('campus', x, 1)` and `townGo('in_uhall' | 'in_ulecture' | 'in_ulibrary' | 'in_uhw' | 'in_uexam' | 'in_ucafe', x, 1)`. Open it with `Save.data.chapter1Complete = true`. Pin `townWeatherType=function(){return 'clear'}; Town.fixHour=12;` for steady screenshots.
+- State: `uniData()` (`fac[id] = { l, xp }`, `deg`, `badge`, `rk`, `seen`, `read`, `lec`, `facts`, `buff`, `n`), `uniFac(id)`, `uniEnergy()`, `uniGainEnergy(n)`, `uniTotal()`, `uniRankIndex()`, `uniIQ()`, `uniCheckRank()` and `recalcStats()` after setting levels. Run stats are `P.stats.dodge`, `bossDmg`, `cdRed`, `xpMul`, `goldMul`, `dropMul`, `pickupMul`.
+- Panels: `uniShowRegistrar()`, `uniShowFaculties()`, `uniShowDegrees()`, `uniShowRanks()`, `uniShowNotebook()`, `uniShowCafe()`, `uniShowJournalTab()`. Pickers: `uniBeginAct({ act: 'uni-lec' | 'uni-shelf' | 'uni-read' | 'uni-hw' | 'uni-exam', m: facultyId })`.
+- Sessions are driven by actions through `handleTownAction`: `town-uq-lec-<id>`, `town-uq-book-<id>`, `town-uq-hw-<faculty>`, `town-uq-exam-<faculty>`, then `town-uq-next` / `town-uq-prev` (slides), `town-uq-a-<n>` or `-t` / `-f` (multiple choice, true or false), `town-uq-o-<i>` (order), `town-uq-ml-<i>` then `town-uq-mr-<j>` (match), `town-uq-est` (estimate, reads `#uq-slider`), `town-uq-q-next`, `town-uq-done`. To see a given question format, empty `UNI_Q` (`UNI_Q.length = 0`) and push the question you want, set its `f` to the faculty and `t` to 1, then start homework.
+- A level-up with a fourth card: `UNI_EXTRA_CHOICE.fill(1)`, rank high enough, then `G.pendingLevels = 1; G.levelGate = 0;` and step.

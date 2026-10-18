@@ -30,7 +30,7 @@ const WARD_TOWN = [['Brickwork', '#B5543C', 'pk_sw'], ['Sea Glass', '#7FD1C0', '
 /* 36 to 41: found out at sea, in the air and in the two villages (js/44zs-explore-rewards.js) */
 WARD_TOWN.push(['Jet Stream', '#8ED0F0', 'fl_sw'], ['Seafoam', '#6FD8B8', 'sea_sw1'], ['Coral Reef', '#F0707A', 'sea_sw2'], ['Cornfield', '#E8C44A', 'fm_sw1'], ['Harvest Orange', '#E8862A', 'fm_sw2'], ['Shell Pink', '#F4C4D0', 'is_sw1'], ['Gold Medal', '#E8B830', 'gym_gold']);
 WARD_TOWN.forEach(function(w){ WARD.push({ name: w[0], c: w[1] }); });
-const WARD_MAX = 42;
+const WARD_MAX = 45;                                    /* 43 to 45: the university ranks Graduate, Professor and Chancellor (js/44zz-campus.js) */
 function wardStarOf(n){ const s = Save.data && Save.data.mini && Save.data.mini.stars; return s ? (s[n - 13] | 0) : 0; }
 function wardUnlocked(n){
   if (n === 0) return true;

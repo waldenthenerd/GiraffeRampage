@@ -30,6 +30,7 @@ function bindInput(){
       if (e.code === 'Digit1') chooseCard(0);
       else if (e.code === 'Digit2') chooseCard(1);
       else if (e.code === 'Digit3') chooseCard(2);
+      else if (e.code === 'Digit4') chooseCard(3);
       else if (e.code === keyOf('reroll')) doReroll();
       return;
     }

@@ -663,14 +663,14 @@ function renderLevelUp(){
   }).join('');
 
   const rr = G.rerolls > 0
-    ? '<button class="btn sm ghost" data-a="reroll">Reroll these three (' + G.rerolls + ' left)</button>'
+    ? '<button class="btn sm ghost" data-a="reroll">Reroll these ' + (G.offer && G.offer.length > 3 ? 'four' : 'three') + ' (' + G.rerolls + ' left)</button>'
     : '<button class="btn sm ghost" disabled>No rerolls left</button>';
 
   setOverlay(
     '<div class="panel" id="lvlwrap">' +
       '<h2 class="lvltitle display">LEVEL ' + P.level + '</h2>' +
-      '<p class="lvlsub">' + (Input.hasTouch ? 'Pick one. Tap a card.' : 'Pick one. Keys 1, 2, 3.') + '</p>' +
-      '<div class="cards">' + cards + '</div>' +
+      '<p class="lvlsub">' + (Input.hasTouch ? 'Pick one. Tap a card.' : 'Pick one. Keys 1 to ' + (G.offer ? G.offer.length : 3) + '.') + '</p>' +
+      '<div class="cards' + (G.offer && G.offer.length > 3 ? ' c4' : '') + '">' + cards + '</div>' +
       '<div id="reroll">' + rr + '</div>' +
     '</div>');
 }
