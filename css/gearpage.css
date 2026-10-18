@@ -61,3 +61,26 @@
 .gcset{margin:8px 0;padding:6px 8px;border-radius:4px;background:rgba(20,16,14,.55);color:var(--dust);font-size:12px}
 .gcset.done{color:#FFD84D;border:1px solid rgba(255,216,77,.45)}
 .gcmp .btn{margin-top:4px}
+/* crates: pity line and the reveal */
+.crate .pity{font-size:11.5px;color:var(--dust);margin:2px 0 8px}
+.crevl{--rc:#A9997F;position:fixed;inset:0;z-index:60;background:rgba(10,7,5,.88);border:0;color:var(--bone);display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;font:inherit;overflow:hidden}
+.crevl.r-rare{--rc:#7E9B4E}.crevl.r-epic{--rc:#9A5BD6}.crevl.r-legendary{--rc:#FFD84D}
+.crbox{font-size:96px;line-height:1;position:absolute}
+.crevl.ph0 .crbox{animation:crshake .6s linear both}
+.crevl.ph1 .crbox{animation:crpop .4s ease-out both}.crevl.ph2 .crbox{display:none}
+.crburst{position:absolute;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle,var(--rc) 0%,rgba(255,255,255,.0) 70%);opacity:0}
+.crevl.ph1 .crburst{animation:crburst .5s ease-out both}.crevl.ph2 .crburst{width:420px;height:420px;opacity:.28}
+.crsparks{position:absolute;width:0;height:0}.crsparks i{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:var(--rc);opacity:0}
+.crevl.ph1 .crsparks i{animation:crspark .6s ease-out both}
+.crcard{position:relative;display:none;flex-direction:column;align-items:center;text-align:center;max-width:min(420px,88vw);gap:3px}
+.crevl.ph2 .crcard{display:flex;animation:crrise .5s cubic-bezier(.2,.9,.3,1) both}
+.crimg{width:128px;height:128px;filter:drop-shadow(0 0 14px var(--rc))}
+.crk{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--rc);font-weight:800}
+.crn{font-size:24px;font-weight:800}.crs{font-size:12.5px;color:var(--dust);text-transform:capitalize}.crd{font-size:13.5px;color:#D6C9B2;line-height:1.5;margin-top:4px}
+.crhint{font-size:11px;color:var(--dust);margin-top:14px;letter-spacing:.06em}
+@keyframes crshake{0%,100%{transform:rotate(0) scale(1)}10%{transform:rotate(-7deg) scale(1.04)}25%{transform:rotate(8deg) scale(1.08)}40%{transform:rotate(-9deg) scale(1.12)}55%{transform:rotate(9deg) scale(1.16)}70%{transform:rotate(-6deg) scale(1.2)}85%{transform:rotate(5deg) scale(1.24)}}
+@keyframes crpop{from{transform:scale(1.24);opacity:1}to{transform:scale(2.2);opacity:0}}
+@keyframes crburst{from{transform:scale(1);opacity:.95}to{transform:scale(14);opacity:0}}
+@keyframes crspark{from{transform:rotate(var(--a)) translateX(10px);opacity:1}to{transform:rotate(var(--a)) translateX(230px);opacity:0}}
+@keyframes crrise{from{transform:translateY(40px) scale(.8);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.crevl.ph0 .crbox{animation:none}}

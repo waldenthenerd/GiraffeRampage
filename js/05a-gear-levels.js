@@ -136,3 +136,37 @@ function cratePityBump(kind, gotGood){
     return d;
   };
 })();
+
+/* ---------- crates: pity, and duplicates that level a piece up ----------
+   Replaces openCrate() from 05-gear.js. Returns { piece, dupe, refund, rarity, levelUp, pity } or null when the purchase could not happen.
+   The rarity is rolled as before; if this is the open that pity guarantees (Supply Crate: the 10th without a rare or better, Prime Crate: the
+   8th without an epic or better) and the roll fell short, it is raised to the floor. A rarity with nothing left to find gives, in order: an
+   unowned piece of that floor or better when pity is on, an unowned piece of any rarity otherwise, and then a duplicate. A duplicate raises
+   the piece one level (up to 5) and refunds nothing; only a piece already at level 5 refunds DUPE_REFUND gems. */
+function openCrate(kind){
+  const crate = CRATES[kind];
+  if (!crate || !Save.data || (Save.data.gems | 0) < crate.cost) return null;
+  if (typeof gearReveal !== 'undefined' && gearReveal.active) return null;                         /* one crate at a time while the reveal plays */
+  Save.data.gems -= crate.cost;
+  const pc = CRATE_PITY[kind], onPity = !!pc && cratePityCount(kind) + 1 >= pc.every;
+  let rarity = rollRarity(crate.weights), pity = false;
+  if (onPity && RARITY_ORDER[rarity] < RARITY_ORDER[pc.floor]){ rarity = pc.floor; pity = true; }
+  const all = Object.keys(GEAR_INDEX).map(function(id){ return GEAR_INDEX[id]; }), floorN = pc ? RARITY_ORDER[pc.floor] : 0;
+  const atRarity = all.filter(function(p){ return p.rarity === rarity; });
+  let candidates = atRarity.filter(function(p){ return !gearOwned(p.id); });
+  if (!candidates.length) candidates = all.filter(function(p){ return !gearOwned(p.id) && (!onPity || RARITY_ORDER[p.rarity] >= floorN); });
+  let piece, dupe = false, refund = 0, levelUp = 0;
+  if (candidates.length){
+    piece = pick(candidates); grantGear(piece.id);
+    if (!gearEquipped(piece.slot)) equipGear(piece.id);                                             /* a piece in an empty slot is worn at once */
+  } else {
+    const pool = (onPity ? all.filter(function(p){ return RARITY_ORDER[p.rarity] >= floorN; }) : (atRarity.length ? atRarity : all));
+    const grow = pool.filter(function(p){ return gearLevel(p.id) < GEAR_LV_MAX; });
+    piece = pick(grow.length ? grow : pool); dupe = true;
+    if (gearLevelUp(piece.id)) levelUp = gearLevel(piece.id); else { refund = DUPE_REFUND; Save.data.gems += refund; }
+  }
+  cratePityBump(kind, RARITY_ORDER[piece.rarity] >= (pc ? RARITY_ORDER[pc.floor] : 0) && !!pc);
+  Save.data.cratesOpened = (Save.data.cratesOpened | 0) + 1;
+  Save.write();
+  return { piece: piece, dupe: dupe, refund: refund, rarity: piece.rarity, levelUp: levelUp, pity: pity };
+}
