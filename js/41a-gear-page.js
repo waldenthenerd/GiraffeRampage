@@ -289,8 +289,14 @@ function buyCrate(kind){                                                        
 }
 
 /* ---------- actions ---------- */
+/* a soft fade at the bottom of the side window while there is more below to scroll to */
+function gearSideFlags(){
+  const side = document.getElementById('gearSide'), p = side && side.firstElementChild;
+  if (side) side.classList.toggle('more', !!p && p.scrollHeight - p.scrollTop - p.clientHeight > 4);
+}
+document.addEventListener('scroll', function(e){ if (e.target && e.target.parentNode && e.target.parentNode.id === 'gearSide') gearSideFlags(); }, true);
 function gearSyncSelection(){                                                               /* hover or tap: update the picture's try-on, the side panel and the tile marks without redrawing the page */
-  const side = document.getElementById('gearSide'); if (side) side.innerHTML = gearSideHTML();
+  const side = document.getElementById('gearSide'); if (side){ side.innerHTML = gearSideHTML(); gearSideFlags(); }
   const tiles = document.querySelectorAll('.gp[data-gh]');
   for (let i = 0; i < tiles.length; i++) tiles[i].classList.toggle('sel', tiles[i].dataset.gh === gearPage.selected);
 }
@@ -312,11 +318,15 @@ function gearAction(a){
   const h = handleAction;
   handleAction = function(a){ if (typeof a === 'string' && a.indexOf('gear-') === 0 && gearAction(a)) return; return h.apply(this, arguments); };
   const s = showShop;
-  showShop = function(tab){ gearPreviewStop(); gearRevealEnd(); const r = s.apply(this, arguments); if (shopTab === 'gear' && G.state === 'shop' && gearPage.view === 'doll') gearPreviewMount(); return r; };
+  showShop = function(tab){ gearPreviewStop(); gearRevealEnd(); const r = s.apply(this, arguments); if (shopTab === 'gear' && G.state === 'shop' && gearPage.view === 'doll'){ gearPreviewMount(); gearSideFlags(); } return r; };
 })();
 /* pointing at a piece tries it on in the picture (desktop); a tap selects it (everywhere) */
+function gearHoverClear(){ gearPage.clearT = 0; if (gearPage.hover){ gearPage.hover = null; gearSyncSelection(); } }
 OV.addEventListener('mouseover', function(e){
   if (shopTab !== 'gear' || G.state !== 'shop') return;
-  const t = e.target.closest ? e.target.closest('[data-gh]') : null, id = t ? t.dataset.gh : null;
-  if (id !== gearPage.hover){ gearPage.hover = id; gearSyncSelection(); }
+  const t = e.target.closest ? e.target.closest('[data-gh]') : null, id = t ? t.dataset.gh : null, inSide = !!(e.target.closest && e.target.closest('#gearSide'));
+  if (gearPage.clearT){ clearTimeout(gearPage.clearT); gearPage.clearT = 0; }
+  if (id){ if (id !== gearPage.hover){ gearPage.hover = id; gearSyncSelection(); } return; }
+  if (inSide || !gearPage.hover) return;                                                   /* the pointer is on the panel (to scroll it or press Equip): keep the piece */
+  gearPage.clearT = setTimeout(gearHoverClear, 350);                                       /* a moment's grace to travel from the tile to the panel */
 });
