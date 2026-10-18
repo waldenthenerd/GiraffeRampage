@@ -217,6 +217,7 @@
     c.setLineDash([]);
   };
   tSign = function(c, text, cx, cy, w, fill, ink){
+    if (curG) (curG.signs = curG.signs || []).push({ x1: cx - w / 2 - 4, x2: cx + w / 2 + 4, y1: cy - 18, y2: cy + 18 });      /* the gutter and drainpipe go round the sign */
     _tSign(c, text, cx, cy, w, fill, ink);
     const h = 28;
     c.strokeStyle = 'rgba(255,255,255,.22)'; c.lineWidth = 1; c.beginPath(); c.roundRect(cx - w / 2 + 3, cy - h / 2 + 3, w - 6, h - 6, 4); c.stroke();
@@ -252,11 +253,17 @@
   }
   function drainpipe(c, g){
     let dx = g.doors.length ? (g.doors[0][0] + g.doors[0][1]) / 2 : g.x0 + g.w / 2;
-    const left = dx > g.x0 + g.w / 2, px = left ? g.x0 + 7 : g.x0 + g.w - 9;
-    c.fillStyle = '#6E727C'; c.fillRect(px, g.top, 4, g.h - 9); c.fillStyle = 'rgba(255,255,255,.3)'; c.fillRect(px, g.top, 1.3, g.h - 9); c.fillStyle = 'rgba(0,0,0,.25)'; c.fillRect(px + 3, g.top, 1, g.h - 9);
-    c.fillStyle = '#4E525C'; for (let yy = g.top + 18; yy < TG - 12; yy += 46) c.fillRect(px - 1.5, yy, 7, 3);
+    const left = dx > g.x0 + g.w / 2, px = left ? g.x0 + 7 : g.x0 + g.w - 9, sg = g.signs || [];
+    let pt = g.top;                                                                                    /* the pipe starts under any sign it would cross */
+    sg.forEach(function(q){ if (px + 4 > q.x1 && px < q.x2 && q.y2 > pt && q.y1 < TG - 40) pt = q.y2; });
+    c.fillStyle = '#6E727C'; c.fillRect(px, pt, 4, TG - 9 - pt); c.fillStyle = 'rgba(255,255,255,.3)'; c.fillRect(px, pt, 1.3, TG - 9 - pt); c.fillStyle = 'rgba(0,0,0,.25)'; c.fillRect(px + 3, pt, 1, TG - 9 - pt);
+    c.fillStyle = '#4E525C'; for (let yy = Math.max(g.top + 18, pt + 8); yy < TG - 12; yy += 46) c.fillRect(px - 1.5, yy, 7, 3);
     c.fillStyle = '#6E727C'; c.fillRect(px - 3, TG - 14, 8, 5); c.fillRect(px - (left ? 8 : -1), TG - 10, 12, 3);                                     /* elbow and spout */
-    if (g.kind !== 'studio'){ c.fillStyle = '#5A5E68'; c.fillRect(g.x0 - 4, g.top - 1, g.w + 8, 3); c.fillStyle = 'rgba(255,255,255,.22)'; c.fillRect(g.x0 - 4, g.top - 1, g.w + 8, 1); }    /* gutter (not where a sign sits on the roof edge) */
+    if (g.kind !== 'studio'){                                                                          /* the gutter, in pieces either side of a sign on the roof edge */
+      let segs = [[g.x0 - 4, g.x0 + g.w + 4]];
+      sg.forEach(function(q){ if (q.y2 < g.top - 6 || q.y1 > g.top + 6) return; const out = []; segs.forEach(function(s2){ if (q.x2 <= s2[0] || q.x1 >= s2[1]){ out.push(s2); return; } if (q.x1 > s2[0]) out.push([s2[0], q.x1]); if (q.x2 < s2[1]) out.push([q.x2, s2[1]]); }); segs = out; });
+      segs.forEach(function(s2){ c.fillStyle = '#5A5E68'; c.fillRect(s2[0], g.top - 1, s2[1] - s2[0], 3); c.fillStyle = 'rgba(255,255,255,.22)'; c.fillRect(s2[0], g.top - 1, s2[1] - s2[0], 1); });
+    }
   }
   function stringLights(c, x1, x2, y, sag, n, seed){
     c.strokeStyle = 'rgba(30,24,20,.7)'; c.lineWidth = 1; c.beginPath(); c.moveTo(x1, y); c.quadraticCurveTo((x1 + x2) / 2, y + sag * 2, x2, y); c.stroke();
