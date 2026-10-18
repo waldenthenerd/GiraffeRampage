@@ -14,12 +14,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 152 | 51,292 | 3.84 MiB (4,021,488 bytes) |
-| Styles (`css/`) | 5 | 1,367 | 123 KiB (126,016 bytes) |
+| JavaScript (`js/`) | 152 | 51,330 | 3.84 MiB (4,024,918 bytes) |
+| Styles (`css/`) | 5 | 1,390 | 125 KiB (127,844 bytes) |
 | Page (`index.html`) | 1 | 199 | 8.5 KiB (8,693 bytes) |
-| **Whole game** | **158** | **52,858** | **3.96 MiB (4,156,197 bytes)** |
+| **Whole game** | **158** | **52,919** | **3.97 MiB (4,161,455 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,290 lines, 3.92 MiB (4,112,722 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,351 lines, 3.93 MiB (4,117,980 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -112,7 +112,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/41-qol.js` | 842 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
 | `js/42-run-hud.js` | 234 | Run lifecycle and the HUD. |
 | `js/43-input.js` | 374 | Input: keyboard, mouse, touch, gamepad. |
-| `js/41a-gear-page.js` | 284 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, and the crate reveal (`gearReveal`). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
+| `js/41a-gear-page.js` | 322 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, the crate reveal (`gearReveal`) and Buy 5 / Buy 10 on every crate (`gearBuyMany`: all the openings play at once, five to a row). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
 | `js/44-loop-boot.js` | 114 | The main loop, resize, and the boot function. |
 | `js/44b-feedback.js` | 229 | Pacing and presentation: title splash, one-time hints, fades, boss entrance, wave-clear beat, number count-ups, overlay fade-out, text size, the kick wind-up. |
 | `js/44c-perf.js` | 170 | The slow-device governor: times each frame's work and, if the game cannot keep up, lowers the canvas sharpness and then the effects (`PERF_STEPS`); shows a notice with a "Back to full quality" button when it does (`perfNotice`; that button turns "Adapt to slow devices" off), counts minigames as play, and the minigame polish layers follow the effects level; brings them back when there is room. Off with Settings, Adapt to slow devices. Also the statistics panel (the `\` key). |

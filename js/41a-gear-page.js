@@ -95,6 +95,10 @@ function gearCratesHTML(){
         '<div class="odds">' + ['common', 'rare', 'epic', 'legendary', 'mythical'].map(function(r){ return '<span class="o ' + r + '">' + r.charAt(0).toUpperCase() + r.slice(1) + ' ' + c.weights[r] + '%</span>'; }).join('') + '</div>' +
         '<div class="pity">' + gearPityText(k) + '</div>' +
         '<button class="btn sm' + (can ? '' : ' ghost') + '" data-crate="' + k + '"' + (can ? '' : ' disabled') + '>' + (can ? 'Open for ' + price : price) + '</button>' +
+        '<div class="crmulti">' + [5, 10].map(function(n){
+          const ok = gems >= c.cost * n && (!c.food || food + 1e-9 >= c.food * n);
+          return '<button class="btn sm ghost crm' + (ok ? ' ok' : '') + '" data-a="gear-buy-' + k + '-' + n + '"' + (ok ? '' : ' disabled') + '>Open ' + n + '<small>' + fmt(c.cost * n) + ' gems' + (c.food ? ' + ' + c.food * n + ' food' : '') + '</small></button>';
+        }).join('') + '</div>' +
       '</div>';
   });
   return crates + '</div>';
@@ -205,11 +209,11 @@ function gearComparePanel(slot, id){
    (0.6s), 1 a burst of light in the piece's rarity colour (0.4s), 2 the piece and what it did. A click skips ahead, then closes. At Visual
    effects "off" it goes straight to phase 2 after 0.2s. Every timer is listed in gearReveal.timers and cleared when the reveal ends, which also
    happens whenever the shop is drawn again (leaving the tab, equipping, starting a run). */
-const gearReveal = { active: false, el: null, timers: [], phase: 0, res: null, sounded: false };
+const gearReveal = { active: false, el: null, timers: [], phase: 0, res: null, sounded: false, batch: null };
 function gearRevealEnd(){
   gearReveal.timers.forEach(clearTimeout); gearReveal.timers.length = 0;
   if (gearReveal.el && gearReveal.el.parentNode) gearReveal.el.parentNode.removeChild(gearReveal.el);
-  gearReveal.el = null; gearReveal.active = false; gearReveal.res = null; gearReveal.phase = 0; gearReveal.sounded = false;
+  gearReveal.el = null; gearReveal.active = false; gearReveal.res = null; gearReveal.phase = 0; gearReveal.sounded = false; gearReveal.batch = null;
 }
 function gearRevealSound(res){
   try {
@@ -221,11 +225,12 @@ function gearRevealSound(res){
 }
 function gearRevealPhase(n){
   if (!gearReveal.active || !gearReveal.el || n < gearReveal.phase) return;                   /* phases only move forward: a late timer must not undo a skip */
-  gearReveal.phase = n; gearReveal.el.className = 'crevl r-' + gearReveal.res.rarity + ' ph' + n;
+  gearReveal.phase = n; gearReveal.el.className = 'crevl' + (gearReveal.batch ? ' multi' : ' r-' + gearReveal.res.rarity) + ' ph' + n;
   if (n >= 1 && !gearReveal.sounded){ gearReveal.sounded = true; gearRevealSound(gearReveal.res); }
 }
 function gearRevealSkip(){ gearRevealPhase(2); }
 function gearRevealStart(res){
+  if (Array.isArray(res)) return gearRevealStartMany(res);
   gearRevealEnd();
   const fx = typeof fxLevelNow === 'function' ? fxLevelNow() : 1, p = res.piece;
   const k = res.dupe ? (res.levelUp ? 'Level up' : 'Duplicate') : 'New gear';
@@ -240,6 +245,38 @@ function gearRevealStart(res){
   const T = function(ms, f){ gearReveal.timers.push(setTimeout(function(){ if (gearReveal.active && gearReveal.el === el && document.body.contains(el)) f(); }, ms)); };
   if (fx > 0){ T(600, function(){ gearRevealPhase(1); }); T(1000, function(){ gearRevealPhase(2); }); }
   else T(200, function(){ gearRevealPhase(2); });
+}
+/* Buy 5 or Buy 10: every opening plays at the same time, five to a row (one row for five, two for ten). The sound is the best piece's. */
+function gearRevealStartMany(list){
+  gearRevealEnd();
+  const fx = typeof fxLevelNow === 'function' ? fxLevelNow() : 1;
+  let best = list[0], news = 0, ups = 0, refund = 0;
+  list.forEach(function(r){ if (RARITY_ORDER[r.rarity] > RARITY_ORDER[best.rarity]) best = r; if (!r.dupe) news++; else if (r.levelUp) ups++; else refund += r.refund; });
+  const el = document.createElement('button'); el.id = 'crateReveal'; el.setAttribute('data-a', 'gear-reveal-close');
+  el.innerHTML = '<div class="crgrid">' + list.map(function(r, i){
+    const p = r.piece, k = r.dupe ? (r.levelUp ? 'Level up +' + (r.levelUp - 1) : 'Refund ' + r.refund) : 'New';
+    return '<div class="crc r-' + r.rarity + '" style="--d:' + (i * 0.05).toFixed(2) + 's"><div class="crbox">' + ico(RARITY_ORDER[r.rarity] >= 2 ? '@t-x-gift' : '@t-x-box') + '</div><div class="crburst"></div>' +
+      '<div class="crcard"><img class="crimg" src="' + gearIcon(p.id, 96, { level: r.levelUp || gearLevel(p.id) }) + '" alt=""><div class="crk">' + k + '</div>' +
+      '<div class="crn">' + p.name + '</div><div class="crs">' + p.setName + ' · ' + SLOT_LABEL[p.slot] + '</div></div></div>';
+  }).join('') + '</div>' +
+  '<div class="crsum">' + list.length + ' crates: ' + news + ' new' + (ups ? ', ' + ups + ' levelled up' : '') + (refund ? ', ' + refund + ' gems back' : '') + '. Best: <b class="crbest r-' + best.rarity + '">' + best.piece.name + '</b> (' + best.rarity + ')</div>' +
+  '<div class="crhint">Click to continue</div>';
+  OV.appendChild(el);
+  gearReveal.el = el; gearReveal.active = true; gearReveal.res = best; gearReveal.batch = list; gearRevealPhase(0);
+  const T = function(ms, f){ gearReveal.timers.push(setTimeout(function(){ if (gearReveal.active && gearReveal.el === el && document.body.contains(el)) f(); }, ms)); };
+  if (fx > 0){ T(600, function(){ gearRevealPhase(1); }); T(1000, function(){ gearRevealPhase(2); }); }
+  else T(200, function(){ gearRevealPhase(2); });
+}
+function gearBuyMany(kind, n){                                                              /* n crates at once (5 or 10): all of it affordable, or none of it */
+  const c = CRATES[kind];
+  if (!c || gearReveal.active || !(n > 1)) return false;
+  if ((Save.data.gems | 0) < c.cost * n || (c.food && (+Save.data.food || 0) + 1e-9 < c.food * n)){ SFX.deny(); return false; }
+  const list = [];
+  for (let i = 0; i < n; i++){ const r = openCrate(kind); if (!r) break; list.push(r); }
+  if (!list.length){ SFX.deny(); return false; }
+  crateResult = null;
+  showShop('gear'); gearRevealStart(list);
+  return true;
 }
 function buyCrate(kind){                                                                    /* replaces 43-input.js: the reveal takes the place of the old redraw-and-sound */
   const c = CRATES[kind];
@@ -266,6 +303,7 @@ function gearAction(a){
     gearPage.selected = same ? null : id; gearPage.hover = null; gearSyncSelection(); return true;
   }
   if (a === 'gear-view-doll' || a === 'gear-view-sets'){ gearPage.view = a.slice(10); gearPage.selected = null; gearPage.hover = null; SFX.click(); showShop('gear'); return true; }
+  if (a.indexOf('gear-buy-') === 0){ const m = /^gear-buy-([a-z]+)-(5|10)$/.exec(a); if (m && !gearBuyMany(m[1], +m[2])) SFX.deny(); return true; }
   if (a === 'gear-reveal-close'){ if (gearReveal.phase < 2) gearRevealSkip(); else { gearRevealEnd(); SFX.click(); } return true; }
   if (a === 'gear-demo-kick'){ gearPreview.kickT = 0; SFX.click(); return true; }
   return false;
