@@ -15,5 +15,5 @@ Read `README.md` (file map) and `lovable.md` (rules for the hosted Lovable copy)
 - Windows-only runner: `tools/qa-run.ps1` (Edge). Cloud runner: `tools/qa-cloud.mjs` (Playwright Chromium, full game from `index.html`).
 - One-time setup: `cd tools && npm install && npx playwright install --with-deps chromium`
 - Run: `node tools/qa-cloud.mjs my.js --shot my.png --wait 20000`, then look at the PNG. Scenario format and the `GR`/`QA` API are in `tools/QA-GUIDE.md`.
-- `qa-cloud.mjs` was written on Windows without Node installed, so it has never been run. First job in the cloud: run it with a tiny scenario (`GR.handleAction('splash-go'); QA.done({ok:1})`) and fix anything that breaks.
+- `qa-cloud.mjs` is verified in the cloud (tiny scenario and a gym scenario with screenshot). If the pinned Playwright wants a Chromium revision that is not installed, it falls back to any `chromium-*` under `PLAYWRIGHT_BROWSERS_PATH` (or set `QA_CHROMIUM=/path/to/chrome`); skip `playwright install` when `/opt/pw-browsers` already has Chromium.
 - Headless frames are throttled: use `GR.step` loops, not wall-clock waits. Gym/town state lives in `Town.gym`, `Save.data.town.gym`.

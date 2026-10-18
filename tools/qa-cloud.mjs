@@ -38,7 +38,20 @@ const server = http.createServer((req, res) => {
 await new Promise(r => server.listen(0, '127.0.0.1', r));
 const port = server.address().port;
 
-const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'] });
+// Pinned playwright may want a different Chromium revision than the one pre-installed (cloud: PLAYWRIGHT_BROWSERS_PATH); QA_CHROMIUM overrides, else fall back to any installed chromium-*/chrome-linux/chrome.
+function findChromium() {
+  if (process.env.QA_CHROMIUM) return process.env.QA_CHROMIUM;
+  const base = process.env.PLAYWRIGHT_BROWSERS_PATH;
+  if (!base || !fs.existsSync(base)) return undefined;
+  for (const d of fs.readdirSync(base).filter(n => /^chromium-\d+$/.test(n)).sort().reverse()) {
+    for (const rel of ['chrome-linux/chrome', 'chrome-linux64/chrome']) { const f = path.join(base, d, rel); if (fs.existsSync(f)) return f; }
+  }
+  return undefined;
+}
+const launchArgs = ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required', '--no-sandbox'];
+let browser;
+try { browser = await chromium.launch({ args: launchArgs }); }
+catch (e) { const exe = findChromium(); if (!exe) throw e; browser = await chromium.launch({ args: launchArgs, executablePath: exe }); }
 const ctx = await browser.newContext({ viewport: { width: W, height: H } });
 const pg = await ctx.newPage();
 const pageErrors = [];
