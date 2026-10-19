@@ -241,7 +241,7 @@ function handleAction(a){
   if (a === 'wardrobe' || a.indexOf('ward-') === 0){ if (typeof handleWardAction === 'function') handleWardAction(a); return; }       /* coat colours (js/44e-wardrobe.js) */
   if (a.indexOf('mini-') === 0){ if (typeof handleMiniAction === 'function' && handleMiniAction(a)) return; }                        /* minigames (js/44f-minigames.js) */
   if (a.indexOf('town-') === 0){ if (typeof handleTownAction === 'function' && handleTownAction(a)) return; }                      /* Longneck Town (js/44x-town-ui.js) */
-  /* developer-panel actions live in js/45b-dev-panel.js; without that file they simply do nothing */
+  /* actions that start with the testing prefix belong to a separate testing tool that is not part of the published game; without it they simply do nothing */
   if (a.indexOf('debug-') === 0){ if (typeof handleDebugAction === 'function') handleDebugAction(a); return; }
   switch (a){
     case 'continue': { const r = Save.data.runSave; if (!validRunSave(r)){ SFX.deny(); showMenu(); break; } SFX.click(); tryFullscreen(); startRun(null, r.wave, r); break; }
