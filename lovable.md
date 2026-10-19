@@ -63,8 +63,8 @@ game. This is the complete list for this version (154 scripts; the developer pan
 
 | # | File | What it does |
 |---|---|---|
-| 1 | `js/00-icons.js` | Icon tables (Material + Tabler) and the icon helpers. Runs outside strict mode, as it always did. |
-| 2 | `js/00b-icons-custom.js` | Every icon in the game other than the stock Tabler set is drawn here (Tabler-style 24x24 outlines, written `'@t-x-name'`). The old filled Material icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
+| 1 | `js/00-icons.js` | The icon table (41 outlined icons drawn for this game) and the icon helpers. Runs outside strict mode, as it always did. |
+| 2 | `js/00b-icons-custom.js` | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
 | 3 | `js/01-core.js` | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. |
 | 4 | `js/01b-savepack.js` | Save compression: LZW packing of the save, `window.GRSave`. Section 4 of this file describes the format. |
 | 5 | `js/02-music.js` | Procedural background music: themes, the 16-bar sequencer (A, A, B, A), key climb through a chapter, boss second phase, theme fade-in, stingers. |

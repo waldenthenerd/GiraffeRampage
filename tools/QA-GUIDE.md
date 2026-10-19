@@ -1,13 +1,13 @@
 # QA guide: how to test Giraffe Rampage with the headless harness
 
 You test the game by writing a small JavaScript **scenario**, running it in the real game inside headless Edge, and reading the
-result plus a screenshot. **Never edit anything under `C:\Users\moopy\ClaudeCode\GiraffeRampage`.** Write your scenarios and
+result plus a screenshot. **Never edit anything under `<path-to-your-checkout>`.** Write your scenarios and
 screenshots only into your own scratch folder (given in your task).
 
 ## Running a scenario
 
 ```powershell
-powershell -NoProfile -File C:\Users\moopy\ClaudeCode\GiraffeRampage\tools\qa-run.ps1 -Scenario <your-folder>\a.js -Shot <your-folder>\a.png -WaitMs 20000
+powershell -NoProfile -File <path-to-your-checkout>\tools\qa-run.ps1 -Scenario <your-folder>\a.js -Shot <your-folder>\a.png -WaitMs 20000
 ```
 
 - Always pass `-WaitMs 20000` (the machine is shared; the default 8000 can be too short).

@@ -1,5 +1,5 @@
 /* Icons drawn for this game, for things the stock sets have no good picture of. They are 24x24, 2px outlines in the same style as
-   the Tabler icons (ICONS_T), so they are written '@t-x-name' and take their colour from the card as usual. Loaded right after
+   the icons in 00-icons.js (ICONS_T), so they are written '@t-x-name' and take their colour from the card as usual. Loaded right after
    00-icons.js. To add one: put its path here and use it as icon:'@t-x-name'. */
 Object.assign(ICONS_T, {
   /* weapons and card chains */
@@ -74,7 +74,7 @@ Object.assign(ICONS_T, {
   'x-deepburrow':'M3 12c1 -4 4 -6 9 -6s8 2 9 6 M3 12h18 M9 12a3 3 0 0 1 6 0 M12 16v5 M9 18l3 3l3 -3',
   'x-sulfur':'M12 3l5 5v8l-5 5l-5 -5v-8z M7 8l5 3l5 -3 M12 11v10',
   'x-habmodule':'M4 12a5 5 0 0 1 5 -5h6a5 5 0 0 1 0 10h-6a5 5 0 0 1 -5 -5z M9 12h.01 M13 12h.01 M3 21h18',
-  /* the everyday pictures (these replaced the filled Material icons, so the whole game is one style) */
+  /* the everyday pictures (these replaced an older filled icon set, so the whole game is one style) */
   'x-rover':'M3 15h18v-3l-3 -4h-8l-2 4h-5z M7 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M17 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M12 8v4',
   'x-cells':'M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M5 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M19 7m-1.5 0a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0 M18 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M6 18m-1.5 0a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0 M7 7l3 3 M17 8l-3 3 M16 17l-3 -3 M7.5 17l3 -3',
   'x-blood':'M12 3c4 4.5 6 7.5 6 10a6 6 0 0 1 -12 0c0 -2.5 2 -5.5 6 -10z M8.5 14h2l1 -2l1.5 4l1 -2h1.5',
