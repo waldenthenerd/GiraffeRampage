@@ -1,0 +1,29 @@
+# Runs tools/ci-check.sh on every push and pull request: README counts, the regression scenarios (desktop and phone), the website package and its ship check.
+# To make it block merges: Settings > Rules > the main ruleset > "Require status checks to pass" > add "QA / qa".
+name: QA
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: qa-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - name: Install the test runner and Chromium
+        working-directory: tools
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Run the checks
+        run: bash tools/ci-check.sh

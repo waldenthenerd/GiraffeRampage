@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Recounts the README: the per-file line counts, the totals table, the 'without the developer panel' line, and the script count in lovable.md.
-Run from anywhere:  python3 tools/recount-readme.py   (prints what changed; run it after every change to a js/ or css/ file or to index.html).
+Run from anywhere:  python3 tools/recount-readme.py   (prints what changed; add --check to change nothing and exit 1 if a recount is needed, as CI does; run it after every change to a js/ or css/ file or to index.html).
 A file's count is its number of lines, counting a last line that has no final newline (so it can be one higher than `wc -l`)."""
 import glob, os, re, sys
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); os.chdir(root)
@@ -21,8 +21,11 @@ s = re.sub(r'\| Page \(`index.html`\) \| 1 \| [\d,]+ \| [^|]+\|', '| Page (`inde
 s = re.sub(r'\| \*\*Whole game\*\* \| \*\*\d+\*\* \| \*\*[\d,]+\*\* \| \*\*[^|]+\*\* \|', '| **Whole game** | **%d** | **%s** | **%s** |' % (len(js) + len(css) + 1, format(jl + cl + il, ','), mib(jb + cb + ib)), s)
 s = re.sub(r'\*\*[\d,]+ lines, [\d.]+ MiB \([\d,]+ bytes\)\*\*', '**%s lines, %s**' % (format(jl + cl + il - dl, ','), mib(jb + cb + ib - db)), s, count=1)
 missing = [p for p in js + css if '`%s`' % p not in s]
-if s != s0: open('README.md', 'w', encoding='utf-8').write(s)
+check = '--check' in sys.argv
+if s != s0 and not check: open('README.md', 'w', encoding='utf-8').write(s)
 l0 = l = rd('lovable.md'); l = re.sub(r'\((\d+) scripts;', '(%d scripts;' % len(js), l, count=1)
-if l != l0: open('lovable.md', 'w', encoding='utf-8').write(l)
-print('README.md %s, lovable.md %s (%d scripts, %d stylesheets).' % ('updated' if s != s0 else 'already right', 'updated' if l != l0 else 'already right', len(js), len(css)))
+if l != l0 and not check: open('lovable.md', 'w', encoding='utf-8').write(l)
+verb = 'is out of date' if check else 'updated'
+print('README.md %s, lovable.md %s (%d scripts, %d stylesheets).' % (verb if s != s0 else 'already right', verb if l != l0 else 'already right', len(js), len(css)))
+if check and (s != s0 or l != l0): print('Run: python3 tools/recount-readme.py'); sys.exit(1)
 if missing: print('Not in the README file map yet (add a row for each):', ', '.join(missing)); sys.exit(1)
