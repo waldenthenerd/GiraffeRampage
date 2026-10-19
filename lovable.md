@@ -34,24 +34,31 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 ## 2. What is hosted and how
 
-- The Lovable project is "Giraffe Rampage Cloud". The game is one HTML file, `public/game/giraffe-rampage.html`, shown in an
-  iframe on the `/play` route.
-- A small **bridge script** at the top of that file posts the player's save (the value of localStorage key
-  `giraffe_rampage_save_v1`) to the Supabase table `game_saves`, and puts a cloud save back into localStorage on load.
+- The Lovable project is "Giraffe Rampage Cloud". The game is a **folder of separate files**, `public/game/rampage/`
+  (`index.html`, `css/`, `js/`), shown in an iframe on the `/play` route (`src="/game/rampage/index.html"`).
+- A small **bridge script** sits right after `<head>` in the hosted `index.html`. It posts the player's save (the value of
+  localStorage key `giraffe_rampage_save_v1`) up to the page, which stores it in the Supabase table `game_saves`; the page
+  seeds localStorage from the cloud copy before the iframe loads. The bridge is **not** in the owner's `index.html`: you add
+  it when you install an update (below).
 - The website has its own, separate, secure admin panel. The game's developer panel is not it and must not be in the site.
-- The owner updates the project by giving you the game files and asking you to apply them. This file tells you how.
+- The owner updates the project by giving you a ZIP built from the game folder with `tools/make-lovable-package.sh`. The ZIP
+  already leaves out the developer panel and its `<script>` line. This file, and your own skill
+  `.agents/skills/update-giraffe-game/SKILL.md`, tell you how to apply it.
 
 ### How to apply an update
 
-1. Take the files in `index.html` order (section 3), **except `js/45b-dev-panel.js`**.
-2. Put `css/style.css` first, `css/polish.css` after it, then `css/campus.css`, `css/townlife.css` and `css/gearpage.css` into the page as `<style>` blocks (or keep them as two linked
-   files). `polish.css` is layered over `style.css`; the order matters.
-3. Put each script in its **own** `<script>` block (or keep separate `<script src>` tags), in the same order. Do **not**
-   concatenate everything into one script block: every file begins with `'use strict';` except `js/00-icons.js`, which was never
-   strict, and joining them would change how it behaves.
-4. Keep the HTML body from `index.html` exactly (the canvas, `#hud`, `#touch`, `#pausebtn`, `#overlay`).
-5. Keep the bridge script at the top, **updated as described in section 4**.
-6. Run the checks in section 9.
+1. Unzip it somewhere temporary. Never copy a `.git` folder, `tools/`, `docs/` or `README.md` into `public/`. (`README.md` is
+   for you to read: it describes every file. It also documents the developer panel for people who clone the repository, so the
+   panel's words appear in it; that is expected, because it is not part of the shipped game.)
+2. Replace `public/game/rampage/css/` and `public/game/rampage/js/` with the ZIP's (delete the old folders first, so removed
+   files go away). There are five stylesheets, in this order: `style.css`, `polish.css`, `campus.css`, `townlife.css`,
+   `gearpage.css`; `index.html` links them.
+3. Rebuild `public/game/rampage/index.html` as: the ZIP's `index.html` lines 1 to 3 (up to `<head>`), then the bridge script
+   (kept from the current hosted file, **updated as described in section 4** if the save format changed), then the rest of the
+   ZIP's `index.html` from line 4. Keep every `<script src>` as a separate, ordered tag (section 3); never concatenate them.
+   Keep the HTML body exactly (the canvas, `#hud`, `#touch`, `#pausebtn`, `#overlay`).
+4. Keep `js/45-test-exports.js` (`window.GR`) and `js/01b-savepack.js` (`window.GRSave`) exactly as given.
+5. Run the checks in section 9.
 
 ---
 
@@ -412,7 +419,7 @@ on the "E" of the title do nothing, and `GR` stays complete without it.
 **The minigame and town buttons in it** (`debug-mini-cd`, `debug-mini-own`, `debug-mini-colours`, `debug-mini-unlock`, `debug-town-open`, `debug-town-find`, `debug-town-friends`, `debug-town-errands`, `debug-town-reset`) are part of the
 panel. **The minigames themselves ARE part of the game and must be included.**
 
-**How to check the shipped game** (search for these; none may be present): `Developer Panel`, `debug-addgold`, `1391`,
+**How to check the shipped game** (search `index.html`, `css/` and `js/` for these; none may be present): `Developer Panel`, `debug-addgold`, `1391`,
 `Dev Test Run`, `debug-dr-`, `devRunBtn`, `devBegin`, `debug-mini-`, `debug-town-`.
 
 ---
@@ -429,6 +436,9 @@ panel. **The minigames themselves ARE part of the game and must be included.**
   the lab, the dust squad. These are only shown, and only appear in the Guide, once a save has unlocked them.
 - **Longneck Town** (`js/44u`-`44x`): a side-on town she walks through (main menu button *Longneck Town*, `G.state === 'town'`). Seven districts on one street (Harbour, Market Street, Town Square, Willow Park, Rooftops, Launchpad, and the Burrows down the manhole), each opening with a chapter. The buildings are the front doors of screens the game already has (wardrobe, trading post, minigames, photo studio, album, bestiary, guide, the outposts, the lab); closing one returns to the town because `showMenu()` is wrapped to do that while `G.townReturn` is true. She finds coins, stars, gems, hats, boots, creature tracks and five hidden coat colours (the neck stretches to reach high ones), digs three daily spots, meets eleven giraffes with errands and friendship, and the town has a day/night cycle and rain. It must be included in the website. Its dev buttons are in the developer panel, which is not.
 - **Inside Longneck Town (second update):** ten rooms she can enter (bakery, caf\u00e9, garage, library, tailor, hall, arcade, photo booth, two homes), longer streets, walking townsfolk, an animated tram (and a short ride when picking a stop on the map), Houston-only car, bread, eight town-only hats and boots, and panels that look like what they are. The car is never available underground, in the Burrows or indoors. Hats and boots found in town are not on the wheel.
+- **Longneck University** (`js/44zz`-`44zzg`): a campus district in the town opened by finishing Chapter 1, with eight faculties, lectures, a question bank, study activities, degrees and a rank. It is part of the game; include it.
+- **Gear and trinkets, redone** (`js/05a`, `33a`-`33e`, `36p`, `41a`, `41b`): 22 gear sets (66 pieces, common to mythical) with drawn art on the giraffe, levels 1 to 5, set bonuses and eleven special effects, three crates (Supply, Prime, Spotted) with Open 5 and Open 10, pity counters, a Gear page with a live picture of her, a compare panel and a Sets view, and trinkets as framed tiles you tap to wear, with a panel showing what each does. The save gains `gearLv` and `cratePity`; both are optional.
+- **Performance, second pass** (`js/44ca-ground-cache.js`): the ground and the scenery that holds still are painted into tiles when the menu is showing, at Low or Medium effects, or after the slow-device governor's first step down. Full effects draw everything live.
 - **The Guide** (`js/44r-guide.js`) replaced the old "How to play" page.
 - **Performance:** a picture cache for creatures (`EnemySprite`, `js/44t-enemy-sprites.js`) and staggered enemy updates (the crowding push and who an enemy heads for are worked out a few times a second, and creatures far from her walk toward her with a cheaper update). These change nothing visible. If an enemy ever looks wrong, `EnemySprite.on = false` turns the cache off for a test.
 - **Wave pace:** waves have 40% fewer enemies arriving at the same rate (so each wave is about 40% shorter at the same pressure), each remaining enemy is worth proportionally more experience, score and drops so progression is unchanged, the wait on an empty field is skipped, and a Call the next wave button (key N) ends a wave once everything has spawned. These numbers are WAVE_COUNT_MUL, KILL_VALUE, WAVE_INTRO_S, WAVE_CLEAR_S and WAVE_PATIENCE_S in js/31-waves-update.js. Do not change them.
