@@ -272,12 +272,16 @@ function drawIntroFX(ctx){
   ctx.font = '700 ' + Math.max(12, size * 0.3) + 'px ui-sans-serif, "Segoe UI", Roboto, sans-serif';
   ctx.fillStyle = '#EFE6D4'; ctx.fillText('CHAPTER ' + f.ch, W / 2 - slide, y - size * 0.9);
   ctx.font = '900 ' + size + 'px "Arial Black", "Helvetica Neue", Impact, sans-serif';
+  const nw = ctx.measureText(f.name.toUpperCase()).width, fitSize = nw > W - 36 ? size * (W - 36) / nw : size;          /* a long name on a narrow phone shrinks to fit */
+  if (fitSize !== size) ctx.font = '900 ' + fitSize + 'px "Arial Black", "Helvetica Neue", Impact, sans-serif';
   ctx.lineWidth = 8; ctx.strokeStyle = 'rgba(10,7,6,.92)'; ctx.strokeText(f.name.toUpperCase(), W / 2 + slide, y);
   ctx.fillStyle = f.accent; ctx.fillText(f.name.toUpperCase(), W / 2 + slide, y);
   ctx.fillStyle = f.accent; ctx.globalAlpha = clamp(a, 0, 1) * 0.8;
   const lw = Math.min(260, W * 0.4) * Math.min(1, k / 0.3); ctx.fillRect(W / 2 - lw / 2, y + size * 0.28, lw, 3);
   ctx.globalAlpha = clamp(a, 0, 1); ctx.font = '600 ' + Math.max(13, size * 0.28) + 'px ui-sans-serif, "Segoe UI", Roboto, sans-serif';
-  ctx.fillStyle = '#EFE6D4'; ctx.fillText(f.desc, W / 2, y + size * 0.78);
+  ctx.fillStyle = '#EFE6D4';
+  const dl = ctx.measureText(f.desc).width > W - 32 ? (function(){ const w = f.desc.split(' '), m = f.desc.length / 2; let at = 0, run = 0; for (let i = 0; i < w.length - 1; i++){ run += w[i].length + 1; if (Math.abs(run - m) < Math.abs(at - m) || !at) at = run; } return [f.desc.slice(0, at).trim(), f.desc.slice(at).trim()]; })() : [f.desc];   /* a long line is split in two on a narrow phone */
+  const lh = Math.max(13, size * 0.28) * 1.3; dl.forEach(function(t, i){ ctx.fillText(t, W / 2, y + size * 0.78 + i * lh); });
   ctx.textAlign = 'left'; ctx.globalAlpha = 1;
 }
 function drawAntShadows(ctx){

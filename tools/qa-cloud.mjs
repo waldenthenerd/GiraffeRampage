@@ -1,7 +1,7 @@
 // Cross-platform QA runner (Linux/cloud/macOS/Windows): same scenarios as qa-run.ps1, but with Playwright's Chromium and the FULL game
 // (index.html's script list, so town, sea and gym code are all loaded; tools/qa.html is an older, shorter list).
 //
-// usage: node tools/qa-cloud.mjs <scenario.js> [--shot out.png] [--params "view=boss&ch=3"] [--seed 12345] [--w 1280] [--h 720] [--scale 1] [--wait 20000]
+// usage: node tools/qa-cloud.mjs <scenario.js> [--shot out.png] [--params "view=boss&ch=3"] [--seed 12345] [--w 1280] [--h 720] [--scale 1] [--touch] [--wait 20000]
 // setup (once): cd tools && npm install && npx playwright install --with-deps chromium
 // prints one JSON line: {"done":true,"result":...,"errors":[...],"logs":[...]}   (see tools/QA-GUIDE.md for how to write scenarios)
 import fs from 'node:fs';
@@ -15,7 +15,7 @@ const root = process.env.QA_ROOT ? path.resolve(process.env.QA_ROOT) : path.reso
 const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf('--' + n); return i >= 0 ? args[i + 1] : d; };
 const scenario = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].startsWith('--')));
-if (!scenario) { console.error('usage: node tools/qa-cloud.mjs <scenario.js> [--shot out.png] [--params "a=1&b=2"] [--seed N] [--w N] [--h N] [--scale N] [--wait ms]'); process.exit(2); }
+if (!scenario) { console.error('usage: node tools/qa-cloud.mjs <scenario.js> [--shot out.png] [--params "a=1&b=2"] [--seed N] [--w N] [--h N] [--scale N] [--touch] [--wait ms]'); process.exit(2); }
 const W = +opt('w', 1280), H = +opt('h', 720), scale = +opt('scale', 1), waitMs = +opt('wait', 20000), seed = opt('seed', '12345'), params = opt('params', ''), shot = opt('shot', ''), profile = args.includes('--profile');
 
 // Build the QA page from the real index.html plus the harness block that lives in qa.html (single source of truth for the QA object).
@@ -52,7 +52,8 @@ const launchArgs = ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--au
 let browser;
 try { browser = await chromium.launch({ args: launchArgs }); }
 catch (e) { const exe = findChromium(); if (!exe) throw e; browser = await chromium.launch({ args: launchArgs, executablePath: exe }); }
-const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: scale });
+const touch = args.includes('--touch');                                              // a phone: touch input, so (pointer:coarse) and (hover:none) match
+const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: scale, hasTouch: touch, isMobile: touch });
 const pg = await ctx.newPage();
 const pageErrors = [];
 pg.on('pageerror', e => pageErrors.push(String(e)));
