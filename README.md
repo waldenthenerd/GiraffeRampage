@@ -39,12 +39,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 154 | 51,594 | 3.85 MiB (4,041,636 bytes) |
+| JavaScript (`js/`) | 155 | 51,711 | 3.86 MiB (4,051,804 bytes) |
 | Styles (`css/`) | 5 | 1,436 | 130 KiB (132,781 bytes) |
-| Page (`index.html`) | 1 | 201 | 8.6 KiB (8,788 bytes) |
-| **Whole game** | **160** | **53,231** | **3.99 MiB (4,183,205 bytes)** |
+| Page (`index.html`) | 1 | 202 | 8.6 KiB (8,835 bytes) |
+| **Whole game** | **161** | **53,349** | **4.00 MiB (4,193,420 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,663 lines, 3.95 MiB (4,139,730 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,781 lines, 3.96 MiB (4,149,945 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -75,7 +75,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/07-enemies.js` | 357 | Enemy types for chapters 1-7 and habitat looks. |
 | `js/08-hazards-marines.js` | 783 | Hostile hazards and the Space Marine AI (chapter 8). |
 | `js/09-enemy-ai.js` | 352 | Enemy update and movement. |
-| `js/10-settings.js` | 44 | Settings object (volumes, speed, layout, keys). |
+| `js/10-settings.js` | 45 | Settings object (volumes, speed, layout, keys). |
 | `js/11-ants.js` | 400 | The ant colony. |
 | `js/12-bestiary.js` | 211 | Bestiary. |
 | `js/13-forage.js` | 205 | Foraging minigame. |
@@ -134,9 +134,9 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
 | `js/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
 | `js/40-fusion.js` | 881 | Card fusion: combos, the machine screen, the film. |
-| `js/41-qol.js` | 842 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
+| `js/41-qol.js` | 843 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
 | `js/42-run-hud.js` | 234 | Run lifecycle and the HUD. |
-| `js/43-input.js` | 374 | Input: keyboard, mouse, touch, gamepad. |
+| `js/43-input.js` | 375 | Input: keyboard, mouse, touch, gamepad. |
 | `js/41a-gear-page.js` | 335 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, the crate reveal (`gearReveal`) and Buy 5 / Buy 10 on every crate (`gearBuyMany`: all the openings play at once, five to a row). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
 | `js/41b-trinket-page.js` | 129 | **The trinkets on the Gear page.** Replaces `trinketsHTML` (41-qol.js): framed tiles with big icons in each trinket's colour (unfound ones are silhouettes), tap to wear or remove in place (`trinket-tap-<id>`: no page redraw, a pop and a sound), and a fixed-size panel with the trinket's effect as chips, before-and-after rows ("if you wear it" / "if you take it off") and the total of everything worn when nothing is picked. The numbers come from `trinketStats(list)`, which runs `recalcStats()` with that list and puts everything back, so they are always the game's own (Red Rampage's boost to worn gear and the Lime Helmet's cut to damage taken included). Pointing at the Lime Helmet also tries it on in the picture (`trinketShownList`). On a phone the panel sits above two rows of tiles that scroll sideways. |
 | `js/44-loop-boot.js` | 115 | The main loop, resize, and the boot function. |
@@ -211,6 +211,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/36p-gear-fx.js` | 157 | **Eleven pieces with a playstyle.** `GEAR_FX`: Thorns, Dust cloak, Cold snap, Sun ward, Aurora drift, Star crack, Undertow, Tidal wake, and the mythical set's Dawnlight, Falling spire and Aegis, each tied to one piece and scaled by its level; hooks on `doKick`, `hurtPlayer`, `updatePlayer` and `applyGear`. State in `GearFx`. |
 | `js/02d-ground-sounds.js` | 125 | **What the ground sounds like.** Replaces `SFX.foot`: mud, snow, ice, metal (the Moon, Mars, the space centre), shallow water, dust, sand, leaf, asphalt, cinders and rock, changed by rain, blizzards, sandstorms and acid (`groundNow`), plus `SFX.groundImpact` and a ground answer when the head lands in a lunge. |
 | `js/44zzp-photo-looks.js` | 215 | **The photo studio's look and light.** A Look and light tab: filters (Sepia, Noir, Glitch, Painterly), seven frames, a time-of-day slider, and a freeze-all-creatures toggle; twelve stickers in the Effects tab. All saved with the picture; photo code version 5 is written only when one is used (older codes are unchanged). |
+| `js/44zzq-npc-voices.js` | 114 | **Babble.** While a townsperson speaks in a dialogue card, each vowel (and every Nth consonant) blips: one `SFX.tone()` oscillator note on the town's sound bus, so Effects volume, Sound and mute apply. Every character has a voice (`NPC_VOICES`: pitch, wave, letters per second, blip length, wander, swing, pauses at punctuation; the mayor is low and stately, Dot high and quick, Elder Ossi deep and wobbly) and everyone not listed gets one made from their id and size (`npcVoiceFor`; smaller giraffes are higher). Vowels pick the pitch, questions rise, full stops settle, exclamations are louder. Wraps `townSay`, `townDlgFinish` and `townCloseDialog` and takes over the card's typewriter (`NPCVoice.tick`), never longer than about 4.5 seconds; a tap still skips. Settings, Sound, "NPC voices" turns it off and gives back the plain typewriter. |
 | `js/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/45b-dev-panel.js` | 568 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/46-main.js` | 4 | Starts the game. |
