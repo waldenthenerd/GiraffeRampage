@@ -39,11 +39,13 @@ function gearPreviewDraw(cv, ts){
   c.clearRect(0, 0, W, H);
   const g = c.createRadialGradient(W * 0.34, H * 0.6, 8, W * 0.34, H * 0.6, W * 0.5); g.addColorStop(0, 'rgba(201,138,60,.26)'); g.addColorStop(1, 'rgba(201,138,60,0)'); c.fillStyle = g; c.fillRect(0, 0, W, H);
   c.fillStyle = 'rgba(0,0,0,.16)'; c.beginPath(); c.ellipse(W * 0.34, H * 0.68, 130, 26, 0, 0, TAU); c.fill();
+  const keepTr = Save.data.equippedTrinkets, trTry = typeof trinketShownList === 'function' ? trinketShownList() : null;                 /* pointing at a trinket tries it on (the Lime Helmet shows) */
   const lo = gearShownLoadout(), keepP = {}, keepGF = {}, keepG = { time: G.time, biome: G.biome, chapter: G.chapter }, keepShow = Settings.showGear, keepGhost = NS.ghosts;
   GA_P_KEYS.forEach(function(k){ keepP[k] = P[k]; }); GA_GF_KEYS.forEach(function(k){ keepGF[k] = GF[k]; });
   let ke = -1;
   if (gearPreview.kickT >= 0){ gearPreview.kickT += dt; if (gearPreview.kickT >= 0.30) gearPreview.kickT = -1; else ke = gearPreview.kickT / 0.30; }
   try {
+    if (trTry) Save.data.equippedTrinkets = trTry;
     Settings.showGear = true; G.time = t; G.biome = 'savanna'; G.chapter = 1; NS.ghosts = [];
     const cp = lo.cape ? GEAR_INDEX[lo.cape] : null, wp = lo.weapon ? GEAR_INDEX[lo.weapon] : null, ap = lo.armor ? GEAR_INDEX[lo.armor] : null;
     P.x = 0; P.y = 0; P.vx = 0; P.vy = 0; P.aim = 0; P.face = 0; P.walk = 0.5; P.hurtT = 0; P.invuln = 0; P.rage = 0; P.dead = false;
@@ -57,6 +59,7 @@ function gearPreviewDraw(cv, ts){
     c.save(); c.translate(W * 0.26, H * 0.56); c.scale(1.9, 1.9); drawPlayer(c); c.restore();
   } finally {
     GA_P_KEYS.forEach(function(k){ P[k] = keepP[k]; }); GA_GF_KEYS.forEach(function(k){ GF[k] = keepGF[k]; });
+    Save.data.equippedTrinkets = keepTr;
     G.time = keepG.time; G.biome = keepG.biome; G.chapter = keepG.chapter; Settings.showGear = keepShow; NS.ghosts = keepGhost;
   }
   gearPreview.frames++;
@@ -168,7 +171,7 @@ function gearTabHTML(){
   const head = '<p class="sub">Gear is bought with gems, which enemies drop during a run. You own ' + ownedCount + ' of ' + Object.keys(GEAR_INDEX).length + ' pieces.' +
     (ownedCount ? '' : ' Nothing yet: collect gems in a run, then open a crate below to find your first piece.') + '</p>' +
     '<div class="gviews"><button class="gview-b' + (gearPage.view === 'doll' ? ' on' : '') + '" data-a="gear-view-doll">Dress her</button><button class="gview-b' + (gearPage.view === 'sets' ? ' on' : '') + '" data-a="gear-view-sets">Sets</button></div>';
-  const trinkets = '<h3 class="gh">Trinkets<small style="font-weight:400;color:var(--dust);font-size:12px"> — any number can be worn at once</small></h3>' + trinketsHTML();
+  const trinkets = (typeof trinketHeadHTML === 'function' ? trinketHeadHTML() : '<h3 class="gh">Trinkets</h3>') + trinketsHTML();
   if (gearPage.view === 'sets') return head + gearSetsHTML() + gearCratesHTML() + gearCrateResultHTML() + trinkets;
   return head +
     '<div class="gdoll"><div class="gcolL">' + gearSlotsHTML() + '</div>' +
