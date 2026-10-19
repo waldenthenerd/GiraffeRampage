@@ -1,0 +1,11 @@
+# Files that decide how the project is published, licensed and saved. A pull request that changes any of them needs the owner's review
+# (turn on "Require review from Code Owners" in the main branch ruleset). README.md is left out on purpose: every change updates its line counts.
+/LICENSE                                @waldenthenerd
+/lovable.md                             @waldenthenerd
+/LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md    @waldenthenerd
+/tools/make-lovable-package.sh          @waldenthenerd
+/js/01b-savepack.js                     @waldenthenerd
+/js/45-test-exports.js                  @waldenthenerd
+/AGENTS.md                              @waldenthenerd
+/CLAUDE.md                              @waldenthenerd
+/.github/                               @waldenthenerd
