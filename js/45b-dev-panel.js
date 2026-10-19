@@ -140,6 +140,7 @@ function showDebugPanel(){
         '<button class="btn ghost" data-a="debug-ants">Unlock ant colony</button>' +
         '<button class="btn ghost" data-a="debug-food">Add 10 food</button>' +
         '<button class="btn ghost" data-a="debug-wheelkey">Add 1 wheel key</button>' +
+        '<button class="btn ghost" data-a="debug-spottedkey">Add 10 Spotted keys</button>' +
         '<button class="btn ghost" data-a="debug-bestiary">Reveal the whole bestiary</button>' +
         '<button class="btn ghost" data-a="debug-forage">Reset the foraging cooldown</button>' +
         '<button class="btn ghost" data-a="debug-mini-cd">Reset the minigame cooldown</button>' +
@@ -203,6 +204,7 @@ function handleDebugAction(a){
     }
     case 'debug-ants': Save.data.antsUnlocked = true; Save.write(); SFX.buy(); showDebugPanel(); break;
     case 'debug-food': Save.data.food = Math.round((Save.data.food + 10) * 10) / 10; Save.write(); SFX.buy(); showDebugPanel(); break;
+    case 'debug-spottedkey': Save.data.spottedKeys = (Save.data.spottedKeys | 0) + 10; Save.write(); SFX.buy(); showDebugPanel(); break;
     case 'debug-wheelkey': Save.data.wheelKeys = (Save.data.wheelKeys | 0) + 1; Save.write(); SFX.buy(); showDebugPanel(); break;
     case 'debug-forage': Save.data.lastForageAt = 0; Save.write(); SFX.buy(); showDebugPanel(); break;
     case 'debug-mini-cd': miniData().last = 0; Save.write(); SFX.buy(); showDebugPanel(); break;

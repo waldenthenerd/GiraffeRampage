@@ -2,6 +2,10 @@
    the icons in 00-icons.js (ICONS_T), so they are written '@t-x-name' and take their colour from the card as usual. Loaded right after
    00-icons.js. To add one: put its path here and use it as icon:'@t-x-name'. */
 Object.assign(ICONS_T, {
+  /* the prize wheels */
+  'x-key':'M8 15m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0 M11 12l9 -9 M16 7l3 3 M13.5 9.5l2 2',
+  'x-gem':'M6 4h12l4 5l-10 12l-10 -12z M2 9h20 M9 4l-2 5l5 12l5 -12l-2 -5',
+  'x-wheel':'M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M12 3v7 M12 14v7 M3 12h7 M14 12h7 M5.6 5.6l4.9 4.9 M13.5 13.5l4.9 4.9 M18.4 5.6l-4.9 4.9 M10.5 13.5l-4.9 4.9',
   /* weapons and card chains */
   'x-whip':'M4 20l4 -4 M8 16c5 0 10 -3 10 -8c0 -3 -3.5 -4 -4.5 -2.5s.5 3.5 3 2.5 M19 4l1 -1',
   'x-drift':'M3 7h6l2 4l-2 3l2 4h-8z M21 6h-6l2 4l-2 3l2 5h6z',

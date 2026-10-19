@@ -184,7 +184,7 @@ const _q = [], _q2 = [];
 const SAVE_KEY = 'giraffe_rampage_save_v1';
 const DEFAULT_SAVE = { gold: 0, gems: 0, meta: {}, gear: {}, equipped: { cape: null, weapon: null, armor: null }, equippedTrinkets: [],
   best: 0, bestWave: 0, runs: 0, totalKills: 0, chaptersComplete: 0, chapter1Complete: false, chapter2Complete: false, chapter3Complete: false, chapter4Complete: false, chapter5Complete: false, chapter6Complete: false, chapter7Complete: false, chapter8Complete: false, chapter9Complete: false, chapter10Complete: false, enginePart: false, spaceplane: 0, homecoming: false, grubs: 0, city: {}, chapter11Complete: false, chapter12Complete: false, chapter13Complete: false, mutationVial: false, iron: 0, argon: 0, marsUp: {}, mutations: {}, mutUses: 0, vials: 0, vialGiven: false, squad: {}, sulfur: 0, basalt: 0, venusUp: {}, antsUnlocked: false, food: 0, ants: null, cratesOpened: 0,
-  wheelKeys: 0, lastWheelKeyAt: 0, runSave: null, combos: {}, fusions: 0, mastered: {}, comboClaims: {}, bestiary: null, lastForageAt: 0, menuChapter: 1,
+  wheelKeys: 0, lastWheelKeyAt: 0, spottedKeys: 0, lastSpottedKeyAt: 0, runSave: null, combos: {}, fusions: 0, mastered: {}, comboClaims: {}, bestiary: null, lastForageAt: 0, menuChapter: 1,
   muted: false, autoKick: true, aimMode: 'cursor' };
 
 const Save = {
@@ -232,6 +232,8 @@ const Save = {
     this.data.fusions = Math.max(0, Math.floor(+this.data.fusions) || 0);
     this.data.wheelKeys = Math.max(0, Math.round(+this.data.wheelKeys || 0));
     this.data.lastWheelKeyAt = +this.data.lastWheelKeyAt || 0;
+    this.data.spottedKeys = Math.max(0, Math.round(+this.data.spottedKeys || 0));
+    this.data.lastSpottedKeyAt = +this.data.lastSpottedKeyAt || 0;
     return this.data;
   },
   write(){ try { window.localStorage.setItem(SAVE_KEY, JSON.stringify(GRPack.encode(this.data))); } catch (e) {} },      /* a JSON string holding the packed save */

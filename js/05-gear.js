@@ -506,7 +506,10 @@ const TRINKETS = {
   argonlamp: { id: 'argonlamp', name: 'Argon Lamp', icon: '@t-x-bulb', color: '#B880FF',
     desc: 'Pickup range +20% and regenerate 1.2 health per second.', source: 'Forged at the Mars forge.' },
   dustveil: { id: 'dustveil', name: 'Dust Veil', icon: '@t-x-cloud', color: '#E8A070',
-    desc: 'Damage taken −8%, move 5% faster and gain 6% more experience.', source: 'Forged at the Mars forge.' }
+    desc: 'Damage taken −8%, move 5% faster and gain 6% more experience.', source: 'Forged at the Mars forge.' },
+  /* the 3% prize of the Spotted prize wheel (41c-wheel-page.js) */
+  spottedpaw: { id: 'spottedpaw', name: 'Spotted Paw', icon: '@t-paw', color: '#F29A2E',
+    desc: 'All damage +7%, critical chance +3% and gold gained +10%.', source: 'A 3% prize on the Spotted wheel. Spotted keys come from a score of 500,000,000.' }
 };
 function trinketOwned(id){ return !!(Save.data && Save.data.gear && Save.data.gear['trinket:' + id]); }
 function trinketEquipped(id){ return !!(Save.data && Save.data.equippedTrinkets && Save.data.equippedTrinkets.indexOf(id) >= 0); }
