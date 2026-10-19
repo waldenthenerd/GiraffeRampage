@@ -30,5 +30,5 @@
     for (i = 0; i < N; i++){ P.invuln = 99; P.hp = P.maxHp; if (G.state === 'levelup') G.state = 'playing'; GR.step(1/60); }
   }
   var rows = Object.keys(byStage).map(function(k){ return [k, Math.round(byStage[k] / N)]; }).sort(function(a, b){ return b[1] - a[1]; }).slice(0, 40);
-  QA.done({ gc: typeof GroundCache !== 'undefined' ? { builds: GroundCache.builds, hits: GroundCache.hits, live: GroundCache.live, tiles: GroundCache.map.size } : null, callsPerFrame: Math.round(cnt.total / N), shadowCallsPerFrame: Math.round(shadow / N), enemies: G.enemies && G.enemies.length, state: G.state, top: rows.map(function(r){ return r[0] + '=' + r[1]; }) });
+  QA.done({ gc: typeof GroundCache !== 'undefined' ? { builds: GroundCache.builds, hits: GroundCache.hits, live: GroundCache.live, tiles: GroundCache.map.size, sbuilds: SceneryCache.builds, shits: SceneryCache.hits, slive: SceneryCache.live } : null, callsPerFrame: Math.round(cnt.total / N), shadowCallsPerFrame: Math.round(shadow / N), enemies: G.enemies && G.enemies.length, state: G.state, top: rows.map(function(r){ return r[0] + '=' + r[1]; }) });
 })();
