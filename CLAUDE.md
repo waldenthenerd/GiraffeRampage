@@ -1,19 +1,12 @@
 # Giraffe Rampage: notes for Claude
 
-Classic-`<script>` canvas game, no build step. Open `index.html`, or serve the folder (`python3 -m http.server 8123`).
-Read `README.md` (file map) and `lovable.md` (rules for the hosted Lovable copy) first.
+The rules for every agent that works on this project (Claude Code and Codex alike) are in `AGENTS.md`; they are loaded here:
 
-## Standing rules
-1. Cutscenes must not announce the end of the game unless told to.
-2. Edit with exact-match replacements; later script declarations override earlier ones (wrapper pattern); `index.html` load order matters.
-3. Test by running the game. Update tests and the README when behaviour changes; recount the README per-file line counts and totals after every change (also the script count in `lovable.md`).
-4. `js/45b-dev-panel.js` must stay out of the website build. Keep the Lovable `GR` export/save bridge and keep saves backward compatible.
-5. No shake-reduction setting. Present ideas as NUMBERED lists, never bullets.
-6. Verify visual work with screenshots.
+@AGENTS.md
 
-## Testing in a cloud / Linux session
-- Windows-only runner: `tools/qa-run.ps1` (Edge). Cloud runner: `tools/qa-cloud.mjs` (Playwright Chromium, full game from `index.html`).
-- One-time setup: `cd tools && npm install && npx playwright install --with-deps chromium`
-- Run: `node tools/qa-cloud.mjs my.js --shot my.png --wait 20000`, then look at the PNG. Scenario format and the `GR`/`QA` API are in `tools/QA-GUIDE.md`.
-- `qa-cloud.mjs` is verified in the cloud (tiny scenario and a gym scenario with screenshot). If the pinned Playwright wants a Chromium revision that is not installed, it falls back to any `chromium-*` under `PLAYWRIGHT_BROWSERS_PATH` (or set `QA_CHROMIUM=/path/to/chrome`); skip `playwright install` when `/opt/pw-browsers` already has Chromium.
-- Headless frames are throttled: use `GR.step` loops, not wall-clock waits. Gym/town state lives in `Town.gym`, `Save.data.town.gym`.
+## Claude-specific
+- Claude's commit trailer is `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`; add no `Claude-Session` line.
+- In a cloud session, outbound network and the browser come pre-configured: Playwright finds Chromium under `/opt/pw-browsers`, so skip `playwright install`.
+- Claude works with the owners directly: simple changes may be committed straight to `main` and merges happen when an owner says so. That is a standing
+  arrangement with Claude only; it does not extend to other agents, which always use a branch and a pull request (see `AGENTS.md`).
+- Ask the owners clarifying questions when a request is open-ended, and do not delete old branches (the owners do).

@@ -32,6 +32,7 @@ If you serve the site yourself and do not want the panel there, remove the `js/4
 - `index.html` holds the page markup (canvas, HUD, touch controls, overlay) and loads the styles and scripts.
 - `css/style.css` holds the base styles, `css/polish.css` is layered over it, and `css/campus.css` holds the Longneck University panels and study card, `css/townlife.css` the collection book and the tram map extras, and `css/gearpage.css` the Gear page. `css/phone.css` is loaded last and is the phone pass: finger-sized sliders, swatches and chips (`pointer:coarse`), an 11px floor for text, the compact Upgrades rows, the three-column bestiary, and the landscape-phone layout of the Wheel and Ants tabs.
 - `js/` holds the game code, split from the old single file along its existing section boundaries.
+- `AGENTS.md` is the guide for AI coding agents (Codex, Claude Code): who is in charge, the branch-and-pull-request workflow, the rules for the code, how to test and how to keep these docs true. `CLAUDE.md` loads it and adds the few Claude-only notes.
 
 ## Size
 
@@ -242,6 +243,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 - `tools/scenery-preview.html?ch=1..13&zoom=0.33&px=2100&py=1575` shows a chapter's whole arena (or a close-up with `zoom=1`), and `tools/shot-scenery.ps1 -Ch 3 [-Zoom 1 -Px x -Py y] [-Out file.png]` saves it as a PNG headlessly with Edge.
 - `tools/sync-gallery.ps1` refreshes the script lists of both tool pages from `index.html`; run it after adding or renaming a js file.
 - `tools/qa-run.ps1 -Scenario file.js [-Shot out.png] [-Params "a=1&b=2"] [-W 1280 -H 720] [-WaitMs 20000]` runs a scenario script in the real game inside headless Edge (`tools/qa.html` is the harness) and prints its `QA.done(...)` result and any script errors as JSON, with an optional screenshot. `tools/QA-GUIDE.md` explains how to write scenarios. Run them one at a time.
+- `python3 tools/recount-readme.py` recounts this README's per-file line counts and totals and the script count in `lovable.md`; run it after every change to `js/`, `css/` or `index.html`.
 - `node tools/qa-cloud.mjs file.js [--shot out.png] [--params "a=1&b=2"] [--wait 20000]` is the same runner for Linux/cloud/macOS (Playwright Chromium, loads the full script list from `index.html`; setup: `cd tools && npm install && npx playwright install --with-deps chromium`). `CLAUDE.md` at the top level holds the standing rules for Claude sessions.
 
 ## Performance
