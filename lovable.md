@@ -51,8 +51,8 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
    for you to read: it describes every file. It also documents the developer panel for people who clone the repository, so the
    panel's words appear in it; that is expected, because it is not part of the shipped game.)
 2. Replace `public/game/rampage/css/` and `public/game/rampage/js/` with the ZIP's (delete the old folders first, so removed
-   files go away). There are five stylesheets, in this order: `style.css`, `polish.css`, `campus.css`, `townlife.css`,
-   `gearpage.css`; `index.html` links them.
+   files go away). There are six stylesheets, in this order: `style.css`, `polish.css`, `campus.css`, `townlife.css`,
+   `gearpage.css`, `phone.css`; `index.html` links them.
 3. Rebuild `public/game/rampage/index.html` as: the ZIP's `index.html` lines 1 to 3 (up to `<head>`), then the bridge script
    (kept from the current hosted file, **updated as described in section 4** if the save format changed), then the rest of the
    ZIP's `index.html` from line 4. Keep every `<script src>` as a separate, ordered tag (section 3); never concatenate them.

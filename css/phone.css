@@ -1,0 +1,47 @@
+/* PHONE PASS. Loaded last, so it can finish what the earlier files meant to do on a phone. Found by an audit at 390x844 and 844x390 with touch input. */
+
+/* touch targets (pointer:coarse = a finger). The 34px sliders and 26px thumbs in style.css were being undone by polish.css, which loads after it and sets the
+   desktop sizes; swatches, chips and a few buttons were also under 40px */
+@media (pointer:coarse){
+  input[type=range]{height:36px}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px}
+  input[type=range]::-webkit-slider-thumb{width:26px;height:26px;margin-top:-9px}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px}
+  .swatch{width:40px;height:40px}.swatches.dots .swatch{width:30px;height:30px;min-width:30px}.swatch.pat canvas{width:32px;height:32px}
+  .pchip{min-height:40px;padding:8px 14px}
+  .gview-b{min-height:40px}
+  #foodAmt{min-height:40px}
+  #perfToast button{min-height:40px;padding:8px 14px}
+}
+
+/* nothing under 11px on a phone, held either way: the health and XP numbers (9px), and the small lines under buttons and above names on the gear, wheel and ants pages */
+@media (max-width:760px),(hover:none) and (pointer:coarse) and (max-height:500px){
+  .bar{height:14px}.bar span{font-size:11px;line-height:14px}
+  .chaptag{font-size:11px}
+  .gsn small,.gp small,.gp em,.gtile small,.crm small,.crc .crs,.crc .crk,.eslot .sl,.gsetrarity,.gpiece .gs,.wpb,.wbtns .btn small,.afbtns .btn small,.arbtns .btn small,.afforage .btn small,.afs small,.gc-list em,.gs-ms em,.gymrank span{font-size:11px}
+  .gp i{font-size:10px}.gtr small{font-size:11px}
+}
+@media (max-width:760px){
+  /* the Back bar of the long pages: solid under the button, fading above it, so rows do not show through the button */
+  .stickyback{padding-top:20px;background:linear-gradient(180deg,rgba(30,23,18,0),rgba(30,23,18,.98) 34%)}
+  /* upgrades: the Buy button and Buy max side by side under the text, not one under the other (about 50px a row) */
+  .shoprow:has(.buy) .txt{flex:1 1 calc(100% - 56px)}
+  .shoprow .buy{flex:1 1 0;width:auto;min-width:120px}
+  .shoprow:has(.buy)>.btn.ghost:not(.buy){flex:0 0 auto}
+  .shoprow .maxed,.shoprow .reqlock{flex:1 1 100%}
+  /* a perf toast that is not a quarter of the screen */
+  #perfToast{padding:8px 10px;font-size:12.5px;line-height:1.3}
+}
+@media (max-width:520px){
+  .bst-grid{grid-template-columns:repeat(3,1fr);gap:6px}.bst-pic{width:64px;height:64px}.bst-name{font-size:12px}
+}
+
+/* a phone held sideways (390px high): the wheel and the ants chambers come up the screen instead of sitting under a tall header */
+@media (max-height:500px) and (min-width:560px){
+  .wpick .wcard{grid-template-columns:auto 1fr auto;padding:6px 10px;gap:2px 10px}
+  .wpick .wcard .wct small,.wpick .wcard .wcgoal{display:none}
+  .wpick .wcard .wcic{width:30px;height:30px;grid-row:auto}.wpick .wcard .wckeys{grid-column:auto}
+  .wheelpg{gap:8px}.wwheel{--ws:min(240px,62vh);margin:8px 0 4px}
+  #antSurface{height:84px}.apsl small{display:none}.apsl{top:6px}
+  .arcv{height:84px}.ards{min-height:0}
+}

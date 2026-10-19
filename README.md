@@ -30,7 +30,7 @@ If you serve the site yourself and do not want the panel there, remove the `js/4
 ## Layout
 
 - `index.html` holds the page markup (canvas, HUD, touch controls, overlay) and loads the styles and scripts.
-- `css/style.css` holds the base styles, `css/polish.css` is layered over it, and `css/campus.css` holds the Longneck University panels and study card, `css/townlife.css` the collection book and the tram map extras, and `css/gearpage.css` the Gear page.
+- `css/style.css` holds the base styles, `css/polish.css` is layered over it, and `css/campus.css` holds the Longneck University panels and study card, `css/townlife.css` the collection book and the tram map extras, and `css/gearpage.css` the Gear page. `css/phone.css` is loaded last and is the phone pass: finger-sized sliders, swatches and chips (`pointer:coarse`), an 11px floor for text, the compact Upgrades rows, the three-column bestiary, and the landscape-phone layout of the Wheel and Ants tabs.
 - `js/` holds the game code, split from the old single file along its existing section boundaries.
 
 ## Size
@@ -39,12 +39,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 157 | 52,144 | 3.90 MiB (4,088,431 bytes) |
-| Styles (`css/`) | 5 | 1,528 | 140 KiB (143,226 bytes) |
-| Page (`index.html`) | 1 | 204 | 8.7 KiB (8,924 bytes) |
-| **Whole game** | **163** | **53,876** | **4.04 MiB (4,240,581 bytes)** |
+| JavaScript (`js/`) | 157 | 52,148 | 3.90 MiB (4,089,193 bytes) |
+| Styles (`css/`) | 6 | 1,575 | 143 KiB (146,294 bytes) |
+| Page (`index.html`) | 1 | 205 | 8.8 KiB (8,969 bytes) |
+| **Whole game** | **164** | **53,928** | **4.05 MiB (4,244,456 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **53,306 lines, 4.00 MiB (4,196,876 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **53,358 lines, 4.01 MiB (4,200,751 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -118,7 +118,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/35g-art-dust.js` | 418 | Enemy art, Chapter 13: the dust aliens (DUST_DRAW). |
 | `js/35h-draw-enemy.js` | 941 | Assembles ENEMY_LOOK_DRAW from every chapter table and draws an enemy (the Chapter 1 / Savannah creatures live in the switch inside drawEnemy). |
 | `js/36a-scenery-core.js` | 186 | Scenery system: large ground patches, themed props and landmarks, ground decals, ambient life and light gameplay terrain, per chapter. |
-| `js/36-atmosphere.js` | 288 | Light, weather and depth: per-chapter base weather, time of day, night, fog, the intro card. |
+| `js/36-atmosphere.js` | 292 | Light, weather and depth: per-chapter base weather, time of day, night, fog, the intro card. |
 | `js/36i-lighting.js` | 250 | Lighting: per-chapter colour grade (GRADE), the sun and soft shadows (`softShadow`), light pools around bright things (PROP_LIGHT, PICKUP_LIGHT), sun shafts, ocean caustics. |
 | `js/36j-weather-events.js` | 160 | Weather events (storms, blizzards, meteor showers...), lightning with thunder, rain ripples, fireflies and stars at dusk (WX_EVENTS, WX_TOD). |
 | `js/36k-water-depth.js` | 192 | Moving water and wet or icy ground, wakes, and depth sorting so tall scenery overlaps creatures (SCEN_TALL). |
