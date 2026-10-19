@@ -9,7 +9,7 @@
    into scratch canvases and
      - every property it reads of the creature must be one of SAFE_READ (not its position, angle, health, timers...);
      - it must not call Math.random, add particles or text, or use a blend mode other than source-over (a glow would change);
-     - its animation must loop exactly after 1 to 5 turns (2 PI each; many drawings mix speeds, so the loop is longer than one turn),
+     - its animation must loop exactly after 1 to 10 turns (2 PI each; many drawings mix speeds, so the loop is longer than one turn),
        so the pictures (16 per turn) repeat without a jump;
      - it must look the same at another G.time, so it does not depend on the clock.
    Anything that fails any of those is left on the live path for good (and EnemySprite.report() says why). Also never cached:
@@ -18,8 +18,8 @@
    The picture is cropped to what was actually drawn. If a drawing touches the edge of its box it is not cached. The total is
    capped (SPRITE_BUDGET pixels); when it is reached the cache is emptied and refills as needed. */
 const EnemySprite = (function(){
-  const MAX_CYCLES = 5, SPRITE_BUDGET = 18e6;
-  const frames = function(k){ return Math.min(80, 16 * k); };       /* pictures per loop: 16 for every turn of the animation */
+  const MAX_CYCLES = 10, SPRITE_BUDGET = 18e6;
+  const frames = function(k){ return Math.min(160, 16 * k); };       /* pictures per loop: 16 for every turn of the animation */
   const SAFE_READ = { def: 1, type: 1, r: 1, anim: 1, state: 1, flash: 1, big: 1, portrait: 1 };
   const ccDesc = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'globalCompositeOperation');
   let maps = new WeakMap(), px = 0, probeA = null, probeB = null, scratchSize = 0;

@@ -4,17 +4,17 @@
 /* Everything here is drawn in screen space after the world, and only reads game state.
    Settings.fxLevel: 0 low (off), 1 medium (tint, night, weather), 2 high (adds the foreground layer). */
 const ATMOS = {
-  1:  { cycle: true, base: [255, 244, 214, 0],    accent: '#F2B33D', fog: [240, 220, 170], fogA: 0.07, weather: 'dust',     blades: '#7A8A34' },
+  1:  { cycle: true, base: [255, 244, 214, 0],    accent: '#F2B33D', fog: [240, 220, 170], fogA: 0.07, weather: 'dust' },
   2:  { cycle: true, base: [190, 215, 255, 0.07], accent: '#A8D8FF', fog: [230, 240, 255], fogA: 0.12, weather: 'snow' },
-  3:  { cycle: true, base: [120, 160, 90, 0.10],  accent: '#B6D870', fog: [130, 170, 110], fogA: 0.14, weather: 'drizzle',  blades: '#2F4A22' },
-  4:  { base: [30, 110, 170, 0.16],               accent: '#7FD0FF', fog: [70, 150, 200],  fogA: 0.10, weather: 'plankton', blades: '#1D6A5A' },
-  5:  { base: [40, 110, 50, 0.12],                accent: '#8FE04A', fog: [110, 160, 110], fogA: 0.10, weather: 'rain',     blades: '#2A5C20' },
+  3:  { cycle: true, base: [120, 160, 90, 0.10],  accent: '#B6D870', fog: [130, 170, 110], fogA: 0.14, weather: 'drizzle' },
+  4:  { base: [30, 110, 170, 0.16],               accent: '#7FD0FF', fog: [70, 150, 200],  fogA: 0.10, weather: 'plankton' },
+  5:  { base: [40, 110, 50, 0.12],                accent: '#8FE04A', fog: [110, 160, 110], fogA: 0.10, weather: 'rain' },
   6:  { cycle: true, base: [255, 170, 120, 0.05], accent: '#F2A060', fog: [160, 150, 150], fogA: 0.10, weather: 'ash' },
   7:  { base: [14, 22, 50, 0.14],                 accent: '#8FB8FF', fog: [120, 140, 180], fogA: 0.06, weather: 'glints' },
   8:  { base: [6, 8, 28, 0.18], night: 0.2,       accent: '#C9D3E8', fog: null,            fogA: 0,    weather: 'glints' },
   9:  { base: [255, 200, 70, 0.12],               accent: '#FFD23F', fog: [230, 190, 80],  fogA: 0.12, weather: 'spores' },
   10: { base: [255, 70, 20, 0.14],                accent: '#FF7A2A', fog: [200, 60, 30],   fogA: 0.10, weather: 'embers' },
-  11: { cycle: true, base: [190, 120, 255, 0.08], accent: '#D8A8FF', fog: [200, 150, 255], fogA: 0.10, weather: 'glints',   blades: '#9A6AD0' },
+  11: { cycle: true, base: [190, 120, 255, 0.08], accent: '#D8A8FF', fog: [200, 150, 255], fogA: 0.10, weather: 'glints' },
   12: { base: [10, 24, 50, 0.10], night: 0.3,     accent: '#7FE8FF', fog: [90, 120, 150],  fogA: 0.08, weather: 'dust' },
   13: { base: [255, 120, 60, 0.10],               accent: '#FF9A5A', fog: [220, 120, 70],  fogA: 0.12, weather: 'storm' }
 };
@@ -54,7 +54,7 @@ function atmosState(ch){
     if (f > 0.7) dark = Math.max(dark, 0.46 * clamp((f - 0.7) / 0.22, 0, 1));
   }
   if (A.weather === 'rain') layers.push({ rgb: [70, 80, 100], a: 0.07 });
-  return { layers: layers, dark: dark, accent: A.accent, fog: A.fog, fogA: A.fogA, weather: A.weather, blades: A.blades || null };
+  return { layers: layers, dark: dark, accent: A.accent, fog: A.fog, fogA: A.fogA, weather: A.weather };
 }
 
 /* ---- weather: screen-space particles that drift with the wind and the camera ---- */
@@ -134,7 +134,6 @@ function fogSprite(rgb){
   return (fogSprites[k] = c);
 }
 const FOG_BANKS = []; for (let i = 0; i < 9; i++) FOG_BANKS.push({ u: (i * 0.618) % 1, v: ((i * 0.37) % 1), r: 190 + (i * 53) % 150, sp: 6 + (i * 7) % 12, ph: i * 1.7 });
-const BLADE_CLUMPS = []; for (let i = 0; i < 16; i++) BLADE_CLUMPS.push({ u: (i * 0.381) % 1, h: 46 + (i * 29) % 70, n: 4 + (i % 3), ph: i * 2.3, w: 10 + (i * 5) % 14 });
 function drawForeground(ctx, S, cx, cy, fx, t, wind){
   const W = G.W, H = G.H;
   if (S.fog && S.fogA > 0){
@@ -145,21 +144,6 @@ function drawForeground(ctx, S, cx, cy, fx, t, wind){
       let y = f.v * H + Math.sin(t * 0.12 + f.ph) * 30 - (cy * G.zoom * 0.3 % 40);
       ctx.globalAlpha = S.fogA * (0.7 + 0.3 * Math.sin(t * 0.3 + f.ph));
       ctx.drawImage(spr, x - f.r, y - f.r * 0.6, f.r * 2, f.r * 1.2);
-    }
-    ctx.globalAlpha = 1;
-  }
-  if (fx >= 2 && S.blades){
-    ctx.strokeStyle = S.blades; ctx.lineCap = 'round';
-    ctx.globalAlpha = 0.5;
-    for (let i = 0; i < BLADE_CLUMPS.length; i++){
-      const c = BLADE_CLUMPS[i], span = W + 300;
-      const x0 = ((c.u * span - cx * G.zoom * 1.35) % span + span) % span - 150;
-      for (let b = 0; b < c.n; b++){
-        const bx = x0 + (b - c.n / 2) * (c.w * 0.55), hh = c.h * (0.7 + 0.3 * Math.sin(b * 2 + c.ph));
-        const sway = Math.sin(t * 1.5 + c.ph + b * 0.6) * (6 + hh * 0.05) + wind * 7;
-        ctx.lineWidth = 3 + (b % 3) * 1.5;
-        ctx.beginPath(); ctx.moveTo(bx, H + 8); ctx.quadraticCurveTo(bx + sway * 0.4, H - hh * 0.55, bx + sway, H - hh); ctx.stroke();
-      }
     }
     ctx.globalAlpha = 1;
   }
