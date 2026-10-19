@@ -23,7 +23,7 @@ Giraffe Rampage is **source-available under the [PolyForm Noncommercial License 
 4. **Play any of the films**: the Moon landing, the Venus ship, the flight home, Area 51, Mars, the Marine ships and the chapter-transition films.
 5. **Unlock things:** mark every chapter complete, open Venus or Mars and give their resources, give the engine part or the finished spaceplane, set up the lab and ant colony, open the Underground Giraffe City, unlock every card combo, reveal the whole bestiary, own every hat and boot, unlock every minigame and every minigame colour.
 6. **Longneck Town:** open every place, find every item, make everyone a best friend, finish every errand, reset the town, give the car, the plane or the whole fleet, and fill the satchel with bread.
-7. **Odds and ends:** add food or a wheel key, reset the foraging and minigame cooldowns, give the Red Rampage or Lime Helmet trinket.
+7. **Odds and ends:** add food or a wheel key, reset the foraging and minigame cooldowns, add Spotted keys (10 at a time), give the Red Rampage or Lime Helmet trinket.
 
 If you serve the site yourself and do not want the panel there, remove the `js/45b-dev-panel.js` line from `index.html`; the game runs the same without it.
 
@@ -39,12 +39,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 155 | 51,711 | 3.86 MiB (4,051,804 bytes) |
-| Styles (`css/`) | 5 | 1,436 | 130 KiB (132,781 bytes) |
-| Page (`index.html`) | 1 | 202 | 8.6 KiB (8,835 bytes) |
-| **Whole game** | **161** | **53,349** | **4.00 MiB (4,193,420 bytes)** |
+| JavaScript (`js/`) | 156 | 51,966 | 3.88 MiB (4,072,760 bytes) |
+| Styles (`css/`) | 5 | 1,484 | 135 KiB (138,097 bytes) |
+| Page (`index.html`) | 1 | 203 | 8.7 KiB (8,880 bytes) |
+| **Whole game** | **162** | **53,653** | **4.02 MiB (4,219,737 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,781 lines, 3.96 MiB (4,149,945 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **53,083 lines, 3.98 MiB (4,176,032 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -61,17 +61,17 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | File | Lines | What is in it |
 |---|---|---|
 | `js/00-icons.js` | 98 | The icon table (41 outlined icons drawn for this game) and the icon helpers. Runs outside strict mode, as it always did. |
-| `js/00b-icons-custom.js` | 149 | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
-| `js/01-core.js` | 315 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. |
+| `js/00b-icons-custom.js` | 153 | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
+| `js/01-core.js` | 317 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. |
 | `js/01b-savepack.js` | 127 | Save compression: the save is stored as a JSON string holding `GR2:` + Base64 of an LZW-packed copy of its JSON (about 42 to 58 percent of the size). Old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `stats`). Format in the file header and in `lovable.md`. |
 | `js/02-music.js` | 342 | Procedural background music: themes, the 16-bar sequencer (A, A, B, A), key climb through a chapter, boss second phase, theme fade-in, stingers. |
 | `js/02b-ambience.js` | 130 | Extra sounds (card pick, wave clear, heartbeat, heavy thump), the per-chapter ambient bed that follows the weather, gamepad rumble. |
 | `js/02c-audio-mix.js` | 329 | Sound design on top of the synth: a reverb that follows the place (`MIX_ENV`), a hit sound per element, a death sound per kind of creature, an attack sound per kind of enemy (`Mix.variant`), boss roar, death and half-health growl, footsteps by ground, the music stingers, and the ambience extras (thunder with a delay, sweeping wind gusts, far-off calls). |
 | `js/03-combat-core.js` | 346 | Particles, zones, shockwaves, projectiles, pickups, damage and death, player damage, draw helpers, targeting. |
 | `js/04-cards.js` | 1149 | The card registry: every card and its forms. |
-| `js/05-gear.js` | 654 | Weapons, gear sets (22: 8 common, 7 rare, 4 epic, 2 legendary, 1 mythical), ownership and equipping, trinkets, prize wheel, crates (the mythical Worldspire set drops at 0.02% from Supply Crates, 0.1% from Prime Crates and 2% from Spotted Crates, which cost 1,000 gems and 50 food). |
+| `js/05-gear.js` | 660 | Weapons, gear sets (22: 8 common, 7 rare, 4 epic, 2 legendary, 1 mythical), ownership and equipping, trinkets, prize wheel, crates (the mythical Worldspire set drops at 0.02% from Supply Crates, 0.1% from Prime Crates and 2% from Spotted Crates, which cost 1,000 gems and 50 food). |
 | `js/05a-gear-levels.js` | 173 | **Gear levels and the crate rules.** A piece goes from level 1 to 5 (`gearLevel`, `gearLevelUp`; each level adds 10% to what the piece gives, a weapon also 6% damage), `gearStatsFor()` and `gearDelta()` say what a loadout or a swap would change without touching the save, crate pity (`CRATE_PITY`: rare or better within 10 Supply Crate opens, epic or better within 8 Prime Crate opens; a mythical roll never turns into something lesser; the Spotted Crate costs food too and has no pity) and `openCrate()` replaced so a duplicate levels the piece up. Save keys `gearLv` and `cratePity` sit beside `gear`. |
-| `js/06-player.js` | 275 | Derived player stats and the player. |
+| `js/06-player.js` | 277 | Derived player stats and the player. |
 | `js/07-enemies.js` | 357 | Enemy types for chapters 1-7 and habitat looks. |
 | `js/08-hazards-marines.js` | 783 | Hostile hazards and the Space Marine AI (chapter 8). |
 | `js/09-enemy-ai.js` | 352 | Enemy update and movement. |
@@ -139,6 +139,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/43-input.js` | 375 | Input: keyboard, mouse, touch, gamepad. |
 | `js/41a-gear-page.js` | 335 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, the crate reveal (`gearReveal`) and Buy 5 / Buy 10 on every crate (`gearBuyMany`: all the openings play at once, five to a row). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
 | `js/41b-trinket-page.js` | 129 | **The trinkets on the Gear page.** Replaces `trinketsHTML` (41-qol.js): framed tiles with big icons in each trinket's colour (unfound ones are silhouettes), tap to wear or remove in place (`trinket-tap-<id>`: no page redraw, a pop and a sound), and a fixed-size panel with the trinket's effect as chips, before-and-after rows ("if you wear it" / "if you take it off") and the total of everything worn when nothing is picked. The numbers come from `trinketStats(list)`, which runs `recalcStats()` with that list and puts everything back, so they are always the game's own (Red Rampage's boost to worn gear and the Lime Helmet's cut to damage taken included). Pointing at the Lime Helmet also tries it on in the picture (`trinketShownList`). On a phone the panel sits above two rows of tiles that scroll sideways. |
+| `js/41c-wheel-page.js` | 239 | **The prize wheels, revamped, and the Spotted wheel.** Replaces `wheelTabHTML`, `spinWheelUI` and `revealWheelResult` (11-ants.js), and wraps `checkWheelKey` and `handleAction`. Two wheel cards (`WHEELS`: the Prize wheel and the Spotted wheel, each with its key count, goal and progress), a painted SVG wheel with an icon on each slice, a prize list with chances and a New/Owned badge for trinkets, and Spin 1 / 5 / 10 buttons. The Spotted wheel (`SPOTTED_SEGMENTS`: 20% Red Rampage, 3% the new Spotted Paw trinket, 12% the new Golden Ossicone trinket, 250,000 or 1,000,000 gold, 1,500 or 4,500 gems, 200 food, or a free Spotted Crate piece) takes a Spotted key: `SPOTTED_KEY_SCORE` is ten times the normal key's score (500,000,000), with its own 30-minute cooldown (`Save.data.spottedKeys`, `lastSpottedKeyAt`). Prizes are decided and saved the moment keys are spent (`wheelSpendKeys`); the spin is only for show, and a batch turns the wheel once to its best prize and lists everything won. A trinket already owned pays gold. |
 | `js/44-loop-boot.js` | 115 | The main loop, resize, and the boot function. |
 | `js/44b-feedback.js` | 229 | Pacing and presentation: title splash, one-time hints, fades, boss entrance, wave-clear beat, number count-ups, overlay fade-out, text size, the kick wind-up. |
 | `js/44c-perf.js` | 170 | The slow-device governor: times each frame's work and, if the game cannot keep up, lowers the canvas sharpness and then the effects (`PERF_STEPS`); shows a notice with a "Back to full quality" button when it does (`perfNotice`; that button turns "Adapt to slow devices" off), counts minigames as play, and the minigame polish layers follow the effects level; brings them back when there is room. Off with Settings, Adapt to slow devices. Also the statistics panel (the `\` key). |
@@ -213,7 +214,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zzp-photo-looks.js` | 215 | **The photo studio's look and light.** A Look and light tab: filters (Sepia, Noir, Glitch, Painterly), seven frames, a time-of-day slider, and a freeze-all-creatures toggle; twelve stickers in the Effects tab. All saved with the picture; photo code version 5 is written only when one is used (older codes are unchanged). |
 | `js/44zzq-npc-voices.js` | 114 | **Babble.** While a townsperson speaks in a dialogue card, each vowel (and every Nth consonant) blips: one `SFX.tone()` oscillator note on the town's sound bus, so Effects volume, Sound and mute apply. Every character has a voice (`NPC_VOICES`: pitch, wave, letters per second, blip length, wander, swing, pauses at punctuation; the mayor is low and stately, Dot high and quick, Elder Ossi deep and wobbly) and everyone not listed gets one made from their id and size (`npcVoiceFor`; smaller giraffes are higher). Vowels pick the pitch, questions rise, full stops settle, exclamations are louder. Wraps `townSay`, `townDlgFinish` and `townCloseDialog` and takes over the card's typewriter (`NPCVoice.tick`), never longer than about 4.5 seconds; a tap still skips. Settings, Sound, "NPC voices" turns it off and gives back the plain typewriter. |
 | `js/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
-| `js/45b-dev-panel.js` | 568 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| `js/45b-dev-panel.js` | 570 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/46-main.js` | 4 | Starts the game. |
 
 ## Tests

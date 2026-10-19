@@ -50,7 +50,7 @@ const GUIDE_TOPICS = [
     let h = '<p>Everything you earn is spent here, between runs.</p><ul class="helplist">' +
       '<li><b>Upgrades</b> are permanent and paid for with gold. They apply to every run from then on. Some have several levels, and you can buy as many as you can afford.</li>' +
       '<li><b>Gear</b> is paid for with gems. Open a crate to find a piece of gear. Wear all three pieces of one set to get the set bonus. <b>Trinkets</b> can all be worn at once.</li>' +
-      '<li><b>Wheel:</b> reach ' + WHEEL_SCORE_THRESHOLD.toLocaleString('en-US') + ' points in a single run to earn a key (at most one every 30 minutes). Spend it on the wheel for gold, gems or a rare trinket.</li>';
+      '<li><b>Wheel:</b> reach ' + WHEEL_SCORE_THRESHOLD.toLocaleString('en-US') + ' points in a single run to earn a key (at most one every 30 minutes). Spend it on the prize wheel for gold, gems or a rare trinket. A score of ' + SPOTTED_KEY_SCORE.toLocaleString('en-US') + ' in a run earns a <b>Spotted key</b> instead, for the Spotted wheel: far better prizes, and a trinket found nowhere else. With several keys you can spin 5 or 10 at once.</li>';
     if (guideAnts()) h += '<li><b>Ants</b> are hired with food. See the ant colony below.</li>';
     if (cityUnlocked()) h += '<li><b>City</b> is the market of the underground giraffe city. See below.</li>';
     return h + '</ul>';
