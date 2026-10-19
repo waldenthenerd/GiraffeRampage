@@ -5,5 +5,5 @@
   "license": "PolyForm-Noncommercial-1.0.0",
   "description": "Headless QA runner for Giraffe Rampage (cloud/Linux friendly). The game itself has no build step.",
   "scripts": { "setup": "playwright install --with-deps chromium" },
-  "dependencies": { "playwright": "1.49.1" }
+  "dependencies": { "playwright": "1.56.1" }
 }
