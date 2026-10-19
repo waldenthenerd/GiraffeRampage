@@ -66,7 +66,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (156 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (157 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -223,6 +223,7 @@ game. This is the complete list for this version (156 scripts; the developer pan
 | - | `js/41a-gear-page.js` | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, the crate reveal (`gearReveal`) and Buy 5 / Buy 10 on every crate (`gearBuyMany`: all the openings play at once, five to a row). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
 | - | `js/41b-trinket-page.js` | The trinkets on the Gear page: framed tiles, tap to wear in place, a panel with the numbers (from `recalcStats`). Replaces `trinketsHTML`; load it after `js/41a-gear-page.js` and `js/43-input.js`. |
 | - | `js/41c-wheel-page.js` | The prize wheels: the Wheel tab with the Prize wheel and the new Spotted wheel (Spotted keys: `Save.data.spottedKeys`, `lastSpottedKeyAt`), Spin 1/5/10. Replaces `wheelTabHTML`/`spinWheelUI`/`revealWheelResult`; load it after `js/41b-trinket-page.js`. |
+| - | `js/41d-ants-page.js` | The Ants tab as a cutaway of the anthill (food store, a chamber per ant with the ants walking in it, Hire 1/5/10, the dust alliance rooms below). Replaces `antsTabHTML`; load it after `js/41c-wheel-page.js`. |
 | 90 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
 | 91 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | 92 | `js/46-main.js` | Starts the game. |
