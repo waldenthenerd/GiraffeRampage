@@ -137,3 +137,40 @@
   .gcolR{min-height:0;height:240px;align-self:auto}                                       /* one column: a fixed window below the picture, so tapping gear does not move the page either */
 }
 .gcolR.more::after{content:'';position:absolute;left:1px;right:1px;bottom:1px;height:36px;pointer-events:none;border-radius:0 0 6px 6px;background:linear-gradient(rgba(36,27,21,0),rgba(36,27,21,.97))}
+
+/* ---------- trinkets (js/41b-trinket-page.js) ---------- */
+.trwrap{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:12px;align-items:start;margin-bottom:12px}
+.trgrid{grid-column:1;grid-row:1}
+.trside{grid-column:2;grid-row:1;position:relative;height:280px;background:rgba(36,27,21,.72);border:1px solid var(--bark2);border-radius:6px}
+.trp{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding:10px;font-size:12.5px;line-height:1.45;scrollbar-width:thin;scrollbar-color:var(--bark2) transparent}
+.trp h4{margin:0 0 2px;font-size:14px;color:var(--sun)}
+.trp .gsub{font-size:11px;color:var(--dust);margin:0 0 4px}.trp .trw{color:#FFD84D;font-weight:700}
+.trp.locked h4{color:var(--dust)}
+.trhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.trhead .tic{width:56px;height:56px;flex:none;font-size:34px}
+.trwornrow{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px}.trwornrow .tic{width:38px;height:38px;font-size:22px}
+.tchips{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 8px}
+.tchip{padding:2px 8px;border-radius:10px;background:rgba(20,16,14,.7);border:1px solid var(--bark2);font-size:12px;color:var(--dust)}
+.tchip b{font-weight:700}.tchip.up b{color:#8FD16A}.tchip.down b{color:#E8705E}.tchip.sp{color:#EBD9A8;border-color:rgba(255,216,77,.45)}
+.ttiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.ttile{--tc:#A9997F;position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px 8px;border-radius:8px;font:inherit;color:var(--bone);cursor:pointer;
+  background:linear-gradient(#352820,#221913);border:2px solid #5b4a3a;border-color:color-mix(in srgb,var(--tc) 50%,#3a2c20);box-shadow:0 0 10px color-mix(in srgb,var(--tc) 18%,transparent)}
+.ttile b{font-size:11.5px;font-weight:600;line-height:1.2;text-align:center;min-height:2.4em;display:flex;align-items:center}
+.ttile:hover{border-color:var(--tc);transform:translateY(-1px)}
+.ttile.sel{outline:2px dashed var(--dust);outline-offset:2px}
+.ttile.on{border-color:var(--sun);box-shadow:0 0 0 1px var(--sun),0 0 16px color-mix(in srgb,var(--tc) 45%,transparent)}
+.ttile .tck{display:none;position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:var(--sun);color:#1B1410;font:700 12px/20px sans-serif;text-align:center;font-style:normal}
+.ttile.on .tck{display:block}
+.ttile.locked{cursor:default;background:#1c1511;border-color:#3a2e24;box-shadow:none}.ttile.locked:hover{transform:none;border-color:#4a3a2c}.ttile.locked b{color:var(--dust)}
+.tic{display:flex;align-items:center;justify-content:center;width:52px;height:52px;font-size:32px;border-radius:50%;color:var(--tc);background:radial-gradient(circle,color-mix(in srgb,var(--tc) 26%,transparent),rgba(0,0,0,0) 70%)}
+.tic svg{width:1em;height:1em;filter:drop-shadow(0 0 4px color-mix(in srgb,var(--tc) 60%,transparent))}
+.ttile.locked .tic,.trp.locked .tic{background:none}.ttile.locked .tic svg,.trp.locked .tic svg{filter:brightness(0) opacity(.55)}
+.ttile.pop{animation:trpop .3s ease-out}
+@keyframes trpop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.ttile.pop{animation:none}.ttile:hover{transform:none}}
+@media (max-width:760px){
+  .trwrap{grid-template-columns:minmax(0,1fr)}
+  .trside{grid-column:1;grid-row:1;height:260px}                                           /* the panel is above the tiles, so a tap is answered where you are looking */
+  .trgrid{grid-column:1;grid-row:2}
+  .ttiles{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:92px;grid-template-rows:repeat(2,auto);overflow-x:auto;padding:4px 2px 8px;scrollbar-width:thin}   /* two rows that scroll sideways */
+}

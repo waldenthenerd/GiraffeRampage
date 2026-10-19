@@ -14,12 +14,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 153 | 51,469 | 3.85 MiB (4,035,988 bytes) |
-| Styles (`css/`) | 5 | 1,399 | 126 KiB (129,038 bytes) |
-| Page (`index.html`) | 1 | 200 | 8.5 KiB (8,741 bytes) |
-| **Whole game** | **159** | **53,068** | **3.98 MiB (4,173,767 bytes)** |
+| JavaScript (`js/`) | 154 | 51,601 | 3.86 MiB (4,046,301 bytes) |
+| Styles (`css/`) | 5 | 1,436 | 130 KiB (132,781 bytes) |
+| Page (`index.html`) | 1 | 201 | 8.6 KiB (8,788 bytes) |
+| **Whole game** | **160** | **53,238** | **3.99 MiB (4,187,870 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,500 lines, 3.94 MiB (4,130,292 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,670 lines, 3.95 MiB (4,144,395 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -112,7 +112,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/41-qol.js` | 842 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
 | `js/42-run-hud.js` | 234 | Run lifecycle and the HUD. |
 | `js/43-input.js` | 374 | Input: keyboard, mouse, touch, gamepad. |
-| `js/41a-gear-page.js` | 332 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, the crate reveal (`gearReveal`) and Buy 5 / Buy 10 on every crate (`gearBuyMany`: all the openings play at once, five to a row). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
+| `js/41a-gear-page.js` | 335 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, the crate reveal (`gearReveal`) and Buy 5 / Buy 10 on every crate (`gearBuyMany`: all the openings play at once, five to a row). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colours screen. |
+| `js/41b-trinket-page.js` | 129 | **The trinkets on the Gear page.** Replaces `trinketsHTML` (41-qol.js): framed tiles with big icons in each trinket's colour (unfound ones are silhouettes), tap to wear or remove in place (`trinket-tap-<id>`: no page redraw, a pop and a sound), and a fixed-size panel with the trinket's effect as chips, before-and-after rows ("if you wear it" / "if you take it off") and the total of everything worn when nothing is picked. The numbers come from `trinketStats(list)`, which runs `recalcStats()` with that list and puts everything back, so they are always the game's own (Red Rampage's boost to worn gear and the Lime Helmet's cut to damage taken included). Pointing at the Lime Helmet also tries it on in the picture (`trinketShownList`). On a phone the panel sits above two rows of tiles that scroll sideways. |
 | `js/44-loop-boot.js` | 115 | The main loop, resize, and the boot function. |
 | `js/44b-feedback.js` | 229 | Pacing and presentation: title splash, one-time hints, fades, boss entrance, wave-clear beat, number count-ups, overlay fade-out, text size, the kick wind-up. |
 | `js/44c-perf.js` | 170 | The slow-device governor: times each frame's work and, if the game cannot keep up, lowers the canvas sharpness and then the effects (`PERF_STEPS`); shows a notice with a "Back to full quality" button when it does (`perfNotice`; that button turns "Adapt to slow devices" off), counts minigames as play, and the minigame polish layers follow the effects level; brings them back when there is room. Off with Settings, Adapt to slow devices. Also the statistics panel (the `\` key). |
