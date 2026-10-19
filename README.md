@@ -2,6 +2,31 @@
 
 A single-page canvas game. Open `index.html` in a browser; there is no build step.
 
+## Play and run it
+
+Open `index.html` in a browser, or serve the folder (`python3 -m http.server 8123` and visit `http://localhost:8123`). Saves live in your browser's local storage.
+
+## License
+
+Giraffe Rampage is **source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE)**. In plain words: you may read, run, change and share it for any noncommercial purpose (personal use, study, hobby projects, charities, schools and the like), as long as you pass on the licence and the `Required Notice` line in `LICENSE`. You may not use it or anything made from it to make money. The licence text is the only thing that counts; this paragraph is a summary. It is not an OSI "open source" licence, because of the noncommercial limit. For anything commercial, ask the author first. All the code, art (it is drawn in code), icons and sound (made in code) are original to this project, so there are no third-party licences to carry along.
+
+## Developer panel
+
+`js/45b-dev-panel.js` is a testing tool for the author and anyone who clones the repo. It is loaded by `index.html` here, but it is **not part of the published game**: the hosted website must be built without that script (see `lovable.md`). Deleting the file and its `<script>` tag changes nothing else.
+
+**Opening it:** on the main menu, click the letter **E** in the title (GIRAFF**E** RAMPAGE) five times within a couple of seconds. A "Developer Access" box asks for a code. The code is **`1391`**. It is a fixed number in the source, so it keeps nothing out of a determined player; it just stops the panel opening by accident. Press Enter or Unlock; Cancel or Close returns to whatever you were doing.
+
+**What is on the panel** (every button changes your real save, so use a spare save or the browser's private mode if you care about it):
+1. **Add gold and gems** to the banked totals.
+2. **Dev Test Run:** Chapter 1 with no enemies and nothing banked. Switch XP gain, invincibility, the wave timer and enemy freezing on or off; jump to any chapter or wave (including each boss wave); take any card, or any combo at levels 1 to 3, at any level up to 10; spawn any enemy from any chapter in any number; give XP or level-ups; heal. While a test run is going, a small **DEV** button appears at the bottom of the screen, and the backtick key (`` ` ``) opens the same panel. "End the test run" goes back to the menu and saves nothing.
+3. **Jump into any chapter** (1 to 13) without the usual unlock, or start a fresh run at any wave.
+4. **Play any of the films**: the Moon landing, the Venus ship, the flight home, Area 51, Mars, the Marine ships and the chapter-transition films.
+5. **Unlock things:** mark every chapter complete, open Venus or Mars and give their resources, give the engine part or the finished spaceplane, set up the lab and ant colony, open the Underground Giraffe City, unlock every card combo, reveal the whole bestiary, own every hat and boot, unlock every minigame and every minigame colour.
+6. **Longneck Town:** open every place, find every item, make everyone a best friend, finish every errand, reset the town, give the car, the plane or the whole fleet, and fill the satchel with bread.
+7. **Odds and ends:** add food or a wheel key, reset the foraging and minigame cooldowns, give the Red Rampage or Lime Helmet trinket.
+
+If you serve the site yourself and do not want the panel there, remove the `js/45b-dev-panel.js` line from `index.html`; the game runs the same without it.
+
 ## Layout
 
 - `index.html` holds the page markup (canvas, HUD, touch controls, overlay) and loads the styles and scripts.
@@ -14,12 +39,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 154 | 51,601 | 3.86 MiB (4,046,301 bytes) |
+| JavaScript (`js/`) | 154 | 51,594 | 3.85 MiB (4,041,636 bytes) |
 | Styles (`css/`) | 5 | 1,436 | 130 KiB (132,781 bytes) |
 | Page (`index.html`) | 1 | 201 | 8.6 KiB (8,788 bytes) |
-| **Whole game** | **160** | **53,238** | **3.99 MiB (4,187,870 bytes)** |
+| **Whole game** | **160** | **53,231** | **3.99 MiB (4,183,205 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,670 lines, 3.95 MiB (4,144,395 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **52,663 lines, 3.95 MiB (4,139,730 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 ## How the files fit together
 
 The scripts are plain classic `<script>` tags loaded **in the order shown below**. They share one global scope, exactly as the old single file did inside its wrapper, so any file can use any function or constant from an earlier file, and functions can call functions defined in later files **once the game is running**.
@@ -35,8 +60,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 
 | File | Lines | What is in it |
 |---|---|---|
-| `js/00-icons.js` | 105 | Icon tables (Material + Tabler) and the icon helpers. Runs outside strict mode, as it always did. |
-| `js/00b-icons-custom.js` | 149 | Every icon in the game other than the stock Tabler set is drawn here (Tabler-style 24x24 outlines, written `'@t-x-name'`). The old filled Material icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
+| `js/00-icons.js` | 98 | The icon table (41 outlined icons drawn for this game) and the icon helpers. Runs outside strict mode, as it always did. |
+| `js/00b-icons-custom.js` | 149 | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
 | `js/01-core.js` | 315 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. |
 | `js/01b-savepack.js` | 127 | Save compression: the save is stored as a JSON string holding `GR2:` + Base64 of an LZW-packed copy of its JSON (about 42 to 58 percent of the size). Old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `stats`). Format in the file header and in `lovable.md`. |
 | `js/02-music.js` | 342 | Procedural background music: themes, the 16-bar sequencer (A, A, B, A), key climb through a chapter, boss second phase, theme fade-in, stingers. |
