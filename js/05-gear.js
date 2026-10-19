@@ -509,7 +509,10 @@ const TRINKETS = {
     desc: 'Damage taken −8%, move 5% faster and gain 6% more experience.', source: 'Forged at the Mars forge.' },
   /* the 3% prize of the Spotted prize wheel (41c-wheel-page.js) */
   spottedpaw: { id: 'spottedpaw', name: 'Spotted Paw', icon: '@t-paw', color: '#F29A2E',
-    desc: 'All damage +7%, critical chance +3% and gold gained +10%.', source: 'A 3% prize on the Spotted wheel. Spotted keys come from a score of 500,000,000.' }
+    desc: 'All damage +7%, critical chance +3% and gold gained +10%.', source: 'A 3% prize on the Spotted wheel. Spotted keys come from a score of 500,000,000.' },
+  /* a 12% prize of the Spotted wheel: the sturdy one, to go with the Paw's damage */
+  goldenossicone: { id: 'goldenossicone', name: 'Golden Ossicone', icon: '@t-x-ossicone', color: '#E8C068',
+    desc: 'Max health +20, regenerate 1 health per second and gain 8% more experience.', source: 'A 12% prize on the Spotted wheel. Spotted keys come from a score of 500,000,000.' }
 };
 function trinketOwned(id){ return !!(Save.data && Save.data.gear && Save.data.gear['trinket:' + id]); }
 function trinketEquipped(id){ return !!(Save.data && Save.data.equippedTrinkets && Save.data.equippedTrinkets.indexOf(id) >= 0); }

@@ -28,6 +28,8 @@ try {
   /* 4. the trinket really does what it says */
   Save.data.equippedTrinkets = []; recalcStats(); var b = { d: P.stats.allDmgMul, c: P.stats.crit, g: P.stats.goldMul };
   var st = trinketStats(['spottedpaw']); out.pawStats = Math.abs(st.allDmgMul - (b.d + 0.07)) < 1e-9 && Math.abs(st.crit - (b.c + 0.03)) < 1e-9 && Math.abs(st.goldMul - (b.g + 0.10)) < 1e-9;
+  var st2 = trinketStats(['goldenossicone']); out.ossStats = Math.abs(st2.maxHpAdd - (P.stats.maxHpAdd + 20)) < 1e-9 && Math.abs(st2.regen - (P.stats.regen + 1)) < 1e-9 && Math.abs(st2.xpMul - (P.stats.xpMul + 0.08)) < 1e-9;
+  out.noLune = !SPOTTED_SEGMENTS.some(function(s){ return s.id === 'peacefullune'; }) && !!seg('goldenossicone') && seg('goldenossicone').weight === 12;
   /* 5. Spin 10: ten prizes decided and paid at once, ten keys spent, totals add up */
   Save.data.gold = 0; Save.data.gems = 0; Save.data.food = 0; Save.data.spottedKeys = 12;
   var g0 = Save.data.cratesOpened | 0, list = wheelSpendKeys(WHEELS.spotted, 10);
@@ -77,5 +79,5 @@ try {
     G.state = 'shop'; shopTab = 'wheel'; showShop('wheel');
   }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-out.pass = out.errs.length === 0 && ['odds', 'counted', 'score', 'lowScore', 'bigScore', 'cooldown', 'noKeys', 'paw', 'pawDupe', 'pawStats', 'ten', 'crateOk', 'freeCrate', 'cards', 'oldIds', 'rows', 'pick', 'newBadge', 'buttons', 'tenDisabled', 'spinning', 'noDouble', 'resultShown', 'five', 'batchShown', 'tabClears', 'normalThree', 'oldApi', 'oldSave'].every(function(k){ return out[k] === true; });
+out.pass = out.errs.length === 0 && ['odds', 'counted', 'score', 'lowScore', 'bigScore', 'cooldown', 'noKeys', 'paw', 'pawDupe', 'pawStats', 'ossStats', 'noLune', 'ten', 'crateOk', 'freeCrate', 'cards', 'oldIds', 'rows', 'pick', 'newBadge', 'buttons', 'tenDisabled', 'spinning', 'noDouble', 'resultShown', 'five', 'batchShown', 'tabClears', 'normalThree', 'oldApi', 'oldSave'].every(function(k){ return out[k] === true; });
 QA.done(out);

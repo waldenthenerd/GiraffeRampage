@@ -5,7 +5,7 @@
    prize list with the chance of each prize and whether the trinket is new to her, and Spin 1 / 5 / 10 buttons (like the gear crates).
    THE PRIZE WHEEL  Unchanged odds (WHEEL_SEGMENTS, 05-gear.js): a key for 50,000,000 score in one run, at most one every 30 minutes.
    THE SPOTTED WHEEL  Takes a Spotted key, earned the same way at ten times the score (500,000,000, its own 30-minute cooldown). 20% Red Rampage,
-     3% the Spotted Paw trinket (05-gear.js), 12% Peaceful Lune, 250,000 or 1,000,000 gold, 1,500 or 4,500 gems, 200 food, or a free Spotted
+     3% the Spotted Paw trinket (05-gear.js), 12% the Golden Ossicone trinket, 250,000 or 1,000,000 gold, 1,500 or 4,500 gems, 200 food, or a free Spotted
      Crate (one gear piece, opened with the crate code in 05a-gear-levels.js, so duplicates level up as usual). A trinket she already owns pays
      gold instead (SPOTTED_WHEELS refund). Spotted keys are Save.data.spottedKeys / lastSpottedKeyAt (01-core.js).
    SPINNING  The reward of every spin is decided and saved the moment the keys are spent; the animation is only for show (as before). Spin 5 and
@@ -21,7 +21,7 @@ const SPOTTED_SEGMENTS = [
   { id: 'gold_l',       label: '250,000 Gold',     weight: 14, color: '#C9A23A', kind: 'gold',  amount: 250000 },
   { id: 'spotcrate',    label: 'Spotted Crate',    weight: 12, color: '#B8794A', kind: 'crate' },
   { id: 'spottedpaw',   label: 'Spotted Paw',      weight: 3,  color: '#F29A2E', kind: 'trinket', refund: 1000000 },
-  { id: 'peacefullune', label: 'Peaceful Lune',    weight: 12, color: '#8FAEE8', kind: 'trinket', refund: 250000 },
+  { id: 'goldenossicone', label: 'Golden Ossicone', weight: 12, color: '#E8C068', kind: 'trinket', refund: 250000 },
   { id: 'gems_xl',      label: '4,500 Gems',       weight: 9,  color: '#6FD0F0', kind: 'gems',  amount: 4500 },
   { id: 'food',         label: '200 Food',         weight: 6,  color: '#7FB85A', kind: 'food',  amount: 200 },
   { id: 'gold_xl',      label: '1,000,000 Gold',   weight: 8,  color: '#F0CF5A', kind: 'gold',  amount: 1000000 }
@@ -31,6 +31,7 @@ const WHEEL_VIEW = {
   redrampage:   { icon: '@t-flame',   rank: 9, note: 'Trinket: every piece of gear 1.4× stronger' },
   spottedpaw:   { icon: '@t-paw',     rank: 10, note: 'Trinket: damage +7%, crit +3%, gold +10%' },
   peacefullune: { icon: '@t-x-moon',  rank: 5, note: 'Trinket: press T to slow the world' },
+  goldenossicone: { icon: '@t-x-ossicone', rank: 6, note: 'Trinket: health +20, regen +1/s, XP +8%' },
   gold_small:   { icon: '@t-coin',   rank: 2 }, gold_large: { icon: '@t-coin', rank: 3 },
   gems_small:   { icon: '@t-x-gem',   rank: 2 }, gems_large: { icon: '@t-x-gem', rank: 3 },
   gems_l:       { icon: '@t-x-gem',   rank: 4 }, gems_xl:    { icon: '@t-x-gem', rank: 6 },
@@ -42,7 +43,7 @@ const WHEELS = {
   normal:  { id: 'normal',  name: 'Prize wheel',   keyName: 'key',         field: 'wheelKeys',   at: 'lastWheelKeyAt',   score: WHEEL_SCORE_THRESHOLD, cd: WHEEL_KEY_COOLDOWN_MS, segs: WHEEL_SEGMENTS, dupe: 25000, color: '#E8C24A', rim: '#6B4A2A', stud: '#E8C24A', spots: false,
              blurb: 'Gold, gems, and the Peaceful Lune. One in fifty is a Red Rampage.' },
   spotted: { id: 'spotted', name: 'Spotted wheel', keyName: 'Spotted key', field: 'spottedKeys', at: 'lastSpottedKeyAt', score: SPOTTED_KEY_SCORE,     cd: SPOTTED_KEY_COOLDOWN_MS, segs: SPOTTED_SEGMENTS, dupe: 250000, color: '#F29A2E', rim: '#8A5A2B', stud: '#F3E3C0', spots: true,
-             blurb: 'Much better prizes: one spin in five is a Red Rampage, and there is a trinket found nowhere else.' }
+             blurb: 'Much better prizes: one spin in five is a Red Rampage, and there are two trinkets found nowhere else.' }
 };
 const wheelPage = { id: 'normal', batch: null, n: 1 };
 const WRARITY = { common: '#A9997F', rare: '#7E9B4E', epic: '#9A5BD6', legendary: '#FFD84D', mythical: '#FF6BD6' };
