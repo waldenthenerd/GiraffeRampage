@@ -16,16 +16,17 @@ try {
   screens.settings(); out.sliders = all('input[type=range]').length > 0 && all('input[type=range]').every(function(e){ return e.getBoundingClientRect().height >= 34; });
   screens.wardrobe(); out.swatches = all('.swatch:not(.pat)').filter(function(e){ return !e.closest('.dots'); }).every(function(e){ return e.getBoundingClientRect().width >= 38; });
   screens.photo(); out.chips = all('.pchip').length > 5 && all('.pchip').every(function(e){ return e.getBoundingClientRect().height >= 38; });
+  screens.upgrades(); out.upChips = all('.upchip').length > 3 && all('.upchip').every(function(e){ return e.getBoundingClientRect().height >= 38; }) && all('.upbtns .btn').every(function(e){ return e.getBoundingClientRect().height >= 38; });
   screens.gear(); out.gview = all('.gview-b').every(function(e){ return e.getBoundingClientRect().height >= 38; });
   /* nothing under 11px in the places that had it */
   function floor11(sel){ var l = all(sel); return l.length === 0 || l.every(function(e){ return parseFloat(getComputedStyle(e).fontSize) >= 10.99; }); }
   screens.gear(); out.gearText = floor11('.gsn small, .gtr small, .gp small');
   screens.ants(); out.antsText = floor11('.afbtns .btn small, .arbtns .btn small, .afforage .btn small, .afs small');
-  screens.wheel(); out.wheelText = floor11('.wbtns .btn small');
+  screens.wheel(); out.wheelText = floor11('.wbtns .btn small, .upbtns .btn small, .uptop .btn small');
   startRun(1); for (var i = 0; i < 20; i++) GR.step(1 / 60); out.hudText = floor11('.bar span');
-  /* upgrades: Buy and Buy max share a row, and the page is much shorter than a button per row */
-  screens.upgrades(); var buy = document.querySelector('.shoprow .buy'), mx = document.querySelector('[data-a^="buymax-"]');
-  out.buyRow = !!buy && !!mx && Math.abs(buy.getBoundingClientRect().top - mx.getBoundingClientRect().top) < 3;
+  /* upgrades (rebuilt in 41e): the Buy, Buy 5 and Max buttons of a row share one line */
+  screens.upgrades(); var ub = all('.upbtns')[0], ubs = ub ? [].slice.call(ub.querySelectorAll('.btn')) : [];
+  out.buyRow = ubs.length >= 2 && ubs.every(function(b){ return Math.abs(b.getBoundingClientRect().top - ubs[0].getBoundingClientRect().top) < 3; });
   /* fusion rows are unchanged: the Choose button stays beside the name */
   screens.fusion(); var row = document.querySelector('.shoprow'), nm = row && row.querySelector('.nm'), ch = row && row.querySelector('.btn');
   out.fusionRow = !!ch && !!nm && Math.abs(ch.getBoundingClientRect().top - nm.getBoundingClientRect().top) < 40;
@@ -41,7 +42,7 @@ try {
   if (land){ screens.wheel(); var cd = document.querySelector('.wpick .wcard'); out.landCards = cd.getBoundingClientRect().height < 60; out.landWheel = document.querySelector('.wwheel').getBoundingClientRect().top < innerHeight * 0.8; }
   if (screen && screens[screen]){ G.state = 'shop'; screens[screen](); }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-var need = ['noSideScroll', 'sliders', 'swatches', 'chips', 'gview', 'gearText', 'antsText', 'wheelText', 'hudText', 'buyRow', 'fusionRow', 'bestiary3', 'titleFits'];
+var need = ['noSideScroll', 'sliders', 'swatches', 'chips', 'upChips', 'gview', 'gearText', 'antsText', 'wheelText', 'hudText', 'buyRow', 'fusionRow', 'bestiary3', 'titleFits'];
 if (innerWidth > innerHeight) need = need.concat(['landCards', 'landWheel']);
 out.pass = out.errs.length === 0 && out.coarse === true && need.every(function(k){ return out[k] === true; });
 QA.done(out);

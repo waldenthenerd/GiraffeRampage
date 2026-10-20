@@ -15,7 +15,7 @@ scen(){                                                    # scen <label> <scena
 echo "== README and lovable.md counts"
 if out="$(python3 tools/recount-readme.py --check 2>&1)"; then ok "recount-readme"; else bad "recount-readme" "$out"; fi
 echo "== scenarios"
-for s in gear-oldsave trinket-ui wheel-spotted ants-page npc-voices gear-spotted; do scen "$s" "$s"; done
+for s in gear-oldsave trinket-ui wheel-spotted ants-page upgrades-page npc-voices gear-spotted; do scen "$s" "$s"; done
 scen "phone-pass (390x844)" phone-pass --touch --w 390 --h 844
 scen "phone-pass (844x390)" phone-pass --touch --w 844 --h 390
 echo "== website package"
