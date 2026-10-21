@@ -1,4 +1,4 @@
-/* The prize wheels and the Spotted wheel (js/41c-wheel-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/wheel-spotted.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --params "view=normal|spotted|batch|new|nokeys"] */
+/* The prize wheels and the Spotted wheel (js/41c-wheel-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/wheel-spotted.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --params "view=normal|spotted|batch|new|nokeys|jackpot"] */
 GR.handleAction('splash-go');
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
 try {
@@ -61,6 +61,31 @@ try {
   /* 9. the other wheel still works and a plain wheel spin of the old kind is unchanged */
   GR.handleAction('wheel-pick-normal'); Save.data.wheelKeys = 3; var before = Save.data.gold + Save.data.gems; var rn = wheelSpendKeys(WHEELS.normal, 3); out.normalThree = rn.length === 3 && Save.data.wheelKeys === 0;
   var old = spinWheel; out.oldApi = typeof old === 'function' && typeof rollWheelSegment === 'function';
+  /* 10b. ticks: one click for every slice edge that passes the pointer, fast at first and slowing with the wheel; and the jackpot for Red Rampage / the Spotted Paw */
+  var tl = [], tone0 = SFX.tone; SFX.tone = function(type, f0, f1, dur, vol, delay){ tl.push({ type: type, delay: delay || 0, dur: dur }); return tone0.apply(this, arguments); };
+  wheelPage.id = 'spotted'; wheelResult = null; wheelPage.batch = null; wheelSpinning = false; wheelRotation = 0; Save.data.spottedKeys = 5; showShop('wheel');
+  tl.length = 0; wheelSpinN(1); var ticks = tl.filter(function(x){ return x.type === 'triangle' && x.dur === 0.03; }).map(function(x){ return x.delay; });
+  out.tickCount = ticks.length >= 40 && ticks.length <= 60;
+  out.tickOrder = ticks.every(function(t, i){ return i === 0 || t >= ticks[i - 1]; }) && ticks[ticks.length - 1] <= WHEEL_SPIN_MS / 1000 + 0.01 && ticks[0] >= 0;
+  var gaps = ticks.map(function(t, i){ return i ? t - ticks[i - 1] : null; }).filter(function(g){ return g !== null; });
+  out.tickSlows = gaps[gaps.length - 1] > gaps[0] * 3 && gaps[gaps.length - 1] > gaps[Math.floor(gaps.length / 2)];
+  var expected = wheelTickTimes(WHEELS.spotted, 0, wheelRotation).length; out.tickMatches = expected === ticks.length;
+  out.bezier = Math.abs(wheelBezTime(0)) < 1e-6 && Math.abs(wheelBezTime(1) - 1) < 1e-3 && wheelBezTime(0.5) < 0.2;                           /* half way round is reached early: the curve is front-loaded */
+  /* jackpot levels */
+  out.jackLevels = wheelJackpotLevel([{ seg: { id: 'gold_l' } }]) === 0 && wheelJackpotLevel([{ seg: { id: 'redrampage' }, isNew: false }]) === 1 && wheelJackpotLevel([{ seg: { id: 'spottedpaw' }, isNew: true }]) === 2 && wheelJackpotLevel([{ seg: { id: 'gold_l' } }, { seg: { id: 'redrampage' }, isNew: true }]) === 2;
+  var finish = function(id, isNew){                                                                          /* spend a key on that prize, then show the result (the spin's own timer never fires here) */
+    Save.data.spottedKeys = 3; if (!isNew) grantTrinket(id); else delete Save.data.gear['trinket:' + id];
+    wheelResult = null; wheelSpinning = false; Math.random = function(){ return forceSeg(id); }; var list = wheelSpendKeys(WHEELS.spotted, 1); Math.random = realRandom;
+    wheelPage.batch = list; tl.length = 0; revealWheelResult(wheelBest(list)); return tl.length;
+  };
+  Save.data.gear = Save.data.gear || {}; var base = finish('gold_l', false);
+  out.noJackpot = !document.querySelector('.wresult.jackpot') && !document.querySelector('.wsparks');
+  var jOwn = finish('redrampage', false);
+  out.jackpotUi = !!document.querySelector('.wresult.jackpot.j1') && !!document.querySelector('.wwheel.win1') && document.querySelectorAll('.wsparks i').length === 14;
+  var jNew = finish('spottedpaw', true);
+  out.jackpotNewUi = !!document.querySelector('.wresult.j2') && !!document.querySelector('.wwheel.win2') && document.querySelectorAll('.wsparks i').length === 22;
+  out.fanfare = jNew > base + 6 && jOwn > base + 4 && jNew > jOwn;                                                                           /* more notes for a first-time trinket */
+  SFX.tone = tone0;
   /* 10. old saves have no Spotted key: it starts at none */
   delete Save.data.spottedKeys; delete Save.data.lastSpottedKeyAt; Save.write(); var back = GRSave.read(); out.oldSave = !back || !back.spottedKeys;
   Save.data.spottedKeys = 0; Save.data.lastSpottedKeyAt = 0;
@@ -70,6 +95,10 @@ try {
     if (view === 'nokeys'){ Save.data.wheelKeys = 0; Save.data.spottedKeys = 0; wheelPage.id = 'spotted'; wheelResult = null; }
     else if (view === 'normal'){ Save.data.wheelKeys = 7; Save.data.spottedKeys = 2; wheelPage.id = 'normal'; wheelResult = null; }
     else if (view === 'spotted'){ Save.data.wheelKeys = 2; Save.data.spottedKeys = 14; wheelPage.id = 'spotted'; wheelResult = null; }
+    else if (view === 'jackpot'){
+      Save.data.wheelKeys = 2; Save.data.spottedKeys = 5; wheelPage.id = 'spotted'; delete Save.data.gear['trinket:spottedpaw']; wheelRotation = 0; wheelSpinning = false;
+      Math.random = function(){ return forceSeg('spottedpaw'); }; var jl = wheelSpendKeys(WHEELS.spotted, 1); Math.random = realRandom; wheelPage.batch = jl; wheelResult = wheelBest(jl);
+    }
     else if (view === 'batch' || view === 'new'){
       Save.data.wheelKeys = 2; Save.data.spottedKeys = 14; wheelPage.id = 'spotted'; delete Save.data.gear['trinket:spottedpaw']; delete Save.data.gear['trinket:redrampage'];
       var rr = wheelSpendKeys(WHEELS.spotted, view === 'batch' ? 10 : 1);
@@ -79,5 +108,5 @@ try {
     G.state = 'shop'; shopTab = 'wheel'; showShop('wheel');
   }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-out.pass = out.errs.length === 0 && ['odds', 'counted', 'score', 'lowScore', 'bigScore', 'cooldown', 'noKeys', 'paw', 'pawDupe', 'pawStats', 'ossStats', 'noLune', 'ten', 'crateOk', 'freeCrate', 'cards', 'oldIds', 'rows', 'pick', 'newBadge', 'buttons', 'tenDisabled', 'spinning', 'noDouble', 'resultShown', 'five', 'batchShown', 'tabClears', 'normalThree', 'oldApi', 'oldSave'].every(function(k){ return out[k] === true; });
+out.pass = out.errs.length === 0 && ['odds', 'counted', 'score', 'lowScore', 'bigScore', 'cooldown', 'noKeys', 'paw', 'pawDupe', 'pawStats', 'ossStats', 'noLune', 'tickCount', 'tickOrder', 'tickSlows', 'tickMatches', 'bezier', 'jackLevels', 'noJackpot', 'jackpotUi', 'jackpotNewUi', 'fanfare', 'ten', 'crateOk', 'freeCrate', 'cards', 'oldIds', 'rows', 'pick', 'newBadge', 'buttons', 'tenDisabled', 'spinning', 'noDouble', 'resultShown', 'five', 'batchShown', 'tabClears', 'normalThree', 'oldApi', 'oldSave'].every(function(k){ return out[k] === true; });
 QA.done(out);

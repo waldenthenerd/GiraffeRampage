@@ -333,3 +333,11 @@ OV.addEventListener('mouseover', function(e){
   if (inSide || !gearPage.hover) return;                                                   /* the pointer is on the panel (to scroll it or press Equip): keep the piece */
   gearPage.clearT = setTimeout(gearHoverClear, 350);                                       /* a moment's grace to travel from the tile to the panel */
 });
+/* keyboard and pad focus does what pointing does: the focused piece is tried on and compared; moving on to the panel (to press Equip) keeps it */
+OV.addEventListener('focusin', function(e){
+  if (shopTab !== 'gear' || G.state !== 'shop' || !(Nav.on || (e.target.matches && e.target.matches(':focus-visible')))) return;
+  const t = e.target.closest ? e.target.closest('[data-gh]') : null, id = t ? t.dataset.gh : null, inSide = !!(e.target.closest && e.target.closest('#gearSide'));
+  if (gearPage.clearT){ clearTimeout(gearPage.clearT); gearPage.clearT = 0; }
+  if (id){ if (id !== gearPage.hover){ gearPage.hover = id; gearSyncSelection(); } return; }
+  if (!inSide && gearPage.hover) gearHoverClear();
+});

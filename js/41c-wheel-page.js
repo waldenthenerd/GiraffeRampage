@@ -8,6 +8,9 @@
      3% the Spotted Paw trinket (05-gear.js), 12% the Golden Ossicone trinket, 250,000 or 1,000,000 gold, 1,500 or 4,500 gems, 200 food, or a free Spotted
      Crate (one gear piece, opened with the crate code in 05a-gear-levels.js, so duplicates level up as usual). A trinket she already owns pays
      gold instead (SPOTTED_WHEELS refund). Spotted keys are Save.data.spottedKeys / lastSpottedKeyAt (01-core.js).
+   TICKS AND JACKPOTS  While the wheel turns, a click is scheduled for every slice edge that passes the pointer, at the moment the real easing curve puts it
+     there, so they come fast and then slow down with the wheel and the last one lands as it stops (wheelTicks). Red Rampage and the Spotted Paw get a fanfare, a
+     burst of sparks and a glowing wheel (wheelJackpotLevel: 2 when the trinket is new to her, 1 when she already had it).
    SPINNING  The reward of every spin is decided and saved the moment the keys are spent; the animation is only for show (as before). Spin 5 and
      Spin 10 decide all their prizes at once, turn the wheel once to the best one, and list everything won underneath.
    Replaces wheelTabHTML, spinWheelUI and revealWheelResult (11-ants.js) and wraps checkWheelKey and handleAction; the old 'spin-wheel' action
@@ -177,22 +180,59 @@ function wheelBatchHTML(list){
 function wheelTabHTML(){
   const W = wheelCur(), keys = wheelKeysOf(W), busy = wheelSpinning;
   const result = wheelResult ? (wheelPage.batch && wheelPage.batch.length > 1 ? wheelBatchHTML(wheelPage.batch) : wheelOneHTML(wheelResult)) : '';
+  const jp = wheelResult ? wheelJackpotLevel(wheelPage.batch || [wheelResult]) : 0, fxOn = typeof fxLevelNow === 'function' ? fxLevelNow() > 0 : true;
+  const nsp = jp > 1 ? 22 : 14, sparks = jp && fxOn ? '<div class="wsparks" aria-hidden="true">' + Array.from({ length: nsp }, function(_, i){ return '<i style="--a:' + Math.round(i * 360 / nsp) + 'deg;--d:' + (60 + (i % 4) * 22) + 'px;--t:' + (0.7 + (i % 3) * 0.2).toFixed(1) + 's"></i>'; }).join('') + '</div>' : '';
   const btns = [1, 5, 10].map(function(n){
     const ok = keys >= n && !busy;
-    return '<button class="btn sm' + (n === 1 ? '' : ' ghost crm') + (ok ? (n === 1 ? '' : ' ok') : ' ghost') + '" ' + (n === 1 ? 'id="wheelSpinBtn" data-a="spin-wheel"' : 'data-a="wheel-spin-' + n + '"') + (ok ? '' : ' disabled') + '>' +
+    return '<button class="btn sm' + (n === 1 ? '' : ' ghost crm') + (ok ? (n === 1 ? '' : ' ok') : ' ghost') + '" aria-label="Spin ' + n + ' time' + (n === 1 ? '' : 's') + ', using ' + n + ' ' + W.keyName + (n === 1 ? '' : 's') + '" ' + (n === 1 ? 'id="wheelSpinBtn" data-a="spin-wheel"' : 'data-a="wheel-spin-' + n + '"') + (ok ? '' : ' disabled') + '>' +
       (n === 1 ? (busy ? 'Spinning…' : 'Spin') : 'Spin ' + n) + '<small>' + n + ' ' + W.keyName + (n === 1 ? '' : 's') + '</small></button>';
   }).join('');
   return '<div class="wheelpg' + (W.id === 'spotted' ? ' spotted' : '') + '" style="--wc:' + W.color + '">' +
     '<div class="wpick">' + wheelCardHTML(WHEELS.normal) + wheelCardHTML(WHEELS.spotted) + '</div>' +
     '<div class="wmain"><div class="wleft">' +
-      '<div class="wwheel"><div class="wpointer"></div><div class="wdisc" id="wheelDisc" style="transform:rotate(' + wheelRotation + 'deg)">' + wheelDiscHTML(W) + '</div><div class="whub">' + ico('@t-x-key') + '</div></div>' +
+      '<div class="wwheel' + (jp ? ' win' + jp : '') + '"><div class="wpointer"></div><div class="wdisc" id="wheelDisc" style="transform:rotate(' + wheelRotation + 'deg)">' + wheelDiscHTML(W) + '</div><div class="whub">' + ico('@t-x-key') + '</div>' + sparks + '</div>' +
       '<div class="wbtns">' + btns + '</div>' +
       (keys <= 0 && !busy ? '<p class="gnote wnokey">You need ' + (W.id === 'spotted' ? 'a Spotted key' : 'a key') + ' to spin. Reach ' + fmt(W.score) + ' score in a single run.</p>' : '') +
     '</div><div class="wright"><h4 class="wh">' + W.name + ' prizes</h4>' + wheelPrizeRowsHTML(W) + '</div></div>' +
-    (result ? '<div class="wresult" id="wheelResult">' + result + '</div>' : '') + '</div>';
+    (result ? '<div class="wresult' + (jp ? ' jackpot j' + jp : '') + '" id="wheelResult">' + result + '</div>' : '') + '</div>';
 }
 
 /* ---------- spinning ---------- */
+/* the wheel's turn is CSS cubic-bezier(0.13,0.66,0.24,1): for how far round it has got (0..1), when (0..1 of the time) is that? */
+function wheelBezTime(progress){
+  const y = function(u){ const v = 1 - u; return 3 * v * v * u * 0.66 + 3 * v * u * u * 1 + u * u * u; };
+  const x = function(u){ const v = 1 - u; return 3 * v * v * u * 0.13 + 3 * v * u * u * 0.24 + u * u * u; };
+  let lo = 0, hi = 1; for (let i = 0; i < 40; i++){ const mid = (lo + hi) / 2; if (y(mid) < progress) lo = mid; else hi = mid; }
+  return x((lo + hi) / 2);
+}
+/* the times (seconds after the spin starts) at which a slice edge passes the pointer on the way from rot0 to target (degrees) */
+function wheelTickTimes(W, rot0, target){
+  const delta = target - rot0, out = [];
+  if (!(delta > 0)) return out;
+  wheelLayout(W).forEach(function(s){
+    let r = (((-(s.a0 + rot0)) % 360) + 360) % 360; if (r === 0) r = 360;                 /* turns until this edge is under the pointer */
+    for (; r <= delta + 1e-6; r += 360) out.push(WHEEL_SPIN_MS / 1000 * wheelBezTime(Math.min(1, r / delta)));
+  });
+  return out.sort(function(a, b){ return a - b; });
+}
+function wheelTicks(W, rot0, target){
+  const times = wheelTickTimes(W, rot0, target), total = WHEEL_SPIN_MS / 1000;
+  times.forEach(function(t){ try { SFX.tone('triangle', 1700 - 700 * (t / total), 900 - 300 * (t / total), 0.03, 0.06, t); } catch (e) {} });
+  return times.length;
+}
+/* 0 = an ordinary prize, 1 = Red Rampage or the Spotted Paw, 2 = one of them for the first time */
+function wheelJackpotLevel(list){
+  let lv = 0;
+  (list || []).forEach(function(r){ if (r && r.seg && (r.seg.id === 'spottedpaw' || r.seg.id === 'redrampage')) lv = Math.max(lv, r.isNew ? 2 : 1); });
+  return lv;
+}
+function wheelJackpotSound(lv){
+  try {
+    [523, 659, 784, 1047, 1319, 1568].forEach(function(f, i){ SFX.tone('triangle', f, f, 0.3, 0.1, i * 0.07); });
+    SFX.tone('sine', 1568, 2349, 0.9, 0.07, 0.45); SFX.tone('square', 262, 262, 0.5, 0.035, 0);
+    if (lv >= 2){ [1047, 1319, 1568, 2093].forEach(function(f, i){ SFX.tone('sine', f, f * 1.01, 0.5, 0.07, 0.55 + i * 0.09); }); SFX.tone('triangle', 131, 196, 1.1, 0.07, 0.1); }
+  } catch (e) {}
+}
 function wheelSound(r){
   try {
     const k = r.isNew ? 4 : r.crate ? RARITY_ORDER[r.crate.rarity] : wheelView(r.seg).rank >= 7 ? 3 : wheelView(r.seg).rank >= 4 ? 2 : 1;
@@ -209,7 +249,7 @@ function wheelSpinN(n){
   const target = wheelRotation - (wheelRotation % 360) + 5 * 360 + (360 - (s.mid + jitter));
   /* draw the wheel at the angle it is resting at, force that frame onto the screen, and only then give it the angle to turn to with a transition
      (setting both in one go leaves nothing to animate between) */
-  SFX.click(); showShop('wheel');
+  SFX.click(); showShop('wheel'); wheelTicks(W, wheelRotation, target);
   const disc = document.getElementById('wheelDisc');
   if (disc){
     void disc.offsetWidth;
@@ -222,7 +262,11 @@ function wheelSpinN(n){
 spinWheelUI = function(){ wheelSpinN(1); };
 revealWheelResult = function(result){
   wheelSpinning = false; wheelResult = result;
-  if (G.state === 'shop' && shopTab === 'wheel'){ showShop('wheel'); wheelSound(result); }
+  if (G.state === 'shop' && shopTab === 'wheel'){
+    showShop('wheel'); wheelSound(result);
+    const jp = wheelJackpotLevel(wheelPage.batch || [result]); if (jp) wheelJackpotSound(jp);
+    if (Nav.on){ const b = document.getElementById('wheelSpinBtn'); if (b && !b.disabled) b.focus({ preventScroll: true }); }        /* a keyboard or pad player is back on Spin, not nowhere */
+  }
 };
 (function(){
   const h = handleAction;

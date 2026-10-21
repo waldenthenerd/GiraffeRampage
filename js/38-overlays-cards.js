@@ -115,7 +115,7 @@ function rollOffer(){
 /* ========================= 34. OVERLAY SCREENS ========================= */
 let lastOvKey = '';
 function setOverlay(html, clear){
-  const keep = Nav.on ? Nav.sig(document.activeElement) : null;
+  const keep = Nav.on ? Nav.sig(document.activeElement) : null, keepRect = keep && document.activeElement ? document.activeElement.getBoundingClientRect() : null;
   const ovKey = G.state + '|' + (G.subScreen || '') + '|' + (G.venusScreen ? 1 : 0) + (G.marsScreen ? 1 : 0) + (G.labScreen ? 1 : 0) + (clear ? 1 : 0);
   const entering = ovKey !== lastOvKey;
   OV.innerHTML = html;
@@ -123,7 +123,7 @@ function setOverlay(html, clear){
   lastOvKey = ovKey;
   overlayPolish(entering);
   const onTab = OV.querySelector('.tabs .tab.on'); if (onTab && onTab.scrollIntoView){ try { onTab.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) {} }
-  if (keep) Nav.restore(keep);
+  if (keep) Nav.restore(keep, entering ? null : keepRect);                                  /* the same screen drawn again: if that button is gone, the nearest one */
 }
 function hideOverlay(){ lastOvKey = ''; overlayLeave(); }       /* fades out (44b-feedback.js) */
 

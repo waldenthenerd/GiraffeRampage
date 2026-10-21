@@ -127,3 +127,11 @@ OV.addEventListener('mouseover', function(e){
   if (inSide || !trinketPage.hover) return;
   trinketPage.clearT = setTimeout(function(){ trinketPage.clearT = 0; if (trinketPage.hover){ trinketPage.hover = null; trinketSync(); } }, 350);
 });
+/* keyboard and pad focus shows a trinket's panel, like pointing at it */
+OV.addEventListener('focusin', function(e){
+  if (shopTab !== 'gear' || G.state !== 'shop' || !(Nav.on || (e.target.matches && e.target.matches(':focus-visible')))) return;
+  const t = e.target.closest ? e.target.closest('[data-th]') : null, id = t ? t.dataset.th : null;
+  if (trinketPage.clearT){ clearTimeout(trinketPage.clearT); trinketPage.clearT = 0; }
+  if (id){ if (id !== trinketPage.hover){ trinketPage.hover = id; trinketSync(); } return; }
+  if (trinketPage.hover && !(e.target.closest && e.target.closest('#trinketSide'))){ trinketPage.hover = null; trinketSync(); }
+});
