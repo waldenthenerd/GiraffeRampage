@@ -333,14 +333,14 @@ function showMenu(){
         venusButtonHTML() +
         marsButtonHTML() +
         labButtonHTML() +
+        (cityLevel('c_fusion') > 0 ? '<button class="btn ghost" data-a="fusion-menu">Card Fusion Machine<small>' + comboCount() + ' of ' + allComboPairs().length + ' combos unlocked</small></button>' : '') +
+        (typeof townButtonHTML === 'function' ? townButtonHTML() : '') +
         '</div><div class="mside r">' +
         '<button class="btn ghost" data-a="bestiary">Bestiary<small>' + (bestiaryCounts().creatures + bestiaryCounts().cards) + ' of ' + (BESTIARY_TOTAL_CREATURES + CARDS.length) + ' discovered</small></button>' +
         forageButtonHTML() +
         (typeof miniButtonHTML === 'function' ? miniButtonHTML() : '') +
-        (cityLevel('c_fusion') > 0 ? '<button class="btn ghost" data-a="fusion-menu">Card Fusion Machine<small>' + comboCount() + ' of ' + allComboPairs().length + ' combos unlocked</small></button>' : '') +
         galleryButtonHTML() +
         (typeof wardrobeButtonHTML === 'function' ? wardrobeButtonHTML() : '') +
-        (typeof townButtonHTML === 'function' ? townButtonHTML() : '') +
         '<button class="btn ghost" data-a="help">Guide<small>How to play, and how it all works</small></button>' +
         '<button class="btn ghost" data-a="settings">Settings<small>Sound, screen, touch</small></button>' +
         '</div>' +

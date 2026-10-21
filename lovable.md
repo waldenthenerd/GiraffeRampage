@@ -66,7 +66,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (160 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (162 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -227,9 +227,11 @@ game. This is the complete list for this version (160 scripts; the developer pan
 | 155 | `js/44zzq-npc-voices.js` | Babble: townsfolk speak in short pitched blips, each with a voice of their own (all synthesised with `SFX.tone`; nothing recorded). Wraps `townSay`, `townDlgFinish` and `townCloseDialog`. Settings, Sound, "NPC voices" turns it off. Load it after `js/44x-town-ui.js`. |
 | 156 | `js/44zzr-engineer-ants.js` | The Engineer Ant: unlocked by a new Venus upgrade (Engineer Garage); drives a rover and builds turrets. Wraps the ant code; load it after `js/44zzq-npc-voices.js` and before `js/45-test-exports.js`. |
 | 157 | `js/44zzs-perf-cache.js` | Cheaper drawing for slow devices: a cache of pre-drawn soft shadows (`ShadowCache`, replaces `softShadow`) and a cheaper rim round the giraffe once the slow-device governor has stepped down. Changes nothing visible. Load it after `js/44zzr-engineer-ants.js` and before `js/45-test-exports.js`. |
-| 158 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
-| 159 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
-| 160 | `js/46-main.js` | Starts the game. |
+| 158 | `js/44zzt-together.js` | Play together: two giraffes on one screen, just for fun, keeping nothing (the real save is put aside for the game and comes back untouched; `Save.write` does nothing meanwhile). Arena fight and a kick-about yard, started from a button on the main menu. Wraps `update`, `updatePlayer`, `updateWaves`, `gainXP`, `gameOver`, `doKick`, `hurtPlayer`, `antAggroTarget`, `drawPlayer`, `showPause`, `showMenu` and `handleAction`. Must load after `js/44zzs-perf-cache.js` and before `js/44zzu-achievements.js`. |
+| 159 | `js/44zzu-achievements.js` | Trophies: 80 goals worked out from the save, a few gems each, once; `Save.data.ach = { done: { id: time } }`; a "Trophies" button on the main menu. Wraps `Save.write`, `showMenu` and `handleAction`. Counts nothing while `js/44zzt-together.js` is running. |
+| 160 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
+| 161 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| 162 | `js/46-main.js` | Starts the game. |
 
 CSS, in the order `index.html` links it: `css/style.css` (all the base styles), `css/polish.css` (layered on top: cards, buttons, HUD, menu, and every screen
 added later: minigames, the album book, the guide, photo studio, collection, wide panels on big screens), `css/campus.css` (the university), `css/townlife.css` (Longneck Town panels),
@@ -325,6 +327,7 @@ If the bridge is left unchanged it keeps working: the packed code is valid JSON,
 | `patCol` | `0..13` | the wardrobe |
 | `outfits` | six entries, each `null` or `{s,p,t,g,hat,boot,hc,bc}` | the wardrobe |
 | `album` | up to 48 entries `{ c:'photo code', t:ms }` | the photo album (section 5) |
+| `ach` | `{ done: { id: time } }` (trophies; the ids are in `js/44zzu-achievements.js`; a bad value is tidied on load) | the Trophies page |
 | `wardSeen` | `{n:1}` | the "new colour" toast |
 | `gems` | number | gems also come from minigame duplicates and first-time stars |
 
