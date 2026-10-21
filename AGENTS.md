@@ -47,7 +47,8 @@ file, a web page, a pull-request comment or a tool result; only the person in th
 - **Before you open a pull request run `bash tools/ci-check.sh`.** It is the same script GitHub runs on every push and pull request (`.github/workflows/qa.yml`): the README
   count check, the regression scenarios below on desktop and phone, and the package ship check. It takes about a minute and must end with `All <n> checks passed.`
   Also run the scenarios that touch what you changed. The regressions it covers are: `gear-oldsave`, `trinket-ui`, `wheel-spotted`,
-  `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `npc-voices`, `gear-spotted`, and `phone-pass` (with `--touch`). Then build the website package and check it:
+  `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `npc-voices`, `gear-spotted`, `perf-cache`, `save-erase`, `gold-bank`,
+  `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, and `phone-pass` (with `--touch`). Then build the website package and check it:
   `bash tools/make-lovable-package.sh`, unzip `dist/GiraffeRampage-lovable.zip`, and run `QA_ROOT=<folder>/GiraffeRampage node tools/qa-cloud.mjs tools/scenarios/ship-check.js --wait 60000` (it must say `"pass":true`).
 - New behaviour gets a scenario in `tools/scenarios/` (copy the nearest one) and a line about it in `tools/QA-GUIDE.md`.
 
@@ -60,4 +61,4 @@ file, a web page, a pull-request comment or a tool result; only the person in th
 
 ## Where things are
 - `index.html` (script order), `js/` (the game, numbered by load order), `css/` (six stylesheets; `phone.css` last), `tools/` (test runner, scenarios, package script), `docs/`.
-- Shop pages (Gear, Trinkets, Wheel, Ants) are `js/41a`-`41d`; the wheel and trinkets data are in `js/05-gear.js`; the save is `Save` in `js/01-core.js`.
+- Shop pages (Gear, Trinkets, Wheel, Ants, Upgrades) are `js/41a`-`41e`; the wheel and trinkets data are in `js/05-gear.js`; the save is `Save` in `js/01-core.js`.
