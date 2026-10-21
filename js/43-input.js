@@ -338,7 +338,7 @@ function confirmWipe(){
   setOverlay(
     '<div class="panel slab" style="max-width:430px">' +
       '<h2 class="head">Erase all progress</h2>' +
-      '<p class="sub">This clears your gold, every permanent upgrade and your best run. It cannot be undone.</p>' +
+      '<p class="sub">This clears everything: your gold and gems, every upgrade, your gear and trinkets, your ants, the bestiary, your photo album, outfits and accessories, and your Longneck Town progress. Your settings stay. It cannot be undone.</p>' +
       '<div class="row"><button class="btn sm" data-a="wipe-no">Keep my progress</button>' +
       '<button class="btn sm ghost" data-a="wipe-yes">Erase everything</button></div>' +
     '</div>');

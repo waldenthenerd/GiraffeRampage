@@ -529,7 +529,7 @@ function townDrawHud(ctx, D, h){
   Town.ui.btns = []; Town.ui.prompt = null;
   /* the district name and what is found in it */
   const inRoom = !!D.indoor, items = inRoom ? townInItems(D.id).length : townItemsIn(D.id).length, got = inRoom ? townInItems(D.id).filter(function(it){ return townFound(it.id); }).length : townFoundIn(D.id);
-  const narrow = W < 600, bw = (narrow ? 70 : 78) * s * (Input.hasTouch ? 1.25 : 1), bh = 34 * s * (Input.hasTouch ? 1.25 : 1), rowY = narrow ? 10 + 54 * s + 8 : 10;
+  const narrow = W < 600, bw = (narrow ? 70 : 78) * s * (Input.hasTouch ? 1.25 : 1), bh = Math.max(Input.hasTouch ? 38 : 0, 34 * s * (Input.hasTouch ? 1.25 : 1)), rowY = narrow ? 10 + 54 * s + 8 : 10;
   ctx.fillStyle = 'rgba(14,10,8,.5)'; ctx.beginPath(); ctx.roundRect(10, 10, narrow ? W - 20 : Math.min(360 * s, W - 3 * (bw + 6) - 24), 54 * s, 10); ctx.fill();
   miniText(ctx, D.name, 22, 36 * s, 20 * s, '#FFE9A0', 'left');
   miniText(ctx, (items ? 'Found ' + got + ' of ' + items + townLeftText(D) : (D.indoor ? 'Indoors' : 'Outdoors')) + '  ·  ' + (D.cave ? 'underground' : townDark(h) > 0.6 ? 'night' : townDark(h) > 0.1 ? 'dusk' : 'day') + (Town.rainK > 0.4 ? ', rain' : ''), 22, 55 * s, 12.5 * s, '#E8D8B0', 'left', false);

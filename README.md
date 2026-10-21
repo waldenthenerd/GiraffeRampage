@@ -40,12 +40,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 160 | 52,778 | 3.95 MiB (4,142,826 bytes) |
+| JavaScript (`js/`) | 160 | 52,785 | 3.95 MiB (4,144,079 bytes) |
 | Styles (`css/`) | 6 | 1,644 | 151 KiB (154,599 bytes) |
 | Page (`index.html`) | 1 | 208 | 8.9 KiB (9,114 bytes) |
-| **Whole game** | **167** | **54,630** | **4.11 MiB (4,306,539 bytes)** |
+| **Whole game** | **167** | **54,637** | **4.11 MiB (4,307,792 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **54,060 lines, 4.07 MiB (4,262,834 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **54,067 lines, 4.07 MiB (4,264,087 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
 ## How the files fit together
 
@@ -64,7 +64,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 |---|---|---|
 | `js/00-icons.js` | 98 | The icon table (41 outlined icons drawn for this game) and the icon helpers. Runs outside strict mode, as it always did. |
 | `js/00b-icons-custom.js` | 153 | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
-| `js/01-core.js` | 346 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. |
+| `js/01-core.js` | 353 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. |
 | `js/01b-savepack.js` | 127 | Save compression: the save is stored as a JSON string holding `GR2:` + Base64 of an LZW-packed copy of its JSON (about 42 to 58 percent of the size). Old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `stats`). Format in the file header and in `lovable.md`. |
 | `js/02-music.js` | 342 | Procedural background music: themes, the 16-bar sequencer (A, A, B, A), key climb through a chapter, boss second phase, theme fade-in, stingers. |
 | `js/02b-ambience.js` | 130 | Extra sounds (card pick, wave clear, heartbeat, heavy thump), the per-chapter ambient bed that follows the weather, gamepad rumble. |

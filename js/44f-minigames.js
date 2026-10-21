@@ -57,7 +57,7 @@ function accOwned(id){ return !!miniData().own[id]; }
 function accOwnedCount(){ let n = 0; for (let i = 0; i < ACC_ITEMS.length; i++) if (accOwned(ACC_ITEMS[i].id)) n++; return n; }
 function accEquipped(kind){ const id = miniData()[kind === 'boot' ? 'boot' : 'hat']; return id && ACC_BY_ID[id] && ACC_BY_ID[id].kind === kind ? ACC_BY_ID[id] : null; }
 function accWear(kind, id){ const m = miniData(); m[kind === 'boot' ? 'boot' : 'hat'] = id && accOwned(id) ? id : ''; Save.write(); }
-function miniReadyIn(){ return Math.max(0, miniData().last + MINI_COOLDOWN_MS - Date.now()); }
+function miniReadyIn(){ const last = miniData().last, now = Date.now(); return last > now ? 0 : Math.max(0, last + MINI_COOLDOWN_MS - now); }      /* a time in the future counts as over */
 function miniUnlocked(ch){ return !!(MINI[ch] && Save.data && Save.data['chapter' + ch + 'Complete']); }
 
 /* ---- hat and boot art ----
