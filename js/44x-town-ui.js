@@ -234,7 +234,6 @@ function townFinishErrand(id, er){
 function townClosePanel(){
   Town.panel = false; hideOverlay(); Town.hold = false;
 }
-let _tjTab = 'errands';
 
 /* ---- actions from the panels ---- */
 function handleTownAction(a){

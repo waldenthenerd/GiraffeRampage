@@ -40,12 +40,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 160 | 52,361 | 3.92 MiB (4,114,597 bytes) |
+| JavaScript (`js/`) | 160 | 52,360 | 3.92 MiB (4,114,492 bytes) |
 | Styles (`css/`) | 6 | 1,644 | 151 KiB (154,599 bytes) |
 | Page (`index.html`) | 1 | 208 | 8.9 KiB (9,114 bytes) |
-| **Whole game** | **167** | **54,213** | **4.08 MiB (4,278,310 bytes)** |
+| **Whole game** | **167** | **54,212** | **4.08 MiB (4,278,205 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **53,643 lines, 4.04 MiB (4,234,604 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **53,642 lines, 4.04 MiB (4,234,499 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
 ## How the files fit together
 
@@ -168,7 +168,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44u-town-data.js` | 349 | **Longneck Town, data.** The seven districts (`TOWN_DIST`: Harbour, Market Street, Town Square, Willow Park, Rooftops, Launchpad, the Burrows; each has an `open()` test, its buildings `b` with the screen each door opens, scenery `p`, lights `L`, residents and daily dig spots), the 54 things to find (`TOWN_ITEMS`: coins, stars, gems, hats, boots, five coat colours, creature tracks; `h` is how high, over 60 needs the neck), the eleven giraffes (`TOWN_NPCS`: look, habit, favourite gift, best-friend gift, lines), the 31 errands (`TOWN_ERRANDS`, each with a `need` evaluated by `townNeed`), friendship levels and the save shape (`Save.data.town`). Add a place, thing, giraffe or errand by adding a row. |
 | `js/44v-town-art.js` | 523 | **Longneck Town, art.** `townGiraffe` (the side view with a neck that stretches, other giraffes' colours, hats and boots), the sky by hour, three painted layers per district (far, middle, street: `townPaintFar/Mid/Field`), every building kind (`townBuilding`) and prop (`townProp`), things to find (`townItemArt`) and the digging patch. Windows record their boxes so they can glow at night. |
 | `js/44w-town-engine.js` | 613 | **Longneck Town, engine.** `Town` state, `townEnter/Go/Resume/Exit`, `townLeaveFor` (a door opens one of the game's own screens; `showMenu()` is wrapped to come back), input (keys, pad, finger), walking and the neck, pickups and rewards (`townCollect`, `townPay`), the herd's habits, today's dig spots and Dot (seeded by date), the day and night (12 real minutes) and rain, drawing and the HUD. `step`, `render`, `showMenu` and `startRun` are wrapped at the end of the file. `Town.fixHour = n` fixes the time for tests. |
-| `js/44x-town-ui.js` | 279 | **Longneck Town, interface.** The conversation card (`townSay`, `#townDlg`), errands (offer, progress, hand in), friendship (`townAddBond`), gifts, hints, the panels (journal, map and tram, herd hall, notice board, high scores, library, Mission Control) in the game's own overlay, `handleTownAction`, the main-menu button and the Guide page. |
+| `js/44x-town-ui.js` | 278 | **Longneck Town, interface.** The conversation card (`townSay`, `#townDlg`), errands (offer, progress, hand in), friendship (`townAddBond`), gifts, hints, the panels (journal, map and tram, herd hall, notice board, high scores, library, Mission Control) in the game's own overlay, `handleTownAction`, the main-menu button and the Guide page. |
 | `js/44y-town-gear.js` | 191 | Town-only hats and boots (`ACC.townHats`, `ACC.townBoots`): drawn by wrapping the four `drawHat*` and `drawBoot*` functions of 44f, appended to `ACC_ITEMS` and left off the wheel (`miniSlicesFor` skips `.town`). Loads before 44m. `ACC_ITEMS` is at 43 (photo codes number it with 6 bits since format 3, up to 63); every one of the sixteen people gives one different hat, boots or colour as a best friend (`TOWN_GIFT_OF` in 44zb). |
 | `js/44z-town-bread-car.js` | 154 | Bread and the car. Bread: stock, price, `breadEat` (heal 5%, 15 s cooldown), auto-eat (`Settings.autoBread`), key B, the on-screen button. Car: ownership, paint, `townCarSide` (town) and `townCarTop` (under her in Chapter 6), `townCarRunMul` used by `06-player.js`, `townCarToggle` and `townDrawPlayer`. |
 | `js/44zb-town-interiors.js` | 481 | Rooms (`townRoomDef`, `indoor:true`), a room painter and the new kinds of building and scenery (`townBuildingX`, `townPropX`), longer streets and more finds appended to the 44u tables, five more people and eight more errands, new need kinds (`stat`, `car`, `bestiary`). |

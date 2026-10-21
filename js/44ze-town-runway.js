@@ -12,7 +12,7 @@
    THE WORLD. A side-on strip: Longneck Town, then the chapters on the Earth in order: 1 to 7; Chapter 11 once Chapter 10 is finished; Chapter 12
    once 11 is. Each has its own ground and scenery, regions blend into one another with a gateway between, and a fog wall ends what is open.
    Gold rings hang along the way. Nothing about a chapter changes. Esc leaves the flight (back on the runway, no harm done). */
-const PLANE_PRICE = 60000, FLY_GROUND = 540, FLY_H = 700, FLY_REGION_W = 2600, FLY_TOWN_W = 3800, FLY_RUNWAY_LEN = 1400, FLY_ZONE = 320;
+const FLY_GROUND = 540, FLY_H = 700, FLY_TOWN_W = 3800, FLY_RUNWAY_LEN = 1400, FLY_ZONE = 320;
 const FV = { stall: 135, rotate: 165, cruise: 250, max: 335, g: 330 };
 const FLY_BIOME = {
   0: { name: 'Longneck Town', g: '#D6A24E', g2: '#8A5A2A', hill: '#6A4A52', tint: null },

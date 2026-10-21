@@ -9,7 +9,7 @@
    the Car button) gets in and out, and driving is 2.2 times as fast; the neck still stretches out of the open roof. It is left behind at
    the manhole: cars cannot go underground, so the Burrows and every indoor place put it away. In a run it is only in Chapter 6
    (Houston), where it is 45% faster and is drawn under her. Everywhere else it simply is not used. */
-const BREAD_COOLDOWN = 15, BREAD_HEAL = 0.05, BREAD_CAP = 30, BREAD_AUTO_BELOW = 0.75, CAR_PRICE = 24000, TOWN_CAR_MUL = 2.2, CAR_RUN_MUL = 1.45;
+const BREAD_COOLDOWN = 15, BREAD_HEAL = 0.05, BREAD_CAP = 30, BREAD_AUTO_BELOW = 0.75, TOWN_CAR_MUL = 2.2;
 const Bread = { cd: 0 };
 function breadStock(){ return Math.max(0, townData().n.loaves | 0); }
 function breadPrice(){ return Math.max(20, Math.round(townCoin() * 0.35)); }
