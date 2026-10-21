@@ -109,7 +109,7 @@ function gymBuy(i){
   if (!townDoneCh(p.ch)){ SFX.deny(); townToast('The ' + p.name + ' opens after Chapter ' + p.ch + '.', '#FFB89A'); return false; }
   if (cur >= i + 1) return false;
   const cost = gymPrice(i);
-  if ((Save.data.gold | 0) < cost){ SFX.deny(); townToast('Not enough gold for the ' + p.name + '.', '#FFB89A'); return false; }
+  if (goldInt(Save.data.gold) < cost){ SFX.deny(); townToast('Not enough gold for the ' + p.name + '.', '#FFB89A'); return false; }
   Save.data.gold -= cost; const d = gymData(); d.pass = i + 1; d.day = townDayKey(); d.spent = (d.spent | 0) + cost; Save.write(); SFX.buy();
   townToast(p.name + ' bought. It lasts until midnight.', '#BFFF9A'); return true;
 }
@@ -459,7 +459,7 @@ function gymRankBar(){
   return '<div class="gymrank"><div><span>GYM RANK</span><b>' + cur.n + '</b></div><div class="gr-bar"><i style="width:' + Math.round(pct * 100) + '%"></i></div><div class="gr-sub">' + n + ' levels trained' + (nxt ? '  ·  next: <em>' + nxt.n + '</em> at ' + nxt.at + (nxt.acc ? ' (' + ACC_BY_ID[nxt.acc].name + ')' : nxt.swatch ? ' (Gold Medal coat colour)' : '') : '  ·  the top') + '</div></div>';
 }
 function townShowGymDesk(){
-  const gold = Save.data.gold | 0, cur = gymTier();
+  const gold = goldInt(Save.data.gold), cur = gymTier();
   let h = '<div class="tp-title">LONGNECK FITNESS</div><p class="bp">Day passes. Brick’s rule: <b>a pass lasts until midnight</b>, and tomorrow you buy it again. Each pass also covers every zone below it, and you can upgrade for the difference. ' +
     (cur ? 'Today you hold the <b style="color:' + GYM_PASSES[cur - 1].col + '">' + GYM_PASSES[cur - 1].name + '</b>.' : 'You have no pass today.') + '</p>' + gymRankBar() + '<div class="gymcards">';
   GYM_PASSES.forEach(function(p, i){

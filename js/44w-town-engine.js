@@ -99,7 +99,7 @@ function townBurst(x, y, col, n){
 function townPay(r, x, y){
   const d = Save.data, out = [];
   let gold = (r.gold | 0) + (r.coin ? r.coin * townCoin() : 0);
-  if (gold){ d.gold = (d.gold | 0) + gold; out.push(fmt(gold) + ' gold'); }
+  if (gold){ d.gold = goldInt(d.gold) + gold; out.push(fmt(gold) + ' gold'); }
   if (r.gems){ d.gems = (d.gems | 0) + r.gems; out.push(r.gems + ' gems'); }
   if (r.acc && ACC_BY_ID[r.acc]){
     const pz = { item: ACC_BY_ID[r.acc] }; miniAward(pz);
@@ -552,8 +552,8 @@ function townDrawHud(ctx, D, h){
     Town.ui.btns.push({ id: b[0], x: x, y: y, w: bw, h: bh });
   });
   /* what she has */
-  if (narrow) miniText(ctx, fmt(Save.data.gold | 0) + ' gold   ' + fmt(Save.data.gems | 0) + ' gems', W - 22, 36 * s, 13 * s, '#FFE9A0', 'right', false);
-  else miniText(ctx, fmt(Save.data.gold | 0) + ' gold   ' + fmt(Save.data.gems | 0) + ' gems', W - 14, 10 + bh + 20 * s, 13 * s, '#FFE9A0', 'right', false);
+  if (narrow) miniText(ctx, fmt(goldInt(Save.data.gold)) + ' gold   ' + fmt(Save.data.gems | 0) + ' gems', W - 22, 36 * s, 13 * s, '#FFE9A0', 'right', false);
+  else miniText(ctx, fmt(goldInt(Save.data.gold)) + ' gold   ' + fmt(Save.data.gems | 0) + ' gems', W - 14, 10 + bh + 20 * s, 13 * s, '#FFE9A0', 'right', false);
   /* notices */
   for (let i = 0; i < Town.toasts.length; i++){
     const o = Town.toasts[i], a = Math.min(1, (4.2 - o.t) * 1.5, o.t * 5);

@@ -38,7 +38,7 @@ function planeOwned(){ return Object.keys(planeFleet().owned).length > 0; }
 function planeColour(){ const p = planeFleet(), c = (p.cols[p.sel] === undefined ? p.col : p.cols[p.sel]) | 0; return c >= 1 && c <= WARD_MAX && wardUnlocked(c) ? WARD[c].c : '#E8B648'; }
 function planeBuy(id){
   id = id || 'sparrow'; const P = PLANE_BY_ID[id], p = planeFleet(); if (!P || p.owned[id]) return false;
-  if ((Save.data.gold | 0) < P.price){ SFX.deny(); return false; }
+  if (goldInt(Save.data.gold) < P.price){ SFX.deny(); return false; }
   Save.data.gold -= P.price; p.owned[id] = 1; p.own = 1; p.sel = id; Save.write(); SFX.buy(); SFX.level(); return true;
 }
 function planePaint(n){ const p = planeFleet(); if (n === 0 || (n >= 1 && n <= WARD_MAX && wardUnlocked(n))){ p.cols[p.sel] = n; Save.write(); return true; } return false; }
@@ -69,7 +69,7 @@ function flyStatsFor(id){ const P = PLANE_BY_ID[id] || PLANES[0]; return { stall
   };
 })();
 function townShowHangar(){
-  const p = planeFleet(), gold = Save.data.gold | 0, cur = p.sel;
+  const p = planeFleet(), gold = goldInt(Save.data.gold), cur = p.sel;
   let cards = '';
   PLANES.forEach(function(P){
     const own = !!p.owned[P.id], on = own && cur === P.id;
@@ -103,7 +103,7 @@ function townCarMul(){ return carSel().town; }
 function townCarRunMul(){ return townCarRunActive() ? carSel().run : 1; }
 function townCarBuy(id){
   id = id || 'runabout'; const C = CAR_BY_ID[id], c = carFleet(); if (!C || c.owned[id]) return false;
-  if ((Save.data.gold | 0) < C.price){ SFX.deny(); return false; }
+  if (goldInt(Save.data.gold) < C.price){ SFX.deny(); return false; }
   Save.data.gold -= C.price; c.owned[id] = 1; c.own = 1; c.sel = id; Save.write(); SFX.buy(); SFX.level(); return true;
 }
 (function(){
@@ -128,7 +128,7 @@ function townCarBuy(id){
   };
 })();
 function townShowGarage(){
-  const c = carFleet(), gold = Save.data.gold | 0, cur = c.sel;
+  const c = carFleet(), gold = goldInt(Save.data.gold), cur = c.sel;
   let cards = '';
   CARS.forEach(function(C){
     const own = !!c.owned[C.id], on = own && cur === C.id;
@@ -156,7 +156,7 @@ const OVEN_PRICE = [12000, 30000, 70000];
   townShowBakery = function(){
     sb();
     const pnl = document.querySelector('.tp-bakery'); if (!pnl) return;
-    const lv = ovenLevel(), foot = pnl.querySelector('.tp-foot'), gold = Save.data.gold | 0;
+    const lv = ovenLevel(), foot = pnl.querySelector('.tp-foot'), gold = goldInt(Save.data.gold);
     const d = document.createElement('div'); d.className = 'ovenrow';
     d.innerHTML = lv >= 3 ? 'The oven is as big as it gets: <b>' + breadCap() + ' loaves, ' + Math.round(breadHeal() * 100) + '% each</b>.'
       : '<button class="chalk" data-a="town-oven"' + (gold >= OVEN_PRICE[lv] ? '' : ' disabled') + '>Bigger oven<small>' + fmt(OVEN_PRICE[lv]) + ' gold: holds ' + (breadCap() + 10) + ', heals ' + Math.round((breadHeal() + 0.01) * 100) + '%</small></button>' +
@@ -189,13 +189,13 @@ function homeBuy(slot, i){
   const S = HOME_SLOTS[slot], h = homeData(); if (!S || !S.opts[i]) return false;
   const key = slot + ':' + i;
   if (i > 0 && !h.own[key]){
-    const p = S.opts[i][1]; if ((Save.data.gold | 0) < p){ SFX.deny(); return false; }
+    const p = S.opts[i][1]; if (goldInt(Save.data.gold) < p){ SFX.deny(); return false; }
     Save.data.gold -= p; h.own[key] = 1; SFX.buy();
   } else SFX.pick();
   h.set[slot] = i; Save.write(); return true;
 }
 function townShowDecor(slot){
-  const S = HOME_SLOTS[slot], h = homeData(), gold = Save.data.gold | 0, cur = homeSet(slot);
+  const S = HOME_SLOTS[slot], h = homeData(), gold = goldInt(Save.data.gold), cur = homeSet(slot);
   let rows = '';
   S.opts.forEach(function(o, i){
     const own = i === 0 || !!h.own[slot + ':' + i], on = cur === i;
@@ -321,7 +321,7 @@ function townShowFrame(idx){
     if (m){ if (townCarBuy(m[1])) townToast('A new car: ' + CAR_BY_ID[m[1]].name + '.', '#BFFF9A'); townShowGarage(); return true; }
     m = /^town-selcar-(\w+)$/.exec(a); if (m){ const c = carFleet(); if (c.owned[m[1]]){ c.sel = m[1]; Save.write(); SFX.pick(); } townShowGarage(); return true; }
     if (a === 'town-buycar'){ if (townCarBuy('runabout')) townToast('She owns a car. Press C in town to get in.', '#BFFF9A'); townShowGarage(); return true; }
-    if (a === 'town-oven'){ const lv = ovenLevel(), t = townData(); if (lv < 3 && (Save.data.gold | 0) >= OVEN_PRICE[lv]){ Save.data.gold -= OVEN_PRICE[lv]; t.n.oven = lv + 1; Save.write(); SFX.buy(); } else SFX.deny(); townShowBakery(); return true; }
+    if (a === 'town-oven'){ const lv = ovenLevel(), t = townData(); if (lv < 3 && goldInt(Save.data.gold) >= OVEN_PRICE[lv]){ Save.data.gold -= OVEN_PRICE[lv]; t.n.oven = lv + 1; Save.write(); SFX.buy(); } else SFX.deny(); townShowBakery(); return true; }
     m = /^town-dset-(\w+)-(\d+)$/.exec(a);
     if (m){ homeBuy(m[1], +m[2]); townShowDecor(m[1]); TOWN_DIST.in_myhome.sig && (Town.layerKey = ''); return true; }
     m = /^town-fset-(\d)-(\d+)$/.exec(a);

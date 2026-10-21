@@ -332,7 +332,7 @@ function townNeed(er){
     case 'chapter': return { cur: townDoneCh(n.ch) ? 1 : 0, max: 1 };
     case 'talk': { let c = 0; n.ids.forEach(function(id){ if (t.talk[id]) c++; }); return { cur: c, max: n.ids.length }; }
     case 'give': {
-      const need = n.coins ? n.coins * townCoin() : n.n, have = n.cur === 'gold' ? (d.gold | 0) : n.cur === 'gems' ? (d.gems | 0) : (d.grubs | 0);
+      const need = n.coins ? n.coins * townCoin() : n.n, have = n.cur === 'gold' ? goldInt(d.gold) : n.cur === 'gems' ? (d.gems | 0) : (d.grubs | 0);
       return { cur: Math.min(need, have), max: need, give: true, curr: n.cur };
     }
   }

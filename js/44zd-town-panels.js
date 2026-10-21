@@ -174,7 +174,7 @@ function townShowMenu(){
 
 /* ---- the bakery ---- */
 function townShowBakery(){
-  const have = breadStock(), price = breadPrice(), gold = Save.data.gold | 0, room = breadCap() - have;
+  const have = breadStock(), price = breadPrice(), gold = goldInt(Save.data.gold), room = breadCap() - have;
   const buy = function(n){ const cost = n * price, can = gold >= cost && room >= n; return '<button class="chalk" data-a="town-bread-' + n + '"' + (can ? '' : ' disabled') + '>' + n + (n === 1 ? ' loaf' : ' loaves') + '<small>' + fmt(cost) + ' gold</small></button>'; };
   townPanelT('bakery', '<div class="tp-title">CRUMB’S BAKERY</div><canvas id="loafCv" width="150" height="90"></canvas>' +
     '<div class="menuboard"><div class="mb"><span>Fresh loaf</span><b>' + fmt(price) + ' gold</b></div>' +

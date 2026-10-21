@@ -386,7 +386,7 @@ function updateFly(dt){
     const r = Fly.rings[i]; if (r.got) continue;
     if (Math.hypot(Fly.x - r.x, Fly.y - r.y) < 54){
       r.got = true; Fly.got++; const g = Math.max(10, Math.round(townCoin() * 0.25 * FV.rings));
-      Save.data.gold = (Save.data.gold | 0) + g; Fly.earned += g; t.n.rings = (t.n.rings | 0) + 1; SFX.coin(); Fly.pop = { x: r.x, y: r.y, t: 0, txt: '+' + g };
+      Save.data.gold = goldInt(Save.data.gold) + g; Fly.earned += g; t.n.rings = (t.n.rings | 0) + 1; SFX.coin(); Fly.pop = { x: r.x, y: r.y, t: 0, txt: '+' + g };
     }
   }
   if (Fly.pop){ Fly.pop.t += dt; if (Fly.pop.t > 1.2) Fly.pop = null; }

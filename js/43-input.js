@@ -97,14 +97,14 @@ function bindInput(){
   function forageTouch(e){
     const t = e.changedTouches[0], rc = stage.getBoundingClientRect();
     if (t){ Input.sx = t.clientX - rc.left; Input.sy = t.clientY - rc.top; }
-    if ((G.state === 'mini' || G.state === 'town' || G.state === 'fly') && e.type === 'touchstart') Input.mdown = true;     /* the minigames and the town read a held finger as a held button (js/44f-minigames.js, 44w-town-engine.js) */
+    if ((G.state === 'mini' || G.state === 'town' || G.state === 'fly' || G.state === 'sail') && e.type === 'touchstart') Input.mdown = true;     /* the minigames, the town and the sea read a held finger as a held button (js/44f-minigames.js, 44w-town-engine.js, 44zq-sea.js) */
     e.preventDefault();
   }
   stage.addEventListener('touchstart', function(e){
     Input.hasTouch = true;
     SFX.init(); SFX.resume();
     if (G.state === 'cutscene'){ const tc = e.changedTouches && e.changedTouches[0]; if (tc && cutSkipHit(tc.clientX, tc.clientY)) endCutscene(); e.preventDefault(); return; }
-    if (G.state === 'forage' || G.state === 'mini' || G.state === 'town' || G.state === 'fly'){ forageTouch(e); return; }   /* the finger steers the neck; no joystick here */
+    if (G.state === 'forage' || G.state === 'mini' || G.state === 'town' || G.state === 'fly' || G.state === 'sail'){ forageTouch(e); return; }   /* the finger steers the neck; no joystick here */
     if (G.state === 'playing'){ TOUCH.classList.add('on'); PAUSEBTN.classList.add('on'); }
     for (let i = 0; i < e.changedTouches.length; i++){
       const t = e.changedTouches[i];
@@ -114,7 +114,7 @@ function bindInput(){
     e.preventDefault();
   }, { passive: false });
   stage.addEventListener('touchmove', function(e){
-    if (G.state === 'forage' || G.state === 'mini' || G.state === 'town' || G.state === 'fly'){ forageTouch(e); return; }
+    if (G.state === 'forage' || G.state === 'mini' || G.state === 'town' || G.state === 'fly' || G.state === 'sail'){ forageTouch(e); return; }
     for (let i = 0; i < e.changedTouches.length; i++){
       const t = e.changedTouches[i];
       if (t.identifier === joyId) joyMove(t);
@@ -122,7 +122,7 @@ function bindInput(){
     e.preventDefault();
   }, { passive: false });
   function endTouch(e){
-    if ((G.state === 'mini' || G.state === 'town' || G.state === 'fly') && (!e.touches || e.touches.length === 0)) Input.mdown = false;
+    if ((G.state === 'mini' || G.state === 'town' || G.state === 'fly' || G.state === 'sail') && (!e.touches || e.touches.length === 0)) Input.mdown = false;
     for (let i = 0; i < e.changedTouches.length; i++)
       if (e.changedTouches[i].identifier === joyId) joyEnd();
   }

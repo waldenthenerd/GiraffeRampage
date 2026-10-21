@@ -27,7 +27,7 @@ function shipBuyCheck(i){
 function buyShipStage(i){
   i = i | 0; if (shipBuyCheck(i)) return false;
   const c = SHIP_STAGES[i].cost, d = Save.data;
-  d.sulfur = (d.sulfur | 0) - c.s; d.basalt = (d.basalt | 0) - c.b; d.gems = (d.gems | 0) - c.gems; d.gold = (d.gold | 0) - c.gold;
+  d.sulfur = (d.sulfur | 0) - c.s; d.basalt = (d.basalt | 0) - c.b; d.gems = (d.gems | 0) - c.gems; d.gold = goldInt(d.gold) - c.gold;
   d.spaceplane = i + 1; Save.write(); return true;
 }
 function shipCostHTML(i){

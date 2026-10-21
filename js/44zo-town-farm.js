@@ -436,7 +436,7 @@ function farmTakeoff(){
 function farmBuyCorn(n){
   const f = farmData(), room = cornCap() - f.corn, want = Math.min(n, room), cost = cornPrice() * want;
   if (want <= 0){ SFX.deny(); townToast('You are carrying all the corn you can.', '#FFB89A'); return false; }
-  if ((Save.data.gold | 0) < cost){ SFX.deny(); return false; }
+  if (goldInt(Save.data.gold) < cost){ SFX.deny(); return false; }
   Save.data.gold -= cost; f.corn += want; Save.write(); SFX.buy(); return true;
 }
 function farmEggs(){
@@ -447,7 +447,7 @@ function farmEggs(){
   townSay({ name: 'The hen coop', text: 'A dozen warm eggs, and a hen who watches you leave with them.' }, []);
 }
 function townShowCornShop(){
-  const f = farmData(), price = cornPrice(), gold = Save.data.gold | 0, room = cornCap() - f.corn;
+  const f = farmData(), price = cornPrice(), gold = goldInt(Save.data.gold), room = cornCap() - f.corn;
   const btn = function(n){ const cost = price * Math.min(n, room); return '<button class="bpbtn" data-a="town-farm-buycorn-' + n + '"' + (room <= 0 || gold < cost ? ' disabled' : '') + '>Buy ' + n + '<small>' + fmt(price * Math.min(n, Math.max(1, room))) + ' gold</small></button>'; };
   townPanelT('bakery', '<div class="tp-title">HOLLIS’S CORN STAND</div>' +
     '<p class="bp">Sweet yellow corn, picked this morning. Eat one in a run: <b>+15% speed for 60 seconds</b>, and you can eat the next one the moment it wears off.</p>' +

@@ -18,7 +18,7 @@ function breadBuy(n){
   n = Math.min(n, room);
   if (n <= 0){ SFX.deny(); return 0; }
   const cost = n * breadPrice();
-  if ((Save.data.gold | 0) < cost){ SFX.deny(); return 0; }
+  if (goldInt(Save.data.gold) < cost){ SFX.deny(); return 0; }
   Save.data.gold -= cost; t.n.loaves = have + n; t.n.bought = (t.n.bought | 0) + n; Save.write(); SFX.coin();
   return n;
 }

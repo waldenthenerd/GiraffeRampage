@@ -198,6 +198,8 @@ function freshSave(){ return JSON.parse(JSON.stringify(DEFAULT_SAVE)); }
 
 /* a score as a whole number that is never negative: `x | 0` wraps past 2,147,483,647 into a negative one, and scores in the late game go beyond that */
 function scoreInt(v){ v = Math.floor(+v || 0); return v > 0 ? v : 0; }
+/* gold the same way: the town, the sea, the farm and the spaceplane add to and take from it, and `| 0` would turn a bank past 2,147,483,647 negative */
+function goldInt(v){ v = Math.floor(+v || 0); return v > 0 ? v : 0; }
 /* a short message across the top of the screen (a save that could not be read or written); click it to dismiss */
 function gameToast(msg, ms){
   try {

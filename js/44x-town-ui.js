@@ -184,7 +184,7 @@ function townNpcMenu(id, text){
   } });
   const cost = 3 * townCoin(), gifted = t.gift[id] === today;
   if (id === 'dewey') ch.push({ label: 'I\u2019m stuck', fn: function(){ townNpcMenu(id, townHintExact()); } });
-  ch.push({ label: gifted ? 'Gift given today' : 'Give a gift (' + fmt(cost) + ' gold)', disabled: gifted || (Save.data.gold | 0) < cost, fn: function(){ townGiftMenu(id); } });
+  ch.push({ label: gifted ? 'Gift given today' : 'Give a gift (' + fmt(cost) + ' gold)', disabled: gifted || goldInt(Save.data.gold) < cost, fn: function(){ townGiftMenu(id); } });
   ch.push({ label: 'Goodbye', fn: function(){ townCloseDialog(); } });
   townSay({ name: def.name + '  ·  ' + TOWN_BOND_NAMES[townBondLevel(id)], text: text, npc: def }, ch);
 }
@@ -192,7 +192,7 @@ function townGiftMenu(id){
   const def = TOWN_NPCS[id], cost = 3 * townCoin(), ch = [];
   TOWN_GIFTS.forEach(function(g){
     ch.push({ label: g[1], fn: function(){
-      if ((Save.data.gold | 0) < cost){ SFX.deny(); return; }
+      if (goldInt(Save.data.gold) < cost){ SFX.deny(); return; }
       Save.data.gold -= cost; townData().gift[id] = townDayKey();
       const fav = def.fav === g[0], pts = fav ? 6 : 2;
       townAddBond(id, pts); SFX.coin(); townBurst(Town.x + Town.face * 60, TG - 120, '#F29AC0', 12);
@@ -217,7 +217,7 @@ function townErrandProgress(id, er){
 function townFinishErrand(id, er){
   const def = TOWN_NPCS[id], nd = townNeed(er), d = Save.data;
   if (nd.give){
-    if (nd.curr === 'gold') d.gold = Math.max(0, (d.gold | 0) - nd.max);
+    if (nd.curr === 'gold') d.gold = Math.max(0, goldInt(d.gold) - nd.max);
     else if (nd.curr === 'gems') d.gems = Math.max(0, (d.gems | 0) - nd.max);
     else d.grubs = Math.max(0, (d.grubs | 0) - nd.max);
   }

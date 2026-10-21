@@ -228,7 +228,7 @@ function uniPrice(s){
 function uniCanBuy(s){
   const p = uniPrice(s), u = uniData();
   if (s.lamp && u.lamps >= UNI_LAMP_MAX) return false;
-  return p.gems ? (Save.data.gems | 0) >= p.gems : (Save.data.gold | 0) >= p.gold;
+  return p.gems ? (Save.data.gems | 0) >= p.gems : goldInt(Save.data.gold) >= p.gold;
 }
 function uniBuy(id){
   const s = UNI_SHOP_BY_ID[id]; if (!s) return false;
@@ -326,7 +326,7 @@ function uniShowNotebook(fid){
   townPanelT('uni', h, { w: 820 });
 }
 function uniShowCafe(){
-  const gold = Save.data.gold | 0, gems = Save.data.gems | 0, t = townData(), sea = seaData();
+  const gold = goldInt(Save.data.gold), gems = Save.data.gems | 0, t = townData(), sea = seaData();
   let h = '<div class="tp-title">CAMPUS CAFÉ</div><p class="bp">Barista Bean: "What can I get you? Everything costs a little more the more you have today."</p>' + uniEnergyBar() + '<div class="unishop">';
   [['food', 'Food'], ['drink', 'Drinks'], ['supplies', 'Study supplies']].forEach(function(g){
     h += '<h4>' + g[1] + '</h4><div class="uniitems">';
