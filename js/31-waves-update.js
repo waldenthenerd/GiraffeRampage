@@ -280,12 +280,12 @@ function buildWave(w){
 }
 
 function spawnPoint(){
-  const viewR = Math.hypot(G.W / G.zoom, G.H / G.zoom) * 0.5 + 80;
+  const viewR = hyp(G.W / G.zoom, G.H / G.zoom) * 0.5 + 80;
   for (let i = 0; i < 16; i++){
     const a = Math.random() * TAU, d = viewR * rand(1.0, 1.2);
     const x = clamp(P.x + Math.cos(a) * d, 34, ARENA_W - 34);
     const y = clamp(P.y + Math.sin(a) * d, 34, ARENA_H - 34);
-    if (Math.hypot(x - P.x, y - P.y) > viewR * 0.86) return { x: x, y: y };
+    if (hyp(x - P.x, y - P.y) > viewR * 0.86) return { x: x, y: y };
   }
   const a = Math.random() * TAU;
   return { x: clamp(P.x + Math.cos(a) * 520, 34, ARENA_W - 34), y: clamp(P.y + Math.sin(a) * 520, 34, ARENA_H - 34) };
@@ -418,7 +418,7 @@ function updateProjectiles(dt){
         const want = Math.atan2(t.y - p.y, t.x - p.x);
         const cur = Math.atan2(p.vy, p.vx);
         const na = cur + clamp(angDiff(want, cur), -p.homing * dt, p.homing * dt);
-        const sp = Math.hypot(p.vx, p.vy);
+        const sp = hyp(p.vx, p.vy);
         p.vx = Math.cos(na) * sp; p.vy = Math.sin(na) * sp;
       }
     }
@@ -447,7 +447,7 @@ function updateProjectiles(dt){
     if (gone){
       if (p.explode){                                                                   /* explosive acid: it bursts, hurting everything near where it landed */
         const near = enemiesNear(p.x, p.y, p.explode.r + 40, []);
-        for (let k = 0; k < near.length; k++){ const q = near[k]; if (q.dead || Math.hypot(q.x - p.x, q.y - p.y) > p.explode.r + q.r) continue; dmgSrc = p.src || 'other'; damageEnemy(q, p.explode.dmg, { kb: 140, kbAngle: Math.atan2(q.y - p.y, q.x - p.x), color: p.color, noCrit: true, quiet: true }); }
+        for (let k = 0; k < near.length; k++){ const q = near[k]; if (q.dead || hyp(q.x - p.x, q.y - p.y) > p.explode.r + q.r) continue; dmgSrc = p.src || 'other'; damageEnemy(q, p.explode.dmg, { kb: 140, kbAngle: Math.atan2(q.y - p.y, q.x - p.x), color: p.color, noCrit: true, quiet: true }); }
         addShock(p.x, p.y, p.explode.r, 0.26, 0, p.color, { width: 8, kb: 0, filled: true });
         burstParticles(p.x, p.y, 14, p.color, 230, 5, { glow: true }); sfx('boom', 0.07);
       }
@@ -463,7 +463,7 @@ function updateProjectiles(dt){
   for (let i = es.length - 1; i >= 0; i--){
     const p = es[i];
     p.life -= dt; p.rot += dt * 9;
-    if (p.home){ const sp = Math.hypot(p.vx, p.vy), cur = Math.atan2(p.vy, p.vx), na = cur + clamp(angDiff(Math.atan2(P.y - p.y, P.x - p.x), cur), -p.home * dt, p.home * dt); p.vx = Math.cos(na) * sp; p.vy = Math.sin(na) * sp; }
+    if (p.home){ const sp = hyp(p.vx, p.vy), cur = Math.atan2(p.vy, p.vx), na = cur + clamp(angDiff(Math.atan2(P.y - p.y, P.x - p.x), cur), -p.home * dt, p.home * dt); p.vx = Math.cos(na) * sp; p.vy = Math.sin(na) * sp; }
     p.x += p.vx * dt; p.y += p.vy * dt;
     if (G.buildings && G.buildings.length && buildingAt(p.x, p.y)){ es.splice(i, 1); continue; }   /* buildings give cover */
     if (G.allies && G.allies.length && marsShotHitsAlly(p)){ es.splice(i, 1); continue; }
@@ -510,7 +510,7 @@ function updateShocks(dt){
     for (let k = 0; k < near.length; k++){
       const e = near[k];
       if (e.dead || s.hit.has(e)) continue;
-      const d = Math.hypot(e.x - s.x, e.y - s.y);
+      const d = hyp(e.x - s.x, e.y - s.y);
       const ok = s.filled ? (d < s.r + e.r) : (d > s.r - s.width - e.r && d < s.r + s.width + e.r);
       if (!ok) continue;
       s.hit.add(e);
@@ -522,7 +522,7 @@ function updateShocks(dt){
         const b = G.buildings[k];
         if (b.collapsed || s.hitB.has(b)) continue;
         const nx = clamp(s.x, b.x, b.x + b.w), ny = clamp(s.y, b.y, b.y + b.h);
-        if (Math.hypot(s.x - nx, s.y - ny) < s.r){ s.hitB.add(b); damageBuilding(b, s.dmg, 'shock'); }
+        if (hyp(s.x - nx, s.y - ny) < s.r){ s.hitB.add(b); damageBuilding(b, s.dmg, 'shock'); }
       }
     }
     if (s.life <= 0) ss.splice(i, 1);
@@ -539,7 +539,7 @@ function updatePickups(dt){
     p.life -= dt; p.bob += dt * 4;
     if (mag) p.life = Math.max(p.life, 2);                 /* and nothing expires on its way */
     const dx = P.x - p.x, dy = P.y - p.y;
-    const d = Math.hypot(dx, dy) || 1;
+    const d = hyp(dx, dy) || 1;
     if (d < radius){
       p.pulled = true;
       const pull = mag ? 1100 : 240 + (radius - d) * 6;

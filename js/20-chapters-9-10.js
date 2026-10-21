@@ -56,7 +56,7 @@ function updateVenusBase(dt){
   G.inBase = false;
   if (G.biome !== 'venus' || G.state !== 'playing' || G.attract || P.dead) return;
   const z = venusBaseZone();
-  if (Math.hypot(P.x - z.x, P.y - z.y) < z.r){
+  if (hyp(P.x - z.x, P.y - z.y) < z.r){
     G.inBase = true;
     if (P.hp < P.maxHp){
       P.hp = Math.min(P.maxHp, P.hp + VENUS_BASE_HEAL * dt);
@@ -114,7 +114,7 @@ function firePulse(radius, color){
   sfx('zap', 0.08);
 }
 function deflectProjectile(p, ox, oy){
-  const a = Math.atan2(p.y - oy, p.x - ox), sp = Math.max(Math.hypot(p.vx, p.vy), 260) * 1.1;
+  const a = Math.atan2(p.y - oy, p.x - ox), sp = Math.max(hyp(p.vx, p.vy), 260) * 1.1;
   p.vx = Math.cos(a) * sp; p.vy = Math.sin(a) * sp;
   p.home = 0; p.deflected = true; p.life = Math.min(p.life, 1.4);
   burstParticles(p.x, p.y, 4, '#BFF4FF', 120, 2.6, { glow: true });
@@ -124,7 +124,7 @@ function updatePulses(dt){
   for (let i = ps.length - 1; i >= 0; i--){
     const q = ps[i];
     q.t += dt; q.x = P.x; q.y = P.y; q.r = q.max * Math.min(1, q.t / q.dur);       /* the ring stays centred on her as it grows */
-    for (let k = 0; k < G.eproj.length; k++){ const p = G.eproj[k]; if (!p.deflected && Math.hypot(p.x - q.x, p.y - q.y) < q.r) deflectProjectile(p, q.x, q.y); }
+    for (let k = 0; k < G.eproj.length; k++){ const p = G.eproj[k]; if (!p.deflected && hyp(p.x - q.x, p.y - q.y) < q.r) deflectProjectile(p, q.x, q.y); }
     if (q.t >= q.dur) ps.splice(i, 1);
   }
 }

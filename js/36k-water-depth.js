@@ -100,7 +100,7 @@ function waterUpdate(dt){
   if (_wakeAcc < 0.14) return;
   _wakeAcc = 0;
   const wake = function(x, y, r){ addParticle(x, y, 0, 0, r, 0.8, 'rgba(235,248,255,0.8)', { shape: 'wake', drag: 0, shrink: false, spin: 0 }); };
-  if (!P.dead && inside(P.x, P.y, -4) && Math.hypot(P.vx, P.vy) > 24) wake(P.x, P.y + 14, 12);
+  if (!P.dead && inside(P.x, P.y, -4) && hyp(P.vx, P.vy) > 24) wake(P.x, P.y + 14, 12);
   const near = enemiesNear(w.x, w.y, rx + 30, _wakeQ);
   let n = 0;
   for (let i = 0; i < near.length && n < 4; i++){

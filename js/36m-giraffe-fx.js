@@ -16,7 +16,7 @@ const STEP_DUST = {
 
 function giraffeFxUpdate(dt){
   if (fxLevelNow() <= 0){ GF.sq = 0; GF.breath = 0; GF.sway = 0; GF.reach = 0; GF.blink = 0; GF.ear = 0; GF.pulse = 0; GF.trail.length = 0; return; }
-  const sp = Math.hypot(P.vx, P.vy), mv = clamp(sp / 150, 0, 1), t = G.time;
+  const sp = hyp(P.vx, P.vy), mv = clamp(sp / 150, 0, 1), t = G.time;
   /* blinking and the odd ear flick */
   GF.nextBlink -= dt; if (GF.nextBlink <= 0){ GF.blink = 0.12; GF.nextBlink = rand(2.2, 5.5); }
   if (GF.blink > 0) GF.blink -= dt;

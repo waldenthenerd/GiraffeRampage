@@ -482,6 +482,15 @@ function buildOceanBubbles(){
     G.oceanBubbles.push({ x: rand(0, 1600), y: rand(0, 900), r: rand(1.2, 3.4), spd: rand(24, 60), par: rand(0.05, 0.2), ph: Math.random() * TAU });
 }
 
+/* The part of the world the camera can see, plus a margin for shake and for things drawn bigger than their position (set by render() in 37-frame-transitions.js).
+   The draw loops below skip what is outside it: a particle, number or pickup that is off the screen costs a canvas call for nothing. */
+const VIEW = { x0: 0, x1: 0, y0: 0, y1: 0 };
+function viewBounds(m){
+  const hw = G.W / G.zoom / 2 + m, hh = G.H / G.zoom / 2 + m;
+  VIEW.x0 = G.camX - hw; VIEW.x1 = G.camX + hw; VIEW.y0 = G.camY - hh; VIEW.y1 = G.camY + hh;
+  return VIEW;
+}
+
 function drawZones(ctx){
   const zs = G.zones;
   for (let i = 0; i < zs.length; i++){
@@ -509,9 +518,10 @@ function drawShocks(ctx){
 }
 
 function drawPickups(ctx){
-  const ps = G.pickups;
+  const ps = G.pickups, v = viewBounds(60);
   for (let i = 0; i < ps.length; i++){
     const p = ps[i];
+    if (p.x < v.x0 || p.x > v.x1 || p.y < v.y0 || p.y > v.y1) continue;
     const bob = Math.sin(p.bob) * 3;
     const fade = p.life < 3 ? (Math.sin(p.life * 14) > 0 ? 1 : 0.3) : 1;
     ctx.globalAlpha = fade;
@@ -560,9 +570,10 @@ function drawPickups(ctx){
 }
 
 function drawProjectiles(ctx){
-  const ps = G.projectiles;
+  const ps = G.projectiles, v = viewBounds(80);
   for (let i = 0; i < ps.length; i++){
     const p = ps[i];
+    if (p.x < v.x0 || p.x > v.x1 || p.y < v.y0 || p.y > v.y1) continue;
     softBlob(ctx, p.x, p.y, p.r * 2.1, p.color, 0.22);
     if (fxLevelNow() > 0){                                           /* a fading streak behind the shot */
       ctx.strokeStyle = p.color; ctx.lineWidth = Math.max(1.5, p.r * 0.9); ctx.lineCap = 'round'; ctx.globalAlpha = 0.28;
@@ -600,8 +611,9 @@ function drawProjectiles(ctx){
   const es = G.eproj;
   for (let i = 0; i < es.length; i++){
     const p = es[i];
+    if (p.x < v.x0 || p.x > v.x1 || p.y < v.y0 || p.y > v.y1) continue;
     if (p.tracer){                                           /* a streak, like a rifle round */
-      const sp = Math.hypot(p.vx, p.vy) || 1, tl = 0.045;
+      const sp = hyp(p.vx, p.vy) || 1, tl = 0.045;
       ctx.strokeStyle = p.color; ctx.lineWidth = p.r * 0.9; ctx.lineCap = 'round'; ctx.globalAlpha = 0.9;
       ctx.beginPath(); ctx.moveTo(p.x - p.vx * tl, p.y - p.vy * tl); ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.lineCap = 'butt';
       ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = p.r * 0.35; ctx.beginPath(); ctx.moveTo(p.x - p.vx * tl * 0.5, p.y - p.vy * tl * 0.5); ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.globalAlpha = 1;
@@ -671,9 +683,10 @@ function drawSwipes(ctx){
 }
 
 function drawParticles(ctx){
-  const ps = G.particles;
+  const ps = G.particles, v = viewBounds(70);
   for (let i = 0; i < ps.length; i++){
     const p = ps[i];
+    if (p.x < v.x0 || p.x > v.x1 || p.y < v.y0 || p.y > v.y1) continue;
     const a = clamp(p.life / p.max, 0, 1);
     const r = p.shrink ? p.r * (0.35 + a * 0.65) : p.r;
     ctx.globalAlpha = p.glow ? a : a * 0.9;
@@ -689,7 +702,7 @@ function drawParticles(ctx){
       ctx.strokeStyle = p.color; ctx.lineWidth = Math.max(1.2, r * 0.4);
       ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, TAU); ctx.stroke();
     } else if (p.shape === 'streak'){                         /* a spark: a short bright line along its motion, glowing */
-      const sp = Math.hypot(p.vx, p.vy) || 1, L = Math.min(26, 3 + sp * 0.045) * (0.4 + a * 0.6);
+      const sp = hyp(p.vx, p.vy) || 1, L = Math.min(26, 3 + sp * 0.045) * (0.4 + a * 0.6);
       ctx.strokeStyle = p.color; ctx.lineWidth = Math.max(1, r * 0.55); ctx.lineCap = 'round';
       ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx / sp * L, p.y - p.vy / sp * L); ctx.stroke();
       ctx.lineCap = 'butt';
@@ -713,11 +726,12 @@ function drawParticles(ctx){
 }
 
 function drawTexts(ctx){
-  const ts = G.texts;
+  const ts = G.texts, v = viewBounds(100);
   ctx.textAlign = 'center';
   let lastFont = '';                                       /* setting a font is the slow part: only when it changes */
   for (let i = 0; i < ts.length; i++){
     const t = ts[i];
+    if (t.x < v.x0 || t.x > v.x1 || t.y < v.y0 || t.y > v.y1) continue;
     const a = clamp(t.life / t.max, 0, 1);
     const pop = 1 + (1 - t.pop) * (t.crit ? 0.9 : 0.5);
     ctx.globalAlpha = a;

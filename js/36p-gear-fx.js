@@ -22,7 +22,7 @@ function gfxInWater(){ return G.biome === 'ocean' || !!(window.groundStateNow &&
 function gfxHit(e, dmg){                                                                    /* damage from gear: no crits, no text, counted as 'gear' in the run report */
   const keep = dmgSrc; dmgSrc = 'gear'; try { damageEnemy(e, dmg, { noCrit: true, silent: true, kb: 0, sx: P.x, sy: P.y }); } finally { dmgSrc = keep; }
 }
-function gfxWithin(r){ const out = []; for (let i = 0; i < G.enemies.length; i++){ const e = G.enemies[i]; if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) <= r + e.r) out.push(e); } return out; }
+function gfxWithin(r){ const out = []; for (let i = 0; i < G.enemies.length; i++){ const e = G.enemies[i]; if (!e.dead && hyp(e.x - P.x, e.y - P.y) <= r + e.r) out.push(e); } return out; }
 function gfxReset(){
   GearFx.trail.length = 0; GearFx.wake.length = 0; GearFx.pending.length = 0; GearFx.dustT = GearFx.wakeT = GearFx.dustHitT = GearFx.wakeHitT = 0; GearFx.kicks = 0; GearFx.dawnT = 12; GearFx.spireKicks = 0;
   GearFx.ward.ready = true; GearFx.ward.cd = 0; GearFx.still = 0;
@@ -39,7 +39,7 @@ const GEAR_FX = {
   'stoneplate:cape': { name: 'Dust cloak', desc: 'Moving leaves a dust trail; enemies crossing it are slowed 15% for 1s.',
     onTick(sc, dt){
       GearFx.dustT -= dt;
-      if (Math.hypot(P.vx, P.vy) > 40 && GearFx.dustT <= 0){
+      if (hyp(P.vx, P.vy) > 40 && GearFx.dustT <= 0){
         GearFx.dustT = 0.12; GearFx.trail.push({ x: P.x - P.vx * 0.04, y: P.y + 10, t: 2.2 }); if (GearFx.trail.length > 22) GearFx.trail.shift();
         if (gfxParticles()) addParticle(P.x, P.y + 10, rand(-8, 8), rand(-8, 8), rand(5, 8), 1.6, 'rgba(190,170,130,.4)', { shape: 'puff', drag: 1.5, shrink: false });
       }
@@ -47,7 +47,7 @@ const GEAR_FX = {
       if (GearFx.dustHitT <= 0 && GearFx.trail.length){
         GearFx.dustHitT = 0.1;
         for (let i = 0; i < G.enemies.length; i++){ const e = G.enemies[i]; if (e.dead) continue;
-          for (let j = 0; j < GearFx.trail.length; j++){ const t = GearFx.trail[j]; if (Math.hypot(e.x - t.x, e.y - t.y) < 22 + e.r * 0.5){ e.slowT = Math.max(e.slowT || 0, 1 * sc); e.slowMul = Math.min(e.slowMul === undefined ? 1 : e.slowMul, 1 - 0.15 * sc); break; } } }
+          for (let j = 0; j < GearFx.trail.length; j++){ const t = GearFx.trail[j]; if (hyp(e.x - t.x, e.y - t.y) < 22 + e.r * 0.5){ e.slowT = Math.max(e.slowT || 0, 1 * sc); e.slowMul = Math.min(e.slowMul === undefined ? 1 : e.slowMul, 1 - 0.15 * sc); break; } } }
       }
     } },
   'frostbite:weapon': { name: 'Cold snap', desc: 'The headbutt frosts a ring of 90: enemies in it are slowed 30% for 1.5s.',
@@ -63,7 +63,7 @@ const GEAR_FX = {
   'aurora:cape': { name: 'Aurora drift', desc: 'Standing still for 2s gives +10% XP for 6s.',
     onTick(sc, dt){
       if (GearFx.auroraT > 0){ GearFx.auroraT -= dt; if (GearFx.auroraT <= 0){ GearFx.auroraT = 0; recalcStats(); } }
-      if (Math.hypot(P.vx, P.vy) < 12) GearFx.still += dt; else GearFx.still = 0;
+      if (hyp(P.vx, P.vy) < 12) GearFx.still += dt; else GearFx.still = 0;
       if (GearFx.still >= 2 && GearFx.auroraT <= 0){ GearFx.auroraT = 6; GearFx.still = 0; recalcStats(); if (gfxParticles()) burstParticles(P.x, P.y - 10, 8, '#8FFFD1', 80, 3, { glow: true }); }
     } },
   'starborn:weapon': { name: 'Star crack', desc: "Every 5th headbutt sends out a star shockwave (radius 140, 60% of the kick's damage).",
@@ -76,13 +76,13 @@ const GEAR_FX = {
   'riptide:armor': { name: 'Undertow', desc: 'A hit taken in water pulls enemies within 160 toward her by 40.',
     onHurt(sc){
       if (!gfxInWater()) return;
-      gfxWithin(160).forEach(function(e){ const d = Math.hypot(e.x - P.x, e.y - P.y), a = Math.atan2(P.y - e.y, P.x - e.x), m = Math.min(40 * sc, Math.max(0, d - e.r - P.r)); e.x += Math.cos(a) * m; e.y += Math.sin(a) * m; });
+      gfxWithin(160).forEach(function(e){ const d = hyp(e.x - P.x, e.y - P.y), a = Math.atan2(P.y - e.y, P.x - e.x), m = Math.min(40 * sc, Math.max(0, d - e.r - P.r)); e.x += Math.cos(a) * m; e.y += Math.sin(a) * m; });
       if (gfxParticles()) addParticle(P.x, P.y, 0, 0, 30, 0.5, 'rgba(120,200,235,.7)', { shape: 'wake', drag: 0, shrink: false });
     } },
   'leviathan:cape': { name: 'Tidal wake', desc: 'A wake of drops trails her; enemies in it take 4 damage a second.',
     onTick(sc, dt){
       GearFx.wakeT -= dt;
-      if (GearFx.wakeT <= 0 && Math.hypot(P.vx, P.vy) > 40){
+      if (GearFx.wakeT <= 0 && hyp(P.vx, P.vy) > 40){
         GearFx.wakeT = 0.1; GearFx.wake.push({ x: P.x, y: P.y + 6, t: 1.4 }); if (GearFx.wake.length > 16) GearFx.wake.shift();
         if (gfxParticles()) addParticle(P.x + rand(-6, 6), P.y + 8 + rand(-4, 4), rand(-12, 12), rand(-12, 12), rand(3.5, 5.5), 1.4, 'rgba(170,235,255,.85)', { drag: 1.2, shrink: true, glow: true });
       }
@@ -90,7 +90,7 @@ const GEAR_FX = {
       if (GearFx.wakeHitT <= 0 && GearFx.wake.length){
         GearFx.wakeHitT = 0.25;
         for (let i = 0; i < G.enemies.length; i++){ const e = G.enemies[i]; if (e.dead) continue;
-          for (let j = 0; j < GearFx.wake.length; j++){ const t = GearFx.wake[j]; if (Math.hypot(e.x - t.x, e.y - t.y) < 20 + e.r * 0.5){ gfxHit(e, 1 * sc); break; } } }
+          for (let j = 0; j < GearFx.wake.length; j++){ const t = GearFx.wake[j]; if (hyp(e.x - t.x, e.y - t.y) < 20 + e.r * 0.5){ gfxHit(e, 1 * sc); break; } } }
       }
     } },
   'worldspire:cape': { name: 'Dawnlight', desc: 'Every 12s a ring of light heals 6% of her max health.',

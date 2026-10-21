@@ -120,7 +120,7 @@ const GLIM_TWIST = {
   },
   wildfire(e, dt){                                                                   /* it sets the grass alight behind it */
     e.twT = (e.twT || 0) - dt;
-    if (e.twT <= 0 && Math.hypot(e.vx || 0, e.vy || 0) > 20){ e.twT = 0.45; hostileZone(e.x, e.y, 34, 3.5, e.dmg * 0.2, '#FF8A3A'); }
+    if (e.twT <= 0 && hyp(e.vx || 0, e.vy || 0) > 20){ e.twT = 0.45; hostileZone(e.x, e.y, 34, 3.5, e.dmg * 0.2, '#FF8A3A'); }
     return null;
   }
 };
@@ -298,7 +298,7 @@ for (let i = 0; i < 270; i++) A51_PATCHES.push({ x: csR(i + 9000) * ARENA_W, y: 
 for (let i = 0; i < 160; i++){
   const x = 80 + csR(i + 9400) * (ARENA_W - 160), y = 80 + csR(i + 9450) * (ARENA_H - 160);
   if (y > A51_RUNWAY.y - 40 && y < A51_RUNWAY.y + A51_RUNWAY.h + 40) continue;
-  let bad = Math.hypot(x - A51_HATCH.x, y - A51_HATCH.y) < A51_HATCH.r + 70;
+  let bad = hyp(x - A51_HATCH.x, y - A51_HATCH.y) < A51_HATCH.r + 70;
   for (let k = 0; k < A51_HANGARS.length; k++){ const h = A51_HANGARS[k]; if (x > h.x - h.w / 2 - 40 && x < h.x + h.w / 2 + 40 && y > h.y - h.h / 2 - 40 && y < h.y + h.h / 2 + 40) bad = true; }
   if (!bad) A51_PROPS.push({ x: x, y: y, k: Math.floor(csR(i + 9500) * 4), a: (csR(i + 9550) - 0.5) * 0.7 });
 }
@@ -599,7 +599,7 @@ function marsAllyHit(a, tgt, frac, extra){
 }
 function marsAllyBlast(a, r, frac){
   const near = enemiesNear(a.x, a.y, r + 40, []);
-  for (let i = 0; i < near.length; i++){ const q = near[i]; if (q.dead || q.untarg || Math.hypot(q.x - a.x, q.y - a.y) > r + q.r) continue; marsAllyHit(a, q, frac, { kb: 160 }); }
+  for (let i = 0; i < near.length; i++){ const q = near[i]; if (q.dead || q.untarg || hyp(q.x - a.x, q.y - a.y) > r + q.r) continue; marsAllyHit(a, q, frac, { kb: 160 }); }
   burstParticles(a.x, a.y, 14, a.def.color, 260, 5, { glow: true }); addShake(4); sfx('boom', 0.08);
 }
 function updateAllies(dt){
@@ -613,14 +613,14 @@ function updateAllies(dt){
     const touching = enemiesNear(a.x, a.y, 80 + a.r, []);
     for (let j = 0; j < touching.length && a.hurt <= 0; j++){
       const e = touching[j];
-      if (e.dead || e.untarg || Math.hypot(e.x - a.x, e.y - a.y) >= e.r + a.r) continue;
+      if (e.dead || e.untarg || hyp(e.x - a.x, e.y - a.y) >= e.r + a.r) continue;
       if (a.squad){ a.hp -= e.dmg * 0.6; a.hurt = 0.4; a.flash = 0.1; }                       /* a squad alien takes the real damage: nothing reduces it */
       else if (e.def.marine){ a.hp -= 0.12; a.hurt = 0.4; a.flash = 0.1; }
     }
     let tgt = nearestEnemy(a.x, a.y, 1500); if (tgt && (tgt.untarg || tgt.dead)) tgt = null;
     let mx = 0, my = 0, spdMul = 1;
     if (tgt){
-      const dx = tgt.x - a.x, dy = tgt.y - a.y, d = Math.hypot(dx, dy) || 1, ux = dx / d, uy = dy / d, reach = tgt.r + a.r + 6;
+      const dx = tgt.x - a.x, dy = tgt.y - a.y, d = hyp(dx, dy) || 1, ux = dx / d, uy = dy / d, reach = tgt.r + a.r + 6;
       a.ang = Math.atan2(uy, ux);
       const frac = (ALLY_DMG[a.type] || 0.12) * (a.squad ? 0.75 : 1);
       if (a.role === 'slam'){
@@ -641,17 +641,19 @@ function updateAllies(dt){
         else if (a.atk <= 0){ a.atk = 0.6; marsAllyHit(a, tgt, frac); sfx('hit', 0.05); }
       }
     } else {                                                           /* nothing to fight: stay near the giraffe */
-      const dx = P.x - a.x, dy = P.y - a.y, d = Math.hypot(dx, dy) || 1;
+      const dx = P.x - a.x, dy = P.y - a.y, d = hyp(dx, dy) || 1;
       if (d > 150){ mx = dx / d; my = dy / d; spdMul = 0.7; a.ang = Math.atan2(my, mx); }
     }
-    const m = Math.hypot(mx, my);
+    const m = hyp(mx, my);
     if (m > 0){ a.x = clamp(a.x + mx / m * a.spd * spdMul * dt, 20, ARENA_W - 20); a.y = clamp(a.y + my / m * a.spd * spdMul * dt, 20, ARENA_H - 20); }
   }
 }
 function drawAllies(ctx){
   const al = G.allies;
   if (!al) return;
+  const v = viewBounds(80);
   for (let i = 0; i < al.length; i++){
+    if (al[i].x < v.x0 || al[i].x > v.x1 || al[i].y < v.y0 || al[i].y > v.y1) continue;
     const a = al[i], col = a.squad ? '#FFD27A' : '#7FFFD4', f = clamp(a.hp / a.maxHp, 0, 1), bw = a.squad ? 34 : 20;
     try { drawEnemy(ctx, a); } catch (err) {}
     ringPath(ctx, a.x, a.y, a.r + 6, a.squad ? 3 : 2, col, 0.55 + 0.2 * Math.sin(G.time * 5 + i));
@@ -664,12 +666,12 @@ function marsClearAllies(){
 }
 function marsShotHitsAlly(p){
   const al = G.allies;
-  for (let i = 0; i < al.length; i++){ const a = al[i]; if (a.dead) continue; if (Math.hypot(a.x - p.x, a.y - p.y) < a.r + p.r){ a.hp -= a.squad ? p.dmg : 0.1; a.flash = 0.1; burstParticles(p.x, p.y, 4, p.color, 140, 3); return true; } }
+  for (let i = 0; i < al.length; i++){ const a = al[i]; if (a.dead) continue; if (hyp(a.x - p.x, a.y - p.y) < a.r + p.r){ a.hp -= a.squad ? p.dmg : 0.1; a.flash = 0.1; burstParticles(p.x, p.y, 4, p.color, 140, 3); return true; } }
   return false;
 }
 function marsBlastAllies(x, y, r, dmg){
   const al = G.allies;
-  for (let i = 0; i < al.length; i++){ const a = al[i]; if (Math.hypot(a.x - x, a.y - y) < r + a.r){ a.hp -= a.squad ? (dmg || 0) * 0.6 : 0.2; a.flash = 0.12; } }
+  for (let i = 0; i < al.length; i++){ const a = al[i]; if (hyp(a.x - x, a.y - y) < r + a.r){ a.hp -= a.squad ? (dmg || 0) * 0.6 : 0.2; a.flash = 0.12; } }
 }
 function marsRestoreHUD(){ HUD.classList.add('on'); if (Input.hasTouch){ TOUCH.classList.add('on'); PAUSEBTN.classList.add('on'); } }
 
@@ -736,13 +738,13 @@ function marsIronGlyph(ctx, x, y, s){
 }
 function updateMarsCollector(dt){
   if (G.state !== 'playing' || G.attract || G.chapter !== 13 || !marsHas('collector')) return;
-  G.marsWalk = (G.marsWalk || 0) + Math.hypot(P.vx || 0, P.vy || 0) * dt;
+  G.marsWalk = (G.marsWalk || 0) + hyp(P.vx || 0, P.vy || 0) * dt;
   const step = marsHas('collector2') ? 170 : 300;
   while (G.marsWalk >= step){ G.marsWalk -= step; G.runArgon = (G.runArgon | 0) + 1; addText(P.x, P.y - 46, '+1 argon', '#C8A0FF', 13, false); }
 }
 function drawMarsCollector(ctx){
   if (!marsHas('collector') || G.attract || !((G.state === 'playing' && G.chapter === 13) || G.state === 'mscout')) return;
-  const moving = Math.hypot(P.vx || 0, P.vy || 0) > 20, t = G.time;
+  const moving = hyp(P.vx || 0, P.vy || 0) > 20, t = G.time;
   ctx.save(); ctx.translate(P.x, P.y); ctx.rotate(P.face || 0);
   ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.fillRect(-14, -8, 24, 18);
   ctx.fillStyle = '#C8CCD6'; ctx.fillRect(-15, -9, 22, 16); ctx.strokeStyle = '#5A606C'; ctx.lineWidth = 1.4; ctx.strokeRect(-15, -9, 22, 16);

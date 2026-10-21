@@ -58,7 +58,7 @@ function colRGB(s){
 /* a soft round light, white-hot in the middle, cached per (quantised) colour */
 const _lightSprites = {};
 function lightSprite(rgb){
-  const r = rgb[0] >> 4 << 4, g = rgb[1] >> 4 << 4, b = rgb[2] >> 4 << 4, k = r + ',' + g + ',' + b;
+  const r = rgb[0] >> 4 << 4, g = rgb[1] >> 4 << 4, b = rgb[2] >> 4 << 4, k = (r >> 4 & 15) << 8 | (g >> 4 & 15) << 4 | (b >> 4 & 15);      /* a number, not text: this runs for every light on every frame */
   let c = _lightSprites[k]; if (c) return c;
   c = document.createElement('canvas'); c.width = c.height = 64;
   const x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
@@ -136,7 +136,7 @@ const Light = {
     ctx.restore();
     if (G.state === 'menu') return;                      /* the menu keeps just its own light edge */
     /* a tinted vignette on top of the neutral one */
-    const r =Math.hypot(W, H) * 0.5, vg = ctx.createRadialGradient(W / 2, H / 2, r * 0.45, W / 2, H / 2, r);
+    const r =hyp(W, H) * 0.5, vg = ctx.createRadialGradient(W / 2, H / 2, r * 0.45, W / 2, H / 2, r);
     vg.addColorStop(0, 'rgba(' + g.vig[0] + ',' + g.vig[1] + ',' + g.vig[2] + ',0)');
     vg.addColorStop(1, 'rgba(' + g.vig[0] + ',' + g.vig[1] + ',' + g.vig[2] + ',' + g.vig[3] + ')');
     ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
@@ -146,7 +146,7 @@ const Light = {
     if (g.shafts && day > 0.05){
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       ctx.translate(W / 2, H / 2); ctx.rotate(this.sun + Math.PI / 2 + 0.05);
-      const span = Math.hypot(W, H), n = 5;
+      const span = hyp(W, H), n = 5;
       for (let i = 0; i < n; i++){
         const ph = i * 1.7, w = 70 + (i * 41) % 90;
         const off = ((i + 0.5) / n - 0.5) * span * 1.15 + Math.sin(t * 0.08 + ph) * 50 - (cx * G.zoom * 0.12) % 140;

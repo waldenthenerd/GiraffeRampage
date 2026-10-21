@@ -22,18 +22,20 @@ const EnemySprite = (function(){
   const frames = function(k){ return Math.min(160, 16 * k); };       /* pictures per loop: 16 for every turn of the animation */
   const SAFE_READ = { def: 1, type: 1, r: 1, anim: 1, state: 1, flash: 1, big: 1, portrait: 1 };
   const ccDesc = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'globalCompositeOperation');
-  let maps = new WeakMap(), px = 0, probeA = null, probeB = null, scratchSize = 0;
+  let maps = new WeakMap(), px = 0, probeA = null, probeB = null, scratchSize = 0, gen = 0;      /* gen: bumped whenever the pictures are thrown away, so a creature's remembered entry is known to be stale */
   const stats = { drawn: 0, live: 0, built: 0, bad: 0, why: {}, liveBy: { portrait: 0, big: 0, flash: 0, off: 0, kind: 0, edge: 0, wait: 0 } };
   let on = true;
-  /* new pictures are made a few per frame at most (a creature that has to wait is simply drawn live that frame), so filling the cache never causes a hitch */
-  const BUILDS_PER_FRAME = 3;
-  let budgetAt = 0, budgetLeft = BUILDS_PER_FRAME;
+  /* new pictures are made for a few milliseconds per frame at most (a creature that has to wait is simply drawn live that frame), so
+     filling the cache never causes a hitch. It is a time budget, not a count: a fast device makes many pictures in its few
+     milliseconds and the cache is full within a second or two, a slow one still makes at least one a frame and no more than it can afford. */
+  const BUILD_MS = 3;
+  let budgetAt = 0, spent = 0;
   function canBuild(){
     const now = performance.now();
-    if (now - budgetAt > 12){ budgetAt = now; budgetLeft = BUILDS_PER_FRAME; }
-    if (budgetLeft <= 0) return false;
-    budgetLeft--; return true;
+    if (now - budgetAt > 12){ budgetAt = now; spent = 0; }
+    return spent < BUILD_MS;
   }
+  function charge(t0){ spent += performance.now() - t0; }
 
   function guarded(cv){
     const c = cv.getContext('2d', { willReadFrequently: true });
@@ -116,16 +118,25 @@ const EnemySprite = (function(){
     if (!on || e.portrait || e.big || !d || !(e.anim === e.anim)){ stats.live++; stats.liveBy[!on ? 'off' : e.portrait ? 'portrait' : 'big']++; return false; }
     const sc = Math.min(2.5, Math.max(0.75, Math.round(G.zoom * G.dpr * 6) / 4));      /* made at 1.5 times the screen's scale (up to 2.5), so drawing them smaller keeps the edges crisp */
     const rq = Math.max(1, Math.round(e.r * 2));
-    const key = (G.chapter | 0) + '|' + fxLevelNow() + '|' + e.type + '|' + e.state + '|' + rq + '|' + sc;
-    let per = maps.get(d);
-    if (!per){ per = new Map(); maps.set(d, per); }
-    let ent = per.get(key);
-    if (!ent){
-      if (!canBuild()){ stats.live++; stats.liveBy.wait++; return false; }
-      const why = probe(d, e.type, e.state, rq / 2);
-      ent = { ok: typeof why === 'number', k: typeof why === 'number' ? why : 1, frames: new Array(typeof why === 'number' ? frames(why) : 0), fl: {} };
-      if (typeof why !== 'number'){ stats.bad++; stats.why['c' + (G.chapter | 0) + ' ' + e.type + ' ' + e.state] = why; }
-      per.set(key, ent);
+    /* what picture set it uses is remembered on the creature and only looked up again when the chapter, effects level, kind, state or size changes
+       (building the key text for every creature on every frame was a large part of the cost of this cache) */
+    const chn = G.chapter | 0, fxv = fxLevelNow(), sk = e._sk || (e._sk = { gen: -1, ch: 0, fx: 0, ty: '', st: '', rq: 0, sc: 0, ent: null });
+    let ent, per = null, key = '';
+    if (sk.gen === gen && sk.ent !== null && sk.ch === chn && sk.fx === fxv && sk.ty === e.type && sk.st === e.state && sk.rq === rq && sk.sc === sc) ent = sk.ent;
+    else {
+      key = chn + '|' + fxv + '|' + e.type + '|' + e.state + '|' + rq + '|' + sc;
+      per = maps.get(d);
+      if (!per){ per = new Map(); maps.set(d, per); }
+      ent = per.get(key);
+      if (!ent){
+        if (!canBuild()){ stats.live++; stats.liveBy.wait++; return false; }
+        const tb = performance.now(), why = probe(d, e.type, e.state, rq / 2);
+        charge(tb);
+        ent = { ok: typeof why === 'number', k: typeof why === 'number' ? why : 1, frames: new Array(typeof why === 'number' ? frames(why) : 0), fl: {} };
+        if (typeof why !== 'number'){ stats.bad++; stats.why['c' + chn + ' ' + e.type + ' ' + e.state] = why; }
+        per.set(key, ent);
+      }
+      sk.gen = gen; sk.ch = chn; sk.fx = fxv; sk.ty = e.type; sk.st = e.state; sk.rq = rq; sk.sc = sc; sk.ent = ent;
     }
     if (!ent.ok){ stats.live++; stats.liveBy.kind++; return false; }
     /* a creature that is flashing from a hit has its colours blended toward white (the player's Hit flash setting); that is a second,
@@ -141,9 +152,11 @@ const EnemySprite = (function(){
     const idx = Math.min(F - 1, Math.floor(ph / span * F));
     let f = arr[idx];
     if (f === undefined){
-      if (px > SPRITE_BUDGET){ maps = new WeakMap(); px = 0; per = new Map(); maps.set(d, per); per.set(key, ent); ent.frames = new Array(ent.frames.length); ent.fl = {}; arr = hf > 0 ? (ent.fl[Math.round(hf * 20) / 20] = new Array(8)) : ent.frames; }
+      if (px > SPRITE_BUDGET){ maps = new WeakMap(); gen++; px = 0; per = new Map(); maps.set(d, per); per.set(key || (chn + '|' + fxv + '|' + e.type + '|' + e.state + '|' + rq + '|' + sc), ent); sk.gen = gen; ent.frames = new Array(ent.frames.length); ent.fl = {}; arr = hf > 0 ? (ent.fl[Math.round(hf * 20) / 20] = new Array(8)) : ent.frames; }
       if (!canBuild()){ stats.live++; stats.liveBy.wait++; return false; }
+      const tb = performance.now();
       f = arr[idx] = build(d, e.type, e.state, rq / 2, idx, sc, ent.k, F, cols);
+      charge(tb);
     }
     if (f === null){ ent.ok = false; stats.bad++; stats.live++; stats.liveBy.edge++; return false; }
     if (f.cv) ctx.drawImage(f.cv, f.x, f.y, f.w, f.h);
@@ -153,7 +166,7 @@ const EnemySprite = (function(){
   return {
     draw: draw, stats: stats,
     get on(){ return on; }, set on(v){ on = !!v; },
-    clear: function(){ maps = new WeakMap(); px = 0; },
+    clear: function(){ maps = new WeakMap(); gen++; px = 0; },
     megapixels: function(){ return px / 1e6; },
     /* for testing and for the stats panel: which kinds of creature are cached, and why not */
     report: function(){ return JSON.parse(JSON.stringify(stats.why)); }

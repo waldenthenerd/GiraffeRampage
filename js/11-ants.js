@@ -72,7 +72,7 @@ function antDie(a){
     const bm = antBlastMul();
     addShock(a.x, a.y, T.blastR * bm, 0.3, T.blast * antPower() * bm, '#FFB838', { width: 12, kb: 260, filled: true });
     const sb = stickyBlast();
-    if (sb){ const near = enemiesNear(a.x, a.y, T.blastR * bm + 30, []); for (let i = 0; i < near.length; i++){ const q = near[i]; if (q.dead || q.big || Math.hypot(q.x - a.x, q.y - a.y) > T.blastR * bm + q.r) continue; q.slowT = Math.max(q.slowT, sb.dur); q.slowMul = Math.min(q.slowMul, 0.5); } burstParticles(a.x, a.y, 10, '#E8B830', 150, 3, { glow: true }); }
+    if (sb){ const near = enemiesNear(a.x, a.y, T.blastR * bm + 30, []); for (let i = 0; i < near.length; i++){ const q = near[i]; if (q.dead || q.big || hyp(q.x - a.x, q.y - a.y) > T.blastR * bm + q.r) continue; q.slowT = Math.max(q.slowT, sb.dur); q.slowMul = Math.min(q.slowMul, 0.5); } burstParticles(a.x, a.y, 10, '#E8B830', 150, 3, { glow: true }); }
     burstParticles(a.x, a.y, 14, '#FFB838', 240, 4, { glow: true });
     abilityShake(4); sfx('boom', 0.12);
   }
@@ -81,16 +81,16 @@ function antDie(a){
    ANT_AGGRO range is even closer. The player is always a candidate at any
    distance, so enemies never simply forget about the giraffe. */
 function antAggroTarget(e){
-  const ants = G.ants, al = G.allies, pd = Math.hypot(P.x - e.x, P.y - e.y);
+  const ants = G.ants, al = G.allies, pd = hyp(P.x - e.x, P.y - e.y);
   let best = null, bd = Math.min(pd, ANT_AGGRO);
   if (ants) for (let i = 0; i < ants.length; i++){
-    const a = ants[i], d = Math.hypot(a.x - e.x, a.y - e.y);
+    const a = ants[i], d = hyp(a.x - e.x, a.y - e.y);
     if (d < bd){ bd = d; best = a; }
   }
   if (al && al.length){                                                    /* a Marine on Mars goes for the nearest dust alien fighting it, or the giraffe if she is nearer; anything else goes for a squad alien that is close */
     const mar = !!(e.def && e.def.marine);
     let ad = mar ? pd : Math.min(pd, 340), ab = null;
-    for (let i = 0; i < al.length; i++){ const a = al[i]; if (!mar && !a.squad) continue; const d = Math.hypot(a.x - e.x, a.y - e.y); if (d < ad){ ad = d; ab = a; } }
+    for (let i = 0; i < al.length; i++){ const a = al[i]; if (!mar && !a.squad) continue; const d = hyp(a.x - e.x, a.y - e.y); if (d < ad){ ad = d; ab = a; } }
     if (ab && (!best || ad < bd)) best = ab;
   }
   return best;
@@ -107,7 +107,7 @@ function distractorTarget(a, claims){
      into range of a neighbouring one, swap to it for being nearer, and leave
      its original enemy undistracted. */
   const cur = a.tgt;
-  if (cur && !cur.dead && Math.hypot(cur.x - a.x, cur.y - a.y) < 900 && (claims.get(cur) || 0) <= 1) return cur;
+  if (cur && !cur.dead && hyp(cur.x - a.x, cur.y - a.y) < 900 && (claims.get(cur) || 0) <= 1) return cur;
   let best = null, bd = 900 * 900;
   const es = G.enemies, r2 = ANT_AGGRO * ANT_AGGRO;
   for (let i = 0; i < es.length; i++){
@@ -150,7 +150,7 @@ function updateAnts(dt){
     const near = enemiesNear(a.x, a.y, 90);
     for (let j = 0; j < near.length && a.hurt <= 0; j++){
       const e = near[j];
-      if (!e.dead && Math.hypot(e.x - a.x, e.y - a.y) < e.r + a.r){ a.hp -= e.dmg * 0.6; a.hurt = 0.4; a.flash = 0.12; }
+      if (!e.dead && hyp(e.x - a.x, e.y - a.y) < e.r + a.r){ a.hp -= e.dmg * 0.6; a.hurt = 0.4; a.flash = 0.12; }
     }
     if (a.hp <= 0){ antDie(a); G.ants.splice(i, 1); continue; }
     let tgt;
@@ -164,7 +164,7 @@ function updateAnts(dt){
     } else tgt = nearestEnemy(a.x, a.y, 900);
     let mx = 0, my = 0, spdMul = 1;
     if (tgt){
-      const dx = tgt.x - a.x, dy = tgt.y - a.y, d = Math.hypot(dx, dy) || 1, ux = dx / d, uy = dy / d;
+      const dx = tgt.x - a.x, dy = tgt.y - a.y, d = hyp(dx, dy) || 1, ux = dx / d, uy = dy / d;
       a.ang = Math.atan2(uy, ux);
       if (a.type === 'soldier'){
         if (d > tgt.r + a.r + 3){ mx = ux; my = uy; }
@@ -196,15 +196,15 @@ function updateAnts(dt){
     } else {
       /* nothing to fight: mill about near the anthill */
       a.wt -= dt;
-      if (a.wt <= 0 || Math.hypot(a.wx - a.x, a.wy - a.y) < 8){
+      if (a.wt <= 0 || hyp(a.wx - a.x, a.wy - a.y) < 8){
         const ang = Math.random() * TAU, rr = rand(20, 90);
         a.wx = hill.x + Math.cos(ang) * rr; a.wy = hill.y + Math.sin(ang) * rr; a.wt = rand(1.5, 3.5);
       }
-      const dx = a.wx - a.x, dy = a.wy - a.y, d = Math.hypot(dx, dy) || 1;
+      const dx = a.wx - a.x, dy = a.wy - a.y, d = hyp(dx, dy) || 1;
       mx = dx / d; my = dy / d; spdMul = 0.45;
       a.ang = Math.atan2(my, mx);
     }
-    const m = Math.hypot(mx, my);
+    const m = hyp(mx, my);
     if (m > 0){
       a.x = clamp(a.x + mx / m * T.spd * antSpdMul() * spdMul * dt, 20, ARENA_W - 20);
       a.y = clamp(a.y + my / m * T.spd * antSpdMul() * spdMul * dt, 20, ARENA_H - 20);
@@ -262,7 +262,8 @@ function drawAnt(ctx, a){
 function drawAnts(ctx){
   const ants = G.ants;
   if (!ants) return;
-  for (let i = 0; i < ants.length; i++) drawAnt(ctx, ants[i]);
+  const v = viewBounds(60);
+  for (let i = 0; i < ants.length; i++){ const a = ants[i]; if (a.x < v.x0 || a.x > v.x1 || a.y < v.y0 || a.y > v.y1) continue; drawAnt(ctx, a); }
 }
 function antsTabHTML(){
   if (!Save.data.antsUnlocked){

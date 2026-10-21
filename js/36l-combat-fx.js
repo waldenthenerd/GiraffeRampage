@@ -138,7 +138,7 @@ function combatHit(e, dmg, crit, opts){
 /* a little flash where a shot leaves the giraffe */
 function combatMuzzle(x, y, vx, vy, color, r){
   if (fxLevelNow() <= 0 || FXB.n >= FXB.cap || G.attract) return;
-  if (Math.hypot(x - P.x, y - P.y) > 90) return;             /* only shots that really leave her, not turrets and mines */
+  if (hyp(x - P.x, y - P.y) > 90) return;             /* only shots that really leave her, not turrets and mines */
   const a = Math.atan2(vy, vx), c = typeof color === 'string' && color.charAt(0) === '#' ? color : '#FFE6A3';
   fxP(x, y, 0, 0, Math.max(5, r * 1.6), 0.1, c, { shape: 'flash', drag: 0, shrink: false, glow: true });
   fxP(x, y, Math.cos(a + 0.5) * 150, Math.sin(a + 0.5) * 150, 1.6, 0.14, '#FFFFFF', { shape: 'streak', drag: 4, glow: true });

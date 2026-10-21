@@ -61,7 +61,7 @@ function neckCurve(shx, shy, a, len, bend, n){
   const cx = (shx + hx) / 2 + px * bend, cy = (shy + hy) / 2 + py * bend, pts = [];
   for (let i = 0; i <= n; i++){
     const t = i / n, u = 1 - t, x = u * u * shx + 2 * u * t * cx + t * t * hx, y = u * u * shy + 2 * u * t * cy + t * t * hy;
-    const dx = 2 * u * (cx - shx) + 2 * t * (hx - cx), dy = 2 * u * (cy - shy) + 2 * t * (hy - cy), l = Math.hypot(dx, dy) || 1;
+    const dx = 2 * u * (cx - shx) + 2 * t * (hx - cx), dy = 2 * u * (cy - shy) + 2 * t * (hy - cy), l = hyp(dx, dy) || 1;
     pts.push({ x: x, y: y, nx: -dy / l, ny: dx / l, t: t });
   }
   let da = Math.atan2(hy - cy, hx - cx) - a; while (da > Math.PI) da -= TAU; while (da < -Math.PI) da += TAU;

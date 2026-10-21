@@ -38,8 +38,8 @@ function scenPlacer(){
     const cx = ARENA_W / 2, cy = ARENA_H / 2, clearR = 230 + r;                               /* keep the spawn point clear */
     for (let k = 0; k < (tries || 24); k++){
       const x = rand(margin, ARENA_W - margin), y = rand(margin, ARENA_H - margin);
-      if (Math.hypot(x - cx, y - cy) < clearR) continue;
-      if (G.water && Math.hypot(x - G.water.x, y - G.water.y) < G.water.r * 1.25 + r) continue;       /* keep clear of the waterhole */
+      if (hyp(x - cx, y - cy) < clearR) continue;
+      if (G.water && hyp(x - G.water.x, y - G.water.y) < G.water.r * 1.25 + r) continue;       /* keep clear of the waterhole */
       if (G.buildings && G.buildings.length && (buildingAt(x, y) || buildingAt(x + r, y) || buildingAt(x - r, y) || buildingAt(x, y + r) || buildingAt(x, y - r))) continue;
       let ok = true;
       for (let i = 0; i < placed.length; i++){ const o = placed[i], d = r + o.r + Math.max(gap, o.gap) * 0.5; if ((x - o.x) * (x - o.x) + (y - o.y) * (y - o.y) < d * d){ ok = false; break; } }

@@ -12,7 +12,7 @@
 function segDist(px, py, x1, y1, x2, y2){
   const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy || 1;
   let t = ((px - x1) * dx + (py - y1) * dy) / l2; t = t < 0 ? 0 : t > 1 ? 1 : t;
-  return Math.hypot(px - (x1 + dx * t), py - (y1 + dy * t));
+  return hyp(px - (x1 + dx * t), py - (y1 + dy * t));
 }
 function turnTo(a, target, maxStep){ return a + clamp(angDiff(target, a), -maxStep, maxStep); }
 function addMarker(x, y, r, dur, color, fn, o){
@@ -33,13 +33,13 @@ function hostileBlast(x, y, r, dmg, color, o){
   o = o || {};
   G.blasts.push({ x: x, y: y, r: r, life: 0.45, max: 0.45, color: color, column: !!o.column });
   if (G.allies && G.allies.length) marsBlastAllies(x, y, r, dmg);
-  if (Math.hypot(P.x - x, P.y - y) < r + P.r * 0.6){
+  if (hyp(P.x - x, P.y - y) < r + P.r * 0.6){
     hurtPlayer(dmg, x, y);
     if (o.kb){ const a = Math.atan2(P.y - y, P.x - x), k = typeof o.kb === 'number' && o.kb > 1 ? o.kb : 70; P.x = clamp(P.x + Math.cos(a) * k, 26, ARENA_W - 26); P.y = clamp(P.y + Math.sin(a) * k, 26, ARENA_H - 26); }
   }
   if (o.hurtEnemies){
     const near = enemiesNear(x, y, r + 40), hit = [];
-    for (let i = 0; i < near.length; i++){ const q = near[i]; if (q.dead || q === o.source || q.untarg) continue; if (Math.hypot(q.x - x, q.y - y) < r + q.r) hit.push(q); }
+    for (let i = 0; i < near.length; i++){ const q = near[i]; if (q.dead || q === o.source || q.untarg) continue; if (hyp(q.x - x, q.y - y) < r + q.r) hit.push(q); }
     for (let i = 0; i < hit.length; i++) damageEnemy(hit[i], hit[i].maxHp * o.hurtEnemies * (hit[i].big ? 0.1 : 1), { noCrit: true, color: '#FFB040', noShield: true });
   }
   burstParticles(x, y, 12, color, 240, 5, { glow: true });
@@ -52,7 +52,7 @@ function updateHZones(dt){
   for (let i = zs.length - 1; i >= 0; i--){
     const z = zs[i];
     z.life -= dt; z.tick -= dt;
-    if (z.tick <= 0 && Math.hypot(P.x - z.x, P.y - z.y) < z.r + P.r * 0.5){ hurtPlayer(z.dps, z.x, z.y); z.tick = 0.5; }
+    if (z.tick <= 0 && hyp(P.x - z.x, P.y - z.y) < z.r + P.r * 0.5){ hurtPlayer(z.dps, z.x, z.y); z.tick = 0.5; }
     if (z.life <= 0) zs.splice(i, 1);
   }
 }
@@ -77,13 +77,13 @@ function updateBeams(dt){
 }
 /* drags the giraffe toward a point; the gravity warden's signature */
 function pullPlayer(ax, ay, force, dt){
-  const d = Math.hypot(ax - P.x, ay - P.y) || 1;
+  const d = hyp(ax - P.x, ay - P.y) || 1;
   P.x = clamp(P.x + (ax - P.x) / d * force * dt, 26, ARENA_W - 26);
   P.y = clamp(P.y + (ay - P.y) / d * force * dt, 26, ARENA_H - 26);
 }
 /* where the giraffe will be, if she keeps going the way she is */
 function leadAim(e, speed){
-  const d = Math.hypot(P.x - e.x, P.y - e.y), t = d / (speed * eprojSpeedMul());     /* the bullet really is slower in Chapters 8 and 9, so lead for that */
+  const d = hyp(P.x - e.x, P.y - e.y), t = d / (speed * eprojSpeedMul());     /* the bullet really is slower in Chapters 8 and 9, so lead for that */
   return Math.atan2(P.y + P.vy * t * 0.85 - e.y, P.x + P.vx * t * 0.85 - e.x);
 }
 function fireBullet(e, a, speed, dmgMul, color, r){
@@ -93,8 +93,11 @@ function fireBullet(e, a, speed, dmgMul, color, r){
 
 /* ---------- drawing ---------- */
 function drawHostileUnder(ctx){
+  const v = viewBounds(0);
   for (let i = 0; i < G.hzones.length; i++){
-    const z = G.hzones[i], a = clamp(z.life / 0.5, 0, 1) * (0.55 + 0.12 * Math.sin(G.time * 12 + i));
+    const z = G.hzones[i];
+    if (z.x + z.r < v.x0 || z.x - z.r > v.x1 || z.y + z.r < v.y0 || z.y - z.r > v.y1) continue;
+    const a = clamp(z.life / 0.5, 0, 1) * (0.55 + 0.12 * Math.sin(G.time * 12 + i));
     const g = ctx.createRadialGradient(z.x, z.y, z.r * 0.1, z.x, z.y, z.r);
     g.addColorStop(0, z.color); g.addColorStop(1, 'rgba(255,80,20,0)');
     ctx.globalAlpha = a * 0.75; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(z.x, z.y, z.r, 0, TAU); ctx.fill();
@@ -157,7 +160,7 @@ function drawHostileOver(ctx){
 /* a melee swing: an instant hit in a wedge in front of the attacker, with a sweep of light and a shove */
 function hostileSwing(e, range, arc, dmg, kb){
   G.arcs.push({ x: e.x, y: e.y, a: e.ang, range: range, arc: arc, life: 0.28, max: 0.28, color: e.def.pale || '#FFFFFF' });
-  const dx = P.x - e.x, dy = P.y - e.y, d = Math.hypot(dx, dy);
+  const dx = P.x - e.x, dy = P.y - e.y, d = hyp(dx, dy);
   if (d < range + P.r && (d < 40 || Math.abs(angDiff(Math.atan2(dy, dx), e.ang)) < arc)){     /* right on top of the attacker always counts as in front */
     hurtPlayer(dmg, e.x, e.y);
     const a = d < 40 ? e.ang : Math.atan2(dy, dx); P.x = clamp(P.x + Math.cos(a) * kb, 26, ARENA_W - 26); P.y = clamp(P.y + Math.sin(a) * kb, 26, ARENA_H - 26);
@@ -292,7 +295,7 @@ const MARINE_AI = {
     e.life -= dt; e.shotT -= dt; e.stateT -= dt; let mx = 0, my = 0;
     if (e.state === 'idle'){
       e.orbA += e.orbDir * 1.7 * dt;
-      const tx = P.x + Math.cos(e.orbA) * e.orbR, ty = P.y + Math.sin(e.orbA) * e.orbR, ddx = tx - e.x, ddy = ty - e.y, dd = Math.hypot(ddx, ddy) || 1, sp = Math.min(e.spdE * 1.8, dd * 6);
+      const tx = P.x + Math.cos(e.orbA) * e.orbR, ty = P.y + Math.sin(e.orbA) * e.orbR, ddx = tx - e.x, ddy = ty - e.y, dd = hyp(ddx, ddy) || 1, sp = Math.min(e.spdE * 1.8, dd * 6);
       mx = ddx / dd * sp; my = ddy / dd * sp; e.ang = Math.atan2(uy, ux);
       if (e.shotT <= 0 && d < 400){ e.shotT = rand(1.3, 1.9); fireBullet(e, leadAim(e, 360), 360, 0.35, '#FF7A5A', 3.4); }
       if (e.life <= 0){ e.state = 'wind'; e.stateT = 0.4; }
@@ -385,7 +388,7 @@ const MARINE_AI = {
     for (let i = 0; i < near.length; i++){ const o = near[i]; if (o === e || o.dead || o.untarg || o.def.medic || o.def.turret) continue; const f = o.hp / o.maxHp; if (f < bf){ bf = f; best = o; } }
     e.ang = turnTo(e.ang, Math.atan2(uy, ux), 4 * dt);
     if (best){
-      const bx = best.x - e.x, by = best.y - e.y, bd = Math.hypot(bx, by) || 1;
+      const bx = best.x - e.x, by = best.y - e.y, bd = hyp(bx, by) || 1;
       if (bd > 130){ mx = bx / bd * e.spdE; my = by / bd * e.spdE; }
       else { best.hp = Math.min(best.maxHp, best.hp + best.maxHp * 0.10 * dt * (best.big ? 0.2 : 1)); e.healTgt = best; e.healTgtT = 0.2; if (Math.random() < dt * 8) addParticle(best.x + rand(-8, 8), best.y - 6, 0, -30, 2.4, 0.6, '#7CFFB0', { glow: true }); }
     }
@@ -425,7 +428,7 @@ const MARINE_AI = {
       if (d < 190 && e.stateT <= 0){ e.state = 'wind'; e.stateT = 0.36; }
     } else if (e.state === 'wind'){
       e.ang = turnTo(e.ang, face, 4 * dt); mx = -ux * e.spdE * 0.2; my = -uy * e.spdE * 0.2;
-      if (e.stateT <= 0){ const gap = Math.hypot(P.x - e.x, P.y - e.y), run = clamp(gap - 30, 60, 160) / 0.16;     /* the lunge closes most of the gap and stops in front of her, never through her */
+      if (e.stateT <= 0){ const gap = hyp(P.x - e.x, P.y - e.y), run = clamp(gap - 30, 60, 160) / 0.16;     /* the lunge closes most of the gap and stops in front of her, never through her */
         e.state = 'dash'; e.stateT = 0.16; e.dashVX = Math.cos(e.ang) * run; e.dashVY = Math.sin(e.ang) * run; }
     } else if (e.state === 'dash'){
       mx = e.dashVX; my = e.dashVY;
@@ -466,7 +469,7 @@ const MARINE_AI = {
       e.ang = Math.atan2(uy, ux); mx = ux * e.spdE * 1.7; my = uy * e.spdE * 1.7;
       if (e.stateT <= 0 || d < 150){ e.state = 'wind'; e.stateT = 0.75; e.sx = P.x; e.sy = P.y; addMarker(e.sx, e.sy, 100, 0.75, e.def.pale || '#FF8A1E', null, { owner: e }); }
     } else if (e.state === 'wind'){
-      const gx = e.sx - e.x, gy = e.sy - e.y, gd = Math.hypot(gx, gy) || 1, sp = Math.min(e.spdE * 2.6, gd / Math.max(dt, 0.016));
+      const gx = e.sx - e.x, gy = e.sy - e.y, gd = hyp(gx, gy) || 1, sp = Math.min(e.spdE * 2.6, gd / Math.max(dt, 0.016));
       mx = gx / gd * sp; my = gy / gd * sp;
       if (e.stateT <= 0){ e.x = e.sx; e.y = e.sy; e.untarg = false; hostileBlast(e.sx, e.sy, 100, e.dmg * 1.3, e.def.pale || '#FF8A1E', { kb: 1, shake: 9, source: e }); e.state = 'recover'; e.stateT = 1.3; }
     } else if (e.stateT <= 0){ e.state = 'idle'; e.stateT = rand(0.8, 1.4); }
@@ -483,10 +486,10 @@ const MARINE_AI = {
     const bx = P.x - Math.cos(P.face) * 180, by = P.y - Math.sin(P.face) * 180;
     if (e.state === 'idle'){
       e.idleT = (e.idleT || 0) + dt;
-      const tx = bx - e.x, ty = by - e.y, td = Math.hypot(tx, ty) || 1, side = (tx * -uy + ty * ux) >= 0 ? 1 : -1;
+      const tx = bx - e.x, ty = by - e.y, td = hyp(tx, ty) || 1, side = (tx * -uy + ty * ux) >= 0 ? 1 : -1;
       /* it does not walk through her: it slides round her, keeping its distance, toward the spot behind her */
       let vx = tx / td * 0.5 + (-uy) * side * 0.8 + (d < 210 ? -ux * 0.6 : 0), vy = ty / td * 0.5 + ux * side * 0.8 + (d < 210 ? -uy * 0.6 : 0);
-      const vl = Math.hypot(vx, vy) || 1; mx = vx / vl * e.spdE * 0.95; my = vy / vl * e.spdE * 0.95; e.ang = Math.atan2(uy, ux);
+      const vl = hyp(vx, vy) || 1; mx = vx / vl * e.spdE * 0.95; my = vy / vl * e.spdE * 0.95; e.ang = Math.atan2(uy, ux);
       e.vis = approach(e.vis, e.revealT > 0 ? 1 : 0.1, dt * 3);
       const behindHer = (e.x - P.x) * Math.cos(P.face) + (e.y - P.y) * Math.sin(P.face) < 0;   /* only strikes once it is on her blind side */
       if (((td < 70 || (d < 200 && behindHer)) || e.idleT > 5) && e.stateT <= 0){ e.state = 'wind'; e.stateT = 0.4; e.idleT = 0; }
@@ -696,7 +699,7 @@ const MARINE_AI = {
         }
       }
     } else if (e.state === 'pre'){                                          /* flies to the start of the run while the path is shown */
-      const tx = e.ax - e.x, ty = e.ay - e.y, td = Math.hypot(tx, ty) || 1, sp = Math.min(900, td * 5);
+      const tx = e.ax - e.x, ty = e.ay - e.y, td = hyp(tx, ty) || 1, sp = Math.min(900, td * 5);
       mx = tx / td * sp; my = ty / td * sp; e.ang = Math.atan2(e.by - e.ay, e.bx - e.ax);
       if (e.stateT <= 0){ e.state = 'run'; e.stateT = 0.95; e.runT = 0.95; e.bombT = 0; }
     } else if (e.state === 'run'){                                          /* the strafing run: carpet-bombing along the line */
