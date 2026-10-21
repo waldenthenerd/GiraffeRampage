@@ -1,5 +1,5 @@
 /* Spotted Crates: 1000 gems + 50 food, 2% mythical, better epic and legendary odds. Run: node tools/qa-cloud.mjs tools/scenarios/gear-spotted.js --wait 60000 [--shot x.png --params "view=card|reveal"] */
-GR.handleAction('splash-go');
+GR.handleAction('splash-go'); Ach.check = function(){ return []; };      /* a trophy for the first crate would add gems to the exact counts below */
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
 function reset(){ Save.data.gear = {}; Save.data.gearLv = {}; Save.data.cratePity = {}; Save.data.equipped = { cape: null, weapon: null, armor: null }; Save.data.cratesOpened = 0; }
 try {
