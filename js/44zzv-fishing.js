@@ -103,7 +103,7 @@ function fishOrder(){
 }
 
 /* ---- the game itself (the same on the pier and on a boat) ---- */
-const Fg = { where: 'pier', phase: 'idle', iv: 0, sea: false, fish: null };
+const Fg = { where: 'pier', phase: 'idle', iv: 0, sea: false, fish: null, clock: 0, a: null, side: false };
 function fishHab(){
   if (!Fg.sea) return 'pier';
   const t = seaTypeAt(Sea.x, Sea.y);
@@ -121,7 +121,7 @@ function fishTackleHTML(){
 }
 function fishPanel(msg){
   if (Fg.iv){ clearInterval(Fg.iv); Fg.iv = 0; }
-  Fg.phase = 'idle'; Fg.fish = null;
+  Fg.phase = 'idle'; if (!Fg.a || Fg.a.k === 'cast') Fg.a = null; Fg.fish = null;
   const o = fishOrder(), of = FISH.filter(function(f){ return f.id === o.id; })[0];
   const html = '<div class="tp-title">' + FISH_HABNAME[fishHab()] + '</div><div class="fishmsg" id="fishMsg">' + (msg || 'Cast a line.') + '</div>' +
     '<div class="fishbar" id="fishBar" style="display:none"><div class="fzone" id="fishZone"></div><i id="fishMark"></i></div>' +
@@ -131,8 +131,9 @@ function fishPanel(msg){
     '<div class="fishlog">' + fishRows() + '</div>' +
     '<p class="tnote">Brine’s order this week: a <b>' + of.name + '</b>' + (o.done ? ' (done)' : ' · 8 gems') + (townIsNight() ? ' · the moon jelly is out' : '') + '</p>';
   if (Fg.sea){
-    setOverlay('<div class="panel tp tp-fish" style="max-width:600px">' + html + '<div class="tp-foot"><button class="tbtn" data-a="fish-sea-close">Back to the boat</button></div></div>');
-  } else townPanelT('fish', html, { w: 600 });
+    setOverlay('<div class="panel tp tp-fish" style="max-width:340px">' + html + '<div class="tp-foot"><button class="tbtn" data-a="fish-sea-close">Back to the boat</button></div></div>');
+  } else townPanelT('fish', html, { w: 340 });
+  OV.classList.add('side'); Fg.side = true;                      /* a sidebar (a bottom sheet on a narrow screen), so the water and the fish stay in view */
 }
 townShowFishing = function(msg){ Fg.sea = false; fishPanel(msg); };
 
@@ -142,6 +143,7 @@ function fishCast(){
   Fg.fish = fish; Fg.phase = 'wait'; Fg.t = 0; Fg.wait = 1 + Math.random() * 2.2; Fg.k = k;
   document.getElementById('fishMsg').textContent = 'The float drifts...'; document.getElementById('fishCast').style.display = 'none';
   SFX.click();
+  Fg.a = { k: 'cast', t: Fg.clock };
   if (Fg.sea){ const t = townData(); t.n.seaCasts = (t.n.seaCasts | 0) + 1; }
   Fg.iv = setInterval(function(){ if (!document.getElementById('fishMsg')){ clearInterval(Fg.iv); Fg.iv = 0; Fg.phase = 'idle'; return; } fishTick(0.03); }, 30);
 }
@@ -152,7 +154,7 @@ function fishTick(dt){
   Fg.t += dt;
   const f = Fg.fish, k = Fg.k;
   if (Fg.phase === 'wait' && Fg.t > Fg.wait){
-    Fg.phase = 'bite'; Fg.t = 0; Fg.zone = 0.18 + Math.random() * 0.5;
+    Fg.phase = 'bite'; Fg.biteAt = Fg.clock; Fg.t = 0; Fg.zone = 0.18 + Math.random() * 0.5;
     Fg.w = clamp((0.28 - Math.min(f.v, 22) * 0.012) * k.rod.z, 0.1, 0.5); Fg.speed = Math.min(4.2, 1.4 + f.v * 0.12) * k.line.sp;
     if (Fg.zone + Fg.w > 0.98) Fg.zone = 0.98 - Fg.w;
     document.getElementById('fishMsg').textContent = 'A bite! Reel when the marker is in the green.';
@@ -179,6 +181,7 @@ function fishResult(win){
     const o = fishOrder(); let ordered = false;
     if (o.id === f.id && !o.done){ o.done = true; ordered = true; pay.gems = (pay.gems | 0) + 8; const t = townData(); t.n.fishOrders = (t.n.fishOrders | 0) + 1; }
     townPay(pay);
+    Fg.a = { k: 'leap', t: Fg.clock, f: f, len: len, rec: rec || first };
     msg = 'You caught a ' + f.name + ', ' + len + ' cm! +' + fmt(gold) + ' gold' + (first ? ' and 5 gems for a new kind' : '') + (rec && !first ? ' · a new record' : '') + '.';
     if (ordered) msg += ' That was Brine’s order: +8 gems!';
     /* new tackle: unlocked by the page she has just completed, and put on */
@@ -187,7 +190,7 @@ function fishResult(win){
     if (names.length) msg += ' New tackle, and it is on: ' + names.join(', ') + '!';
     const t2 = townData();
     if (FISH.every(function(x){ return log[x.id] > 0; }) && !t2.n.fishAll){ t2.n.fishAll = 1; townPay({ gems: 100 }); msg += ' Every kind caught: +100 gems!'; SFX.transform(); } else SFX.level();
-  } else { msg = 'It got away.'; SFX.deny(); }
+  } else { msg = 'It got away.'; SFX.deny(); Fg.a = { k: 'lost', t: Fg.clock, f: f }; }
   Save.write();
   fishPanel(msg);
 }
@@ -224,6 +227,7 @@ function fishCardHTML(f){
     '<span style="color:' + FISH_RCOL[q] + '">' + FISH_RARITY[q] + '</span><small>' + (n ? 'Biggest ' + best + ' cm · caught ' + n : hint) + '</small></div>';
 }
 function showFishBook(){
+  Fg.side = false;
   const tk = fishTackle();
   let body = '';
   FISH_GROUPS.forEach(function(g){
@@ -247,16 +251,12 @@ function fishSeaOpen(){
   fishPanel('Cast a line.'); return true;
 }
 function fishSeaClose(){
+  Fg.a = null; Fg.side = false;
   if (Fg.iv){ clearInterval(Fg.iv); Fg.iv = 0; } Fg.phase = 'idle';
   G.state = 'sail'; G.subScreen = ''; Fg.sea = false; hideOverlay();
 }
 (function(){
   KEY_ACTIONS.push(['cast', 'Cast a line (at sea)']); DEFAULT_KEYS.cast = 'KeyF';
-  const rn = render;
-  render = function(){
-    if (Sea.on && G.state === 'fishing'){ const ctx = CTX; if (!ctx) return; ctx.setTransform(G.dpr, 0, 0, G.dpr, 0, 0); ctx.globalAlpha = 1; ctx.fillStyle = STAGE_BG; ctx.fillRect(0, 0, G.W, G.H); renderSea(ctx); return; }
-    return rn.apply(this, arguments);
-  };
   const st = step;
   step = function(dt){
     const r = st(dt);
@@ -289,6 +289,101 @@ function fishSeaClose(){
     }
     return ha.apply(this, arguments);
   };
+})();
+
+
+/* ---- seeing it: the line, the float, the bite and the fish coming out of the water ---- */
+/* At the pier (drawn in the street's own coordinates, from the giraffe's head out over the water) and from a boat (drawn over the sea, to the side of the boat, seen from above).
+   Fg.clock is the game's own time (it moves with every step), Fg.a is what is happening: cast (the line flies out), then the float rests on the water and rings spread from it;
+   a bite (Fg.phase 'bite') makes it dip and splash; leap (a catch: the fish comes up out of the water in an arc and is held up, with its name and length); lost (a splash and a tail). */
+const FISH_ICON = {};
+function fishIcon(f){ let c = FISH_ICON[f.id]; if (!c){ c = document.createElement('canvas'); c.width = 84; c.height = 48; fishPaint(c, f, true); FISH_ICON[f.id] = c; } return c; }
+const FISH_ANIM = { cast: 0.55, leap: 2.3, lost: 0.9 };
+function fishAnimOn(){ return Fg.phase !== 'idle' || (Fg.a && Fg.clock - Fg.a.t < FISH_ANIM[Fg.a.k]); }
+/* one picture of the whole thing: p is { rod: [x, y] (where the line leaves the rod), rest: [x, y] (the float on the water), hold: [x, y] (where a caught fish is held up),
+   k: pixels per unit (1 at the pier), flat: how flattened the rings are (a side view: 0.3, from above: 1), arc: how high a leap goes } */
+function fishDrawAnim(ctx, p){
+  if (!fishAnimOn()) return;
+  const a = Fg.a, now = Fg.clock, k = p.k, lerp2 = function(u, v, e){ return [u[0] + (v[0] - u[0]) * e, u[1] + (v[1] - u[1]) * e]; };
+  let fl = p.rest.slice(), taut = 0.6, floatOn = true, e;
+  const age = a ? now - a.t : 99;
+  if (a && a.k === 'cast' && age < FISH_ANIM.cast){ e = age / FISH_ANIM.cast; fl = lerp2(p.rod, p.rest, e); fl[1] -= Math.sin(e * Math.PI) * 60 * k * p.arc; taut = 0.9; }
+  else if (Fg.phase === 'bite'){ const bt = now - (Fg.biteAt || now); fl[1] += Math.sin(bt * 26) * 2.4 * k + Math.abs(Math.sin(bt * 5)) * 7 * k; fl[0] += Math.sin(bt * 17) * 3 * k; taut = 0.97; }
+  else if (Fg.phase === 'wait'){ fl[1] += Math.sin(now * 2.6) * 1.8 * k; taut = 0.75; }
+  else floatOn = false;
+  if (a && a.k === 'leap' && age < FISH_ANIM.leap || a && a.k === 'lost' && age < FISH_ANIM.lost) taut = 0.9;
+  ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  /* rings on the water round the float */
+  if (Fg.phase !== 'idle' || (a && a.k !== 'cast') ){
+    const fast = Fg.phase === 'bite' ? 3.2 : 1;
+    for (let i = 0; i < 3; i++){ const ph = (now * 0.8 * fast + i / 3) % 1; ctx.globalAlpha = (1 - ph) * 0.55; ctx.strokeStyle = '#E8FBFF'; ctx.lineWidth = 1.6 * k; ctx.beginPath(); ctx.ellipse(p.rest[0], p.rest[1] + 3 * k, (6 + 26 * ph) * k, (6 + 26 * ph) * k * p.flat, 0, 0, TAU); ctx.stroke(); }
+    ctx.globalAlpha = 1;
+  }
+  /* the rod and the line: it hangs a little when slack and is straight when a fish pulls */
+  if (p.rodFrom){ ctx.strokeStyle = '#6A4A2A'; ctx.lineWidth = 3 * k; ctx.beginPath(); ctx.moveTo(p.rodFrom[0], p.rodFrom[1]); ctx.lineTo(p.rod[0], p.rod[1]); ctx.stroke(); }
+  const held = a && a.k === 'leap' && age > 1.0, tip = held ? p.hold : fl;
+  if (floatOn || held || (a && a.k === 'leap') || (a && a.k === 'lost')){
+    const mx = (p.rod[0] + tip[0]) / 2, my = (p.rod[1] + tip[1]) / 2 + (1 - taut) * 46 * k * p.arc;
+    ctx.strokeStyle = 'rgba(245,250,255,.85)'; ctx.lineWidth = 1.3 * k; ctx.beginPath(); ctx.moveTo(p.rod[0], p.rod[1]); ctx.quadraticCurveTo(mx, my, tip[0], tip[1]); ctx.stroke();
+  }
+  /* the float */
+  if (floatOn && !(a && a.k === 'leap' && age < FISH_ANIM.leap)){
+    ctx.fillStyle = '#F4F4F0'; ctx.beginPath(); ctx.arc(fl[0], fl[1], 4.6 * k, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#D5352B'; ctx.beginPath(); ctx.arc(fl[0], fl[1] - 1.4 * k, 4.6 * k, Math.PI, 0); ctx.fill();
+  }
+  /* the fish out of the water: up in an arc, then held on the line (with a swing), then back in */
+  if (a && a.k === 'leap' && age < FISH_ANIM.leap){
+    const f = a.f, ic = fishIcon(f), w = clamp(60 + a.len * 0.5, 74, 170) * k * (p.flat < 1 ? 0.8 : 0.7), h = w * 48 / 84;
+    let pos, ang, sc = 1;
+    if (age < 1.0){ e = age / 1.0; pos = lerp2(p.rest, p.hold, e * e * (3 - 2 * e)); pos[1] -= Math.sin(e * Math.PI) * 120 * k * p.arc; ang = (e - 0.5) * 1.6 * p.dir; if (p.flat >= 1) sc = 1 + Math.sin(e * Math.PI) * 0.45; }
+    else { const u = age - 1.0; pos = [p.hold[0] + Math.sin(u * 6) * 6 * k * (1 - Math.min(1, u / 1.3)), p.hold[1] + Math.abs(Math.sin(u * 3)) * 3 * k]; ang = Math.sin(u * 6) * 0.12 * (1 - Math.min(1, u / 1.3)); if (u > 1.0) ctx.globalAlpha = clamp(1 - (u - 1.0) / 0.3, 0, 1); }
+    if (p.flat >= 1){ ctx.globalAlpha *= 0.28; ctx.fillStyle = '#05121C'; ctx.beginPath(); ctx.ellipse(pos[0] + 6 * k, pos[1] + 14 * k * sc, w * 0.4, h * 0.25, 0, 0, TAU); ctx.fill(); ctx.globalAlpha = age > 2.0 ? clamp(1 - (age - 2.0) / 0.3, 0, 1) : 1; }
+    ctx.save(); ctx.translate(pos[0], pos[1]); ctx.rotate(ang * (p.flat >= 1 ? 1 : 1)); if (p.dir < 0 && p.flat < 1) ctx.scale(-1, 1); ctx.scale(sc, sc);
+    ctx.drawImage(ic, -w / 2, -h / 2, w, h); ctx.restore(); ctx.globalAlpha = 1;
+    /* the drops it throws up as it leaves the water, and a tag once it is held */
+    if (age < 0.9) for (let i = 0; i < 12; i++){ const an = i * 0.78 + 0.4, v = (50 + (i % 4) * 26) * k, tt = age; const x = p.rest[0] + Math.cos(an) * v * tt * 0.9, y = p.rest[1] - Math.abs(Math.sin(an)) * v * tt * 1.4 * p.arc + 260 * k * tt * tt * 0.5 * p.arc; ctx.globalAlpha = clamp(1 - tt / 0.9, 0, 1); ctx.fillStyle = '#DFF6FF'; ctx.beginPath(); ctx.arc(x, y, (2.8 - tt * 2) * k, 0, TAU); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    if (age > 1.0 && age < 2.0){
+      const txt = f.name + ', ' + a.len + ' cm' + (a.rec ? '  ★' : '');
+      ctx.font = '700 ' + Math.round(15 * Math.max(1, k * 0.9)) + 'px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(8,20,30,.85)'; ctx.fillStyle = '#FFF3C4';
+      ctx.globalAlpha = age > 1.8 ? clamp(1 - (age - 1.8) / 0.2, 0, 1) : 1;
+      ctx.strokeText(txt, pos[0], pos[1] - h * 0.9 - 8 * k); ctx.fillText(txt, pos[0], pos[1] - h * 0.9 - 8 * k); ctx.globalAlpha = 1;
+    }
+  }
+  /* it got away: a splash and a dark shape darting off */
+  if (a && a.k === 'lost' && age < FISH_ANIM.lost){
+    ctx.globalAlpha = clamp(1 - age / FISH_ANIM.lost, 0, 1) * 0.8;
+    const d = age * 140 * k * p.dir, ic = fishIcon(a.f);
+    ctx.save(); ctx.translate(p.rest[0] - d, p.rest[1] + 6 * k); ctx.scale(0.5 * k * (p.dir || 1), 0.5 * k * p.flat + 0.001); ctx.globalAlpha *= 0.55; ctx.drawImage(ic, -42, -24, 84, 48); ctx.restore();
+    ctx.globalAlpha = clamp(1 - age / 0.5, 0, 1); ctx.strokeStyle = '#DFF6FF'; ctx.lineWidth = 2 * k; ctx.beginPath(); ctx.ellipse(p.rest[0], p.rest[1], 10 * k + age * 60 * k, (10 * k + age * 60 * k) * p.flat, 0, 0, TAU); ctx.stroke();
+  }
+  ctx.restore();
+}
+function fishPierGeo(){
+  const f = Town.face < 0 ? -1 : 1, x = Town.x;
+  return { rodFrom: [x + f * 46, TG - 146], rod: [x + f * 104, TG - 204], rest: [x + f * 168, TG - 30], hold: [x + f * 112, TG - 170], k: 1.15, flat: 0.28, arc: 1, dir: f };
+}
+function fishSeaGeo(){
+  const W = G.W, H = G.H, z = clamp(H / 520, 0.8, 1.7), cx = W / 2, cy = H / 2, narrow = W < 700;
+  let nx = Math.cos(Sea.h + Math.PI / 2), ny = Math.sin(Sea.h + Math.PI / 2);
+  if (narrow ? ny > 0 : nx > 0){ nx = -nx; ny = -ny; }                      /* the side away from the sidebar */
+  return { rodFrom: null, rod: [cx + nx * 26 * z, cy + ny * 26 * z], rest: [cx + nx * 120 * z, cy + ny * 120 * z], hold: [cx + nx * 34 * z, cy + ny * 34 * z], k: z, flat: 1, arc: 0.7, dir: nx < 0 ? -1 : 1 };
+}
+(function(){
+  const dyn = townDynamic;
+  townDynamic = function(ctx, D, t, dark){
+    dyn.apply(this, arguments);
+    if (!Fg.sea && D.id === 'harbour' && Town.on && fishAnimOn()) fishDrawAnim(ctx, fishPierGeo());
+  };
+  const rn = render;
+  render = function(){
+    if (Sea.on && G.state === 'fishing'){ const ctx = CTX; if (!ctx) return; ctx.setTransform(G.dpr, 0, 0, G.dpr, 0, 0); ctx.globalAlpha = 1; ctx.fillStyle = STAGE_BG; ctx.fillRect(0, 0, G.W, G.H); renderSea(ctx); fishDrawAnim(ctx, fishSeaGeo()); return; }
+    return rn.apply(this, arguments);
+  };
+  const st = step;
+  step = function(dt){ Fg.clock += Math.min(dt, 0.1); return st(dt); };
+  const dh = townDynamic && typeof townDialogHeight === 'function' ? townDialogHeight : null;
+  if (dh) townDialogHeight = function(){ return Town.panel && Fg.side && G.W < 700 ? Math.round(G.H * 0.44) : dh.apply(this, arguments); };
 })();
 
 /* ---- trophies for it ---- */
