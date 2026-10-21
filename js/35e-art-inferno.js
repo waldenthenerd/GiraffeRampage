@@ -93,7 +93,6 @@ function in10_body(ctx, b, dk, pale, s, bob, e){
   in10_crack(ctx, Math.max(1, 1.2 * s), pale, 0.62 + 0.3 * f);
   ctx.globalAlpha = 0.5 + 0.4 * f; fillCircle(ctx, 0, bob, 2.4 * s, pale); ctx.globalAlpha = 1; fillCircle(ctx, 0, bob, 1.1 * s, IN10_CORE);   /* the ember heart */
 }
-function rockBody(ctx, b, dk, pale, s, bob, e){ in10_body(ctx, b, dk, pale, s, bob, e); }
 function rockEyes(ctx, pale, x, bob, gap, r){ for (const sy of [-1, 1]) in10_eye(ctx, x, bob + sy * gap, r, pale); }
 /* weapons (own copies, so this chapter does not depend on the Chapter 9 helpers) */
 function in10_blade(ctx, s, wind, pale){

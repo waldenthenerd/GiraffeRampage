@@ -425,7 +425,8 @@ function equipGear(id){
   const p = GEAR_INDEX[id];
   if (!p || !gearOwned(id) || !Save.data) return false;
   if (!Save.data.equipped) Save.data.equipped = {};
-  Save.data.equipped[p.slot] = id;
+  const previous = Save.data.equipped[p.slot]; Save.data.equipped[p.slot] = id;
+  if (p.slot === 'cape' && previous !== id && typeof gfxClearAurora === 'function') gfxClearAurora();
   Save.write();
   recalcStats();
   return true;
@@ -433,6 +434,7 @@ function equipGear(id){
 function unequipSlot(slot){
   if (!Save.data || !Save.data.equipped) return;
   Save.data.equipped[slot] = null;
+  if (slot === 'cape' && typeof gfxClearAurora === 'function') gfxClearAurora();
   Save.write();
   recalcStats();
 }
@@ -628,35 +630,4 @@ function rollRarity(weights){
   let r = Math.random() * total;
   for (const k in weights){ r -= weights[k]; if (r <= 0) return k; }
   return 'common';
-}
-/* Returns { piece, dupe, refund } or null if the purchase could not happen. */
-function openCrate(kind){
-  const crate = CRATES[kind];
-  if (!crate) return null;
-  if (!Save.data || (Save.data.gems | 0) < crate.cost) return null;
-  Save.data.gems -= crate.cost;
-
-  /* Pick a rarity, then a piece of that rarity. If every piece of the rolled
-     rarity is already owned, prefer an unowned piece from any rarity so the
-     crate still feels like progress; only then fall back to a duplicate. */
-  const rarity = rollRarity(crate.weights);
-  const all = Object.keys(GEAR_INDEX).map(id => GEAR_INDEX[id]);
-  const atRarity = all.filter(p => p.rarity === rarity);
-  let candidates = atRarity.filter(p => !gearOwned(p.id));
-  if (!candidates.length) candidates = all.filter(p => !gearOwned(p.id));
-  let piece, dupe = false, refund = 0;
-  if (candidates.length){
-    piece = pick(candidates);
-    grantGear(piece.id);
-    /* auto-equip into an empty slot so a new player sees it work immediately */
-    if (!gearEquipped(piece.slot)) equipGear(piece.id);
-  } else {
-    piece = pick(atRarity.length ? atRarity : all);
-    dupe = true;
-    refund = DUPE_REFUND;
-    Save.data.gems += refund;
-  }
-  Save.data.cratesOpened = (Save.data.cratesOpened | 0) + 1;
-  Save.write();
-  return { piece: piece, dupe: dupe, refund: refund, rarity: piece.rarity };
 }

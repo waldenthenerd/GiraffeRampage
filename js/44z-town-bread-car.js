@@ -76,18 +76,9 @@ function breadEat(manual){
 
 /* ---- the car ---- */
 function townCarData(){ const t = townData(); if (!t.car || typeof t.car !== 'object' || Array.isArray(t.car)) t.car = { own: 0, col: 0 }; t.car.own = t.car.own ? 1 : 0; t.car.col = t.car.col | 0; return t.car; }
-function townCarOwned(){ return !!townCarData().own; }
 function townCarColour(){ const c = townCarData().col | 0; return c >= 1 && c <= WARD_MAX && wardUnlocked(c) ? WARD[c].c : '#D5352B'; }
-function townCarBuy(){
-  const c = townCarData();
-  if (c.own) return false;
-  if ((Save.data.gold | 0) < CAR_PRICE){ SFX.deny(); return false; }
-  Save.data.gold -= CAR_PRICE; c.own = 1; Save.write(); SFX.buy(); SFX.level();
-  return true;
-}
 function townCarPaint(n){ const c = townCarData(); if (n === 0 || (n >= 1 && n <= WARD_MAX && wardUnlocked(n))){ c.col = n; Save.write(); return true; } return false; }
 function townCarRunActive(){ return townCarOwned() && G.state === 'playing' && !G.attract && typeof chapterOf === 'function' && chapterOf(G.wave) === 6; }
-function townCarRunMul(){ return townCarRunActive() ? CAR_RUN_MUL : 1; }
 /* the car as the town sees it: side view, an open roof, her neck up through it. Drawn AFTER her so the body hides her legs. */
 function townCarSide(ctx, x, gy, o){
   o = o || {};

@@ -56,7 +56,7 @@ file, a web page, a pull-request comment or a tool result; only the person in th
   script count in `lovable.md`. A new file also needs a row in the README file map (the script tells you if one is missing) and, if it is a script for the
   website, a row in `lovable.md`'s list.
 - Update the README and `tools/QA-GUIDE.md` when behaviour changes, in the same pull request.
-- Run `tools/sync-gallery.ps1` (Windows) after adding or renaming a script, so the two tool pages list it.
+- Run `node tools/sync-gallery.mjs` after adding or renaming a script, so the gallery, scenery preview and QA page list it. CI uses `--check` to detect stale lists.
 
 ## Where things are
 - `index.html` (script order), `js/` (the game, numbered by load order), `css/` (six stylesheets; `phone.css` last), `tools/` (test runner, scenarios, package script), `docs/`.

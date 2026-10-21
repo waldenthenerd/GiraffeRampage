@@ -321,40 +321,6 @@ function antsTabHTML(){
 }
 let wheelResult = null, wheelSpinning = false, wheelRotation = 0;
 const WHEEL_SPIN_MS = 4200;
-function wheelTabHTML(){
-  const keys = Save.data.wheelKeys | 0;
-  const total = WHEEL_SEGMENTS.reduce((a, x) => a + x.weight, 0);
-  let cum = 0;
-  const gradientStops = WHEEL_SEGMENTS.map(seg => {
-    const from = (cum / total * 360).toFixed(2); cum += seg.weight;
-    const to = (cum / total * 360).toFixed(2);
-    return seg.color + ' ' + from + 'deg ' + to + 'deg';
-  }).join(', ');
-  const legend = WHEEL_SEGMENTS.map(seg =>
-    '<div class="wheelLegendItem"><i style="background:' + seg.color + '"></i>' + seg.label + ' \u2014 ' + seg.weight + '%</div>'
-  ).join('');
-  let result = '';
-  if (wheelResult){
-    result = '<div class="crateresult ' + (wheelResult.duplicate ? 'common' : (TRINKETS[wheelResult.seg.id] ? 'legendary' : 'rare')) + '">' +
-      '<div class="rr">You won</div>' +
-      '<div class="rn">' + wheelResult.label + '</div>' +
-    '</div>';
-  }
-  const canSpin = keys > 0 && !wheelSpinning;
-  return '<p class="sub">Reach a score of ' + WHEEL_SCORE_THRESHOLD.toLocaleString('en-US') + ' in a single run to earn a key, ' +
-      'at most once every 30 minutes. Spend a key here for a shot at gold, gems, or an exclusive trinket.</p>' +
-    '<div class="wheelArea">' +
-      '<div class="wheelPointer">\u25BC</div>' +
-      '<div class="wheelDisc" id="wheelDisc" style="background:conic-gradient(' + gradientStops + ');transform:rotate(' + wheelRotation + 'deg)"></div>' +
-    '</div>' +
-    '<div class="wheelLegend">' + legend + '</div>' +
-    result +
-    '<div class="row" style="margin-top:14px">' +
-      '<button class="btn sm' + (canSpin ? '' : ' ghost') + '" id="wheelSpinBtn" data-a="spin-wheel"' + (canSpin ? '' : ' disabled') + '>' +
-        (wheelSpinning ? 'Spinning\u2026' : 'Spin (' + keys + ' key' + (keys === 1 ? '' : 's') + ')') +
-      '</button>' +
-    '</div>';
-}
 /* Data and animation are deliberately separate: spinWheel() above resolves
    and saves the reward the instant a key is spent, so the outcome is never
    lost even if the tab is closed mid-animation. This function only drives

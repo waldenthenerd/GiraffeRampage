@@ -7,7 +7,7 @@ function srcInfo(id, cards){
     const def = CARDMAP[id], row = cards && cards.filter(function(c){ return c[0] === id; })[0], lv = row ? row[1] : 1, f = cardForm(def, lv);
     return { name: f.name, icon: f.icon, col: f.color };
   }
-  const T = { kick: ['Your kick', '@t-x-hoof', '#E8A060'], ants: ['Ant colony', '@t-bug', '#C0C94A'], allies: ['Dust allies', '@t-paw', '#C98A4A'], squad: ['Dust squad', '@t-paw', '#F2B33D'], burn: ['Burning', '@t-flame', '#FF7A2A'], turrets: ['Ant turrets', '@t-x-crosshair', '#E0A82A'], other: ['Other', '@t-x-help', '#A89E90'] };
+const T = { kick: ['Your kick', '@t-x-hoof', '#E8A060'], gear: ['Gear effects', '@t-x-medal', '#F2B33D'], ants: ['Ant colony', '@t-bug', '#C0C94A'], allies: ['Dust allies', '@t-paw', '#C98A4A'], squad: ['Dust squad', '@t-paw', '#F2B33D'], burn: ['Burning', '@t-flame', '#FF7A2A'], turrets: ['Ant turrets', '@t-x-crosshair', '#E0A82A'], other: ['Other', '@t-x-help', '#A89E90'] };
   const t = T[id] || T.other; return { name: t[0], icon: t[1], col: t[2] };
 }
 function enemyDisplayName(e){

@@ -24,7 +24,6 @@ function groundCacheOn(){
 let _wver = 0;
 const _buildDecorOrig = buildDecor; buildDecor = function(){ _wver++; return _buildDecorOrig.apply(this, arguments); };
 const _buildSceneryOrig = buildScenery; buildScenery = function(){ _wver++; return _buildSceneryOrig.apply(this, arguments); };
-function groundCacheClear(){ [GroundCache, SceneryCache].forEach(function(L){ L.map.clear(); L.bytes = 0; }); }
 
 /* draw the view from L's tiles, painting missing ones (a few a frame) with paint(ctx, centreX, centreY, width, height); false = draw this frame live */
 function tilesDraw(L, sig, ctx, cx, cy, vw, vh, paint){

@@ -1,5 +1,5 @@
 // Cross-platform QA runner (Linux/cloud/macOS/Windows): same scenarios as qa-run.ps1, but with Playwright's Chromium and the FULL game
-// (index.html's script list, so town, sea and gym code are all loaded; tools/qa.html is an older, shorter list).
+// (index.html's script list, so town, sea and gym code are all loaded; tools/qa.html is kept in sync by sync-gallery.mjs).
 //
 // usage: node tools/qa-cloud.mjs <scenario.js> [--shot out.png] [--params "view=boss&ch=3"] [--seed 12345] [--w 1280] [--h 720] [--scale 1] [--touch] [--wait 20000]
 // setup (once): cd tools && npm install && npx playwright install --with-deps chromium

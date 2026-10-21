@@ -116,28 +116,6 @@ function townRide(toId){
   Town.hold = true; Town.panel = false;
   try { SFX.tone('triangle', 1175, 1175, 0.28, 0.1, 0, 0); } catch (e) {}
 }
-function townDrawRide(ctx){
-  const R = Town.ride, W = G.W, H = G.H, k = R.t / R.dur, h = townHour(), sky = townSkyAt(h);
-  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, sky.top); g.addColorStop(1, sky.bot); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  const sc = H / 600, speed = 520 + 900 * Math.sin(Math.min(1, k) * Math.PI);
-  const off = R.t * speed;
-  [[0.25, '#8FA6C0', 90, 230], [0.5, '#6F88A8', 60, 160], [1, '#4A6280', 40, 90]].forEach(function(l, li){
-    ctx.fillStyle = l[1]; const w = 120 + li * 40, step = w + 30 + li * 14, base = H * 0.78;
-    const o = (off * l[0] * 0.4) % step;
-    for (let x = -step + -o; x < W + step; x += step){ const idx = Math.floor((x + off * l[0] * 0.4) / step), hh = l[2] + ((idx * 53) % 7) * l[3] / 7 * sc; ctx.fillRect(x, base - hh, w, hh + H); }
-  });
-  /* the carriage around the window */
-  ctx.fillStyle = '#2A3A32'; ctx.fillRect(0, 0, W, H * 0.12); ctx.fillRect(0, H * 0.74, W, H * 0.26); ctx.fillRect(0, 0, W * 0.08, H); ctx.fillRect(W * 0.92, 0, W * 0.08, H);
-  ctx.fillStyle = '#F1E6C8'; ctx.fillRect(0, H * 0.72, W, H * 0.03);
-  ctx.fillStyle = '#7A3A2E'; for (let i = 0; i < 3; i++) ctx.fillRect(W * (0.12 + i * 0.3), H * 0.8, W * 0.22, H * 0.2);
-  ctx.strokeStyle = '#C9CDD9'; ctx.lineWidth = 3; for (let i = 0; i < 5; i++){ const x = W * (0.15 + i * 0.18), sw = Math.sin(R.t * 6 + i) * 6; ctx.beginPath(); ctx.moveTo(x, H * 0.12); ctx.lineTo(x + sw, H * 0.3); ctx.stroke(); ctx.beginPath(); ctx.arc(x + sw, H * 0.31, 8, 0, TAU); ctx.stroke(); }
-  /* she sits by the window */
-  const bob = Math.sin(R.t * 18) * 1.5;
-  townGiraffe(ctx, W * 0.5, H * 0.9 + bob, { s: Math.min(2.2, H / 330), sit: true, flip: false, reach: 0.15, t: Town.t, ph: 0 });
-  miniText(ctx, 'Next stop: ' + TOWN_DIST[R.to].name, W / 2, H * 0.085, Math.min(26, W / 14), '#FFF6E0');
-  miniText(ctx, 'from ' + R.from, W / 2, H * 0.085 + 24, 14, '#C9B890', 'center', false);
-  ctx.fillStyle = 'rgba(8,6,5,' + (k > 0.85 ? (k - 0.85) / 0.15 : k < 0.12 ? 1 - k / 0.12 : 0).toFixed(2) + ')'; ctx.fillRect(0, 0, W, H);
-}
 
 /* ---- things that move ---- */
 function townBirds(ctx, D, t){

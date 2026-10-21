@@ -153,8 +153,6 @@ TOWN_ERRANDS.forEach(function(e){ TOWN_ERR_BY_ID[e.id] = e; });
   };
 })();
 
-/* ---- visitors in the new places: the street an item belongs to, and where pickups happen ---- */
-function townWhere(it){ return it.in || it.d; }
 
 /* ---- painting ---- */
 (function(){

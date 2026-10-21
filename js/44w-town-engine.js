@@ -19,7 +19,6 @@ function townHour(){ return typeof Town.fixHour === 'number' ? Town.fixHour : (D
 function townDark(h){ if (h < 5.5) return 1; if (h < 7.2) return 1 - (h - 5.5) / 1.7; if (h < 18) return 0; if (h < 20) return (h - 18) / 2; return 1; }
 function townDusk(h){ return Math.max(0, 1 - Math.abs(h - 18.7) / 1.7, 1 - Math.abs(h - 6.4) / 1.3); }
 function townIsNight(){ return townDark(townHour()) > 0.6; }
-function townRainNow(){ const w = Math.floor(Date.now() / 240000); return miniRng(w * 7919 + 13)() < 0.22; }
 function townDayKey(){ const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
 function townHash(s){ let h = 2166136261; for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 /* today's glimmering spots (three, in districts she can reach) and where Dot is hiding */

@@ -21,6 +21,7 @@ function startRun(startChapter, waveOverride, snap){
   const chapter = forcedWave ? chapterOf(forcedWave) : clamp(Math.round(startChapter) || 1, 1, TOTAL_CHAPTERS);
   SFX.init(); SFX.resume(); keepAwake();
   resetWorld();
+  gfxReset(); GearFx.lastTime = 0;
   G.attract = false; G.deathFX = null; G.slowmo = null; G.reviveFX = null; G.introFX = null; G.bannerHold = null;
   G.splash = false; screenFadeIn(0.5);
   G.time = 0; G.runTime = 0; G.score = 0; G.kills = 0; G.bonusGold = 0;
@@ -80,6 +81,7 @@ function gameOver(){
   if (G.state === 'dead' || G.state === 'victory') return;
   P.dead = true;
   G.state = 'dead';
+  gfxClearAurora(); recalcStats();
   const gm = P.stats.goldMul;
   const base = Math.floor(G.score * 0.002);
   const bonus = Math.floor(G.bonusGold);
@@ -110,6 +112,7 @@ function gameOver(){
 function chapterComplete(){
   if (G.state === 'victory' || G.state === 'dead') return;
   G.state = 'victory';
+  gfxClearAurora(); recalcStats();
   const gm = P.stats.goldMul;
   const COMPLETION_MUL = 1.5;
   const base = Math.floor(G.score * 0.002);
