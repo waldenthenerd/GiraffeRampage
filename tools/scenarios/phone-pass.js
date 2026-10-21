@@ -68,11 +68,27 @@ try {
     });
     townCarOwned = realCar; G.state = 'menu'; Town.on = false; out.townHud = hits.length === 0 && shown >= 4; out.townHudHits = hits.join(', ');
   })();
+  /* at sea: a finger held on the screen steers and the boat moves (js/43-input.js has to treat 'sail' like the town), and it does not drift back to the dock by itself */
+  (function(){
+    var sd = seaData(), realSel = sd.sel, st = document.getElementById('stage'), rc = st.getBoundingClientRect();
+    function touch(type, x, y){
+      var t = new Touch({ identifier: 7, target: st, clientX: rc.left + x, clientY: rc.top + y });
+      st.dispatchEvent(new TouchEvent(type, { changedTouches: type === 'touchend' ? [t] : [t], touches: type === 'touchend' ? [] : [t], bubbles: true, cancelable: true }));
+    }
+    sd.sel = 'skiff'; G.state = 'menu'; Input.hasTouch = true; seaStart('harbour');
+    var x0 = Sea.x, y0 = Sea.y, down;
+    touch('touchstart', G.W * 0.85, G.H * 0.5); down = Input.mdown === true;
+    for (var i = 0; i < 240; i++) GR.step(1 / 30);
+    var moved = Math.hypot(Sea.x - x0, Sea.y - y0), still = G.state === 'sail' && Sea.on;
+    touch('touchend', G.W * 0.85, G.H * 0.5);
+    out.sail = down && Input.mdown === false && moved > 60 && still; out.sailInfo = 'down ' + down + ' moved ' + Math.round(moved) + ' state ' + G.state;
+    Sea.on = false; G.state = 'menu'; sd.sel = realSel;
+  })();
   /* landscape: the wheel cards are one line each and the wheel is on the first screen */
   if (land){ screens.wheel(); var cd = document.querySelector('.wpick .wcard'); out.landCards = cd.getBoundingClientRect().height < 60; out.landWheel = document.querySelector('.wwheel').getBoundingClientRect().top < innerHeight * 0.8; }
   if (screen && screens[screen]){ G.state = 'shop'; screens[screen](); }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-var need = ['noSideScroll', 'sliders', 'swatches', 'chips', 'upChips', 'gview', 'gearText', 'antsText', 'wheelText', 'hudText', 'buyRow', 'fusionRow', 'bestiary3', 'titleFits', 'runHud', 'townHud'];
+var need = ['noSideScroll', 'sliders', 'swatches', 'chips', 'upChips', 'gview', 'gearText', 'antsText', 'wheelText', 'hudText', 'buyRow', 'fusionRow', 'bestiary3', 'titleFits', 'runHud', 'townHud', 'sail'];
 if (innerWidth > innerHeight) need = need.concat(['landCards', 'landWheel']);
 out.pass = out.errs.length === 0 && out.coarse === true && need.every(function(k){ return out[k] === true; });
 QA.done(out);
