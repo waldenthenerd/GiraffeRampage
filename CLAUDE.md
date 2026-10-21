@@ -9,4 +9,5 @@ The rules for every agent that works on this project (Claude Code and Codex alik
 - In a cloud session, outbound network and the browser come pre-configured: Playwright finds Chromium under `/opt/pw-browsers`, so skip `playwright install`.
 - Claude works with the owners directly: simple changes may be committed straight to `main` and merges happen when an owner says so. That is a standing
   arrangement with Claude only; it does not extend to other agents, which always use a branch and a pull request (see `AGENTS.md`).
+- The owners also let Claude (not other agents) edit `AGENTS.md` and `lovable.md` without asking first, and commit changes of small size straight to `main`; bigger work goes on a `claude/<topic>` branch and waits for "merge".
 - Ask the owners clarifying questions when a request is open-ended, and do not delete old branches (the owners do).
