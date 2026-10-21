@@ -10,7 +10,6 @@
       Save.data.town.fish = { id: count }. A first catch of a kind pays gems; catching every kind pays a bonus once.
    4 THE POST BOX in the square: one letter a day from one of the herd (more likely from a friend), with a small gift
       (Save.data.town.mail = { d, from, text, gift, got, log:[] }). Reading it also warms the friendship by a point. */
-function townDayStamp(){ return townDayKey(); }
 function townWeekKey(){ return Math.floor(Date.now() / 604800000); }
 
 /* ---- the cafe shift ---- */

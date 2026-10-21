@@ -48,12 +48,6 @@ function sp7_dots(ctx, pts, oy, r, c){
   for (let i = 0; i < pts.length; i += 2){ ctx.moveTo(pts[i] + r, pts[i + 1] + oy); ctx.arc(pts[i], pts[i + 1] + oy, r, 0, TAU); }
   ctx.fill();
 }
-/* many separate line segments [x1,y1,x2,y2,...] in one stroke */
-function sp7_segs(ctx, pts, oy, w, c){
-  ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath();
-  for (let i = 0; i < pts.length; i += 4){ ctx.moveTo(pts[i], pts[i + 1] + oy); ctx.lineTo(pts[i + 2], pts[i + 3] + oy); }
-  ctx.stroke();
-}
 
 const SPACE_DRAW = {
   quadbot(ctx, e, b, dk, bob, wind, d){

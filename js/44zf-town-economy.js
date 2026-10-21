@@ -35,7 +35,6 @@ function planeFleet(){
   return p;
 }
 function planeOwned(){ return Object.keys(planeFleet().owned).length > 0; }
-function planeSel(){ return PLANE_BY_ID[planeFleet().sel] || PLANES[0]; }
 function planeColour(){ const p = planeFleet(), c = (p.cols[p.sel] === undefined ? p.col : p.cols[p.sel]) | 0; return c >= 1 && c <= WARD_MAX && wardUnlocked(c) ? WARD[c].c : '#E8B648'; }
 function planeBuy(id){
   id = id || 'sparrow'; const P = PLANE_BY_ID[id], p = planeFleet(); if (!P || p.owned[id]) return false;

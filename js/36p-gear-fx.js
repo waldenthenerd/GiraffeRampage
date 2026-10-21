@@ -28,6 +28,7 @@ function gfxReset(){
   GearFx.ward.ready = true; GearFx.ward.cd = 0; GearFx.still = 0;
   if (GearFx.auroraT > 0){ GearFx.auroraT = 0; recalcStats(); }
 }
+function gfxClearAurora(){ GearFx.auroraT = 0; GearFx.still = 0; }                       /* callers recalculate after the equipment or run boundary */
 function gfxLater(t, f){ GearFx.pending.push({ t: t, f: f }); }
 
 const GEAR_FX = {

@@ -344,18 +344,6 @@ function confirmWipe(){
     '</div>');
 }
 
-function buyCrate(kind){
-  const c = CRATES[kind];
-  if (!c) return;
-  if ((Save.data.gems | 0) < c.cost){ SFX.deny(); return; }
-  const res = openCrate(kind);
-  if (!res){ SFX.deny(); return; }
-  crateResult = res;
-  if (res.dupe) SFX.coin();
-  else if (res.rarity === 'legendary' || res.rarity === 'epic') SFX.transform();
-  else SFX.buy();
-  showShop('gear');
-}
 
 function buyUpgrade(id){
   const m = METAMAP[id];

@@ -182,7 +182,6 @@ function townFound(id){ return !!townData().found[id]; }
 function townFoundIn(d){ let n = 0; TOWN_ITEMS.forEach(function(it){ if (it.d === d && townData().found[it.id]) n++; }); return n; }
 function townFoundTotal(){ let n = 0; TOWN_ITEMS.forEach(function(it){ if (townData().found[it.id]) n++; }); return n; }
 function townFoundType(t){ let n = 0; TOWN_ITEMS.forEach(function(it){ if (it.t === t && townData().found[it.id]) n++; }); return n; }
-function townSwatchFound(n){ for (let i = 0; i < TOWN_ITEMS.length; i++) if (TOWN_ITEMS[i].n === n) return !!townData().found[TOWN_ITEMS[i].id]; return false; }
 
 /* ---- the herd ---- */
 /* look: coat, spot, pat (a WARD_PATTERNS number), hat, boot (ACC ids), hc/bc (tint colour numbers), s (size). habit: what she does when nobody is talking

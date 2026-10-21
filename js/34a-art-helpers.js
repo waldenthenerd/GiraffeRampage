@@ -114,12 +114,4 @@ function lkCHAIN(ctx, n, x0, x1, amp, ph, r0, r1, c, bob){
   }
   return pts;
 }
-function lkWings(ctx, flap, len, wid, off, b, tip){
-  for (let side = -1; side <= 1; side += 2){
-    ctx.save(); ctx.rotate(side * flap);
-    lkOV(ctx, -3, side * off, len, wid, b, side * 0.28);
-    if (tip) lkOV(ctx, -3 - len * 0.72, side * (off + wid * 0.7), len * 0.36, wid * 0.55, tip, side * 0.28);
-    ctx.restore();
-  }
-}
 

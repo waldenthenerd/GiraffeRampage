@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Recounts the README: the per-file line counts, the totals table, the 'without the developer panel' line, and the script count in lovable.md.
 Run from anywhere:  python3 tools/recount-readme.py   (prints what changed; add --check to change nothing and exit 1 if a recount is needed, as CI does; run it after every change to a js/ or css/ file or to index.html).
-A file's count is its number of lines, counting a last line that has no final newline (so it can be one higher than `wc -l`)."""
+Every game file now ends with a newline, so its line count matches `wc -l`. The counter also handles a missing final newline if one is introduced later."""
 import glob, os, re, sys
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); os.chdir(root)
 def rd(p): return open(p, encoding='utf-8').read()

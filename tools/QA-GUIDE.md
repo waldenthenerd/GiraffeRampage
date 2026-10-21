@@ -92,6 +92,10 @@ Your scenario files and screenshots stay in your scratch folder; mention their n
 - Photo studio: `PHOTO.filter` (0 to 4), `PHOTO.frame` (0 to 7), `PHOTO.tod` (-1 or 0 to 47, half hours), `PHOTO.freeze`, then `photoRender(canvas, false)`; `photoToCode()` writes code version 5 only if one is set.
 
 ## Gear page, gear art, levels, crates, effects
+- `runreport-gear.js`: real damage and a run end list Gear effects, preserving existing source labels.
+- `preview-trail.js`: Kick creates visible preview-owned afterimages while the live array and timer survive normal drawing and exceptions.
+- `aurora-buff.js`: pause, cape changes, death, chapter completion, restart and shop checks for the temporary XP buff.
+- `compare-panel-triage.js`: 1,386 comparisons across every piece and trinket; `view=offset` shows the gear-only endpoint discrepancy in `docs/cleanup-compare-triage.md`.
 Scenarios are in `tools/scenarios/` (run each with `node tools/qa-cloud.mjs tools/scenarios/<name>.js --wait 25000`, add `--shot x.png` and the params below to see it):
 - `gear-levels.js`: levels (`gearLevel(id)`, `gearLevelUp(id)`, `gearLevelScale(n)`), `gearStatsFor({cape, weapon, armor})`, `gearDelta(slot, id)`, `cratePityCount(kind)` / `cratePityBump(kind, good)`.
 - `gear-art.js`: `view=capes|weapons|armor`, `lv=1..5`, `page=0|1` (weapons), `zoom=1.9`. Draws a contact sheet of all 16 over the page (capes by `drawPlayer` with each equipped); also checks that every design paints pixels.

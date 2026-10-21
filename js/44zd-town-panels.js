@@ -193,19 +193,6 @@ function townShowBakery(){
   }
 }
 /* ---- the garage ---- */
-function townShowGarage(){
-  const c = townCarData(), owned = !!c.own, gold = Save.data.gold | 0;
-  let sw = '<div class="paint">';
-  sw += '<button class="swt' + (!c.col ? ' on' : '') + '" data-a="town-carpaint-0" title="Racing red" style="background:#D5352B"></button>';
-  for (let n = 1; n <= WARD_MAX; n++){ if (!wardUnlocked(n)) continue; sw += '<button class="swt' + (c.col === n ? ' on' : '') + '" data-a="town-carpaint-' + n + '" title="' + WARD[n].name + '" style="background:' + WARD[n].c + '"></button>'; }
-  sw += '</div>';
-  townPanelT('garage', '<div class="tp-title">TORQUE MOTORS</div><canvas id="carCv" width="320" height="150"></canvas>' +
-    '<div class="spec"><div><span>In town</span><b>2.2× faster</b></div><div><span>In Houston</span><b>+45% speed</b></div><div><span>Underground</span><b>never</b></div></div>' +
-    (owned ? '<p class="bp">Yours. Pick a colour. Press <b>C</b> in town to get in and out.</p>' + sw
-           : '<p class="bp">An open-top car with a hole in the roof, because someone has to fit that neck.</p><button class="bpbtn" data-a="town-buycar"' + (gold >= CAR_PRICE ? '' : ' disabled') + '>Buy it<small>' + fmt(CAR_PRICE) + ' gold  ·  you have ' + fmt(gold) + '</small></button>'), { w: 560 });
-  const cv = document.getElementById('carCv');
-  if (cv){ const g = cv.getContext('2d'); g.translate(160, 130); g.scale(1.55, 1.55); townCarSide(g, 0, 0, { col: owned ? townCarColour() : '#D5352B', t: 0, spin: 0 }); }
-}
 
 /* ---- the actions of the new panels ---- */
 (function(){

@@ -97,14 +97,6 @@ function townThunder(delay){
 
 /* ---- 2 routines ---- */
 const TOWN_KEEPERS = ['mayor', 'tilly', 'barnaby', 'penny', 'rio', 'gus', 'skye'];
-function townNpcSlot(id){
-  const def = TOWN_NPCS[id], h = townHour(), i = TOWN_KEEPERS.indexOf(id);
-  if (i < 0) return { d: def.d, x: def.x };
-  if (h >= 21 || h < 6.5) return (id === 'skye' && h >= 21 && h < 23) ? { d: def.d, x: def.x } : null;
-  if (h >= 12 && h < 13.5 && (id === 'tilly' || id === 'barnaby' || id === 'mayor' || id === 'penny')) return { d: 'in_cafe', x: 340 + i * 90 };
-  if (h >= 18 && h < 21 && id !== 'skye') return { d: 'square', x: 820 + i * 70 };
-  return { d: def.d, x: def.x };
-}
 function townApplyRoutines(){
   const D = TOWN_DIST[Town.d]; if (!D || !Town.on) return;
   Town.npcs = Town.npcs.filter(function(n){ if (TOWN_KEEPERS.indexOf(n.id) < 0) return true; const s = townNpcSlot(n.id); return s && s.d === Town.d; });

@@ -12,7 +12,7 @@
    THE WORLD. A side-on strip: Longneck Town, then the chapters on the Earth in order: 1 to 7; Chapter 11 once Chapter 10 is finished; Chapter 12
    once 11 is. Each has its own ground and scenery, regions blend into one another with a gateway between, and a fog wall ends what is open.
    Gold rings hang along the way. Nothing about a chapter changes. Esc leaves the flight (back on the runway, no harm done). */
-const PLANE_PRICE = 60000, FLY_GROUND = 540, FLY_H = 700, FLY_REGION_W = 2600, FLY_TOWN_W = 3800, FLY_RUNWAY_LEN = 1400, FLY_ZONE = 320;
+const FLY_GROUND = 540, FLY_H = 700, FLY_TOWN_W = 3800, FLY_RUNWAY_LEN = 1400, FLY_ZONE = 320;
 const FV = { stall: 135, rotate: 165, cruise: 250, max: 335, g: 330 };
 const FLY_BIOME = {
   0: { name: 'Longneck Town', g: '#D6A24E', g2: '#8A5A2A', hill: '#6A4A52', tint: null },
@@ -27,23 +27,6 @@ const FLY_BIOME = {
   12: { name: 'Area 51', g: '#DDBE82', g2: '#B08C52', hill: '#C8A86A', tint: ['#FFD890', 0.14] }
 };
 function planeData(){ const t = townData(); if (!t.plane || typeof t.plane !== 'object' || Array.isArray(t.plane)) t.plane = { own: 0, col: 0 }; t.plane.own = t.plane.own ? 1 : 0; t.plane.col = t.plane.col | 0; return t.plane; }
-function planeOwned(){ return !!planeData().own; }
-function planeColour(){ const c = planeData().col | 0; return c >= 1 && c <= WARD_MAX && wardUnlocked(c) ? WARD[c].c : '#E8B648'; }
-function planeBuy(){
-  const p = planeData(); if (p.own) return false;
-  if ((Save.data.gold | 0) < PLANE_PRICE){ SFX.deny(); return false; }
-  Save.data.gold -= PLANE_PRICE; p.own = 1; Save.write(); SFX.buy(); SFX.level(); return true;
-}
-function planePaint(n){ const p = planeData(); if (n === 0 || (n >= 1 && n <= WARD_MAX && wardUnlocked(n))){ p.col = n; Save.write(); return true; } return false; }
-/* which regions she can see, in order */
-function flyRegions(){
-  const out = [{ ch: 0, name: 'Longneck Town', w: FLY_TOWN_W }];
-  [1, 2, 3, 4, 5, 6, 7].forEach(function(c){ out.push({ ch: c, name: FLY_BIOME[c].name, w: FLY_REGION_W }); });
-  if (townDoneCh(10)) out.push({ ch: 11, name: FLY_BIOME[11].name, w: FLY_REGION_W });
-  if (townDoneCh(10) && townDoneCh(11)) out.push({ ch: 12, name: FLY_BIOME[12].name, w: FLY_REGION_W });
-  let x = 0; out.forEach(function(r){ r.x0 = x; x += r.w; r.x1 = x; });
-  return out;
-}
 
 /* ---- the plane, side view, facing right; her neck comes up through the cockpit ----
    o: col, flip, bank (radians), prop (angle), s, t, riders: [{ x, look, reach }] (default: her, alone; rider:false for none) */
@@ -267,18 +250,6 @@ function townPaintRunwayField(c, D, W, H, R){
 })();
 
 /* ---- the shop panel and what the doors do ---- */
-function townShowHangar(){
-  const p = planeData(), owned = !!p.own, gold = Save.data.gold | 0;
-  let sw = '<div class="paint"><button class="swt' + (!p.col ? ' on' : '') + '" data-a="town-planepaint-0" title="Sunshine yellow" style="background:#E8B648"></button>';
-  for (let n = 1; n <= WARD_MAX; n++){ if (!wardUnlocked(n)) continue; sw += '<button class="swt' + (p.col === n ? ' on' : '') + '" data-a="town-planepaint-' + n + '" title="' + WARD[n].name + '" style="background:' + WARD[n].c + '"></button>'; }
-  sw += '</div>';
-  townPanelT('garage', '<div class="tp-title">WINGNUT AVIATION</div><canvas id="planeCv" width="340" height="170"></canvas>' +
-    '<div class="spec"><div><span>Rotate at</span><b>' + FV.rotate + ' (stalls below ' + FV.stall + ')</b></div><div><span>Cruise</span><b>' + FV.cruise + '</b></div><div><span>Range</span><b>the whole Earth</b></div></div>' +
-    (owned ? '<p class="bp">Yours. Take off from anywhere on the runway. Right and left: throttle. Up and down: elevator. F turns her round. Esc leaves the flight.</p>' + sw
-           : '<p class="bp">A small propeller plane with room for a neck. Throttle, elevator and a stall if you are careless. See the town from above, and every chapter that is on the Earth.</p><button class="bpbtn" data-a="town-buyplane"' + (gold >= PLANE_PRICE ? '' : ' disabled') + '>Buy it<small>' + fmt(PLANE_PRICE) + ' gold  ·  you have ' + fmt(gold) + '</small></button>'), { w: 600 });
-  const cv = document.getElementById('planeCv');
-  if (cv){ const g = cv.getContext('2d'); flyPlane(g, 170, 92, { col: owned ? planeColour() : '#E8B648', prop: 0.3, s: 1.5, t: 0, rider: owned }); }
-}
 (function(){
   const h = handleTownAction;
   handleTownAction = function(a){

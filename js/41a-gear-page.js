@@ -8,7 +8,7 @@
    Needs 05a (levels), 33a-33d (art and icons). State: gearPage { slot, selected, hover, view }; the live picture: gearPreview.
    ============================================================================================================================= */
 const gearPage = { slot: 'cape', selected: null, hover: null, view: 'doll' };
-const gearPreview = { id: 0, raf: 0, frames: 0, kickT: -1, last: 0, lastDraw: 0 };
+const gearPreview = { id: 0, raf: 0, frames: 0, kickT: -1, last: 0, lastDraw: 0, trail: [], trailT: 0 };
 const GEAR_SLOT_NAME = { cape: 'Capes', weapon: 'Weapons', armor: 'Armor' };
 
 function gaDesc(p){ return p.desc || (p.weapon ? WEAPONS[p.weapon].blurb : ''); }
@@ -18,7 +18,6 @@ function gaPiecesOf(slot){
   return out.sort(function(a, b){ const oa = gearOwned(a.id) ? 0 : 1, ob = gearOwned(b.id) ? 0 : 1; return oa - ob || RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity]; });
 }
 function gaFx(id){ return typeof GEAR_FX !== 'undefined' ? GEAR_FX[id] || null : null; }
-function gaPips(lv){ let s = ''; for (let i = 1; i < lv; i++) s += '●'; return s; }
 /* what the picture shows: what she wears, with the piece being pointed at or selected swapped in */
 function gearTryon(){
   const id = gearPage.hover || gearPage.selected;
@@ -32,7 +31,7 @@ function gearShownLoadout(){
 
 /* ---------- the live picture ---------- */
 const GA_P_KEYS = ['x', 'y', 'vx', 'vy', 'aim', 'face', 'walk', 'hurtT', 'invuln', 'kickAnim', 'rage', 'dead', 'weapon', 'capeColor', 'armorInfo', 'capeSet', 'capeLevel', 'weaponLevel', 'armorLevel'];
-const GA_GF_KEYS = ['blink', 'ear', 'sq', 'breath', 'sway', 'reach', 'pulse', 'power', 'neck', 'land'];
+const GA_GF_KEYS = ['blink', 'ear', 'sq', 'breath', 'sway', 'reach', 'pulse', 'power', 'neck', 'land', 'trail', 'trailT'];
 function gearPreviewDraw(cv, ts){
   const c = cv.getContext('2d'), W = cv.width, H = cv.height, t = ts / 1000, dt = Math.min(0.1, gearPreview.last ? (ts - gearPreview.last) / 1000 : 0.033);
   gearPreview.last = ts;
@@ -54,7 +53,12 @@ function gearPreviewDraw(cv, ts){
     P.weapon = wp && wp.weapon ? weaponAtLevel(WEAPONS[wp.weapon], gearLevel(wp.id)) : DEFAULT_WEAPON; P.weaponLevel = wp ? gearLevel(wp.id) : 1;
     P.armorInfo = ap ? { setId: ap.setId, color: ap.color, rarity: ap.rarity } : null; P.armorLevel = ap ? gearLevel(ap.id) : 1;
     GF.blink = 0; GF.ear = 0; GF.sq = 0; GF.reach = 0; GF.pulse = 0; GF.power = 0; GF.land = 0; GF.breath = Math.sin(t * 2.4) * 0.014; GF.sway = Math.sin(t * 1.3) * 1.6;
-    GF.neck = { ext: 0, bend: 0 };
+    GF.neck = { ext: 0, bend: 0 }; GF.trail = gearPreview.trail; GF.trailT = gearPreview.trailT - dt;
+    /* Advance only the picture's afterimages; the run's array and timer are restored below. */
+    for (let i = GF.trail.length - 1; i >= 0; i--){ GF.trail[i].age += dt; if (GF.trail[i].age > 0.26) GF.trail.splice(i, 1); }
+    if (fxLevelNow() <= 0) GF.trail.length = 0;
+    else if (ke >= 0 && GF.trailT <= 0){ GF.trailT = 0.035; GF.trail.push({ x: P.x, y: P.y, f: P.face, age: 0 }); if (GF.trail.length > 6) GF.trail.shift(); }
+    gearPreview.trailT = GF.trailT;
     if (ke >= 0){ const pr = neckProfile(ke); GF.neck = { ext: pr.k * NS_REACH, bend: pr.w * 30 }; GF.sq = Math.sin(ke * Math.PI) * 0.1; if (ke > 0.3) GF.land = Math.max(0, 1 - (ke - 0.3) * 3.4); }
     c.save(); c.translate(W * 0.26, H * 0.56); c.scale(1.9, 1.9); drawPlayer(c); c.restore();
   } finally {
@@ -68,7 +72,7 @@ function gearPreviewStop(){ if (gearPreview.raf) cancelAnimationFrame(gearPrevie
 function gearPreviewMount(){
   gearPreviewStop();
   const cv = document.getElementById('gearPreview'); if (!cv) return;
-  const me = gearPreview.id; gearPreview.last = 0; gearPreview.lastDraw = 0; gearPreview.err = null;
+  const me = gearPreview.id; gearPreview.last = 0; gearPreview.lastDraw = 0; gearPreview.err = null; gearPreview.trail = []; gearPreview.trailT = 0;
   (function loop(ts){
     if (me !== gearPreview.id || !document.body.contains(cv)) return;                         /* left the tab, or the page was drawn again: this loop ends */
     if (!gearPreview.lastDraw || ts - gearPreview.lastDraw >= 32){ gearPreview.lastDraw = ts; try { gearPreviewDraw(cv, ts); } catch (e) { gearPreview.err = e.message; return; } }
@@ -201,7 +205,7 @@ function gearComparePanel(slot, id){
   if (on) html += '<p class="gnote">Equipped now.</p>';
   else if (!stat.length) html += '<p class="gnote">No change to her stats.</p>';
   else html += '<div class="grows">' + stat.map(function(r){ return '<div class="grow ' + (r.better ? 'up' : 'down') + '"><span>' + r.label + '</span><b>' + gearFmtVal(r.key, r.from) + ' → ' + gearFmtVal(r.key, r.to) + '</b></div>'; }).join('') + '</div>';
-  if (setRow) html += '<div class="gcset' + (setRow.completes ? ' done' : '') + '">' + setRow.label + ' ' + setRow.from + '/3 → ' + setRow.to + '/3' + (setRow.completes ? '<br><b>Completes it: ' + setRow.setDesc + '</b>' : (setRow.to === 3 ? '' : '')) + '</div>';
+  if (setRow) html += '<div class="gcset' + (setRow.completes ? ' done' : '') + '">' + setRow.label + ' ' + setRow.from + '/3 → ' + setRow.to + '/3' + (setRow.completes ? '<br><b>Completes it: ' + setRow.setDesc + '</b>' : '') + '</div>';
   if (lv > 1) html += '<p class="gnote">Level ' + lv + ': its effects are ' + Math.round((gearLevelScale(lv) - 1) * 100) + '% stronger.</p>';
   if (!on) html += '<button class="btn sm" data-equip="' + id + '">Equip</button>';
   return html + '</div>';

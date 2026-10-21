@@ -66,9 +66,6 @@ function mr8_upper(ctx, b, dk, pale, s, bob, d, o){
   lkOV(ctx, 6 * s, bob, 2.3 * s, 4.2 * s, vis); lkOV(ctx, 6.5 * s, bob + 1.7 * s, 1.5 * s, 2.2 * s, vis2);
   lkOV(ctx, 6.6 * s, bob - 1.7 * s, 0.9 * s, 1.5 * s, '#FFFFFF', -0.25);
 }
-function mBody(ctx, b, dk, pale, s, bob, ph, d, pack, o){
-  mr8_lower(ctx, b, dk, pale, s, bob, ph, d, pack); mr8_upper(ctx, b, dk, pale, s, bob, d, o);
-}
 /* A detailed marine rifle, seen from above, pointing along +x: stock, receiver with an ejection port, a vented handguard,
    magazine, grip, a top rail with an optic, a barrel with a muzzle brake, and a glowing energy strip in the unit's colour.
    Drawn from x = 3s to 3s + len, so the muzzle sits where the old single line ended. acc (optional): a colour band on the handguard. */
