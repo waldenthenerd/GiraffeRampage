@@ -37,7 +37,7 @@ function boatOwned(){ return !!seaData().sel; }
 function boatSel(){ return BOAT_BY_ID[seaData().sel] || BOATS[0]; }
 function boatBuy(id){
   const b = BOAT_BY_ID[id], s = seaData(); if (!b || s.own[id]) return false;
-  if ((Save.data.gold | 0) < b.price){ SFX.deny(); return false; }
+  if (goldInt(Save.data.gold) < b.price){ SFX.deny(); return false; }
   Save.data.gold -= b.price; s.own[id] = 1; s.sel = id; Save.write(); SFX.buy(); SFX.level(); return true;
 }
 
@@ -674,11 +674,11 @@ function seaPrice(kind){ return Math.max(kind === 'fish' ? 80 : 110, Math.round(
 function seaBuy(kind, n){
   const s = seaData(), room = seaCap(kind) - s[kind], want = Math.min(n, room), cost = seaPrice(kind) * want;
   if (want <= 0){ SFX.deny(); townToast('You are carrying all the ' + kind + ' you can.', '#FFB89A'); return false; }
-  if ((Save.data.gold | 0) < cost){ SFX.deny(); return false; }
+  if (goldInt(Save.data.gold) < cost){ SFX.deny(); return false; }
   Save.data.gold -= cost; s[kind] += want; Save.write(); SFX.buy(); return true;
 }
 function townShowBoatShop(){
-  const s = seaData(), gold = Save.data.gold | 0;
+  const s = seaData(), gold = goldInt(Save.data.gold);
   let h = '<div class="tp-title">SALTWIND BOATS</div><p class="bp">Four boats, from a rowing skiff to a speedboat. Sail from the mooring beside the shop: W and S for the throttle, A and D to turn.</p><div class="boatgrid">';
   BOATS.forEach(function(b){
     const own = !!s.own[b.id], on = s.sel === b.id;
@@ -691,7 +691,7 @@ function townShowBoatShop(){
   document.querySelectorAll('canvas[data-boat]').forEach(function(cv){ const g = cv.getContext('2d'); g.fillStyle = '#2E78B8'; g.fillRect(0, 0, 150, 76); g.fillStyle = 'rgba(255,255,255,.2)'; for (let i = 0; i < 6; i++) g.fillRect(8 + i * 24, 10 + (i * 17) % 50, 14, 2); seaDrawBoat(g, 75, 38, -0.2, cv.getAttribute('data-boat'), 0, 1.15, 0); });
 }
 function seaShop(kind, title, blurb, effect){
-  const s = seaData(), price = seaPrice(kind), gold = Save.data.gold | 0, room = seaCap(kind) - s[kind];
+  const s = seaData(), price = seaPrice(kind), gold = goldInt(Save.data.gold), room = seaCap(kind) - s[kind];
   const btn = function(n){ const c = price * Math.min(n, Math.max(1, room)); return '<button class="bpbtn" data-a="town-sea-' + kind + '-' + n + '"' + (room <= 0 || gold < price * Math.min(n, room) ? ' disabled' : '') + '>Buy ' + n + '<small>' + fmt(c) + ' gold</small></button>'; };
   townPanelT('bakery', '<div class="tp-title">' + title + '</div><p class="bp">' + blurb + '</p>' +
     '<div class="spec"><div><span>In your satchel</span><b>' + s[kind] + ' of 10</b></div><div><span>Price</span><b>' + fmt(price) + ' gold each</b></div><div><span>' + effect[0] + '</span><b>' + effect[1] + '</b></div><div><span>Key in a run</span><b>' + keyName(keyOf(kind)) + '</b></div></div>' +

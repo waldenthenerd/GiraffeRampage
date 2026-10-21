@@ -17,13 +17,13 @@ function cornCap(){ return CORN_CAP + 5 * Math.min(2, carryLv('corn')); }
 function seaCap(k){ return 10 + 5 * Math.min(2, carryLv(k)); }
 function carryBuy(k){
   const U = CARRY_UP[k], lv = carryLv(k); if (lv >= 2) return false;
-  if ((Save.data.gold | 0) < U.price[lv]){ SFX.deny(); return false; }
+  if (goldInt(Save.data.gold) < U.price[lv]){ SFX.deny(); return false; }
   Save.data.gold -= U.price[lv];
   if (k === 'corn') farmData().cornLv = lv + 1; else seaData()[k + 'Lv'] = lv + 1;
   Save.write(); SFX.buy(); SFX.level(); townToast(U.name + ' upgraded: holds ' + (k === 'corn' ? cornCap() : seaCap(k)) + ' ' + U.noun + '.', '#BFFF9A'); return true;
 }
 function carryRow(k){
-  const U = CARRY_UP[k], lv = carryLv(k), gold = Save.data.gold | 0, cap = k === 'corn' ? cornCap() : seaCap(k);
+  const U = CARRY_UP[k], lv = carryLv(k), gold = goldInt(Save.data.gold), cap = k === 'corn' ? cornCap() : seaCap(k);
   return lv >= 2 ? 'The ' + U.name.toLowerCase() + ' is as big as it gets: <b>holds ' + cap + ' ' + U.noun + '</b>.'
     : '<button class="chalk" data-a="town-up-' + k + '"' + (gold >= U.price[lv] ? '' : ' disabled') + '>' + (lv ? 'Even bigger ' : 'Bigger ') + U.name.toLowerCase() + '<small>' + fmt(U.price[lv]) + ' gold: holds ' + (cap + 5) + ' ' + U.noun + '</small></button><div class="stock">' + U.name + ' level ' + lv + ' of 2: holds ' + cap + '</div>';
 }

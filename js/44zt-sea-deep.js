@@ -38,7 +38,7 @@
 
   /* ---- the sinking ---- */
   function sink(sx, sy, sa){
-    const B = boatSel(), price = B.price | 0, fee = Math.min(Save.data.gold | 0, Math.round(price * 0.05));
+    const B = boatSel(), price = B.price | 0, fee = Math.min(goldInt(Save.data.gold), Math.round(price * 0.05));
     const planks = [];
     for (let i = 0; i < 11; i++){ const a = Math.random() * TAU, sp = 60 + Math.random() * 150; planks.push({ x: Sea.x, y: Sea.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, a: Math.random() * TAU, va: (Math.random() - 0.5) * 7, l: 12 + Math.random() * 16, c: i % 3 ? B.col : '#6A4A28' }); }
     const toward = Math.atan2(SEA_W / 2 - Sea.y, SEA_W / 2 - Sea.x);
@@ -49,7 +49,7 @@
   }
   function finishSunk(){
     const S = Sea.sunk; if (!S || S.done) return; S.done = true;
-    if (S.fee > 0){ Save.data.gold = Math.max(0, (Save.data.gold | 0) - S.fee); Save.write(); }
+    if (S.fee > 0){ Save.data.gold = Math.max(0, goldInt(Save.data.gold) - S.fee); Save.write(); }
     const txt = S.fee > 0 ? 'The ' + S.boat + ' was towed in. Repairs: ' + fmt(S.fee) + ' gold.' : 'The ' + S.boat + ' was towed in. The yard repaired it for free this once.';
     Sea.sunk = null; Sea.sharks = [];
     seaArrive('harbour');
