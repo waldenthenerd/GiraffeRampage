@@ -9,8 +9,8 @@
 const FORAGE_COOLDOWN_MS = 15 * 60 * 1000;
 const FORAGE_LEAVES = 25;
 function forageReadyIn(){
-  const last = +(Save.data && Save.data.lastForageAt) || 0;
-  return Math.max(0, last + FORAGE_COOLDOWN_MS - Date.now());
+  const last = +(Save.data && Save.data.lastForageAt) || 0, now = Date.now();
+  return last > now ? 0 : Math.max(0, last + FORAGE_COOLDOWN_MS - now);        /* a time in the future (a clock that was ahead) counts as over, as with the wheel keys */
 }
 function fmtClock(ms){
   const s = Math.ceil(ms / 1000);

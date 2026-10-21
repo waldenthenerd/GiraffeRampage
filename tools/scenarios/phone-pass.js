@@ -55,11 +55,24 @@ try {
     });
     canCallNextWave = realCan; Settings.touchLeft = false; applyTouchLayout(); out.runHud = allHits.length === 0 && shown >= 8; out.runHudHits = allHits.join(', ');
   })();
+  /* in town: the Journal, Map and Menu buttons (and Car, with a car) are finger sized, stay on the screen and do not overlap each other or the "Tap: ..." prompt */
+  (function(){
+    var hits = [], realCar = townCarOwned, shown = 0; Input.hasTouch = true; townCarOwned = function(){ return true; };
+    [false, true].forEach(function(withPrompt){
+      G.state = 'menu'; townEnter('square'); Town.bannerT = 0; Town.near = null; for (var i = 0; i < 6; i++) GR.step(1 / 30);
+      if (withPrompt){ Town.near = { label: 'Make a wish' }; GR.step(1 / 60); Town.near = { label: 'Make a wish' }; render(); }
+      var B = Town.ui.btns.slice(), P2 = withPrompt ? Town.ui.prompt : null; shown = Math.max(shown, B.length);
+      B.forEach(function(b){ if (b.w < 38 || b.h < 38) hits.push(b.id + ' too small ' + Math.round(b.w) + 'x' + Math.round(b.h)); if (b.x < 0 || b.y < 0 || b.x + b.w > innerWidth || b.y + b.h > innerHeight) hits.push(b.id + ' off screen'); });
+      for (var a = 0; a < B.length; a++) for (var c = a + 1; c < B.length; c++){ var p = B[a], q = B[c]; if (p.x < q.x + q.w - 1 && q.x < p.x + p.w - 1 && p.y < q.y + q.h - 1 && q.y < p.y + p.h - 1) hits.push(p.id + ' overlaps ' + q.id); }
+      if (P2){ if (P2.h < 38) hits.push('prompt too short'); if (P2.x < 0 || P2.x + P2.w > innerWidth) hits.push('prompt off screen'); B.forEach(function(b){ if (P2.x < b.x + b.w && b.x < P2.x + P2.w && P2.y < b.y + b.h && b.y < P2.y + P2.h) hits.push('prompt overlaps ' + b.id); }); }
+    });
+    townCarOwned = realCar; G.state = 'menu'; Town.on = false; out.townHud = hits.length === 0 && shown >= 4; out.townHudHits = hits.join(', ');
+  })();
   /* landscape: the wheel cards are one line each and the wheel is on the first screen */
   if (land){ screens.wheel(); var cd = document.querySelector('.wpick .wcard'); out.landCards = cd.getBoundingClientRect().height < 60; out.landWheel = document.querySelector('.wwheel').getBoundingClientRect().top < innerHeight * 0.8; }
   if (screen && screens[screen]){ G.state = 'shop'; screens[screen](); }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-var need = ['noSideScroll', 'sliders', 'swatches', 'chips', 'upChips', 'gview', 'gearText', 'antsText', 'wheelText', 'hudText', 'buyRow', 'fusionRow', 'bestiary3', 'titleFits', 'runHud'];
+var need = ['noSideScroll', 'sliders', 'swatches', 'chips', 'upChips', 'gview', 'gearText', 'antsText', 'wheelText', 'hudText', 'buyRow', 'fusionRow', 'bestiary3', 'titleFits', 'runHud', 'townHud'];
 if (innerWidth > innerHeight) need = need.concat(['landCards', 'landWheel']);
 out.pass = out.errs.length === 0 && out.coarse === true && need.every(function(k){ return out[k] === true; });
 QA.done(out);

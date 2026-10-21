@@ -1,7 +1,7 @@
 'use strict';
 /* Bestiary. */
 /* ========================= BESTIARY ========================= */
-/* A record of every creature (per chapter, 85 in all) and every card the
+/* A record of every creature (per chapter) and every card the
    player has come across. Creatures are logged on their first defeat,
    cards the first time one is taken; a card's later forms only reveal
    themselves once that level has actually been reached. Undiscovered
