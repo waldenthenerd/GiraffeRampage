@@ -7,9 +7,9 @@
   function run(n, dt){ for (var i = 0; i < n; i++) GR.step(dt || 1 / 60); }
   function clearKeys(){ Input.keys = {}; Input.mdown = false; }
   try {
-    /* the menu button is there for a keyboard and gone for a phone */
+    /* the menu button is there on every device, in the left-hand column */
     Input.hasTouch = false; showMenu(); out.menuBtn = !!document.querySelector('[data-a="co-open"]');
-    Input.hasTouch = true; showMenu(); out.menuBtnPhone = !document.querySelector('[data-a="co-open"]'); Input.hasTouch = false; showMenu();
+    Input.hasTouch = true; showMenu(); out.menuBtnPhone = !!document.querySelector('.mside.l [data-a="co-open"]'); Input.hasTouch = false; showMenu();
     handleAction('co-open'); out.panel = G.subScreen === 'together' && /Arena fight/.test(OV.innerHTML) && /Kick-about/.test(OV.innerHTML);
     out.chaptersFresh = JSON.stringify(coChapters());
     Save.data.chapter1Complete = true; out.chaptersAfter1 = JSON.stringify(coChapters()); handleAction('co-ch-next'); out.picked = Co.pick; handleAction('co-ch-prev'); Save.data.chapter1Complete = false;

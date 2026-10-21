@@ -472,9 +472,9 @@ function coAction(a){
   const sm = showMenu;
   showMenu = function(){
     const r = sm.apply(this, arguments);
-    if (G.state === 'menu' && !Input.hasTouch && typeof OV !== 'undefined'){
-      const guide = OV.querySelector('[data-a="help"]');
-      if (guide && !OV.querySelector('[data-a="co-open"]')) guide.insertAdjacentHTML('beforebegin', '<button class="btn ghost" data-a="co-open">Play together<small>Two giraffes, one screen, just for fun</small></button>');
+    if (G.state === 'menu' && typeof OV !== 'undefined'){            /* on the left, to balance the right-hand column; shown on every device (a touch screen can still have a keyboard or pads) */
+      const left = OV.querySelector('.mside.l');
+      if (left && !OV.querySelector('[data-a="co-open"]')) left.insertAdjacentHTML('beforeend', '<button class="btn ghost" data-a="co-open">Play together<small>Two giraffes, one screen, just for fun</small></button>');
     }
     return r;
   };
