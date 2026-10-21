@@ -19,6 +19,8 @@
 const CO_SW = ['x', 'y', 'vx', 'vy', 'face', 'aim', 'walk', 'hp', 'maxHp', 'invuln', 'hurtT', 'kickCd', 'kickAnim', 'dead', 'rage', 'regenAcc'];
 const CO_CHAPTERS = [1, 2, 3, 5];                   /* the backdrops that need nothing special (no water, buildings or space) */
 const CO_ROUND_WAVES = [1, 2, 3, 4, 6, 7, 8, 9];     /* the waves of the chapter a round is built from (no boss waves) */
+/* without cards or experience the pair are weaker than a real run's giraffe: a third as many creatures, with a third of the health and a third of the damage */
+const CO_EASE = 3;
 const CO_P2 = { name: 'Blue', coat: '#8FB4E0', spot: '#3E5C96', dark: '#6C92C4' };
 const CO_YARD = { w: 1700, h: 960, goal: 280, win: 5 };
 const Co = {
@@ -211,8 +213,8 @@ function coNextRound(){
   const k = (Co.round - 1) % CO_ROUND_WAVES.length, cyc = Math.floor((Co.round - 1) / CO_ROUND_WAVES.length);
   const w = (Co.chapter - 1) * WAVES_PER_CHAPTER + CO_ROUND_WAVES[k];
   G.wave = w; G.chapter = Co.chapter;
-  /* the chapter's own mix of creatures, but only a few at first (a later chapter's wave is far bigger than two giraffes without cards can take): five and two more every round */
-  let q = buildWave(w).filter(function(s){ return !s.boss && !s.ally; }).slice(0, 5 + 2 * Co.round);
+  /* the chapter's own mix of creatures, but only a few at first (a later chapter's wave is far bigger than two giraffes without cards can take): five and two more every round, then a third of that (CO_EASE) */
+  let q = buildWave(w).filter(function(s){ return !s.boss && !s.ally; }).slice(0, Math.max(2, Math.round((5 + 2 * Co.round) / CO_EASE)));
   Co.cyc = cyc;
   Co.queue = q; Co.spawnT = 0; Co.calm = 0;
   P.stats.allDmgMul = coDmgMul();                                         /* they get a little stronger every round, so the rounds can */
@@ -230,7 +232,7 @@ function coArenaStep(dt){
     const p = spawnPoint(), e = spawnEnemy(Co.queue[0].type, p.x, p.y, G.wave);
     if (!e) break;
     Co.queue.shift();
-    if (Co.cyc){ e.hp *= 1 + 0.2 * Co.cyc; e.maxHp = e.hp; }
+    e.hp = e.hp / CO_EASE * (1 + 0.2 * (Co.cyc || 0)); e.maxHp = e.hp; e.dmg /= CO_EASE;
     burstParticles(p.x, p.y, 5, '#6B5B45', 120, 3);
   }
   if (!Co.queue.length){
