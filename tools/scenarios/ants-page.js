@@ -5,7 +5,7 @@ try {
   var view = (QA.params && QA.params.view) || 'none';
   Save.data.antsUnlocked = true; Save.data.ants = { soldier: 3, distractor: 0, shooter: 12 }; Save.data.food = 40; Save.data.gold = 1e6; Save.data.gems = 5000;
   showShop('ants');
-  out.page = !!document.querySelector('.antpg') && document.querySelectorAll('.aproom').length === 3 && !!document.getElementById('antSurface') && document.querySelectorAll('canvas.arcv').length === 3;
+  out.page = !!document.querySelector('.antpg') && document.querySelectorAll('.aproom').length === 4 && !!document.getElementById('antSurface') && document.querySelectorAll('canvas.arcv').length === 3;
   out.food = /40\.0/.test(document.querySelector('.apfood').textContent) && !!document.querySelector('[data-forage-btn]') && !!document.getElementById('foodAmt');
   /* costs: a batch is the sum of its steps and the price stops rising at the 16th */
   Save.data.ants.soldier = 0; var c1 = antCostMany('soldier', 1), c5 = antCostMany('soldier', 5), s5 = 0; for (var i = 0; i < 5; i++) s5 += Math.round(Math.pow(1.3, i) * 10) / 10;

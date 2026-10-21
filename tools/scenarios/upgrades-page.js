@@ -37,7 +37,7 @@ try {
   fresh(1e6); GR.handleAction('upg-g-sea'); var sea = $('.uprow[data-up="swimlegs"]'); out.seaLocked = sea.classList.contains('locked') && /Finish Chapter 3/.test(sea.textContent) && !sea.querySelector('[data-buy]');
   GR.handleAction('upg-g-ants'); var ant = $('.uprow[data-up="antcap"]'); out.antLocked = ant.classList.contains('locked') && /100,000,000/.test(ant.textContent) && !!ant.querySelector('.upbar');
   var w = parseFloat(ant.querySelector('.upbar u').style.width); out.antBar = Math.abs(w - 12345678 / ANT_UNLOCK_SCORE * 100) < 0.2;
-  Save.data.chapter3Complete = true; Save.data.antsUnlocked = true; showShop('upgrades'); out.unlocks = !$('.uprow.locked') && !!$('.uprow[data-up="antcap"] [data-buy]');
+  Save.data.chapter3Complete = true; Save.data.antsUnlocked = true; showShop('upgrades'); out.unlocks = $$('.uprow.locked').every(function(r){ return ['engspeed', 'engturhp', 'engrange'].indexOf(r.dataset.up) >= 0; }) && !!$('.uprow[data-up="antcap"] [data-buy]');
   GR.handleAction('upg-buy-antcap-1'); out.antBuy = metaLevel('antcap') === 1;
   /* 6. Buy all I can: asks first, shows the list, buys cheapest-first, spends exactly what it said */
   fresh(100000); var plan = upgPlanAll(); out.plan = plan.n > 3 && plan.spent <= 100000;
@@ -53,7 +53,7 @@ try {
   /* 7. the bonus summary: real stats, and special text for upgrades with no stat */
   fresh(0); out.sumEmpty = /Nothing bought yet/.test($('.upsum').textContent);
   Save.data.meta = { hooves: 3, hide: 2, deck: 2, antcap: 1 }; Save.data.antsUnlocked = true; Save.data.gold = 0; upgPage.sumSig = ''; showShop('upgrades');
-  var sum = $('.upsum').textContent; out.sumStats = /4 of 24 upgrades · 8 levels/.test(sum) && /Max health/.test(sum) && /Weapon damage|Kick damage/.test(sum);
+  var sum = $('.upsum').textContent; out.sumStats = new RegExp('4 of ' + META.length + ' upgrades · 8 levels').test(sum) && /Max health/.test(sum) && /Weapon damage|Kick damage/.test(sum);
   out.sumSpecial = !!$('.upsum .tchip.sp') && /Rare and epic cards appear 14% more often/.test(sum) && /Each ant type can hold 2 more/.test(sum);
   var st0 = JSON.stringify(P.stats); upgStats({}); out.pure = JSON.stringify(P.stats) === st0 && metaLevel('hooves') === 3;
   /* 8. an old save with no meta object */

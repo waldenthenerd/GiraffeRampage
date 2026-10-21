@@ -48,7 +48,7 @@ function makeFood(n){
 function hireAnt(type){
   if (!ANT_TYPES[type] || !Save.data.antsUnlocked){ SFX.deny(); return false; }
   const n = Save.data.ants[type] | 0, c = antCost(type);
-  if (n >= antMax() || Save.data.food + 1e-9 < c){ SFX.deny(); return false; }
+  if (n >= (typeof antCapFor === 'function' ? antCapFor(type) : antMax()) || Save.data.food + 1e-9 < c){ SFX.deny(); return false; }
   Save.data.food = Math.round((Save.data.food - c) * 10) / 10;
   Save.data.ants[type] = n + 1;
   Save.write(); SFX.buy(); return true;

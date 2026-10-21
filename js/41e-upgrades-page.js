@@ -87,7 +87,7 @@ function upgRowHTML(m){
   if (locked){
     const ant = m.requires === 'antsUnlocked', best = Math.max(0, +Save.data.best || 0), bar = ant ? '<i class="upbar"><u style="width:' + Math.min(100, best / ANT_UNLOCK_SCORE * 100).toFixed(1) + '%"></u></i>' : '';
     return '<div class="' + cls + '" style="--ac:' + g.color + '" data-up="' + m.id + '">' + ring + '<div class="upt"><div class="upn"><b>' + m.name + '</b><em>Locked</em></div>' +
-      '<div class="uplock">' + ico('@t-x-lock') + '<span>' + (REQUIRES_LABEL[m.requires] || 'Locked') + (ant ? ' · best run ' + fmt(best) : '') + '</span></div>' + bar + '</div></div>';
+      '<div class="uplock">' + ico('@t-x-lock') + '<span>' + (m.lockText || REQUIRES_LABEL[m.requires] || 'Locked') + (ant ? ' · best run ' + fmt(best) : '') + '</span></div>' + bar + '</div></div>';
   }
   const rem = m.max - lv, n5 = Math.min(5, rem), can1 = upgCanBuy(m), max = maxAffordable(m);
   const btns = maxed ? '' :

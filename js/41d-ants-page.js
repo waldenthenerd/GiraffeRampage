@@ -16,12 +16,12 @@
 const antsPage = { id: 0, raf: 0, last: 0, sim: {}, cvs: [], t: 0 };
 function antCostMany(type, n){
   const have = (Save.data.ants && Save.data.ants[type]) | 0; let sum = 0;
-  for (let k = 0; k < n; k++) sum += Math.round(Math.pow(1.3, Math.min(ANT_COST_CAP, have + k)) * 10) / 10;
+  for (let k = 0; k < n; k++) sum += Math.round(Math.pow(1.3, Math.min(ANT_COST_CAP, have + k)) * antCostMul(type) * 10) / 10;
   return Math.round(sum * 10) / 10;
 }
 function antCanHire(type, n){
   const have = (Save.data.ants && Save.data.ants[type]) | 0;
-  return !!ANT_TYPES[type] && !!Save.data.antsUnlocked && have + n <= antMax() && Save.data.food + 1e-9 >= antCostMany(type, n);
+  return !!ANT_TYPES[type] && !!Save.data.antsUnlocked && have + n <= antCapFor(type) && (type !== 'engineer' || engineersUnlocked()) && Save.data.food + 1e-9 >= antCostMany(type, n);
 }
 function hireAntMany(type, n){
   if (!(n >= 1) || !antCanHire(type, n)){ SFX.deny(); return false; }
@@ -30,7 +30,9 @@ function hireAntMany(type, n){
   Save.data.ants[type] = ((Save.data.ants[type] | 0) + n);
   Save.write(); SFX.buy(); return true;
 }
+function antsPageOrder(){ return ANT_ORDER.concat(['engineer']); }                                 /* the engineer is not in ANT_ORDER (the ordinary ant loop would try to spawn it), but it has a chamber */
 function antsStatsHTML(type){
+  if (type === 'engineer') return engineerStatsHTML();
   const T = ANT_TYPES[type], pw = antHpMul(), dm = antDmgMul(), r = function(x){ return Math.round(x); };
   const chips = [['Health', r(T.hp * pw)]];
   if (T.dmg) chips.push(['Bite', r(T.dmg * dm)]);
@@ -40,13 +42,14 @@ function antsStatsHTML(type){
   return '<div class="arstats">' + chips.map(function(c){ return '<span>' + c[0] + ' <b>' + c[1] + '</b></span>'; }).join('') + '</div>';
 }
 function antsRoomHTML(type){
-  const T = ANT_TYPES[type], n = (Save.data.ants[type] | 0), cap = antMax(), maxed = n >= cap;
+  const T = ANT_TYPES[type], n = (Save.data.ants[type] | 0), cap = antCapFor(type), maxed = n >= cap;
+  if (type === 'engineer' && !engineersUnlocked()) return '<article class="aproom eng locked" style="--ac:' + T.color + '"><div class="arhead"><b>' + T.name + '</b><span class="arcount">Locked</span></div><div class="aplock">' + ico('@t-x-lock') + '<span>Build the <b>Engineer Garage</b> at the Venus outpost (it needs the Makeshift Rover, the Basalt Burrows and Chapter 9 finished).</span></div><p class="ards">' + T.desc + '</p></article>';
   const btns = [1, 5, 10].map(function(k){
     const ok = antCanHire(type, k);
     return '<button class="btn sm' + (k === 1 ? '' : ' ghost crm') + (ok ? (k === 1 ? '' : ' ok') : ' ghost') + '" data-a="ant-hire-' + type + '-' + k + '" aria-label="Hire ' + k + ' ' + T.name + (k === 1 ? '' : 's') + ' for ' + antCostMany(type, k) + ' food"' + (ok ? '' : ' disabled') + '>Hire ' + k +
       '<small>' + (n + k > cap ? 'no room' : antCostMany(type, k) + ' food') + '</small></button>';
   }).join('');
-  return '<article class="aproom" style="--ac:' + T.color + '"><div class="arhead"><b>' + T.name + '</b><span class="arcount">' + n + ' / ' + cap + '</span></div>' +
+  return '<article class="aproom' + (type === 'engineer' ? ' eng' : '') + '" style="--ac:' + T.color + '"><div class="arhead"><b>' + T.name + '</b><span class="arcount">' + n + ' / ' + cap + '</span></div>' +
     '<canvas class="arcv" data-ant="' + type + '"></canvas><p class="ards">' + T.desc + '</p>' + antsStatsHTML(type) +
     '<div class="arbar" title="' + n + ' of ' + cap + ' hired"><u style="width:' + Math.min(100, n / cap * 100).toFixed(1) + '%"></u></div>' +
     (maxed ? '<div class="arfull">Chamber full</div>' : '<div class="arbtns">' + btns + '</div>') + '</article>';
@@ -79,7 +82,7 @@ antsTabHTML = function(){
   if (!Save.data.antsUnlocked) return _antsLockedHTML.apply(this, arguments);
   return '<div class="antpg"><div class="apsurf"><canvas id="antSurface"></canvas><div class="apsl"><b>The colony</b><small>Hired ants are permanent. Each kind comes out of the anthill every ' + Math.round(antRespawnTime() * 10) / 10 + ' seconds until all you own are out.</small></div></div>' +
     '<div class="apsoil"><div class="aptuns one"><i></i></div>' + antsFoodHTML() + '<div class="aptuns"><i></i><i></i><i></i></div>' +
-    '<div class="aprooms">' + ANT_ORDER.map(antsRoomHTML).join('') + '</div>' + antsDeepHTML() + '</div></div>';
+    '<div class="aprooms">' + antsPageOrder().map(antsRoomHTML).join('') + '</div>' + antsDeepHTML() + '</div></div>';
 };
 
 /* ---------- the pictures ---------- */
@@ -110,6 +113,7 @@ function antsDrawRoom(cv, type, dt){
   const g = c.createRadialGradient(W / 2, H * 0.4, 6, W / 2, H * 0.5, W * 0.62); g.addColorStop(0, '#3A2A1C'); g.addColorStop(1, '#190F09'); c.fillStyle = g; c.fillRect(0, 0, W, H);
   for (let i = 0; i < 14; i++){ const h = Math.sin((type.length + i) * 91.7) * 43758.5, f = h - Math.floor(h), h2 = Math.sin((type.length + i) * 12.9) * 4375.5, f2 = h2 - Math.floor(h2);
     c.fillStyle = 'rgba(' + (90 + (i % 3) * 14) + ',' + (66 + (i % 3) * 8) + ',44,.35)'; c.beginPath(); c.ellipse(f * W, H * 0.55 + f2 * H * 0.45, 2 + (i % 3), 1.4 + (i % 2), 0, 0, TAU); c.fill(); }
+  if (type === 'engineer'){ antsEngineerScene(c, W, H, n, dt); return; }
   if (n <= 0){
     c.globalAlpha = 0.28; drawAnt(c, { type: type, x: W / 2, y: H / 2, ang: -0.4, anim: 0, r: T.r * 2.1, flash: 0, hp: 1, maxHp: 1 }); c.globalAlpha = 1;
     c.fillStyle = 'rgba(214,201,178,.8)'; c.font = '600 12px system-ui,sans-serif'; c.textAlign = 'center'; c.fillText('Empty chamber', W / 2, H - 10);
