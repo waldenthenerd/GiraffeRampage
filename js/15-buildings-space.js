@@ -45,7 +45,7 @@ function buildCityBuildings(){
       let ok = true;
       for (let i = 0; i < avoid.length; i++){
         const a = avoid[i], nx = clamp(a.x, x, x + w), ny = clamp(a.y, y, y + h);
-        if (Math.hypot(a.x - nx, a.y - ny) < a.r){ ok = false; break; }
+        if (hyp(a.x - nx, a.y - ny) < a.r){ ok = false; break; }
       }
       if (ok) G.buildings.push(makeBuilding(x, y, w, h, styles[Math.floor(Math.random() * styles.length)], seed * 7919 + Math.floor(Math.random() * 1000)));
     }
@@ -65,7 +65,8 @@ function resolveBuildings(o, r){
   for (let i = 0; i < bs.length; i++){
     const b = bs[i];
     if (b.collapsed) continue;
-    const nx = clamp(o.x, b.x, b.x + b.w), ny = clamp(o.y, b.y, b.y + b.h);
+    if (o.x + r < b.x || o.x - r > b.x + b.w || o.y + r < b.y || o.y - r > b.y + b.h) continue;      /* most buildings are nowhere near: no arithmetic for them */
+    const nx = o.x < b.x ? b.x : o.x > b.x + b.w ? b.x + b.w : o.x, ny = o.y < b.y ? b.y : o.y > b.y + b.h ? b.y + b.h : o.y;
     const dx = o.x - nx, dy = o.y - ny, d2 = dx * dx + dy * dy;
     if (d2 >= r * r) continue;
     if (d2 > 1e-6){ const d = Math.sqrt(d2); o.x = nx + dx / d * r; o.y = ny + dy / d * r; }
@@ -337,7 +338,7 @@ function buildSpaceCenter(){
       let ok = true;
       for (let i = 0; i < avoid.length; i++){
         const a = avoid[i], nx = clamp(a.x, x, x + w), ny = clamp(a.y, y, y + h);
-        if (Math.hypot(a.x - nx, a.y - ny) < a.r){ ok = false; break; }
+        if (hyp(a.x - nx, a.y - ny) < a.r){ ok = false; break; }
       }
       if (ok) G.buildings.push(makeBuilding(x, y, w, h, style, seed * 7919 + Math.floor(Math.random() * 1000)));
     }
@@ -383,7 +384,7 @@ function drawSpaceRoof(ctx, b, st){
     for (let k = 1; k <= 3; k++){ ctx.beginPath(); ctx.arc(dx, dy, dr * k / 3.4, 0, TAU); ctx.stroke(); }
     ctx.beginPath(); ctx.moveTo(dx, dy); ctx.lineTo(dx - dr * 0.9, dy - dr * 0.9); ctx.stroke(); fillCircle(ctx, dx - dr * 0.9, dy - dr * 0.9, 2.4, '#6A7280');
     for (let i = 0; i < b.units.length; i++){
-      const u = b.units[i]; if (Math.hypot(u.x - dx, u.y - dy) < dr + 16) continue;
+      const u = b.units[i]; if (hyp(u.x - dx, u.y - dy) < dr + 16) continue;
       ctx.fillStyle = '#A8B0BC'; ctx.fillRect(u.x, u.y, u.w, u.h); ctx.strokeStyle = '#6E7682'; ctx.lineWidth = 1; ctx.strokeRect(u.x, u.y, u.w, u.h);
     }
   }

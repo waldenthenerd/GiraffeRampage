@@ -300,7 +300,7 @@ function softBlob(ctx, x, y, r, c, a){
    Returns the polyline's centerline so a caller can decorate along it. */
 function taperedLimb(ctx, ox, oy, ex, ey, bow, w0, w1, color){
   const dx = ex - ox, dy = ey - oy;
-  const len = Math.hypot(dx, dy) || 1;
+  const len = hyp(dx, dy) || 1;
   const perp = Math.atan2(dy, dx) + Math.PI / 2;
   const cx = (ox + ex) / 2 + Math.cos(perp) * bow;
   const cy = (oy + ey) / 2 + Math.sin(perp) * bow;
@@ -312,7 +312,7 @@ function taperedLimb(ctx, ox, oy, ex, ey, bow, w0, w1, color){
     const by = mt * mt * oy + 2 * mt * t * cy + t * t * ey;
     const tx = 2 * mt * (cx - ox) + 2 * t * (ex - cx);
     const ty = 2 * mt * (cy - oy) + 2 * t * (ey - cy);
-    const tl = Math.hypot(tx, ty) || 1;
+    const tl = hyp(tx, ty) || 1;
     const nx = -ty / tl, ny = tx / tl;
     const w = lerp(w0, w1, t * t);
     left.push([bx + nx * w, by + ny * w]);

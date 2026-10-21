@@ -2,7 +2,7 @@
 /* Enemy update and movement. */
 /* ========================= 19. ENEMY UPDATE ========================= */
 function updateEnemies(dt){
-  const list = G.enemies;
+  const list = G.enemies, kdrag = Math.pow(0.0018, dt);        /* how much a shove has faded over this frame: the same for every creature */
   for (let i = list.length - 1; i >= 0; i--){
     const e = list[i];
     if (e.dead){
@@ -35,7 +35,7 @@ function updateEnemies(dt){
     else { antT = e.aggTgt = antAggroTarget(e); e.aggT = 0.1 + Math.random() * 0.08; }
     const tgx = antT ? antT.x : P.x, tgy = antT ? antT.y : P.y;
     const dx = tgx - e.x, dy = tgy - e.y;
-    const d = Math.hypot(dx, dy) || 1;
+    const d = hyp(dx, dy) || 1;
     const ux = dx / d, uy = dy / d;
     const spd = e.spd * e.slowMul * (1 + 0.55 * (G.hunt || 0)) * (e.buffT > 0 ? 1.35 : 1);
     let mvx = 0, mvy = 0;
@@ -80,7 +80,7 @@ function updateEnemies(dt){
           const tx = -uy * e.flankDir, ty = ux * e.flankDir;
           mvx = ux * closeSpeed * 0.5 + tx * spd * 0.95;
           mvy = uy * closeSpeed * 0.5 + ty * spd * 0.95;
-          const mvlen = Math.hypot(mvx, mvy);
+          const mvlen = hyp(mvx, mvy);
           if (mvlen > 4) e.ang = Math.atan2(mvy, mvx);
           break;
         }
@@ -289,7 +289,7 @@ function updateEnemies(dt){
           const o = near[k];
           if (o === e || o.dead) continue;
           const ox = e.x - o.x, oy = e.y - o.y;
-          const od = Math.hypot(ox, oy);
+          const od = hyp(ox, oy);
           const want = e.r + o.r;
           if (od > 0.01 && od < want){
             const push = (want - od) / want;
@@ -302,8 +302,8 @@ function updateEnemies(dt){
     }
     if (offs){ const bm = OFFSCREEN_BOOST[G.runSpeedLevel | 0] || 1.3; mvx *= bm; mvy *= bm; }      /* far from the screen, enemies hurry in: 1.3x, or 1.8x in speed mode, 2.3x in hyperspeed, 4x in ultrafast */
 
-    e.kx *= Math.pow(0.0018, dt);
-    e.ky *= Math.pow(0.0018, dt);
+    e.kx *= kdrag;
+    e.ky *= kdrag;
     e.x += (mvx + e.kx) * dt;
     e.y += (mvy + e.ky) * dt;
     e.x = clamp(e.x, 12, ARENA_W - 12);

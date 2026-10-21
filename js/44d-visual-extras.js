@@ -205,7 +205,7 @@ const Memory = { acc: 0, accE: 0, side: 1 };
     if (fxLevelNow() <= 0 || G.state !== 'playing' || G.attract || P.dead) return;
     const col = PRINT_COL[G.biome];
     if (!col) return;
-    const sp = Math.hypot(P.vx, P.vy);
+    const sp = hyp(P.vx, P.vy);
     Memory.acc += dt * Math.min(1.5, sp / 180);
     if (sp > 55 && Memory.acc >= 0.2){
       Memory.acc = 0; Memory.side = -Memory.side;
@@ -283,7 +283,7 @@ const EDGE_FX = {                                   /* biome: [r, g, b, a, how] 
   venus: [255, 214, 70, 0.4, 'glow'], area51: [90, 255, 150, 0.35, 'glow'], mars: [255, 110, 60, 0.4, 'glow']
 };
 function drawIris(ctx, f){
-  const W = G.W, H = G.H, k = f.t / f.dur, R = Math.hypot(W, H) * 0.6;
+  const W = G.W, H = G.H, k = f.t / f.dur, R = hyp(W, H) * 0.6;
   const sx = W / 2 + (P.x - G.camX) * G.zoom, sy = H / 2 + (P.y - G.camY) * G.zoom;
   let r;
   if (k < 0.12) r = R - (R - R * 0.55) * (k / 0.12);
@@ -311,7 +311,7 @@ function drawEdgeFX(ctx){
   f.t = G.time - f.t0;                                                         /* game time, so it does not depend on the frame rate */
   if (f.t >= f.dur || f.t < 0){ G.edgeFX = null; return; }
   const k = f.t / f.dur, a = (k < 0.12 ? k / 0.12 : 1 - (k - 0.12) / 0.88) * (Settings.calmFlash ? 0.5 : 1), e = EDGE_FX[f.biome]; if (!e || a <= 0) return;
-  const W = G.W, H = G.H, r = Math.hypot(W, H) * 0.5, A = e[3] * a * a;
+  const W = G.W, H = G.H, r = hyp(W, H) * 0.5, A = e[3] * a * a;
   ctx.save();
   if (e[4] === 'glow') ctx.globalCompositeOperation = 'lighter';
   const gr = ctx.createRadialGradient(W / 2, H / 2, r * 0.55, W / 2, H / 2, r);

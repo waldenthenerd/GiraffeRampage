@@ -12,7 +12,7 @@ function frame(ts){
      about 100 updates and draws a second (60 on a 120 Hz screen, 72 on a 144 Hz one) */
   accDt += dt;
   if (accDt < 0.0095) return;
-  if (G.state === 'menu' && accDt < 0.031) return;       /* the menu's moving background runs at 30 frames a second: it is only a backdrop, and this halves its cost */
+  if ((G.state === 'menu' || G.state === 'shop' || G.state === 'help' || G.state === 'paused') && accDt < 0.031) return;       /* the moving background behind the menu, the shop and Guide pages and the pause screen runs at 30 frames a second: it is only a backdrop, and this halves its cost */
   dt = accDt; accDt = 0;
   if (dt > 0.06) dt = 0.06;
   step(dt);

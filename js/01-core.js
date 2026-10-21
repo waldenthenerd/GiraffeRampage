@@ -5,6 +5,7 @@ const TAU = Math.PI * 2;
 const rand  = (a, b) => a + Math.random() * (b - a);
 const randi = (a, b) => Math.floor(a + Math.random() * (b - a + 1));
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const hyp = (x, y) => Math.sqrt(x * x + y * y);       /* the distance of (x, y) from the origin; Math.hypot does the same about ten times slower, which adds up with hundreds of creatures a frame */
 const lerp  = (a, b, t) => a + (b - a) * t;
 const pick  = a => a[Math.floor(Math.random() * a.length)];
 /* Whole numbers with thousands separators, and big ones compacted (12.3k, 4.5M, 1.2B) so they never overflow a label. */
@@ -154,26 +155,30 @@ const SFX = {
 
 /* ========================= 3. SPATIAL GRID ========================= */
 const Grid = {
-  cell: 120, map: new Map(),
+  cell: 120, map: new Map(), pool: [],
+  /* a cell's key is a number, not text, and the lists are reused from one frame to the next: the grid is rebuilt every frame and queried by
+     every creature, so text keys and fresh arrays made a lot of garbage. (Cells beyond -64 are clamped; the arena is 35 cells wide.) */
   build(list){
-    this.map.clear();
+    const m = this.map, pool = this.pool, c = this.cell;
+    m.forEach(function(a){ a.length = 0; pool.push(a); });
+    m.clear();
     for (let i = 0; i < list.length; i++){
       const e = list[i];
-      const k = ((e.x / this.cell) | 0) + ',' + ((e.y / this.cell) | 0);
-      let a = this.map.get(k);
-      if (!a) { a = []; this.map.set(k, a); }
+      const k = (((e.x / c) | 0) + 64) * 1024 + ((e.y / c) | 0) + 64;
+      let a = m.get(k);
+      if (a === undefined){ a = pool.length ? pool.pop() : []; m.set(k, a); }
       a.push(e);
     }
   },
   query(x, y, r, out){
     out.length = 0;
-    const c = this.cell;
-    const x0 = ((x - r) / c) | 0, x1 = ((x + r) / c) | 0;
-    const y0 = ((y - r) / c) | 0, y1 = ((y + r) / c) | 0;
+    const c = this.cell, m = this.map;
+    const x0 = Math.max(-64, ((x - r) / c) | 0), x1 = Math.min(900, ((x + r) / c) | 0);
+    const y0 = Math.max(-64, ((y - r) / c) | 0), y1 = Math.min(900, ((y + r) / c) | 0);
     for (let i = x0; i <= x1; i++)
       for (let j = y0; j <= y1; j++){
-        const a = this.map.get(i + ',' + j);
-        if (a) for (let k = 0; k < a.length; k++) out.push(a[k]);
+        const a = m.get((i + 64) * 1024 + j + 64);
+        if (a !== undefined) for (let k = 0; k < a.length; k++) out.push(a[k]);
       }
     return out;
   }

@@ -98,7 +98,7 @@ function weatherDraw(ctx, Wx, key, accent, t, fade, frac){                      
       ctx.lineWidth = pass ? 1.6 : 1;
       ctx.beginPath();
       for (let i = pass; i < N; i += 2){
-        const p = L[i], len = K.len[0] + (K.len[1] - K.len[0]) * p.l, sp = Math.hypot(K.vx, K.vy) || 1, ux = K.vx / sp, uy = K.vy / sp;
+        const p = L[i], len = K.len[0] + (K.len[1] - K.len[0]) * p.l, sp = hyp(K.vx, K.vy) || 1, ux = K.vx / sp, uy = K.vy / sp;
         ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - ux * len * p.z, p.y - uy * len * p.z);
       }
       ctx.stroke();
@@ -234,7 +234,7 @@ function drawDeathFX(ctx){
   ctx.save();
   ctx.globalCompositeOperation = 'saturation'; ctx.globalAlpha = 0.85 * e; ctx.fillStyle = '#808080'; ctx.fillRect(0, 0, G.W, G.H);
   ctx.restore();
-  const r = Math.hypot(G.W, G.H) * 0.5, g = ctx.createRadialGradient(G.W / 2, G.H / 2, r * 0.25, G.W / 2, G.H / 2, r);
+  const r = hyp(G.W, G.H) * 0.5, g = ctx.createRadialGradient(G.W / 2, G.H / 2, r * 0.25, G.W / 2, G.H / 2, r);
   g.addColorStop(0, 'rgba(60,8,8,0)'); g.addColorStop(1, 'rgba(60,8,8,' + (0.7 * e).toFixed(3) + ')');
   ctx.fillStyle = g; ctx.fillRect(0, 0, G.W, G.H);
   /* a ring leaves the giraffe */
@@ -287,6 +287,7 @@ function drawIntroFX(ctx){
 function drawAntShadows(ctx){
   const ants = G.ants; if (!ants) return;
   ctx.fillStyle = 'rgba(22,15,10,.34)';
-  for (let i = 0; i < ants.length; i++){ const a = ants[i]; ctx.beginPath(); ctx.ellipse(a.x, a.y + a.r * 0.55, a.r * 1.1, a.r * 0.5, 0, 0, TAU); ctx.fill(); }
+  const v = viewBounds(60);
+  for (let i = 0; i < ants.length; i++){ const a = ants[i]; if (a.x < v.x0 || a.x > v.x1 || a.y < v.y0 || a.y > v.y1) continue; ctx.beginPath(); ctx.ellipse(a.x, a.y + a.r * 0.55, a.r * 1.1, a.r * 0.5, 0, 0, TAU); ctx.fill(); }
 }
 

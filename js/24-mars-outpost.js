@@ -118,11 +118,11 @@ function drawMarsWire(ctx, x1, y1, x2, y2, ok, t, chew){
   if (ok){
     ctx.strokeStyle = '#2A2E38'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
     ctx.strokeStyle = '#E8B040'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-    const L = Math.hypot(x2 - x1, y2 - y1) || 1;
+    const L = hyp(x2 - x1, y2 - y1) || 1;
     for (let k = 0; k < 5; k++){ const a = (t * 0.7 + k / 5) % 1; fillCircle(ctx, x1 + (x2 - x1) * a, y1 + (y2 - y1) * a, 3, '#FFF2A0'); }
     if (chew > 0){ const mx = (x1 + x2) / 2, my = (y1 + y2) / 2; ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(mx - 18, my - 22, 36, 6); ctx.fillStyle = '#FF8A4A'; ctx.fillRect(mx - 17, my - 21, 34 * clamp(chew, 0, 1), 4); }
   } else {
-    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, ux = (x2 - x1) / (Math.hypot(x2 - x1, y2 - y1) || 1), uy = (y2 - y1) / (Math.hypot(x2 - x1, y2 - y1) || 1);
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, ux = (x2 - x1) / (hyp(x2 - x1, y2 - y1) || 1), uy = (y2 - y1) / (hyp(x2 - x1, y2 - y1) || 1);
     ctx.strokeStyle = '#2A2E38'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(mx - ux * 14, my - uy * 14); ctx.moveTo(mx + ux * 14, my + uy * 14); ctx.lineTo(x2, y2); ctx.stroke();
     ctx.strokeStyle = '#8A6A28'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(mx - ux * 14, my - uy * 14); ctx.moveTo(mx + ux * 14, my + uy * 14); ctx.lineTo(x2, y2); ctx.stroke();
     if (Math.sin(t * 9) > 0){ csGlow(ctx, mx - ux * 14, my - uy * 14, 14, '#FFE060', 0.8); csGlow(ctx, mx + ux * 14, my + uy * 14, 14, '#FFE060', 0.8); }
@@ -130,7 +130,7 @@ function drawMarsWire(ctx, x1, y1, x2, y2, ok, t, chew){
   }
   ctx.lineCap = 'butt';
 }
-function marsWireEnd(dx, dy, bx, by){ const L = Math.hypot(dx, dy) || 1; return { x: bx + dx / L * 62, y: by + dy / L * 62 }; }
+function marsWireEnd(dx, dy, bx, by){ const L = hyp(dx, dy) || 1; return { x: bx + dx / L * 62, y: by + dy / L * 62 }; }
 /* the SP-1 and whatever has been built beside it. o: { hab: 0-3, t, s } */
 function drawMarsBase(ctx, x, y, o){
   o = o || {}; const hab = o.hab | 0, t = o.t || 0;
@@ -299,8 +299,8 @@ function msHitFoe(sc, e, n){
 }
 function msKick(sc){
   let best = null, bd = 1e9, isFoe = false;
-  for (let i = 0; i < sc.rubble.length; i++){ const r = sc.rubble[i], d = Math.hypot(r.x - sc.x, r.y - sc.y) - r.r; if (d < 64 && d < bd){ bd = d; best = r; } }
-  for (let i = 0; i < sc.foes.length; i++){ const e = sc.foes[i]; if (e.dead) continue; const d = Math.hypot(e.x - sc.x, e.y - sc.y) - e.r; if (d < 64 && d < bd){ bd = d; best = e; isFoe = true; } }
+  for (let i = 0; i < sc.rubble.length; i++){ const r = sc.rubble[i], d = hyp(r.x - sc.x, r.y - sc.y) - r.r; if (d < 64 && d < bd){ bd = d; best = r; } }
+  for (let i = 0; i < sc.foes.length; i++){ const e = sc.foes[i]; if (e.dead) continue; const d = hyp(e.x - sc.x, e.y - sc.y) - e.r; if (d < 64 && d < bd){ bd = d; best = e; isFoe = true; } }
   sc.kickCd = 0.38; sc.swing = 0.24;
   if (!best) return;
   sc.face = Math.atan2(best.y - sc.y, best.x - sc.x);
@@ -308,7 +308,7 @@ function msKick(sc){
 }
 function msSegDist(px, py, x1, y1, x2, y2){
   const abx = x2 - x1, aby = y2 - y1, t = clamp(((px - x1) * abx + (py - y1) * aby) / (abx * abx + aby * aby || 1), 0, 1), qx = x1 + abx * t, qy = y1 + aby * t;
-  return { d: Math.hypot(px - qx, py - qy), x: qx, y: qy };
+  return { d: hyp(px - qx, py - qy), x: qx, y: qy };
 }
 /* which wire is nearest to (x, y), among those still whole */
 function msNearestWire(sc, x, y){
@@ -329,7 +329,7 @@ function msUpdateMouse(sc, m, dt){
   m.anim += dt * 12; const shield = marsHas('shield') ? 2 : 1;
   if (m.state === 'run'){
     if (!m.w.ok){ m.state = 'flee'; m.t = 0; return; }
-    const dx = m.tx - m.x, dy = m.ty - m.y, d = Math.hypot(dx, dy) || 1; m.ang = Math.atan2(dy, dx); m.x += dx / d * 120 * dt; m.y += dy / d * 120 * dt;
+    const dx = m.tx - m.x, dy = m.ty - m.y, d = hyp(dx, dy) || 1; m.ang = Math.atan2(dy, dx); m.x += dx / d * 120 * dt; m.y += dy / d * 120 * dt;
     if (d < 8){ m.state = 'chew'; m.t = 0; }
   } else if (m.state === 'chew'){
     if (!m.w.ok){ m.state = 'flee'; m.t = 0; return; }
@@ -337,7 +337,7 @@ function msUpdateMouse(sc, m, dt){
     if (Math.random() < dt * 14) sc.pops.push({ x: m.x, y: m.y, t: 0, dust: true, vx: rand(-40, 40), vy: rand(-50, -10) });
     if (m.t >= 3.2 * shield){ msBreakWire(sc, m.w, 'mouse'); m.state = 'flee'; m.t = 0; }
   } else {
-    m.t += dt; const dx = m.x - SCOUT_POD.x, dy = m.y - SCOUT_POD.y, d = Math.hypot(dx, dy) || 1; m.ang = Math.atan2(dy, dx); m.x += dx / d * 170 * dt; m.y += dy / d * 170 * dt;
+    m.t += dt; const dx = m.x - SCOUT_POD.x, dy = m.y - SCOUT_POD.y, d = hyp(dx, dy) || 1; m.ang = Math.atan2(dy, dx); m.x += dx / d * 170 * dt; m.y += dy / d * 170 * dt;
     if (m.t > 6 || m.x < 40 || m.y < 40 || m.x > SCOUT_W - 40 || m.y > SCOUT_H - 40) m.dead = true;
   }
 }
@@ -349,11 +349,11 @@ function msSpawnMarine(sc){
 }
 /* a Marine goes for whichever is nearer, the giraffe or one of the wires; it can only shoot the giraffe */
 function msUpdateMarine(sc, e, dt){
-  const dx = P.x - e.x, dy = P.y - e.y, d = Math.hypot(dx, dy) || 1, prev = e.state, shield = marsHas('shield') ? 2 : 1;
+  const dx = P.x - e.x, dy = P.y - e.y, d = hyp(dx, dy) || 1, prev = e.state, shield = marsHas('shield') ? 2 : 1;
   const nw = msNearestWire(sc, e.x, e.y);
   e.spdE = e.spd * 0.6;
   if (nw && nw.d < d - 20){                                                    /* a wire is nearer: walk to it and cut it */
-    const ex = nw.x - e.x, ey = nw.y - e.y, ed = Math.hypot(ex, ey) || 1; e.ang = Math.atan2(ey, ex);
+    const ex = nw.x - e.x, ey = nw.y - e.y, ed = hyp(ex, ey) || 1; e.ang = Math.atan2(ey, ex);
     if (ed > 26){ e.x += ex / ed * e.spdE * dt; e.y += ey / ed * e.spdE * dt; e.cutT = 0; e.cutting = null; }
     else { e.cutting = nw.w; e.cutT = (e.cutT || 0) + dt; nw.w.chew = e.cutT / (2.4 * shield); if (Math.random() < dt * 12) sc.pops.push({ x: e.x, y: e.y, t: 0, dust: true, vx: rand(-40, 40), vy: rand(-40, 10) }); if (e.cutT >= 2.4 * shield){ msBreakWire(sc, nw.w, 'marine'); e.cutT = 0; e.cutting = null; } }
   } else {
@@ -370,7 +370,7 @@ function mscoutToggleRover(){
   if (!sc || sc.done || !sc.rover) return false;
   const r = sc.rover;
   if (r.riding){ r.riding = false; r.x = sc.x; r.y = sc.y; msPop(sc.x, sc.y - 50, 'Got out of the rover', '#E8ECF8'); return true; }
-  if (Math.hypot(sc.x - r.x, sc.y - r.y) > 90){ msPop(sc.x, sc.y - 50, 'Walk to the rover first', '#FFD86A'); return false; }
+  if (hyp(sc.x - r.x, sc.y - r.y) > 90){ msPop(sc.x, sc.y - 50, 'Walk to the rover first', '#FFD86A'); return false; }
   if (r.battery < 1){ msPop(sc.x, sc.y - 50, 'Battery flat: park it by the base to recharge', '#FF8A5A'); return false; }
   r.riding = true; sc.face = r.ang; msPop(sc.x, sc.y - 50, 'Rover on!', '#9FE8FF'); sfx('pickupS', 0.05);
   return true;
@@ -389,13 +389,13 @@ function updateMScout(dt){
   P.x = sc.x; P.y = sc.y; P.vx = inp.x * speed; P.vy = inp.y * speed; P.face = sc.face; P.aim = sc.face;
   if (riding){ rv.x = sc.x; rv.y = sc.y; rv.ang = sc.face; }
   if (marsHas('collector') && !riding){                                                  /* the collector: argon as she walks */
-    sc.walkAcc += Math.hypot(sc.x - ox, sc.y - oy); const step = marsHas('collector2') ? 170 : 300;
+    sc.walkAcc += hyp(sc.x - ox, sc.y - oy); const step = marsHas('collector2') ? 170 : 300;
     while (sc.walkAcc >= step){ sc.walkAcc -= step; sc.carryA++; msPop(sc.x, sc.y - 36, '+1 argon', '#C8A0FF'); }
   }
   const zone = msZone();
-  sc.inBase = Math.hypot(sc.x - zone.x, sc.y - zone.y) < zone.r;
+  sc.inBase = hyp(sc.x - zone.x, sc.y - zone.y) < zone.r;
   sc.inStorm = false;
-  for (let i = 0; i < sc.storms.length; i++) if (Math.hypot(sc.x - sc.storms[i].x, sc.y - sc.storms[i].y) < sc.storms[i].r) sc.inStorm = true;
+  for (let i = 0; i < sc.storms.length; i++) if (hyp(sc.x - sc.storms[i].x, sc.y - sc.storms[i].y) < sc.storms[i].r) sc.inStorm = true;
   if (sc.inBase){
     sc.cold = Math.max(0, sc.cold - MS_WARM_RATE * marsWarmMul() * dt); sc.hp = Math.min(100, sc.hp + MS_BASE_HEAL * dt); msBank(sc);
     if (sc.cold < 40) sc.warnedCold = false;
@@ -406,12 +406,12 @@ function updateMScout(dt){
   if (sc.cold >= 100){ sc.hp -= MS_FREEZE * dt; sc.killer = 'cold'; }
   if (rv){
     if (riding){ rv.battery = Math.max(0, rv.battery - (mk2 ? 2 : 3) * dt); if (rv.battery <= 0){ rv.riding = false; rv.x = sc.x; rv.y = sc.y; msPop(sc.x, sc.y - 60, 'Battery flat! On foot from here.', '#FF8A5A'); } }
-    else if (Math.hypot(rv.x - zone.x, rv.y - zone.y) < zone.r) rv.battery = Math.min(100, rv.battery + (mk2 ? 40 : 25) * dt);
+    else if (hyp(rv.x - zone.x, rv.y - zone.y) < zone.r) rv.battery = Math.min(100, rv.battery + (mk2 ? 40 : 25) * dt);
   }
   const reach = riding ? 40 : 30;
   for (let i = sc.items.length - 1; i >= 0; i--){
     const it = sc.items[i];
-    if (Math.hypot(it.x - sc.x, it.y - sc.y) < reach){
+    if (hyp(it.x - sc.x, it.y - sc.y) < reach){
       sc.items.splice(i, 1); if (it.t === 'i') sc.carryI++; else if (it.t === 's') sc.carryS++; else sc.carryB++;
       msPop(it.x, it.y - 10, it.t === 'i' ? '+1 iron' : it.t === 's' ? '+1 sulfur' : '+1 basalt', it.t === 'i' ? '#FF9A6A' : it.t === 's' ? '#FFE27A' : '#B8C4E8'); sfx('pickupS', 0.04);
     }
@@ -419,13 +419,13 @@ function updateMScout(dt){
   sc.kickCd -= dt; sc.ramCd -= dt; if (sc.swing > 0) sc.swing -= dt;
   for (let i = 0; i < sc.rubble.length; i++) if (sc.rubble[i].shake > 0) sc.rubble[i].shake -= dt;
   if (riding && sc.ramCd <= 0 && inp.m > 0.1){
-    for (let i = 0; i < sc.rubble.length; i++){ const r = sc.rubble[i]; if (Math.hypot(r.x - sc.x, r.y - sc.y) < r.r + 30){ msHitRubble(sc, r); sc.ramCd = 0.4; break; } }
-    if (sc.ramCd <= 0) for (let i = 0; i < sc.foes.length; i++){ const e = sc.foes[i]; if (!e.dead && Math.hypot(e.x - sc.x, e.y - sc.y) < e.r + 30){ msHitFoe(sc, e, 45); sc.ramCd = 0.4; break; } }
+    for (let i = 0; i < sc.rubble.length; i++){ const r = sc.rubble[i]; if (hyp(r.x - sc.x, r.y - sc.y) < r.r + 30){ msHitRubble(sc, r); sc.ramCd = 0.4; break; } }
+    if (sc.ramCd <= 0) for (let i = 0; i < sc.foes.length; i++){ const e = sc.foes[i]; if (!e.dead && hyp(e.x - sc.x, e.y - sc.y) < e.r + 30){ msHitFoe(sc, e, 45); sc.ramCd = 0.4; break; } }
   }
   if (!riding && (Input.mdown || Input.touchKick || Input.keys[keyOf('kick')] || Settings.autoKick) && sc.kickCd <= 0){
     let near = false;
-    for (let i = 0; i < sc.rubble.length && !near; i++) if (Math.hypot(sc.rubble[i].x - sc.x, sc.rubble[i].y - sc.y) - sc.rubble[i].r < 64) near = true;
-    for (let i = 0; i < sc.foes.length && !near; i++) if (!sc.foes[i].dead && Math.hypot(sc.foes[i].x - sc.x, sc.foes[i].y - sc.y) - sc.foes[i].r < 64) near = true;
+    for (let i = 0; i < sc.rubble.length && !near; i++) if (hyp(sc.rubble[i].x - sc.x, sc.rubble[i].y - sc.y) - sc.rubble[i].r < 64) near = true;
+    for (let i = 0; i < sc.foes.length && !near; i++) if (!sc.foes[i].dead && hyp(sc.foes[i].x - sc.x, sc.foes[i].y - sc.y) - sc.foes[i].r < 64) near = true;
     if (near || Input.mdown || Input.touchKick || Input.keys[keyOf('kick')]) msKick(sc);
   }
   /* the wires: walking over a broken one mends it */
@@ -449,7 +449,7 @@ function updateMScout(dt){
   for (let i = sc.foes.length - 1; i >= 0; i--){ msUpdateMarine(sc, sc.foes[i], dt); if (sc.foes[i].dead) sc.foes.splice(i, 1); }
   for (let i = G.eproj.length - 1; i >= 0; i--){                                          /* the Marines' rounds: they can only hurt the giraffe */
     const p = G.eproj[i]; p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt;
-    if (Math.hypot(p.x - sc.x, p.y - sc.y) < 20){ msHurt(sc, MS_MARINE_DMG, 'marine', 0.5); G.eproj.splice(i, 1); }
+    if (hyp(p.x - sc.x, p.y - sc.y) < 20){ msHurt(sc, MS_MARINE_DMG, 'marine', 0.5); G.eproj.splice(i, 1); }
     else if (p.life <= 0 || p.x < 0 || p.y < 0 || p.x > SCOUT_W || p.y > SCOUT_H) G.eproj.splice(i, 1);
   }
   for (let i = sc.pops.length - 1; i >= 0; i--){ const p = sc.pops[i]; p.t += dt; if (p.dust){ p.x += p.vx * dt; p.y += p.vy * dt; } if (p.t > (p.dust ? 0.5 : 1.1)) sc.pops.splice(i, 1); }
@@ -558,8 +558,8 @@ function renderMScout(ctx){
   if (sc.wires.length){ let down = 0; for (let i = 0; i < sc.wires.length; i++) if (!sc.wires[i].ok) down++; ctx.fillStyle = down ? '#FF9A6A' : '#9FE8A8'; ctx.fillText(down ? 'Wires down: ' + down + ' of ' + sc.wires.length + '  (walk over them to mend)' : 'All ' + sc.wires.length + ' wires whole', 20, ty0 + 40); }
   const tl = Math.max(0, Math.ceil(sc.left)); ctx.textAlign = 'center'; ctx.font = '800 22px sans-serif'; ctx.fillStyle = tl <= 15 ? '#FFD86A' : '#fff'; ctx.fillText(Math.floor(tl / 60) + ':' + String(tl % 60).padStart(2, '0'), W / 2, 34); ctx.textAlign = 'left';
   const arrow = (tx, ty, col, label) => { const a = Math.atan2(ty - sc.y, tx - sc.x), ax = W / 2 + Math.cos(a) * Math.min(W, H) * 0.38, ay = H / 2 + Math.sin(a) * Math.min(W, H) * 0.38; ctx.save(); ctx.translate(ax, ay); ctx.rotate(a); ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(16, 0); ctx.lineTo(-10, -11); ctx.lineTo(-4, 0); ctx.lineTo(-10, 11); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.fillStyle = col; ctx.font = '700 11px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(label, ax - Math.cos(a) * 26, ay - Math.sin(a) * 26 + 4); ctx.textAlign = 'left'; };
-  if (Math.hypot(sc.x - p.x, sc.y - p.y) > 420) arrow(p.x, p.y, 'rgba(255,220,180,.9)', 'BASE');
-  let bw = null, bwd = 1e9; for (let i = 0; i < sc.wires.length; i++){ const w = sc.wires[i]; if (w.ok) continue; const d = Math.hypot((w.mx + w.bx) / 2 - sc.x, (w.my + w.by) / 2 - sc.y); if (d < bwd){ bwd = d; bw = w; } }
+  if (hyp(sc.x - p.x, sc.y - p.y) > 420) arrow(p.x, p.y, 'rgba(255,220,180,.9)', 'BASE');
+  let bw = null, bwd = 1e9; for (let i = 0; i < sc.wires.length; i++){ const w = sc.wires[i]; if (w.ok) continue; const d = hyp((w.mx + w.bx) / 2 - sc.x, (w.my + w.by) / 2 - sc.y); if (d < bwd){ bwd = d; bw = w; } }
   if (bw && bwd > 260) arrow((bw.mx + bw.bx) / 2, (bw.my + bw.by) / 2, 'rgba(255,120,80,.95)', 'WIRE');
   ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.font = '12px sans-serif';
   ctx.fillText((Input.hasTouch ? 'Joystick to walk. ' : 'WASD to walk. ') + (rvs ? (Input.hasTouch ? 'ROVER button to board. ' : 'E boards the rover. ') : '') + (Settings.autoKick ? 'Stand by rubble to kick it open. ' : 'Hold the mouse or Space to kick. ') + 'Stay in the ring to warm up and bank your haul. ' + (Input.hasTouch ? '' : 'Esc gives up.'), 14, H - 14);
@@ -588,7 +588,7 @@ CARDS.push({
       v.x += Math.cos(a) * 230 * dt; v.y += Math.sin(a) * 230 * dt; v.tick -= dt;
       if (v.tick <= 0){
         v.tick = 0.25; const near = enemiesNear(v.x, v.y, s.rad + 40, []);
-        for (let k = 0; k < near.length; k++){ const e = near[k]; if (e.dead || Math.hypot(e.x - v.x, e.y - v.y) > e.r + s.rad) continue; damageEnemy(e, s.dmg, { kb: s.kb, sx: v.x, sy: v.y, color: '#E8B890', quiet: true, noCrit: true }); e.slowT = Math.max(e.slowT, 0.5); e.slowMul = Math.min(e.slowMul, 0.6); }
+        for (let k = 0; k < near.length; k++){ const e = near[k]; if (e.dead || hyp(e.x - v.x, e.y - v.y) > e.r + s.rad) continue; damageEnemy(e, s.dmg, { kb: s.kb, sx: v.x, sy: v.y, color: '#E8B890', quiet: true, noCrit: true }); e.slowT = Math.max(e.slowT, 0.5); e.slowMul = Math.min(e.slowMul, 0.6); }
       }
     }
   },

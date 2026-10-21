@@ -81,7 +81,7 @@ try {
   Save.data.meta = {}; Save.data.gold = 1e9; upPlan = upgPlanAll(); out.planUnlocked = !!upPlan.add.engspeed; unlock(false); Save.data.gold = 1e9; out.planLocked = !upgPlanAll().add.engspeed;
   /* 16. drawing: engineers, turrets (built and unbuilt) and shadows draw without trouble */
   unlock(true); startRun(1); G.state = 'playing'; Save.data.ants.engineer = 2; G.engTimer = 0; updateAnts(0.05); G.engTimer = 0; updateAnts(0.05); var t1 = engNewTurret(P.x + 200, P.y); t1.done = true; var t2 = engNewTurret(P.x - 200, P.y); engSetProgress(t2, 0.5);
-  var cv2 = document.createElement('canvas'); cv2.width = 600; cv2.height = 400; var c2 = cv2.getContext('2d'); c2.translate(300 - P.x, 200 - P.y); var drew = true; try { drawAntShadows(c2); drawAnts(c2); } catch (e) { drew = false; out.errs.push('draw ' + e.message); }
+  var cv2 = document.createElement('canvas'); cv2.width = 600; cv2.height = 400; var c2 = cv2.getContext('2d'); c2.translate(300 - P.x, 200 - P.y); G.camX = P.x; G.camY = P.y; var drew = true; try { drawAntShadows(c2); drawAnts(c2); } catch (e) { drew = false; out.errs.push('draw ' + e.message); }
   var px = c2.getImageData(0, 0, 600, 400).data, cnt = 0; for (var i = 3; i < px.length; i += 4 * 53) if (px[i] > 0) cnt++; out.draws = drew && cnt > 30;
   /* 17. cost of a crowd: 60 turrets and 30 enemies are cheap to update */
   G.antTurrets.length = 0; for (var i = 0; i < 60; i++){ var tt = engNewTurret(200 + (i % 10) * 150, 200 + Math.floor(i / 10) * 150); tt.done = true; } G.enemies.length = 0; for (var i = 0; i < 30; i++) spawnEnemy('hyena', 300 + i * 40, 500 + (i % 5) * 60, 1);

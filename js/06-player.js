@@ -79,7 +79,7 @@ function playerInputVector(){
   if (k[keyOf('down')] || k['ArrowDown'])  iy += 1;
   if (Input.joyActive){ ix += Input.joyX; iy += Input.joyY; }
   if (Input.padOn){ ix += Input.padX; iy += Input.padY; }
-  const m = Math.hypot(ix, iy);
+  const m = hyp(ix, iy);
   if (m > 1){ ix /= m; iy /= m; }
   return { x: ix, y: iy, m: Math.min(1, m) };
 }
@@ -101,7 +101,7 @@ function updatePlayer(dt){
   P.y = clamp(P.y + P.vy * dt, 26, ARENA_H - 26);
   if (G.buildings && G.buildings.length) resolveBuildings(P, P.r * 0.8);
 
-  const moving = Math.hypot(P.vx, P.vy);
+  const moving = hyp(P.vx, P.vy);
   P.walk += dt * (2.5 + moving * 0.034);
   if (moving > 12) P.face = Math.atan2(P.vy, P.vx);
 
@@ -165,7 +165,7 @@ function doKick(){
         const e = near[i];
         if (e.dead) continue;
         const dx = e.x - P.x, dy = e.y - P.y;
-        const d = Math.hypot(dx, dy);
+        const d = hyp(dx, dy);
         if (d > range + e.r) continue;
         if (arc < TAU && Math.abs(angDiff(Math.atan2(dy, dx), a)) > arc * 0.5) continue;
         if (strikes > 1 && !canHit(e, 'wep' + rep, 0.05)) continue;
@@ -243,7 +243,7 @@ function doKick(){
     for (let k = 0; k < G.buildings.length; k++){
       const b = G.buildings[k];
       if (b.collapsed) continue;
-      const nx = clamp(P.x, b.x, b.x + b.w), ny = clamp(P.y, b.y, b.y + b.h), d = Math.hypot(nx - P.x, ny - P.y);
+      const nx = clamp(P.x, b.x, b.x + b.w), ny = clamp(P.y, b.y, b.y + b.h), d = hyp(nx - P.x, ny - P.y);
       if (d > range + 10) continue;
       if (arc < TAU - 0.01 && d > 30 && Math.abs(angDiff(Math.atan2(ny - P.y, nx - P.x), base)) > arc / 2 + 0.35) continue;
       damageBuilding(b, dmg * strikes, 'kick');

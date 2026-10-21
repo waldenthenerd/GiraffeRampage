@@ -55,7 +55,7 @@ function engInit(){
   if (G._engAnts === G.ants) return;                                                    /* G.ants is a new array at every run start: so is everything here */
   G._engAnts = G.ants; G.engineers = []; G.antTurrets = []; G.engTimer = antRespawnTime();
 }
-function engNearestEnemyDist(x, y, r){ const e = nearestEnemy(x, y, r); return e ? Math.hypot(e.x - x, e.y - y) : Infinity; }
+function engNearestEnemyDist(x, y, r){ const e = nearestEnemy(x, y, r); return e ? hyp(e.x - x, e.y - y) : Infinity; }
 function engSpawn(){
   const h = antHill(), pw = antPower() * antHpMul();
   G.engineers.push({ x: h.x + rand(-10, 10), y: h.y + rand(-10, 10), ang: Math.random() * TAU, hp: ENG.hp * pw, maxHp: ENG.hp * pw, r: ENG.r, anim: Math.random() * 6,
@@ -82,9 +82,9 @@ function engPickSite(e){
   for (let k = 0; k < 14; k++){
     const a = Math.random() * TAU, d = rand(ENG.siteMin, ENG.siteMax), x = clamp(P.x + Math.cos(a) * d, 70, ARENA_W - 70), y = clamp(P.y + Math.sin(a) * d, 70, ARENA_H - 70);
     let ok = true;
-    for (let i = 0; i < G.antTurrets.length && ok; i++) if (Math.hypot(G.antTurrets[i].x - x, G.antTurrets[i].y - y) < ENG.spacing) ok = false;
+    for (let i = 0; i < G.antTurrets.length && ok; i++) if (hyp(G.antTurrets[i].x - x, G.antTurrets[i].y - y) < ENG.spacing) ok = false;
     if (!ok || engNearestEnemyDist(x, y, ENG.avoid) < ENG.avoid) continue;
-    if (G.buildings && G.buildings.length){ const q = { x: x, y: y }; resolveBuildings(q, 24); if (Math.hypot(q.x - x, q.y - y) > 1) continue; }
+    if (G.buildings && G.buildings.length){ const q = { x: x, y: y }; resolveBuildings(q, 24); if (hyp(q.x - x, q.y - y) > 1) continue; }
     return { x: x, y: y };
   }
   return null;
@@ -94,7 +94,7 @@ function engPickUnfinished(e){
   let best = null, bd = 900;
   for (let i = 0; i < G.antTurrets.length; i++){
     const t = G.antTurrets[i]; if (t.done || t.builder) continue;
-    const d = Math.hypot(t.x - e.x, t.y - e.y); if (d >= bd) continue;
+    const d = hyp(t.x - e.x, t.y - e.y); if (d >= bd) continue;
     if (engNearestEnemyDist(t.x, t.y, ENG.avoid) < ENG.avoid) continue;
     best = t; bd = d;
   }
@@ -105,10 +105,10 @@ function engUpdateOne(e, dt){
   const spd = ENG.spd * antSpdMul(); let mx = 0, my = 0, sp = 1;
   e.anim += dt * 16; e.hurt -= dt; e.flash -= dt; e.tgtT -= dt;
   const near = enemiesNear(e.x, e.y, 90);                                               /* enemies that touch it hurt it, as with the other ants */
-  for (let j = 0; j < near.length && e.hurt <= 0; j++){ const q = near[j]; if (!q.dead && Math.hypot(q.x - e.x, q.y - e.y) < q.r + e.r){ e.hp -= q.dmg * 0.6; e.hurt = 0.4; e.flash = 0.12; } }
+  for (let j = 0; j < near.length && e.hurt <= 0; j++){ const q = near[j]; if (!q.dead && hyp(q.x - e.x, q.y - e.y) < q.r + e.r){ e.hp -= q.dmg * 0.6; e.hurt = 0.4; e.flash = 0.12; } }
   if (e.hp <= 0){ engKill(e); return; }
   const foe = nearestEnemy(e.x, e.y, ENG.avoid);
-  const dFoe = foe ? Math.hypot(foe.x - e.x, foe.y - e.y) : Infinity;
+  const dFoe = foe ? hyp(foe.x - e.x, foe.y - e.y) : Infinity;
   if (e.state === 'build'){
     const t = e.turret;
     if (!t || t.dead){ e.state = 'wait'; e.turret = null; e.cool = 1; }
@@ -122,7 +122,7 @@ function engUpdateOne(e, dt){
   }
   if (foe){                                                                              /* an enemy inside the keep-away distance: run, away from it */
     e.state = 'flee'; e.fleeT = 0.35; e.turret = null;
-    const dx = e.x - foe.x, dy = e.y - foe.y, d = Math.hypot(dx, dy) || 1, gx = P.x - e.x, gy = P.y - e.y, gd = Math.hypot(gx, gy) || 1;
+    const dx = e.x - foe.x, dy = e.y - foe.y, d = hyp(dx, dy) || 1, gx = P.x - e.x, gy = P.y - e.y, gd = hyp(gx, gy) || 1;
     mx = dx / d + gx / gd * 0.25; my = dy / d + gy / gd * 0.25;
   } else if (e.state === 'flee'){ e.fleeT -= dt; if (e.fleeT <= 0){ e.state = 'wait'; e.cool = Math.min(e.cool, 1.5); } }
   else {
@@ -135,18 +135,18 @@ function engUpdateOne(e, dt){
     if (e.state === 'drive'){
       if (e.turret && (e.turret.dead || e.turret.builder || e.turret.done)){ e.state = 'wait'; e.turret = null; e.cool = 0.5; }
       else {
-        const dx = e.tx - e.x, dy = e.ty - e.y, d = Math.hypot(dx, dy) || 1;
+        const dx = e.tx - e.x, dy = e.ty - e.y, d = hyp(dx, dy) || 1;
         if (d < 12){
           if (engNearestEnemyDist(e.x, e.y, ENG.avoid / 2) < ENG.avoid / 2){ e.state = 'wait'; e.turret = null; e.cool = 1.5; }
           else { const t = e.turret || engNewTurret(e.tx, e.ty); t.builder = e; e.turret = t; e.state = 'build'; }
         } else { mx = dx / d; my = dy / d; }
       }
     } else if (e.state === 'wait'){                                                        /* between jobs: idle about near her */
-      if (e.tgtT <= 0 || Math.hypot(e.tx - e.x, e.ty - e.y) < 12){ const a = Math.random() * TAU, r = rand(150, 300); e.tx = clamp(P.x + Math.cos(a) * r, 60, ARENA_W - 60); e.ty = clamp(P.y + Math.sin(a) * r, 60, ARENA_H - 60); e.tgtT = rand(2, 4); }
-      const dx = e.tx - e.x, dy = e.ty - e.y, d = Math.hypot(dx, dy) || 1; mx = dx / d; my = dy / d; sp = 0.5;
+      if (e.tgtT <= 0 || hyp(e.tx - e.x, e.ty - e.y) < 12){ const a = Math.random() * TAU, r = rand(150, 300); e.tx = clamp(P.x + Math.cos(a) * r, 60, ARENA_W - 60); e.ty = clamp(P.y + Math.sin(a) * r, 60, ARENA_H - 60); e.tgtT = rand(2, 4); }
+      const dx = e.tx - e.x, dy = e.ty - e.y, d = hyp(dx, dy) || 1; mx = dx / d; my = dy / d; sp = 0.5;
     }
   }
-  const m = Math.hypot(mx, my);
+  const m = hyp(mx, my);
   if (m > 0){
     e.ang = Math.atan2(my, mx);
     e.x = clamp(e.x + mx / m * spd * sp * dt, 20, ARENA_W - 20); e.y = clamp(e.y + my / m * spd * sp * dt, 20, ARENA_H - 20);
@@ -157,14 +157,14 @@ function turretUpdateOne(t, dt){
   t.anim += dt; t.atk -= dt; t.hurt -= dt; t.flash -= dt; t.scanT -= dt;
   if (t.scanT <= 0){                                                                   /* a few looks a second, not one a frame */
     t.scanT = 0.14 + Math.random() * 0.1;
-    if (t.hurt <= 0){ const near = enemiesNear(t.x, t.y, 80); for (let j = 0; j < near.length; j++){ const q = near[j]; if (!q.dead && Math.hypot(q.x - t.x, q.y - t.y) < q.r + t.r){ t.hp -= q.dmg * 0.6; t.hurt = 0.4; t.flash = 0.12; break; } } }
+    if (t.hurt <= 0){ const near = enemiesNear(t.x, t.y, 80); for (let j = 0; j < near.length; j++){ const q = near[j]; if (!q.dead && hyp(q.x - t.x, q.y - t.y) < q.r + t.r){ t.hp -= q.dmg * 0.6; t.hurt = 0.4; t.flash = 0.12; break; } } }
     if (t.done) t.tgt = nearestEnemy(t.x, t.y, turretRange());
   }
   if (t.hp <= 0){ t.dead = true; if (t.builder){ t.builder.turret = null; t.builder = null; } burstParticles(t.x, t.y, 10, '#8A8E98', 150, 3); return; }
   if (!t.done) return;
   const q = t.tgt;
   if (!q || q.dead || q.untarg){ t.tgt = null; return; }
-  const dx = q.x - t.x, dy = q.y - t.y, d = Math.hypot(dx, dy) || 1;
+  const dx = q.x - t.x, dy = q.y - t.y, d = hyp(dx, dy) || 1;
   if (d > turretRange() + q.r){ t.tgt = null; return; }
   t.ang = Math.atan2(dy, dx);
   if (t.atk <= 0){
@@ -191,9 +191,9 @@ function turretUpdateOne(t, dt){
   antAggroTarget = function(e){
     let best = aggro.apply(this, arguments);
     if (!G.engineers) return best;
-    const pd = Math.hypot(P.x - e.x, P.y - e.y);
-    let bd = best ? Math.hypot(best.x - e.x, best.y - e.y) : Math.min(pd, ANT_AGGRO);
-    const look = function(list){ for (let i = 0; i < list.length; i++){ const a = list[i]; if (a.dead) continue; const d = Math.hypot(a.x - e.x, a.y - e.y); if (d < bd){ bd = d; best = a; } } };
+    const pd = hyp(P.x - e.x, P.y - e.y);
+    let bd = best ? hyp(best.x - e.x, best.y - e.y) : Math.min(pd, ANT_AGGRO);
+    const look = function(list){ for (let i = 0; i < list.length; i++){ const a = list[i]; if (a.dead) continue; const d = hyp(a.x - e.x, a.y - e.y); if (d < bd){ bd = d; best = a; } } };
     look(G.engineers); look(G.antTurrets);
     return best;
   };
@@ -232,7 +232,8 @@ function drawAntTurret(ctx, t, time){
   drawAnts = function(ctx){
     da.apply(this, arguments);
     if (!G.engineers || (!G.engineers.length && !G.antTurrets.length)) return;
-    for (let i = 0; i < G.antTurrets.length; i++) drawAntTurret(ctx, G.antTurrets[i], G.time);
+    const v = viewBounds(60);
+    for (let i = 0; i < G.antTurrets.length; i++){ const t = G.antTurrets[i]; if (t.x < v.x0 || t.x > v.x1 || t.y < v.y0 || t.y > v.y1) continue; drawAntTurret(ctx, t, G.time); }
     for (let i = 0; i < G.engineers.length; i++){ const e = G.engineers[i]; drawEngineerRover(ctx, e.x, e.y, e.ang, G.time, e.flash > 0); }
   };
   const ds = drawAntShadows;

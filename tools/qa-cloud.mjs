@@ -16,7 +16,7 @@ const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf('--' + n); return i >= 0 ? args[i + 1] : d; };
 const scenario = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].startsWith('--')));
 if (!scenario) { console.error('usage: node tools/qa-cloud.mjs <scenario.js> [--shot out.png] [--params "a=1&b=2"] [--seed N] [--w N] [--h N] [--scale N] [--touch] [--wait ms]'); process.exit(2); }
-const W = +opt('w', 1280), H = +opt('h', 720), scale = +opt('scale', 1), waitMs = +opt('wait', 20000), seed = opt('seed', '12345'), params = opt('params', ''), shot = opt('shot', ''), profile = args.includes('--profile');
+const W = +opt('w', 1280), H = +opt('h', 720), scale = +opt('scale', 1), waitMs = +opt('wait', 20000), seed = opt('seed', '12345'), params = opt('params', ''), shot = opt('shot', ''), profile = args.includes('--profile'), heap = args.includes('--heap');
 
 // Build the QA page from the real index.html plus the harness block that lives in qa.html (single source of truth for the QA object).
 const qaHtml = fs.readFileSync(path.join(here, 'qa.html'), 'utf8');
@@ -48,7 +48,7 @@ function findChromium() {
   }
   return undefined;
 }
-const launchArgs = ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required', '--no-sandbox'];
+const launchArgs = ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required', '--no-sandbox', '--enable-precise-memory-info'];
 let browser;
 try { browser = await chromium.launch({ args: launchArgs }); }
 catch (e) { const exe = findChromium(); if (!exe) throw e; browser = await chromium.launch({ args: launchArgs, executablePath: exe }); }
@@ -59,6 +59,7 @@ const pageErrors = [];
 pg.on('pageerror', e => pageErrors.push(String(e)));
 const url = `http://127.0.0.1:${port}/qa-full.html?s=${encodeURIComponent('/__scenario.js')}&seed=${seed}${params ? '&' + params : ''}`;
 let cdp = null;
+if (heap) { cdp = await ctx.newCDPSession(pg); await cdp.send('HeapProfiler.enable'); await cdp.send('HeapProfiler.startSampling', { samplingInterval: 2048, includeObjectsCollectedByMajorGC: true, includeObjectsCollectedByMinorGC: true }); }
 if (profile) { cdp = await ctx.newCDPSession(pg); await cdp.send('Profiler.enable'); await cdp.send('Profiler.setSamplingInterval', { interval: 200 }); await cdp.send('Profiler.start'); }
 await pg.goto(url);
 let out = null;
@@ -68,6 +69,13 @@ try {
 } catch (e) {
   out = await pg.evaluate(() => window.QA ? JSON.stringify({ done: false, result: null, errors: QA.errors, logs: QA.logs }) : null).catch(() => null);
   if (!out) out = JSON.stringify({ done: false, result: null, errors: ['no result: the scenario did not run, never called QA.done, or the page did not load'].concat(pageErrors), logs: [] });
+}
+if (heap) {                                             // --heap: which functions allocate the most (everything the page allocated, collected or not), as a table on stderr
+  const { profile: hp } = await cdp.send('HeapProfiler.stopSampling'); const by = new Map();
+  (function walk(n) { const k = (n.callFrame.functionName || '(anonymous)') + ' ' + path.basename(n.callFrame.url) + ':' + (n.callFrame.lineNumber + 1); by.set(k, (by.get(k) || 0) + n.selfSize); n.children.forEach(walk); })(hp.head);
+  const tot = [...by.values()].reduce((a, b) => a + b, 0); console.error('--- allocations (KB, % of ' + (tot / 1024).toFixed(0) + ' KB) ---');
+  [...by.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40).forEach(([k, v]) => console.error((v / 1024).toFixed(0).padStart(8) + ' ' + (100 * v / tot).toFixed(1).padStart(5) + '%  ' + k));
+  cdp = null;
 }
 if (cdp) {                                              // --profile: top functions by self time, as a table on stderr
   const { profile: pr } = await cdp.send('Profiler.stop'); const self = new Map(), byId = new Map(pr.nodes.map(n => [n.id, n]));

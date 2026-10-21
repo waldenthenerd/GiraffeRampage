@@ -279,7 +279,7 @@ function lavaBlobPath(ctx, l, k){
 function lavaFlowPath(ctx, f, grow){
   const pts = f.pts, L = [], R = [];
   for (let i = 0; i < pts.length; i++){
-    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1, nx = -dy / d, ny = dx / d, h = pts[i].w * grow / 2;
+    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)], dx = b.x - a.x, dy = b.y - a.y, d = hyp(dx, dy) || 1, nx = -dy / d, ny = dx / d, h = pts[i].w * grow / 2;
     L.push({ x: pts[i].x + nx * h, y: pts[i].y + ny * h }); R.push({ x: pts[i].x - nx * h, y: pts[i].y - ny * h });
   }
   ctx.beginPath(); ctx.moveTo(L[0].x, L[0].y); for (let i = 1; i < L.length; i++) ctx.lineTo(L[i].x, L[i].y); for (let i = R.length - 1; i >= 0; i--) ctx.lineTo(R[i].x, R[i].y); ctx.closePath();
@@ -337,18 +337,18 @@ function scoutMakeLava(x, y, r){
     let px = x + Math.cos(al) * rho * 0.88, py = y + Math.sin(al) * rho * 0.88, dir = al; const pts = [];
     for (let k = 0; k <= steps; k++){
       const u = k / steps;
-      if (Math.hypot(px - SCOUT_POD.x, py - SCOUT_POD.y) < 330 || px < 70 || py < 70 || px > SCOUT_W - 70 || py > SCOUT_H - 70) break;       /* never reach the base, or the edge of the map */
+      if (hyp(px - SCOUT_POD.x, py - SCOUT_POD.y) < 330 || px < 70 || py < 70 || px > SCOUT_W - 70 || py > SCOUT_H - 70) break;       /* never reach the base, or the edge of the map */
       pts.push({ x: px, y: py, w: Math.max(2, w0 * Math.pow(1 - u, 0.85) + 2) });
       dir += curve * 0.35 + (Math.random() - 0.5) * 0.35; px += Math.cos(dir) * len / steps; py += Math.sin(dir) * len / steps;
     }
-    let fl = 0; for (let k = 1; k < pts.length; k++) fl += Math.hypot(pts[k].x - pts[k - 1].x, pts[k].y - pts[k - 1].y);
+    let fl = 0; for (let k = 1; k < pts.length; k++) fl += hyp(pts[k].x - pts[k - 1].x, pts[k].y - pts[k - 1].y);
     if (pts.length >= 3 && fl >= 50) L.flows.push({ pts: pts });          /* no little stubs: a flow is at least 50 px long, or it is tried again at another angle */
   }
-  let R = r * 1.3; for (const o of L.outline) R = Math.max(R, Math.hypot(o.x - x, o.y - y)); for (const f of L.flows) for (const q of f.pts) R = Math.max(R, Math.hypot(q.x - x, q.y - y) + q.w); L.R = R + 30;
+  let R = r * 1.3; for (const o of L.outline) R = Math.max(R, hyp(o.x - x, o.y - y)); for (const f of L.flows) for (const q of f.pts) R = Math.max(R, hyp(q.x - x, q.y - y) + q.w); L.R = R + 30;
   return L;
 }
 function scoutLavaHit(L, x, y){
-  const dx = x - L.x, dy = y - L.y, d = Math.hypot(dx, dy);
+  const dx = x - L.x, dy = y - L.y, d = hyp(dx, dy);
   if (d > (L.R || L.r)) return false;                 /* a plain round pool (no outline or flows) still works */
   if (d < scoutLavaRho(L, Math.atan2(dy, dx))) return true;
   const flows = L.flows || [];
@@ -356,7 +356,7 @@ function scoutLavaHit(L, x, y){
     const pts = flows[i].pts;
     for (let k = 0; k + 1 < pts.length; k++){
       const a = pts[k], b = pts[k + 1], abx = b.x - a.x, aby = b.y - a.y, t = clamp(((x - a.x) * abx + (y - a.y) * aby) / (abx * abx + aby * aby || 1), 0, 1);
-      if (Math.hypot(x - (a.x + abx * t), y - (a.y + aby * t)) < (a.w + (b.w - a.w) * t) * 0.5) return true;
+      if (hyp(x - (a.x + abx * t), y - (a.y + aby * t)) < (a.w + (b.w - a.w) * t) * 0.5) return true;
     }
   }
   return false;
@@ -367,7 +367,7 @@ function scoutSpot(minD, maxD, avoid, pad){
     const x = SCOUT_POD.x + Math.cos(a) * d, y = SCOUT_POD.y + Math.sin(a) * d;
     if (x < 90 || y < 90 || x > SCOUT_W - 90 || y > SCOUT_H - 90) continue;
     let ok = true;
-    for (let i = 0; i < avoid.length && ok; i++) if (Math.hypot(x - avoid[i].x, y - avoid[i].y) < avoid[i].r + (pad || 30)) ok = false;
+    for (let i = 0; i < avoid.length && ok; i++) if (hyp(x - avoid[i].x, y - avoid[i].y) < avoid[i].r + (pad || 30)) ok = false;
     if (ok) return { x: x, y: y, d: d };
   }
   return { x: SCOUT_POD.x + 300, y: SCOUT_POD.y, d: 300 };
@@ -437,8 +437,8 @@ function scoutHitFoe(sc, e, n){
 }
 function scoutKick(sc){
   let best = null, bd = 1e9, isFoe = false;
-  for (let i = 0; i < sc.rubble.length; i++){ const r = sc.rubble[i], d = Math.hypot(r.x - sc.x, r.y - sc.y) - r.r; if (d < 64 && d < bd){ bd = d; best = r; } }
-  for (let i = 0; i < sc.foes.length; i++){ const e = sc.foes[i]; if (e.kind !== 'marine' || e.dead) continue; const d = Math.hypot(e.x - sc.x, e.y - sc.y) - e.r; if (d < 64 && d < bd){ bd = d; best = e; isFoe = true; } }
+  for (let i = 0; i < sc.rubble.length; i++){ const r = sc.rubble[i], d = hyp(r.x - sc.x, r.y - sc.y) - r.r; if (d < 64 && d < bd){ bd = d; best = r; } }
+  for (let i = 0; i < sc.foes.length; i++){ const e = sc.foes[i]; if (e.kind !== 'marine' || e.dead) continue; const d = hyp(e.x - sc.x, e.y - sc.y) - e.r; if (d < 64 && d < bd){ bd = d; best = e; isFoe = true; } }
   sc.kickCd = 0.38; sc.swing = 0.24;
   if (!best) return;
   sc.face = Math.atan2(best.y - sc.y, best.x - sc.x);
@@ -483,7 +483,7 @@ function scoutSpawnFoe(kind){
   return e;
 }
 function scoutUpdateMarine(sc, e, dt){
-  const dx = P.x - e.x, dy = P.y - e.y, d = Math.hypot(dx, dy) || 1, prev = e.state;
+  const dx = P.x - e.x, dy = P.y - e.y, d = hyp(dx, dy) || 1, prev = e.state;
   e.spdE = e.spd * 0.55;                                                   /* slow and easily dodged: a nuisance, not a threat */
   const mv = MARINE_AI.m_rifle(e, dt, dx / d, dy / d, d);
   if (prev === 'burst' && e.state === 'idle') e.stateT = 2.4 + Math.random() * 1.4;
@@ -494,11 +494,11 @@ function scoutUpdateMarine(sc, e, dt){
    pod it loses interest, walks away from it, and leaves for good once it reaches the edge of the map. */
 function scoutUpdateBehemoth(sc, e, dt){
   const spd = e.spd;
-  let ux = P.x - e.x, uy = P.y - e.y; const d = Math.hypot(ux, uy) || 1; ux /= d; uy /= d;
+  let ux = P.x - e.x, uy = P.y - e.y; const d = hyp(ux, uy) || 1; ux /= d; uy /= d;
   if (sc.inPod && !e.leaving){ e.leaving = true; e.state = 'idle'; scoutPop(e.x, e.y - 60, 'The Behemoth loses interest and wanders off.', '#FFD86A'); }
   let mvx = 0, mvy = 0;
   if (e.leaving){
-    const ax = e.x - SCOUT_POD.x, ay = e.y - SCOUT_POD.y, al = Math.hypot(ax, ay) || 1;
+    const ax = e.x - SCOUT_POD.x, ay = e.y - SCOUT_POD.y, al = hyp(ax, ay) || 1;
     mvx = ax / al * spd; mvy = ay / al * spd; e.ang = Math.atan2(ay, ax);
   } else {
     e.stateT -= dt; e.ang = Math.atan2(uy, ux);
@@ -529,7 +529,7 @@ function scoutToggleRover(){
   if (!sc || sc.done || !sc.rover) return false;
   const r = sc.rover;
   if (r.riding){ r.riding = false; r.x = sc.x; r.y = sc.y; scoutPop(sc.x, sc.y - 50, 'Got out of the rover', '#E8ECF8'); return true; }
-  if (Math.hypot(sc.x - r.x, sc.y - r.y) > 90){ scoutPop(sc.x, sc.y - 50, 'Walk to the rover first', '#FFD86A'); return false; }
+  if (hyp(sc.x - r.x, sc.y - r.y) > 90){ scoutPop(sc.x, sc.y - 50, 'Walk to the rover first', '#FFD86A'); return false; }
   if (r.battery < 1){ scoutPop(sc.x, sc.y - 50, 'Battery flat: park it in the pod ring to recharge', '#FF8A5A'); return false; }
   r.riding = true; sc.face = r.ang; scoutPop(sc.x, sc.y - 50, 'Rover on!', '#9FE8FF'); sfx('pickupS', 0.05);
   return true;
@@ -547,7 +547,7 @@ function updateScout(dt){
   P.x = sc.x; P.y = sc.y; P.vx = inp.x * speed; P.vy = inp.y * speed; P.face = sc.face; P.aim = sc.face;   /* head and neck point the way she is walking */
   if (riding){ rv.x = sc.x; rv.y = sc.y; rv.ang = sc.face; }
   const zone = scoutZone();
-  sc.inPod = Math.hypot(sc.x - zone.x, sc.y - zone.y) < zone.r;
+  sc.inPod = hyp(sc.x - zone.x, sc.y - zone.y) < zone.r;
   sc.inLava = false;
   for (let i = 0; i < sc.lava.length; i++) if (scoutLavaHit(sc.lava[i], sc.x, sc.y)) sc.inLava = true;
   if (sc.inPod){
@@ -562,12 +562,12 @@ function updateScout(dt){
   if (sc.heat >= 100){ sc.hp -= SCOUT_BURN * dt; sc.killer = 'heat'; }
   if (rv){                                                                              /* the rover's battery */
     if (riding){ rv.battery = Math.max(0, rv.battery - SCOUT_ROVER_DRAIN * dt); if (rv.battery <= 0){ rv.riding = false; rv.x = sc.x; rv.y = sc.y; scoutPop(sc.x, sc.y - 60, 'Battery flat! On foot from here.', '#FF8A5A'); } }
-    else if (Math.hypot(rv.x - zone.x, rv.y - zone.y) < zone.r) rv.battery = Math.min(100, rv.battery + SCOUT_ROVER_CHARGE * dt);
+    else if (hyp(rv.x - zone.x, rv.y - zone.y) < zone.r) rv.battery = Math.min(100, rv.battery + SCOUT_ROVER_CHARGE * dt);
   }
   const reach = riding ? 40 : 30;
   for (let i = sc.items.length - 1; i >= 0; i--){
     const it = sc.items[i];
-    if (Math.hypot(it.x - sc.x, it.y - sc.y) < reach){
+    if (hyp(it.x - sc.x, it.y - sc.y) < reach){
       sc.items.splice(i, 1); if (it.t === 's') sc.carryS++; else sc.carryB++;
       scoutPop(it.x, it.y - 10, it.t === 's' ? '+1 sulfur' : '+1 basalt', it.t === 's' ? '#FFE27A' : '#B8C4E8'); sfx('pickupS', 0.04);
     }
@@ -575,13 +575,13 @@ function updateScout(dt){
   sc.kickCd -= dt; sc.ramCd -= dt; if (sc.swing > 0) sc.swing -= dt;
   for (let i = 0; i < sc.rubble.length; i++) if (sc.rubble[i].shake > 0) sc.rubble[i].shake -= dt;
   if (riding && sc.ramCd <= 0 && (inp.m > 0.1)){                                        /* the rover rams rubble (and marines) apart */
-    for (let i = 0; i < sc.rubble.length; i++){ const r = sc.rubble[i]; if (Math.hypot(r.x - sc.x, r.y - sc.y) < r.r + 30){ scoutHitRubble(sc, r); sc.ramCd = 0.4; break; } }
-    if (sc.ramCd <= 0) for (let i = 0; i < sc.foes.length; i++){ const e = sc.foes[i]; if (e.kind === 'marine' && !e.dead && Math.hypot(e.x - sc.x, e.y - sc.y) < e.r + 30){ scoutHitFoe(sc, e, 45); sc.ramCd = 0.4; break; } }
+    for (let i = 0; i < sc.rubble.length; i++){ const r = sc.rubble[i]; if (hyp(r.x - sc.x, r.y - sc.y) < r.r + 30){ scoutHitRubble(sc, r); sc.ramCd = 0.4; break; } }
+    if (sc.ramCd <= 0) for (let i = 0; i < sc.foes.length; i++){ const e = sc.foes[i]; if (e.kind === 'marine' && !e.dead && hyp(e.x - sc.x, e.y - sc.y) < e.r + 30){ scoutHitFoe(sc, e, 45); sc.ramCd = 0.4; break; } }
   }
   if (!riding && (Input.mdown || Input.touchKick || Input.keys[keyOf('kick')] || Settings.autoKick) && sc.kickCd <= 0){
     let near = false;
-    for (let i = 0; i < sc.rubble.length && !near; i++) if (Math.hypot(sc.rubble[i].x - sc.x, sc.rubble[i].y - sc.y) - sc.rubble[i].r < 64) near = true;
-    for (let i = 0; i < sc.foes.length && !near; i++) if (sc.foes[i].kind === 'marine' && !sc.foes[i].dead && Math.hypot(sc.foes[i].x - sc.x, sc.foes[i].y - sc.y) - sc.foes[i].r < 64) near = true;
+    for (let i = 0; i < sc.rubble.length && !near; i++) if (hyp(sc.rubble[i].x - sc.x, sc.rubble[i].y - sc.y) - sc.rubble[i].r < 64) near = true;
+    for (let i = 0; i < sc.foes.length && !near; i++) if (sc.foes[i].kind === 'marine' && !sc.foes[i].dead && hyp(sc.foes[i].x - sc.x, sc.foes[i].y - sc.y) - sc.foes[i].r < 64) near = true;
     if (near || Input.mdown || Input.touchKick || Input.keys[keyOf('kick')]) scoutKick(sc);
   }
   /* visitors */
@@ -594,7 +594,7 @@ function updateScout(dt){
   }
   for (let i = G.eproj.length - 1; i >= 0; i--){                                        /* the marine's rounds */
     const p = G.eproj[i]; p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt;
-    if (Math.hypot(p.x - sc.x, p.y - sc.y) < 20){ scoutHurt(sc, SCOUT_MARINE_DMG, 'marine', 0.5); G.eproj.splice(i, 1); }
+    if (hyp(p.x - sc.x, p.y - sc.y) < 20){ scoutHurt(sc, SCOUT_MARINE_DMG, 'marine', 0.5); G.eproj.splice(i, 1); }
     else if (p.life <= 0 || p.x < 0 || p.y < 0 || p.x > SCOUT_W || p.y > SCOUT_H) G.eproj.splice(i, 1);
   }
   for (let i = sc.pops.length - 1; i >= 0; i--){ const p = sc.pops[i]; p.t += dt; if (p.dust){ p.x += p.vx * dt; p.y += p.vy * dt; } if (p.t > (p.dust ? 0.5 : 1.1)) sc.pops.splice(i, 1); }
@@ -716,7 +716,7 @@ function renderScout(ctx){
   ctx.font = '700 14px sans-serif'; ctx.fillStyle = '#FFE27A'; ctx.fillText('Carrying: ' + sc.carryS + ' sulfur   ' + sc.carryB + ' basalt', 20, ty0);
   ctx.fillStyle = '#E8ECF8'; ctx.fillText('Banked:     ' + sc.gotS + ' sulfur   ' + sc.gotB + ' basalt', 20, ty0 + 20);
   const tl = Math.max(0, Math.ceil(sc.left)); ctx.textAlign = 'center'; ctx.font = '800 22px sans-serif'; ctx.fillStyle = tl <= 15 ? '#FFD86A' : '#fff'; ctx.fillText(Math.floor(tl / 60) + ':' + String(tl % 60).padStart(2, '0'), W / 2, 34); ctx.textAlign = 'left';
-  const pd = Math.hypot(sc.x - SCOUT_POD.x, sc.y - SCOUT_POD.y);
+  const pd = hyp(sc.x - SCOUT_POD.x, sc.y - SCOUT_POD.y);
   if (pd > 420){ const a = Math.atan2(SCOUT_POD.y - sc.y, SCOUT_POD.x - sc.x), ax = W / 2 + Math.cos(a) * Math.min(W, H) * 0.38, ay = H / 2 + Math.sin(a) * Math.min(W, H) * 0.38;
     ctx.save(); ctx.translate(ax, ay); ctx.rotate(a); ctx.fillStyle = 'rgba(150,215,255,.85)'; ctx.beginPath(); ctx.moveTo(16, 0); ctx.lineTo(-10, -11); ctx.lineTo(-4, 0); ctx.lineTo(-10, 11); ctx.closePath(); ctx.fill(); ctx.restore();
     ctx.fillStyle = 'rgba(150,215,255,.9)'; ctx.font = '700 11px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('POD', ax - Math.cos(a) * 26, ay - Math.sin(a) * 26 + 4); ctx.textAlign = 'left'; }
@@ -737,7 +737,7 @@ function roverToggle(){
   const r = G.rover;
   if (G.state !== 'playing' || !r || !r.alive) return false;
   if (r.riding){ r.riding = false; r.x = P.x; r.y = P.y; return true; }
-  if (Math.hypot(P.x - r.x, P.y - r.y) > 110){ addText(P.x, P.y - 40, 'Walk to the rover first', '#FFD86A', 14, false); return false; }
+  if (hyp(P.x - r.x, P.y - r.y) > 110){ addText(P.x, P.y - 40, 'Walk to the rover first', '#FFD86A', 14, false); return false; }
   r.riding = true; sfx('pickupS', 0.05); addText(P.x, P.y - 40, 'Rover on!', '#9FE8FF', 15, false);
   return true;
 }
@@ -769,7 +769,7 @@ function drawRover(ctx){
     ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(r.x - 24, r.y - 38, 48, 6); ctx.fillStyle = f > 0.35 ? '#5CC0F0' : '#E8603A'; ctx.fillRect(r.x - 23, r.y - 37, 46 * f, 4);
   }
   if (r.hp < r.maxHp * 0.35) for (let k = 0; k < 3; k++){ const a = ((G.time * 0.9 + k / 3) % 1); ctx.globalAlpha = 0.5 * (1 - a); fillCircle(ctx, r.x - 10 + k * 6, r.y - 14 - a * 30, 4 + a * 8, '#3A3632'); } ctx.globalAlpha = 1;
-  if (!r.riding && G.state === 'playing' && Math.hypot(P.x - r.x, P.y - r.y) < 140){ ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.font = '700 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(Input.hasTouch ? 'tap ROVER' : 'E: board rover', r.x, r.y + 38); ctx.textAlign = 'left'; }
+  if (!r.riding && G.state === 'playing' && hyp(P.x - r.x, P.y - r.y) < 140){ ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.font = '700 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(Input.hasTouch ? 'tap ROVER' : 'E: board rover', r.x, r.y + 38); ctx.textAlign = 'left'; }
 }
 function refreshRoverBtn(){
   const b = document.getElementById('roverbtn');
