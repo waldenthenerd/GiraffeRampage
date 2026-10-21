@@ -11,16 +11,23 @@
 const trinketPage = { sel: null, hover: null, clearT: 0 };
 const TR_SPECIAL = { redrampage: 'Gear effects ×1.4', peacefullune: 'Press T: slow the world' };
 
-/* her stats with exactly this list of trinkets worn; everything else (gear, cards, perks) as it is now */
-function trinketStats(list){
-  const keepList = Save.data.equippedTrinkets, hp = P.hp, mhp = P.maxHp, out = {};
-  Save.data.equippedTrinkets = list.slice();
+/* her stats as the shop shows them: the game's own recalcStats() with NO cards (P.cards still holds the last run's until the next run starts, and card passives multiply
+   and cap, so they would change every number here) and with whatever `setup` changes (the trinkets worn, the upgrades bought); everything is put back afterwards */
+function previewStats(setup){
+  const keepCards = P.cards, keepList = Save.data.equippedTrinkets, keepMeta = Save.data.meta, hp = P.hp, mhp = P.maxHp, out = {};
+  P.cards = [];
   try {
-    recalcStats();
+    setup(); recalcStats();
     const s = P.stats;
     Object.keys(GEAR_STAT_LABELS).forEach(function(k){ if (typeof s[k] === 'number') out[k] = s[k]; });
-    out.dr = 1 - (1 - s.dr) * (list.indexOf('limehelmet') >= 0 ? 0.93 : 1);            /* the Lime Helmet's cut is taken off the damage, not kept in the stats */
-  } finally { Save.data.equippedTrinkets = keepList; recalcStats(); P.hp = hp; P.maxHp = mhp; }
+    out.dr = s.dr;
+  } finally { P.cards = keepCards; Save.data.equippedTrinkets = keepList; Save.data.meta = keepMeta; recalcStats(); P.hp = hp; P.maxHp = mhp; }
+  return out;
+}
+/* her stats with exactly this list of trinkets worn; everything else (gear, perks) as it is now */
+function trinketStats(list){
+  const out = previewStats(function(){ Save.data.equippedTrinkets = list.slice(); });
+  out.dr = 1 - (1 - out.dr) * (list.indexOf('limehelmet') >= 0 ? 0.93 : 1);                /* the Lime Helmet's cut is taken off the damage, not kept in the stats */
   return out;
 }
 function trinketWorn(){ return (Save.data.equippedTrinkets || []).filter(function(id){ return TRINKETS[id] && trinketOwned(id); }); }

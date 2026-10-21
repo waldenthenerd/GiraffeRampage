@@ -325,7 +325,7 @@ function townShowHall(){
   for (let c = 1; c <= 13; c++){ const done = townDoneCh(c); tr += '<span class="troph' + (done ? ' on' : '') + '" title="' + (done ? CHAPTER_INFO[c - 1].name : 'Chapter ' + c + ' not finished') + '" style="' + (done ? 'background:' + WARD[c].c : '') + '">' + c + '</span>'; }
   tr += '</div>';
   townPanel('Herd Hall', '<p class="sub">The hall keeps the herd’s records: a pennant on the square for every chapter, and these.</p>' + tr +
-    '<ul class="helplist"><li>Best run: <b>' + fmt(d.best | 0) + '</b> points, wave <b>' + (d.bestWave | 0) + '</b></li><li>Runs: <b>' + (d.runs | 0) + '</b> · kills: <b>' + fmt(d.totalKills | 0) + '</b></li>' +
+    '<ul class="helplist"><li>Best run: <b>' + fmt(scoreInt(d.best)) + '</b> points, wave <b>' + (d.bestWave | 0) + '</b></li><li>Runs: <b>' + (d.runs | 0) + '</b> · kills: <b>' + fmt(d.totalKills | 0) + '</b></li>' +
     '<li>Chapters finished: <b>' + townChaptersDone() + ' of 13</b>' + (d.chaptersComplete ? ' · whole journeys: <b>' + d.chaptersComplete + '</b>' : '') + '</li>' +
     '<li>Minigame stars: <b>' + (typeof miniStarTotal === 'function' ? miniStarTotal() : 0) + ' of 39</b> · hats and boots: <b>' + accOwnedCount() + ' of ' + ACC_ITEMS.length + '</b></li>' +
     '<li>Photos in the album: <b>' + photoAlbum().length + ' of ' + PHOTO_ALBUM_MAX + '</b></li><li>Things found in town: <b>' + townFoundTotal() + ' of ' + TOWN_ITEMS.length + '</b></li>' +

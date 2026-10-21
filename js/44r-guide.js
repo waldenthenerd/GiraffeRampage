@@ -50,10 +50,21 @@ const GUIDE_TOPICS = [
     let h = '<p>Everything you earn is spent here, between runs.</p><ul class="helplist">' +
       '<li><b>Upgrades</b> are permanent and paid for with gold. They apply to every run from then on. Some have several levels, and you can buy as many as you can afford.</li>' +
       '<li><b>Gear</b> is paid for with gems. Open a crate to find a piece of gear. Wear all three pieces of one set to get the set bonus. <b>Trinkets</b> can all be worn at once.</li>' +
-      '<li><b>Wheel:</b> reach ' + WHEEL_SCORE_THRESHOLD.toLocaleString('en-US') + ' points in a single run to earn a key (at most one every 30 minutes). Spend it on the prize wheel for gold, gems or a rare trinket. A score of ' + SPOTTED_KEY_SCORE.toLocaleString('en-US') + ' in a run earns a <b>Spotted key</b> instead, for the Spotted wheel: far better prizes, and a trinket found nowhere else. With several keys you can spin 5 or 10 at once.</li>';
+      '<li><b>Wheel:</b> reach ' + WHEEL_SCORE_THRESHOLD.toLocaleString('en-US') + ' points in a single run to earn a key (at most one every 30 minutes). Spend it on the prize wheel for gold, gems or a rare trinket. A score of ' + SPOTTED_KEY_SCORE.toLocaleString('en-US') + ' in a run earns a <b>Spotted key</b> as well (and the ordinary key too, if its 30-minute wait is over), for the Spotted wheel: far better prizes, and a trinket found nowhere else. With several keys you can spin 5 or 10 at once.</li>';
     if (guideAnts()) h += '<li><b>Ants</b> are hired with food. See the ant colony below.</li>';
     if (cityUnlocked()) h += '<li><b>City</b> is the market of the underground giraffe city. See below.</li>';
     return h + '</ul>';
+  } },
+  { id: 'gear', title: 'Gear levels and crates', show: function(){ return true; }, html: function(){
+    const pity = function(k){ const p = CRATE_PITY[k]; return p ? p.floor + ' or better is guaranteed within every ' + p.every + ' opens' : 'there is no guarantee: its odds are the point'; };
+    const myth = function(k){ return CRATES[k].weights.mythical + '%'; };
+    const fx = Object.keys(GEAR_FX).map(function(k){ return GEAR_FX[k].name; });
+    return '<p>Gear comes from crates, bought with gems at the trading post. Open one, or five or ten at a time.</p><ul class="helplist">' +
+      '<li>The <b>' + CRATES.normal.name + '</b> costs ' + CRATES.normal.cost + ' gems (' + pity('normal') + '; mythical ' + myth('normal') + '). The <b>' + CRATES.rare.name + '</b> costs ' + CRATES.rare.cost + ' gems (' + pity('rare') + '; mythical ' + myth('rare') + ').</li>' +
+      '<li>The <b>' + CRATES.spotted.name + '</b> costs ' + CRATES.spotted.cost + ' gems <i>and</i> ' + CRATES.spotted.food + ' food, and ' + pity('spotted') + ' (mythical ' + myth('spotted') + '). Food comes from foraging.</li>' +
+      '<li><b>Duplicates level a piece up.</b> Opening a piece you already own raises it one level, up to level ' + GEAR_LV_MAX + '. Each level makes the piece\u2019s own bonuses ' + Math.round(GEAR_LV_MUL * 100) + '% stronger (a weapon\u2019s damage ' + Math.round(GEAR_WEAPON_LV_DMG * 100) + '%). A duplicate of a piece already at the top level gives some gems back.</li>' +
+      '<li>Wear all three pieces of one set (cape, weapon, armour) for the set bonus. <b>Trinkets</b> are separate, and all of them can be worn at once.</li>' +
+      '<li>Some pieces also have a <b>playstyle effect</b> (' + fx.length + ' in all: ' + fx.join(', ') + ') that changes how you play, not just the numbers. It is shown on the piece, marked with a star.</li></ul>';
   } },
   { id: 'speed', title: 'Speed mode', show: function(){ return true; }, html: function(){
     return '<p>The slider beside Start on the main menu makes time run faster for the whole run. It is fixed once a run starts.</p><ul class="helplist">' +

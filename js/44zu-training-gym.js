@@ -50,7 +50,7 @@ const GYM_W = 4650;
 const GYM_SETS = 8;
 
 /* ---- the numbers ---- */
-function gymData(){ const t = townData(); if (!t.gym) t.gym = { pass: 0, day: '', sk: {}, reps: 0, spent: 0, rk: {} }; const g = t.gym; if (!g.sk) g.sk = {}; if (!g.rk) g.rk = {}; return g; }
+function gymData(){ const t = townData(); if (!t.gym || typeof t.gym !== 'object' || Array.isArray(t.gym)) t.gym = { pass: 0, day: '', sk: {}, reps: 0, spent: 0, rk: {} }; const g = t.gym; if (!g.sk || typeof g.sk !== 'object') g.sk = {}; if (!g.rk || typeof g.rk !== 'object') g.rk = {}; return g; }       /* a gym that is a number or a list (a damaged save) starts again instead of throwing */
 function gymTier(){ const d = gymData(); return d.day === townDayKey() ? (d.pass | 0) : 0; }
 function gymSkill(id){ const d = gymData(); if (!d.sk[id]) d.sk[id] = { l: 0, xp: 0 }; return d.sk[id]; }
 function gymNeed(l){ return 12 + Math.round(26 * Math.log(l + 1)); }                       /* xp to go from level l to l + 1 */

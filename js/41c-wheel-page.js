@@ -62,7 +62,7 @@ function wheelKeysOf(W){ return Save.data[W.field] | 0; }
     base.apply(this, arguments);
     if (G.attract || G.score < SPOTTED_KEY_SCORE) return;
     const now = Date.now();
-    if (Save.data.lastSpottedKeyAt && now - Save.data.lastSpottedKeyAt < SPOTTED_KEY_COOLDOWN_MS) return;
+    if (keyCooling(Save.data.lastSpottedKeyAt, SPOTTED_KEY_COOLDOWN_MS)) return;
     Save.data.lastSpottedKeyAt = now;
     Save.data.spottedKeys = (Save.data.spottedKeys | 0) + 1;
     Save.write();
@@ -134,7 +134,7 @@ function wheelDiscHTML(W){
 
 /* ---------- the page ---------- */
 function wheelCooldownText(W){
-  const left = (Save.data[W.at] || 0) + W.cd - Date.now();
+  const last = Save.data[W.at] || 0, left = keyCooling(last, W.cd) ? last + W.cd - Date.now() : 0;
   return left > 0 ? 'Next key in ' + Math.ceil(left / 60000) + ' min' : '';
 }
 function wheelCardHTML(W){
