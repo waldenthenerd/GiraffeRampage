@@ -43,7 +43,7 @@ function antsRoomHTML(type){
   const T = ANT_TYPES[type], n = (Save.data.ants[type] | 0), cap = antMax(), maxed = n >= cap;
   const btns = [1, 5, 10].map(function(k){
     const ok = antCanHire(type, k);
-    return '<button class="btn sm' + (k === 1 ? '' : ' ghost crm') + (ok ? (k === 1 ? '' : ' ok') : ' ghost') + '" data-a="ant-hire-' + type + '-' + k + '"' + (ok ? '' : ' disabled') + '>Hire ' + k +
+    return '<button class="btn sm' + (k === 1 ? '' : ' ghost crm') + (ok ? (k === 1 ? '' : ' ok') : ' ghost') + '" data-a="ant-hire-' + type + '-' + k + '" aria-label="Hire ' + k + ' ' + T.name + (k === 1 ? '' : 's') + ' for ' + antCostMany(type, k) + ' food"' + (ok ? '' : ' disabled') + '>Hire ' + k +
       '<small>' + (n + k > cap ? 'no room' : antCostMany(type, k) + ' food') + '</small></button>';
   }).join('');
   return '<article class="aproom" style="--ac:' + T.color + '"><div class="arhead"><b>' + T.name + '</b><span class="arcount">' + n + ' / ' + cap + '</span></div>' +
@@ -69,7 +69,7 @@ function antsDeepHTML(){
     const k = DUST_KIT[s.type], hired = squadHired(i), c = squadCost(i), can = canPay(c);
     return '<article class="aproom sq' + (hired ? ' hired' : '') + '" style="--ac:' + k.color + '"><div class="arhead"><b>' + s.name + '</b><span class="arcount">Key ' + (i + 1) + '</span></div>' +
       '<canvas class="arsq" data-sq="' + s.type + '" width="64" height="64"></canvas>' +
-      (hired ? '<div class="arfull">In the squad</div>' : '<div class="arbtns"><button class="btn sm' + (can ? '' : ' ghost') + '" data-a="squad-hire-' + i + '"' + (can ? '' : ' disabled') + '>Hire<small>' + costText(c) + '</small></button></div>') + '</article>';
+      (hired ? '<div class="arfull">In the squad</div>' : '<div class="arbtns"><button class="btn sm' + (can ? '' : ' ghost') + '" data-a="squad-hire-' + i + '" aria-label="Hire ' + s.name + ' for ' + costText(c) + '"' + (can ? '' : ' disabled') + '>Hire<small>' + costText(c) + '</small></button></div>') + '</article>';
   }).join('');
   return '<div class="aptuns one"><i></i></div><div class="apdeep"><h4>The dust alliance</h4><p class="sub" style="margin:0 0 8px">Up to five dust aliens join the squad. In a run, ' + (Input.hasTouch ? 'tap them in the squad strip on the right edge' : 'keys <b>1–5</b>') +
     ' call them in; each has ten times your health (armour does not help it) and needs ' + SQUAD_CD + ' seconds before it can be called again if it falls.</p><div class="aprooms sq5">' + rooms + '</div></div>';

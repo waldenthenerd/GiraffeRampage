@@ -305,3 +305,17 @@
   .upchip.aff{margin-left:0}
   .upbar{grid-column:2}
 }
+
+/* ticks and jackpots on the wheel (41c-wheel-page.js) */
+.wsparks{position:absolute;inset:0;pointer-events:none;z-index:4}
+.wsparks i{position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3px;border-radius:50%;background:#FFD84D;box-shadow:0 0 8px #FFB300;opacity:0;animation:wspark var(--t,.9s) ease-out forwards;transform:rotate(var(--a)) translateY(0)}
+.wsparks i:nth-child(3n){background:#FFF3B0}.wsparks i:nth-child(4n){background:#FF8A5A;box-shadow:0 0 8px #FF5A2A}
+@keyframes wspark{0%{opacity:1;transform:rotate(var(--a)) translateY(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateY(calc(var(--ws) * -0.62 - var(--d))) scale(.3)}}
+.wwheel.win1 .wdisc,.wwheel.win2 .wdisc{animation:wglow 1.3s ease-out 1}.wwheel.win2 .wdisc{animation-duration:1.9s}
+@keyframes wglow{0%{box-shadow:0 6px 22px rgba(0,0,0,.55),0 0 0 3px rgba(0,0,0,.35)}30%{box-shadow:0 6px 22px rgba(0,0,0,.55),0 0 0 3px #FFD84D,0 0 46px 8px rgba(255,216,77,.75)}100%{box-shadow:0 6px 22px rgba(0,0,0,.55),0 0 0 3px rgba(0,0,0,.35)}}
+.wresult.jackpot .crateresult{border-left-color:#FFD84D;animation:wjack 1.2s ease-out 1}.wresult.j2 .crateresult{box-shadow:0 0 26px rgba(255,216,77,.45)}
+@keyframes wjack{0%{transform:scale(.92);box-shadow:0 0 0 0 rgba(255,216,77,.9)}40%{transform:scale(1.03);box-shadow:0 0 30px 6px rgba(255,216,77,.7)}100%{transform:scale(1)}}
+/* keyboard and pad focus on the new pages: a ring on every control, and room for it inside the scrolling chip rows */
+#overlay summary:focus-visible,#overlay .ttile:focus-visible,#overlay .gp:focus-visible,#overlay .wcard:focus-visible,#overlay .upchip:focus-visible{outline:2px solid #F2B33D;outline-offset:2px}
+.upchips{padding:5px 4px 6px}
+.upsum summary{border-radius:4px}

@@ -9,9 +9,17 @@ const Nav = {
     for (let i = 0; i < el.attributes.length; i++){ const a = el.attributes[i]; if (a.name.indexOf('data-') === 0) return '[' + a.name + '="' + String(a.value).replace(/"/g, '\\"') + '"]'; }
     return el.id ? '#' + el.id : null;
   },
-  restore(sig){ try { const el = OV.querySelector(sig); if (el) el.focus({ preventScroll: true }); } catch (e) {} },
+  /* put focus back after the screen is drawn again; if that button is gone or has just gone grey (bought the last one, spun the last key), focus the nearest one to where it was */
+  restore(sig, rect){
+    try { const el = OV.querySelector(sig); if (el && !el.disabled){ el.focus({ preventScroll: true }); return; } } catch (e) {}
+    if (!rect) return;
+    const L = this.list(); if (!L.length) return;
+    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2; let best = null, bd = 1e12;
+    for (let i = 0; i < L.length; i++){ const r = L[i].getBoundingClientRect(), d = Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy); if (d < bd){ bd = d; best = L[i]; } }
+    if (best) best.focus({ preventScroll: true });
+  },
   list(){
-    return Array.prototype.filter.call(OV.querySelectorAll('button, input[type=range]'), function(el){
+    return Array.prototype.filter.call(OV.querySelectorAll('button, input[type=range], input[type=number], summary'), function(el){
       if (el.disabled) return false;
       const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0;
     });
@@ -36,7 +44,7 @@ const Nav = {
     if (best){ best.focus({ preventScroll: true }); try { best.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
     return true;
   },
-  click(){ const a = document.activeElement; if (a && OV.contains(a) && a.tagName === 'BUTTON' && !a.disabled){ a.click(); return true; } return false; },
+  click(){ const a = document.activeElement; if (a && OV.contains(a) && (a.tagName === 'BUTTON' || a.tagName === 'SUMMARY') && !a.disabled){ a.click(); return true; } return false; },
   back(){ const b = OV.querySelector('[data-a="resume"],[data-a="settings-back"],[data-a="gallery-back"],[data-a="menu"],[data-a="mini-back"],[data-a="town-close"],[data-a="back"]'); if (b && !b.disabled){ b.click(); return true; } return false; },
   overlayOpen(){ return OV.className.indexOf('on') >= 0 && G.state !== 'playing' && G.state !== 'cutscene'; }
 };

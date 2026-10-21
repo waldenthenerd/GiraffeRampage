@@ -91,9 +91,9 @@ function upgRowHTML(m){
   }
   const rem = m.max - lv, n5 = Math.min(5, rem), can1 = upgCanBuy(m), max = maxAffordable(m);
   const btns = maxed ? '' :
-    '<div class="upbtns"><button class="btn sm buy' + (can1 ? '' : ' ghost') + '" data-buy="' + m.id + '"' + (can1 ? '' : ' disabled') + '>Buy<small>' + fmt(metaCost(m, lv)) + ' gold</small></button>' +
-    (rem >= 2 ? '<button class="btn sm ghost' + (Save.data.gold >= upgCostMany(m, n5) ? ' ok' : '') + '" data-a="upg-buy-' + m.id + '-' + n5 + '"' + (Save.data.gold >= upgCostMany(m, n5) ? '' : ' disabled') + '>Buy ' + n5 + '<small>' + fmt(upgCostMany(m, n5)) + '</small></button>' : '') +
-    (max >= 2 ? '<button class="btn sm ghost ok" data-a="buymax-' + m.id + '" title="Buy every level you can afford">Max<small>' + max + ' levels</small></button>' : '') + '</div>';
+    '<div class="upbtns"><button class="btn sm buy' + (can1 ? '' : ' ghost') + '" data-buy="' + m.id + '" aria-label="Buy ' + m.name + ' level ' + (lv + 1) + ' for ' + fmt(metaCost(m, lv)) + ' gold"' + (can1 ? '' : ' disabled') + '>Buy<small>' + fmt(metaCost(m, lv)) + ' gold</small></button>' +
+    (rem >= 2 ? '<button class="btn sm ghost' + (Save.data.gold >= upgCostMany(m, n5) ? ' ok' : '') + '" data-a="upg-buy-' + m.id + '-' + n5 + '" aria-label="Buy ' + n5 + ' levels of ' + m.name + ' for ' + fmt(upgCostMany(m, n5)) + ' gold"' + (Save.data.gold >= upgCostMany(m, n5) ? '' : ' disabled') + '>Buy ' + n5 + '<small>' + fmt(upgCostMany(m, n5)) + '</small></button>' : '') +
+    (max >= 2 ? '<button class="btn sm ghost ok" data-a="buymax-' + m.id + '" aria-label="Buy ' + max + ' levels of ' + m.name + ' (every level you can afford)" title="Buy every level you can afford">Max<small>' + max + ' levels</small></button>' : '') + '</div>';
   return '<div class="' + cls + '" style="--ac:' + g.color + '" data-up="' + m.id + '">' + ring + '<div class="upt"><div class="upn"><b>' + m.name + '</b><em>Level ' + lv + ' / ' + m.max + '</em>' + (maxed ? '<span class="upbadge">MAXED</span>' : '') + '</div>' +
     '<div class="upnow">' + (lv ? '<span class="upnowc">' + m.desc(lv) + '</span>' : '<span class="upnone">Not bought yet</span>') + '</div>' +
     (maxed ? '' : '<div class="upnext">Next: ' + m.desc(lv + 1) + '</div>') + '</div>' + btns + '</div>';
