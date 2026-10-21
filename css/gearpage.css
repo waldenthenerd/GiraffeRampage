@@ -305,3 +305,7 @@
   .upchip.aff{margin-left:0}
   .upbar{grid-column:2}
 }
+/* the engineer's bay on the Ants page (44zzr-engineer-ants.js) */
+.aproom.eng{grid-column:1/-1}.aproom.eng .arcv{height:150px}
+.aproom.eng.locked{opacity:.85}.aplock{display:flex;gap:8px;align-items:center;color:var(--dust);font-size:12.5px;padding:6px 0}.aplock .ico,.aplock svg{width:20px;height:20px;flex:none}.aplock b{color:var(--bone)}
+@media (max-height:500px) and (min-width:560px){.aproom.eng .arcv{height:100px}}

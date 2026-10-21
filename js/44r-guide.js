@@ -110,7 +110,8 @@ const GUIDE_TOPICS = [
       '<li>Hire ants at the trading post with food. There are three kinds: the <b>Soldier</b> charges and bites, the <b>Distractor</b> draws enemies off you and bursts when it falls, and the <b>Shooter</b> spits acid from a distance.</li>' +
       '<li>Hired ants are permanent. Each kind returns from the anthill 15 seconds after it falls, as long as fewer are out than you own.</li>' +
       '<li>Food comes from foraging, and can also be made from gold and gems at the trading post.</li>' +
-      '<li>Ants grow stronger as the waves go on, and upgrades make them tougher and bigger in number.</li></ul>';
+      '<li>Ants grow stronger as the waves go on, and upgrades make them tougher and bigger in number.</li>' +
+      (typeof engineersUnlocked === 'function' && engineersUnlocked() ? '<li>The <b>Engineer</b> is different: it drives about in a rover, keeps well away from enemies, and stops to <b>build turrets</b> that shoot anything near them. Half as many fit in the hill. If an enemy gets close it drops the job and runs, leaving a half-built turret that is very weak until an engineer comes back to finish it, so protect them while they work. There is no limit to the number of turrets, but enemies will go for them.</li>' : '') + '</ul>';
   } },
   { id: 'venus', title: 'The Venus outpost and scouting', show: function(){ return venusUnlocked(); }, html: function(){
     let h = '<p>The wreck of the pod is now a base. It has two new materials, <b>sulfur</b> and <b>basalt</b>, and you cannot find gems here, so everything the outpost sells is paid for in them.</p>' +

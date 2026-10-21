@@ -66,7 +66,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (158 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (159 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -213,6 +213,7 @@ game. This is the complete list for this version (158 scripts; the developer pan
 | - | `js/02d-ground-sounds.js` | **What the ground sounds like.** Replaces `SFX.foot`: mud, snow, ice, metal (the Moon, Mars, the space centre), shallow water, dust, sand, leaf, asphalt, cinders and rock, changed by rain, blizzards, sandstorms and acid (`groundNow`), plus `SFX.groundImpact` and a ground answer when the head lands in a lunge. |
 | - | `js/44zzp-photo-looks.js` | **The photo studio's look and light.** A Look and light tab: filters (Sepia, Noir, Glitch, Painterly), seven frames, a time-of-day slider, and a freeze-all-creatures toggle; twelve stickers in the Effects tab. All saved with the picture; photo code version 5 is written only when one is used (older codes are unchanged). |
 | - | `js/44zzq-npc-voices.js` | Babble: townsfolk speak in short pitched blips, each with a voice of their own (all synthesised with `SFX.tone`; nothing recorded). Wraps `townSay`, `townDlgFinish` and `townCloseDialog`. Settings, Sound, "NPC voices" turns it off. Load it after `js/44x-town-ui.js`. |
+| - | `js/44zzr-engineer-ants.js` | The Engineer Ant: unlocked by a new Venus upgrade (Engineer Garage); drives a rover and builds turrets. Wraps the ant code; load it after `js/44zzq-npc-voices.js` and before `js/45-test-exports.js`. |
 | - | `js/05a-gear-levels.js` | **Gear levels and the crate rules.** A piece goes from level 1 to 5 (`gearLevel`, `gearLevelUp`; each level adds 10% to what the piece gives, a weapon also 6% damage), `gearStatsFor()` and `gearDelta()` say what a loadout or a swap would change without touching the save, crate pity (`CRATE_PITY`: rare or better within 10 Supply Crate opens, epic or better within 8 Prime Crate opens; a mythical roll never turns into something lesser; the Spotted Crate costs food too and has no pity) and `openCrate()` replaced so a duplicate levels the piece up. Save keys `gearLv` and `cratePity` sit beside `gear`. |
 | - | `js/33a-gear-art-capes.js` | **Twenty-two capes.** One design per gear set (`CAPE_DESIGNS`) on a shared cloth frame (`capeFrame`) so the wind and flutter are the same; `capeDraw()` is called by `drawPlayer`; level 3 adds a trim, level 5 a glint. Also keeps `P.capeSet`, `P.capeLevel`, `P.weaponLevel`, `P.armorLevel` up to date. |
 | - | `js/33b-gear-art-weapons.js` | **Twenty-one weapons you can see.** `WEAPON_ART` draws each weapon on her: hoof pieces, head pieces (fangs, lances, a maul, a trident, an anglerfish lure) and body pieces (twin tails, a spinning maw ring), timed to the neck lunge. Level 4 and up glows. |
