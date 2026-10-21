@@ -7,10 +7,10 @@
    (storm, fog, rain). At sea what bites depends on the water under the boat (shallows, reef, open water or deep), the time of day and the weather; a few
    come only at night or in one kind of weather. Every catch has a size in centimetres (the biggest of each kind is kept), and pays gold by kind and size.
    RARITY follows the odds weight: common, uncommon, rare, legendary.
-   TACKLE is free: it is unlocked by completing a group of the book, and the best she has unlocked is used (and can be changed in the fishing panel).
-     rods   Cane rod (the pier page)  wider green zone;     Golden rod (the whole book)  widest zone
-     lines  Braided line (the shallows page)  a longer bite;  Deep reel (the deep page)  longest bite and a slower marker
-     baits  Shrimp (the reef page)  more uncommon and rarer fish;  Glow lure (the three weather fish)  many more rare and legendary ones
+   TACKLE is free: it is unlocked by how many kinds of fish she has caught, and each piece is put on when it unlocks (and can be changed in the fishing panel).
+     rods   Cane rod (5 kinds)  wider green zone;     Golden rod (all 35)  widest zone
+     lines  Braided line (10)  a longer bite;  Deep reel (20)  longest bite and a slower marker
+     baits  Shrimp (15)  more uncommon and rarer fish;  Glow lure (28)  many more rare and legendary ones
    BRINE'S ORDER: each week one named fish is asked for; catching it pays gems.
    Save: Save.data.town.fish { id: count } (as before), .fishBook { id: biggest cm }, .tackle { rod, line, bait }, .fishOrder { w, id, done }.
    While the sea panel is open G.state is 'fishing' and the boat does not move. */
@@ -43,16 +43,17 @@
 const FISH_GROUPS = [['pier', 'The pier'], ['shallows', 'The shallows'], ['reef', 'The reef'], ['deep', 'The deep'], ['special', 'Weather fish']];
 const FISH_RARITY = ['common', 'uncommon', 'rare', 'legendary'], FISH_RCOL = ['#BFD8E0', '#8FE0A0', '#8FB4F2', '#F2B33D'];
 function fishRarity(f){ return f.r >= 15 ? 0 : f.r >= 8 ? 1 : f.r >= 3 ? 2 : 3; }
-const FISH_RODS = [{ n: 'Plain rod', z: 1 }, { n: 'Cane rod', z: 1.15, need: 'pier' }, { n: 'Golden rod', z: 1.4, need: 'all' }];
-const FISH_LINES = [{ n: 'Thin line', win: 5.5, sp: 1 }, { n: 'Braided line', win: 7.5, sp: 1, need: 'shallows' }, { n: 'Deep reel', win: 10, sp: 0.85, need: 'deep' }];
-const FISH_BAITS = [{ n: 'No bait', m: [1, 1, 1, 1] }, { n: 'Shrimp', m: [1, 1.6, 1.6, 1.6], need: 'reef' }, { n: 'Glow lure', m: [1, 1.2, 2.2, 2.2], need: 'special' }];
+/* tackle is unlocked by how many kinds of fish she has caught: `need` is that number */
+const FISH_RODS = [{ n: 'Plain rod', z: 1 }, { n: 'Cane rod', z: 1.15, need: 5 }, { n: 'Golden rod', z: 1.4, need: FISH.length }];
+const FISH_LINES = [{ n: 'Thin line', win: 5.5, sp: 1 }, { n: 'Braided line', win: 7.5, sp: 1, need: 10 }, { n: 'Deep reel', win: 10, sp: 0.85, need: 20 }];
+const FISH_BAITS = [{ n: 'No bait', m: [1, 1, 1, 1] }, { n: 'Shrimp', m: [1, 1.6, 1.6, 1.6], need: 15 }, { n: 'Glow lure', m: [1, 1.2, 2.2, 2.2], need: 28 }];
 
 /* ---- what she has caught ---- */
 function fishBook(){ const t = townData(); if (!t.fishBook || typeof t.fishBook !== 'object' || Array.isArray(t.fishBook)) t.fishBook = {}; return t.fishBook; }
 function fishGroupDone(g){ const log = fishLog(); return FISH.every(function(f){ return (g === 'all' || f.h === g) ? log[f.id] > 0 : true; }); }
 function fishGroupCount(g){ const log = fishLog(); let n = 0, all = 0; FISH.forEach(function(f){ if (f.h === g){ all++; if (log[f.id] > 0) n++; } }); return [n, all]; }
 function fishKinds(){ const log = fishLog(); return FISH.filter(function(f){ return log[f.id] > 0; }).length; }
-function fishUnlocked(list, i){ return !list[i].need || fishGroupDone(list[i].need); }
+function fishUnlocked(list, i){ return !list[i].need || fishKinds() >= list[i].need; }
 function fishTackle(){
   const t = townData(); if (!t.tackle || typeof t.tackle !== 'object' || Array.isArray(t.tackle)) t.tackle = {};
   const k = t.tackle;
@@ -228,15 +229,18 @@ function fishCardHTML(f){
 }
 function showFishBook(){
   Fg.side = false;
-  const tk = fishTackle();
-  let body = '';
+  const tk = fishTackle(), kinds = fishKinds();
+  const gear = [['Cane rod', FISH_RODS[1]], ['Braided line', FISH_LINES[1]], ['Shrimp bait', FISH_BAITS[1]], ['Deep reel', FISH_LINES[2]], ['Glow lure', FISH_BAITS[2]], ['Golden rod', FISH_RODS[2]]];
+  let body = '<h3 class="thead">Tackle <small>free, unlocked by how many kinds you have caught</small></h3><div class="fgrid">' + gear.map(function(g){
+    const on = kinds >= g[1].need;
+    return '<div class="fcard' + (on ? ' got' : '') + '"><b>' + g[0] + '</b><span style="color:' + (on ? '#8FE0A0' : '#BFD8E0') + '">' + (on ? 'yours' : kinds + ' of ' + g[1].need + ' kinds') + '</span></div>';
+  }).join('') + '</div>';
   FISH_GROUPS.forEach(function(g){
-    const c = fishGroupCount(g[0]), gift = g[0] === 'pier' ? 'Cane rod' : g[0] === 'shallows' ? 'Braided line' : g[0] === 'reef' ? 'Shrimp bait' : g[0] === 'deep' ? 'Deep reel' : 'Glow lure';
-    body += '<h3 class="thead">' + g[1] + ' <small>' + c[0] + ' of ' + c[1] + ' · complete it for: ' + gift + (c[0] === c[1] ? ' ✓' : '') + '</small></h3><div class="fgrid">' +
+    const c = fishGroupCount(g[0]);
+    body += '<h3 class="thead">' + g[1] + ' <small>' + c[0] + ' of ' + c[1] + (c[0] === c[1] ? ' \u2713' : '') + '</small></h3><div class="fgrid">' +
       FISH.filter(function(f){ return f.h === g[0]; }).map(fishCardHTML).join('') + '</div>';
   });
-  const html = '<div class="panel slab fishbook"><h2 class="head">Fish book</h2><p class="sub">' + fishKinds() + ' of ' + FISH.length + ' kinds caught · tackle in use: ' + tk.rod.n + ', ' + tk.line.n + ', ' + tk.bait.n +
-    (fishGroupDone('all') ? ' · the whole book is done (the Golden rod is yours)' : ' · finish the whole book for the Golden rod') + '</p><div class="tscroll">' + body + '</div>' +
+  const html = '<div class="panel slab fishbook"><h2 class="head">Fish book</h2><p class="sub">' + kinds + ' of ' + FISH.length + ' kinds caught \u00b7 tackle in use: ' + tk.rod.n + ', ' + tk.line.n + ', ' + tk.bait.n + (kinds >= FISH.length ? ' \u00b7 the whole book is done' : '') + '</p><div class="tscroll">' + body + '</div>' +
     '<div class="menucol" style="margin-top:10px;width:100%"><button class="btn ghost" data-a="fish-book-back">Back</button></div></div>';
   setOverlay(html);
   FISH.forEach(function(f){ const cv = OV.querySelector('canvas[data-fb="' + f.id + '"]'); if (cv) fishPaint(cv, f, (fishLog()[f.id] | 0) > 0); });

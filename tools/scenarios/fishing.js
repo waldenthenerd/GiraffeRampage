@@ -1,5 +1,5 @@
 /* fishing: the grown fishing of js/44zzv-fishing.js. 35 kinds in five groups, what bites on the pier and in each kind of water (and by weather, night and bait), the
-   timing game (a catch, a miss, a bite that is not answered), sizes and records, tackle unlocked free by completing a page of the fish book and put on, Brine's
+   timing game (a catch, a miss, a bite that is not answered), sizes and records, tackle unlocked free by how many kinds she has caught and put on, Brine's
    weekly order, the fish book, casting from a boat (F, the Cast button, Esc, only when the boat is nearly still), and trophies. There are no real timers here:
    the game is stepped by hand with fishTick. */
 (function(){
@@ -47,21 +47,30 @@
     /* a smaller one does not break the record */
     fishBook().sardine = 20; cast('sardine'); Fg.pos = Fg.zone + Fg.w / 2; fishReel(); out.record = fishBook().sardine === 20 && fishLog().sardine === 2;
 
-    /* tackle, free, from completing a page */
-    var log = fishLog(); FISH.filter(function(f){ return f.h === 'pier' && f.id !== 'carp'; }).forEach(function(f){ log[f.id] = 1; });
+    /* tackle, free, unlocked by how many kinds she has caught (5, 10, 15, 20, 28, all 35) */
+    var log = fishLog();
+    function setKinds(n){ Object.keys(log).forEach(function(k){ delete log[k]; }); FISH.slice(0, n).forEach(function(f){ log[f.id] = 1; }); }
+    setKinds(4);
     out.noRodYet = !fishUnlocked(FISH_RODS, 1) && fishTackle().rod.n === 'Plain rod';
-    var wPlain; cast('carp'); wPlain = Fg.w; Fg.pos = Fg.zone + Fg.w / 2; fishReel();
-    out.newTackle = fishGroupDone('pier') && fishTackle().rod.n === 'Cane rod' && /New tackle/.test(document.getElementById('fishMsg').textContent) && /Cane rod/.test(document.getElementById('fishMsg').textContent);
-    cast('carp'); out.rodWider = Math.abs(Fg.w / wPlain - 1.15) < 0.01; Fg.pos = Fg.zone + Fg.w / 2; fishReel();
-    handleAction('fish-tk-rod'); out.noCycle = fishTackle().rod.n === 'Cane rod' || fishTackle().rod.n === 'Plain rod';
-    FISH.filter(function(f){ return f.h === 'shallows'; }).forEach(function(f){ log[f.id] = 1; });
-    out.lineNeed = fishUnlocked(FISH_LINES, 1) && !fishUnlocked(FISH_LINES, 2);
-    fishTackle().k.line = 1; cast('sardine'); out.longerBite = Fg.k.line.win === 7.5; while (Fg.phase === 'bite' && Fg.t < 6) fishTick(0.03); out.stillBiting = Fg.phase === 'bite' && Fg.t >= 6; tick(80); out.timedOut = Fg.phase === 'idle';
+    var wPlain; cast('sardine'); wPlain = Fg.w; Fg.pos = Fg.zone + Fg.w / 2; fishReel();
+    out.stillPlain = fishKinds() === 4 && fishTackle().rod.n === 'Plain rod';
+    cast('carp'); Fg.pos = Fg.zone + Fg.w / 2; fishReel();
+    out.newTackle = fishKinds() === 5 && fishTackle().rod.n === 'Cane rod' && /New tackle/.test(document.getElementById('fishMsg').textContent) && /Cane rod/.test(document.getElementById('fishMsg').textContent);
+    cast('sardine'); out.rodWider = Math.abs(Fg.w / wPlain - 1.15) < 0.01; Fg.pos = Fg.zone + Fg.w / 2; fishReel();
+    setKinds(10);
+    out.lineNeed = fishUnlocked(FISH_LINES, 1) && !fishUnlocked(FISH_LINES, 2) && !fishUnlocked(FISH_BAITS, 1);
+    fishTackle().k.line = 1; cast('sardine'); out.longerBite = Fg.k.line.win === 7.5;
+    while (Fg.phase === 'bite' && Fg.t < 6) fishTick(0.03); out.stillBiting = Fg.phase === 'bite' && Fg.t >= 6; tick(80); out.timedOut = Fg.phase === 'idle';
     fishTackle().k.line = 2; out.lockedLine = fishTackle().line.n === 'Thin line';
     fishTackle().k.bait = 1; out.lockedBait = fishTackle().bait.n === 'No bait';
-    FISH.forEach(function(f){ log[f.id] = 1; }); out.all = fishGroupDone('all') && fishUnlocked(FISH_RODS, 2) && fishUnlocked(FISH_LINES, 2) && fishUnlocked(FISH_BAITS, 2);
-    fishTackle().k.rod = 2; fishTackle().k.line = 2; cast('sardine'); out.golden = Math.abs(Fg.w - clamp((0.28 - Math.min(1, 22) * 0.012) * 1.4, 0.1, 0.5)) < 0.05 || Fg.w > 0.2; out.deepReel = Fg.k.line.win === 10; Fg.phase = 'idle'; clearInterval(Fg.iv);
+    setKinds(15); out.shrimp = fishUnlocked(FISH_BAITS, 1) && !fishUnlocked(FISH_LINES, 2);
+    setKinds(20); out.deepReelNeed = fishUnlocked(FISH_LINES, 2) && !fishUnlocked(FISH_BAITS, 2);
+    setKinds(27); out.noGlowYet = !fishUnlocked(FISH_BAITS, 2); setKinds(28); out.glow = fishUnlocked(FISH_BAITS, 2) && !fishUnlocked(FISH_RODS, 2);
+    FISH.forEach(function(f){ log[f.id] = 1; }); out.all = fishKinds() === 35 && fishUnlocked(FISH_RODS, 2) && fishUnlocked(FISH_LINES, 2) && fishUnlocked(FISH_BAITS, 2);
+    fishTackle().k.rod = 2; fishTackle().k.line = 2; cast('sardine'); out.golden = Fg.w > 0.2; out.deepReel = Fg.k.line.win === 10; Fg.phase = 'idle'; clearInterval(Fg.iv);
     handleAction('fish-tk-rod'); out.cycles = fishTackle().rod.n === 'Plain rod'; handleAction('fish-tk-rod'); handleAction('fish-tk-rod'); out.cyclesBack = fishTackle().rod.n === 'Golden rod';
+    setKinds(12); showFishBook(); out.bookTackle = /Tackle/.test(OV.innerHTML) && /12 of 28 kinds/.test(OV.innerHTML) && OV.querySelectorAll('.fcard.got').length >= 2;
+    FISH.forEach(function(f){ log[f.id] = 1; }); townShowFishing();
 
     /* Brine's order: eight gems, once a week */
     var o = fishOrder(); out.order = !!o.id && o.done === false && fishOrder().id === o.id && FISH.filter(function(f){ return f.id === o.id; })[0].h !== 'special';
@@ -71,7 +80,7 @@
 
     /* the fish book */
     var l2 = fishLog(); FISH.forEach(function(f){ delete l2[f.id]; }); l2.sardine = 3; fishBook().sardine = 17;
-    showFishBook(); out.book = OV.querySelectorAll('.fcard').length === 35 && OV.querySelectorAll('.fcard.got').length === 1 && /Biggest 17 cm/.test(OV.innerHTML) && /\?\?\?\?\?/.test(OV.innerHTML);
+    showFishBook(); out.book = OV.querySelectorAll('.fcard canvas').length === 35 && OV.querySelectorAll('.fcard.got canvas').length === 1 && /Biggest 17 cm/.test(OV.innerHTML) && /\?\?\?\?\?/.test(OV.innerHTML);
     function ink(id){ var cv = OV.querySelector('canvas[data-fb="' + id + '"]'), d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, n = 0; for (var q = 3; q < d.length; q += 4) if (d[q] > 40) n++; return n; }
     out.paints = FISH.every(function(f){ return ink(f.id) > 80; }); out.paintSample = ink('sardine') + ',' + ink('stormray') + ',' + ink('jelly');
     fishBook().marlin = 250; l2.marlin = 1; showFishBook(); out.bookNew = /Biggest 250 cm/.test(OV.innerHTML);
@@ -104,7 +113,7 @@
     var tt = townData(); FISH.forEach(function(f){ tt.fish = tt.fish || {}; tt.fish[f.id] = 1; }); tt.fishBook = { oarfish: 400 }; tt.n.fishOrders = 3; tt.n.seaCasts = 2;
     out.achEarn = A.every(function(a){ return a.val() >= a.goal; });
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['list', 'groups', 'rarities', 'pierOnly', 'shallows', 'reef', 'deep', 'water', 'noWeatherFish', 'storm', 'fog', 'bait', 'picks', 'panel', 'side', 'clock', 'animBite', 'leap', 'leapDraws', 'leapEnds', 'lostAnim', 'lostDraws', 'bite', 'won', 'bite2', 'missed', 'bite3', 'timeout', 'record', 'noRodYet', 'newTackle', 'rodWider', 'lineNeed', 'longerBite', 'stillBiting', 'timedOut', 'lockedLine', 'lockedBait', 'all', 'deepReel', 'cycles', 'cyclesBack', 'order', 'orderPaid', 'orderOnce', 'book', 'paints', 'bookNew', 'bookBack', 'refusedMoving', 'btn', 'opened', 'seaSide', 'seaAnim', 'seaLeapDraws', 'rendersSea', 'seaCatch', 'closed', 'achs', 'achEarn'];
+  var need = ['list', 'groups', 'rarities', 'pierOnly', 'shallows', 'reef', 'deep', 'water', 'noWeatherFish', 'storm', 'fog', 'bait', 'picks', 'panel', 'side', 'clock', 'animBite', 'leap', 'leapDraws', 'leapEnds', 'lostAnim', 'lostDraws', 'bite', 'won', 'bite2', 'missed', 'bite3', 'timeout', 'record', 'noRodYet', 'stillPlain', 'newTackle', 'rodWider', 'lineNeed', 'longerBite', 'stillBiting', 'timedOut', 'lockedLine', 'lockedBait', 'shrimp', 'deepReelNeed', 'noGlowYet', 'glow', 'all', 'deepReel', 'cycles', 'cyclesBack', 'bookTackle', 'order', 'orderPaid', 'orderOnce', 'book', 'paints', 'bookNew', 'bookBack', 'refusedMoving', 'btn', 'opened', 'seaSide', 'seaAnim', 'seaLeapDraws', 'rendersSea', 'seaCatch', 'closed', 'achs', 'achEarn'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);

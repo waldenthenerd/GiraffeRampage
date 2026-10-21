@@ -243,11 +243,21 @@ function seaDrawBoat(ctx, x, y, ang, kind, t, scale, wob){
       ctx.fillStyle = '#8A5A32'; ctx.fillRect(-18, -12, 4, 24); ctx.fillRect(2, -12, 4, 24);
       ctx.strokeStyle = '#6A4A28'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(-8, -10); ctx.lineTo(-24, -26 + Math.sin(t * 4) * 3); ctx.moveTo(-8, 10); ctx.lineTo(-24, 26 - Math.sin(t * 4) * 3); ctx.stroke();
   }
-  /* her, from above: a head with two horns and spots, and the long neck lying forward over the bow */
-  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(-4, 0, 11, 7, 0, 0, TAU); ctx.fill(); ctx.fillRect(-4, -2.4, 24, 4.8);
-  ctx.beginPath(); ctx.ellipse(22, 0, 8, 5.4, 0, 0, TAU); ctx.fill();
-  ctx.fillStyle = cl.spot; ctx.beginPath(); ctx.arc(-8, -2, 2.6, 0, TAU); ctx.arc(-1, 2.6, 2.2, 0, TAU); ctx.arc(8, 0, 1.8, 0, TAU); ctx.fill();
-  ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.arc(18, -4.6, 1.8, 0, TAU); ctx.arc(18, 4.6, 1.8, 0, TAU); ctx.arc(27, -1.8, 1, 0, TAU); ctx.arc(27, 1.8, 1, 0, TAU); ctx.fill();
+  /* her, from above: a tail, the body with spots, the long neck lying forward over the bow with a mane down it, and a head with ears, two horn knobs, eyes and a muzzle */
+  const dk = cl.dark || cl.spot;
+  ctx.strokeStyle = dk; ctx.lineWidth = 1.8; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-16, 0); ctx.quadraticCurveTo(-21, 3, -23, 6); ctx.stroke(); ctx.fillStyle = cl.spot; ctx.beginPath(); ctx.arc(-23, 6.4, 1.7, 0, TAU); ctx.fill();
+  ctx.fillStyle = cl.coat; ctx.strokeStyle = 'rgba(58,34,10,.7)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(-5, 0, 12.5, 8.6, 0, 0, TAU); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(4, -3.6); ctx.lineTo(24, -2.3); ctx.lineTo(24, 2.3); ctx.lineTo(4, 3.6); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = cl.spot; ctx.beginPath(); ctx.arc(-9, -2.6, 2.7, 0, TAU); ctx.arc(-2, 3, 2.4, 0, TAU); ctx.arc(-11, 3.6, 1.8, 0, TAU); ctx.arc(2, -3.4, 1.7, 0, TAU); ctx.arc(10, 1, 1.5, 0, TAU); ctx.arc(17, -0.8, 1.3, 0, TAU); ctx.fill();
+  ctx.strokeStyle = dk; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(25, 0); ctx.stroke();
+  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(24.5, -6.6, 3.4, 1.7, -0.5, 0, TAU); ctx.ellipse(24.5, 6.6, 3.4, 1.7, 0.5, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#E8A8A0'; ctx.beginPath(); ctx.ellipse(24.5, -6.6, 1.9, 0.9, -0.5, 0, TAU); ctx.ellipse(24.5, 6.6, 1.9, 0.9, 0.5, 0, TAU); ctx.fill();
+  ctx.fillStyle = cl.coat; ctx.strokeStyle = 'rgba(58,34,10,.7)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(29, 0, 9, 6.6, 0, 0, TAU); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#F0DDB4'; ctx.beginPath(); ctx.ellipse(35, 0, 5.2, 4.2, 0, 0, TAU); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.arc(37.4, -1.6, 0.9, 0, TAU); ctx.arc(37.4, 1.6, 0.9, 0, TAU); ctx.fill();
+  ctx.fillStyle = dk; ctx.beginPath(); ctx.arc(26.6, -2.3, 2, 0, TAU); ctx.arc(26.6, 2.3, 2, 0, TAU); ctx.fill(); ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.arc(26.6, -2.3, 1.1, 0, TAU); ctx.arc(26.6, 2.3, 1.1, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); ctx.arc(31, -4.3, 2, 0, TAU); ctx.arc(31, 4.3, 2, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#1A1208'; ctx.beginPath(); ctx.arc(31.6, -4.4, 1.05, 0, TAU); ctx.arc(31.6, 4.4, 1.05, 0, TAU); ctx.fill();
   ctx.restore();
 }
 function seaDrawFeatures(ctx, W, H, z, camX, camY, t){
