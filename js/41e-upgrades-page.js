@@ -52,13 +52,7 @@ function upgBuyAll(){
 }
 
 /* ---------- the total of everything bought ---------- */
-function upgStats(meta){
-  const keep = Save.data.meta, hp = P.hp, mhp = P.maxHp, out = {};
-  Save.data.meta = meta;
-  try { recalcStats(); const s = P.stats; Object.keys(GEAR_STAT_LABELS).forEach(function(k){ if (typeof s[k] === 'number') out[k] = s[k]; }); }
-  finally { Save.data.meta = keep; recalcStats(); P.hp = hp; P.maxHp = mhp; }
-  return out;
-}
+function upgStats(meta){ return previewStats(function(){ Save.data.meta = meta; }); }
 function upgSummaryHTML(){
   const lv = {}; let owned = 0, levels = 0;
   META.forEach(function(m){ const l = metaLevel(m.id); if (l > 0){ lv[m.id] = l; owned++; levels += l; } });

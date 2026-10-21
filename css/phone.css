@@ -24,7 +24,7 @@
 @media (max-width:760px){
   /* the Back bar of the long pages: solid under the button, fading above it, so rows do not show through the button */
   .stickyback{padding-top:20px;background:linear-gradient(180deg,rgba(30,23,18,0),rgba(30,23,18,.98) 34%)}
-  /* upgrades: the Buy button and Buy max side by side under the text, not one under the other (about 50px a row) */
+  /* shop lists with a Buy button (the City, the Venus and Mars workshops): the button and a second one side by side under the text, not one under the other (about 50px a row). The rebuilt Upgrades tab does not use .shoprow: its rows (.uprow, .upbtns) are laid out in gearpage.css */
   .shoprow:has(.buy) .txt{flex:1 1 calc(100% - 56px)}
   .shoprow .buy{flex:1 1 0;width:auto;min-width:120px}
   .shoprow:has(.buy)>.btn.ghost:not(.buy){flex:0 0 auto}
@@ -44,4 +44,13 @@
   .wheelpg{gap:8px}.wwheel{--ws:min(240px,62vh);margin:8px 0 4px}
   #antSurface{height:84px}.apsl small{display:none}.apsl{top:6px}
   .arcv{height:84px}.ards{min-height:0}
+}
+
+/* the in-run buttons on a phone (found by checking every button's rectangle): with the joystick on the right (Settings > Joystick side) KICK, SLOW and ROVER move to the left, where
+   the bread, corn, fish and crab buttons stand, so those go to the right; and "Call the next wave" sits under the health bars when they have a line of their own */
+@media (pointer:coarse){
+  body.lefty #breadBtn,body.lefty #cornBtn,body.lefty #fishBtn,body.lefty #crabBtn{left:auto;right:14px}
+}
+@media (max-width:520px){
+  #nextWaveBtn{top:max(122px,calc(98px + env(safe-area-inset-top,0px)))}
 }

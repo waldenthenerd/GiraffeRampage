@@ -61,7 +61,7 @@ function townShowHall(){
   for (let c = 1; c <= 13; c++){ const done = townDoneCh(c); cups += '<span class="cup' + (done ? ' on' : '') + '" title="' + (done ? CHAPTER_INFO[c - 1].name : 'Chapter ' + c + ' is not finished') + '" style="' + (done ? '--c:' + WARD[c].c : '') + '"><i></i><b>' + c + '</b></span>'; }
   const row = function(a, b){ return '<div class="rec"><span>' + a + '</span><b>' + b + '</b></div>'; };
   townPanelT('hall', '<div class="tp-title">HERD HALL</div><div class="shelf">' + cups + '</div><div class="plaque">' +
-    row('Best run', fmt(d.best | 0) + ' points, wave ' + (d.bestWave | 0)) + row('Runs', (d.runs | 0) + '  ·  ' + fmt(d.totalKills | 0) + ' kills') +
+    row('Best run', fmt(scoreInt(d.best)) + ' points, wave ' + (d.bestWave | 0)) + row('Runs', (d.runs | 0) + '  ·  ' + fmt(d.totalKills | 0) + ' kills') +
     row('Chapters finished', townChaptersDone() + ' of 13' + (d.chaptersComplete ? '  ·  whole journeys: ' + d.chaptersComplete : '')) +
     row('Minigame stars', (typeof miniStarTotal === 'function' ? miniStarTotal() : 0) + ' of 39') + row('Hats and boots', accOwnedCount() + ' of ' + ACC_ITEMS.length) +
     row('Photos in the album', photoAlbum().length + ' of ' + PHOTO_ALBUM_MAX) + row('Found in town', townFoundTotal() + ' of ' + TOWN_ITEMS.length) +

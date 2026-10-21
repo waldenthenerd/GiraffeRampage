@@ -85,13 +85,13 @@ function gameOver(){
   const bonus = Math.floor(G.bonusGold);
   const earned = Math.max(1, Math.floor((base + bonus) * gm));
   const d = Save.data;
-  const prevBest = d.best | 0, prevBestWave = d.bestWave | 0;
+  const prevBest = scoreInt(d.best), prevBestWave = d.bestWave | 0;
   d.gold += earned;
   d.runs = (d.runs | 0) + 1; d.runSave = null;
   d.totalKills = (d.totalKills | 0) + G.kills;
   d.gems = (d.gems | 0) + (G.runGems | 0);
   d.sulfur = (d.sulfur | 0) + (G.runSulfur | 0); d.basalt = (d.basalt | 0) + (G.runBasalt | 0); d.grubs = (d.grubs | 0) + (G.runGrubs | 0); d.iron = (d.iron | 0) + (G.runIron | 0); d.argon = (d.argon | 0) + (G.runArgon | 0);
-  if (G.score > (d.best | 0)) d.best = G.score;
+  if (G.score > scoreInt(d.best)) d.best = G.score;
   if (G.wave > (d.bestWave | 0)) d.bestWave = G.wave;
   Save.write();
   G.lastRun = { report: runReport(prevBest, prevBestWave), wave: G.wave, kills: G.kills, score: G.score, gold: earned, base: base, bonus: bonus, mult: gm, time: G.runTime, gems: G.runGems | 0, sulfur: G.runSulfur | 0, basalt: G.runBasalt | 0, grubs: G.runGrubs | 0, iron: G.runIron | 0, argon: G.runArgon | 0 };
@@ -116,7 +116,7 @@ function chapterComplete(){
   const bonus = Math.floor(G.bonusGold);
   const earned = Math.max(1, Math.floor((base + bonus) * gm * COMPLETION_MUL));
   const d = Save.data;
-  const prevBest = d.best | 0, prevBestWave = d.bestWave | 0;
+  const prevBest = scoreInt(d.best), prevBestWave = d.bestWave | 0;
   d.gold += earned;
   d.runs = (d.runs | 0) + 1; d.runSave = null;
   d.totalKills = (d.totalKills | 0) + G.kills;
@@ -124,7 +124,7 @@ function chapterComplete(){
   d.sulfur = (d.sulfur | 0) + (G.runSulfur | 0); d.basalt = (d.basalt | 0) + (G.runBasalt | 0); d.grubs = (d.grubs | 0) + (G.runGrubs | 0); d.iron = (d.iron | 0) + (G.runIron | 0); d.argon = (d.argon | 0) + (G.runArgon | 0);
   d.chaptersComplete = (d.chaptersComplete | 0) + 1;
   const hadPart = !!d.enginePart; if (G.wave >= 175) d.chapter7Complete = true; if (G.wave >= 200) d.chapter8Complete = true; if (G.wave >= 225) d.chapter9Complete = true; if (G.wave >= 250){ d.chapter10Complete = true; d.enginePart = true; } if (G.wave >= 275) d.chapter11Complete = true; if (G.wave >= 300){ d.chapter12Complete = true; d.mutationVial = true; } if (G.wave >= CHAPTER_LAST_WAVE) d.chapter13Complete = true; G.vialNew = false; G.enginePartNew = !hadPart && G.wave === 250;     /* finishing a chapter completes it and every one before it */     /* the Inferno's reward: a spaceship engine part */   /* finishing the last chapter counts every chapter before it */
-  if (G.score > (d.best | 0)) d.best = G.score;
+  if (G.score > scoreInt(d.best)) d.best = G.score;
   if (G.wave > (d.bestWave | 0)) d.bestWave = G.wave;
   Save.write();
   G.lastRun = { report: runReport(prevBest, prevBestWave), wave: G.wave, kills: G.kills, score: G.score, gold: earned, base: base, bonus: bonus, mult: gm * COMPLETION_MUL, time: G.runTime, gems: G.runGems | 0, sulfur: G.runSulfur | 0, basalt: G.runBasalt | 0, grubs: G.runGrubs | 0, iron: G.runIron | 0, argon: G.runArgon | 0 };

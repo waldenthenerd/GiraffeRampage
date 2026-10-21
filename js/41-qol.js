@@ -212,6 +212,7 @@ function applyTouchLayout(){
   const sc = clamp(Settings.touchScale, 0.5, 1) * 1.0;
   TOUCH.style.setProperty('--ts', String(0.7 + sc * 0.6));        /* 50% -> 1.0x, 100% -> 1.3x */
   TOUCH.classList.toggle('lefty', !!Settings.touchLeft);
+  document.body.classList.toggle('lefty', !!Settings.touchLeft);                                  /* the bread, corn, fish and crab buttons move to the other side, away from KICK */
   JOY.style.transform = 'scale(' + (0.7 + sc * 0.6) + ')';
 }
 function touchScaleNow(){ return 0.7 + clamp(Settings.touchScale, 0.5, 1) * 0.6; }
@@ -259,7 +260,7 @@ function showGallery(){
 function runSnapshot(){
   const cards = [];
   for (let i = 0; i < P.cards.length; i++){ const c = P.cards[i]; if (c.hidden) continue; if (c.parts) cards.push(['@t-x-fusion', c.parts[0].def.id, c.parts[0].level, c.parts[1].def.id, c.parts[1].level, c.level]); else cards.push([c.def.id, c.level]); }
-  return { v: 1, wave: G.wave, chapter: G.chapter, score: G.score | 0, kills: G.kills | 0, bonusGold: G.bonusGold || 0, runTime: G.runTime || 0,
+  return { v: 1, wave: G.wave, chapter: G.chapter, score: scoreInt(G.score), kills: G.kills | 0, bonusGold: G.bonusGold || 0, runTime: G.runTime || 0,
     speedLevel: G.runSpeedLevel | 0, rerolls: G.rerolls | 0, revives: G.revives | 0, pending: G.pendingLevels | 0,
     gems: G.runGems | 0, sulfur: G.runSulfur | 0, basalt: G.runBasalt | 0, grubs: G.runGrubs | 0, iron: G.runIron | 0, argon: G.runArgon | 0,
     level: P.level | 0, xp: P.xp || 0, xpNext: P.xpNext || 50, hp: P.hp || 1, marsShips: !!G.marsShipsSeen, cards: cards };

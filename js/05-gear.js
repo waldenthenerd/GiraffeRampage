@@ -548,10 +548,12 @@ const WHEEL_SEGMENTS = [
   { id: 'gems_small',   label: '150 Gems',       weight: 25, color: '#4AA8D8', kind: 'gems',  amount: 150 },
   { id: 'gems_large',   label: '450 Gems',       weight: 13, color: '#6FD0F0', kind: 'gems',  amount: 450 }
 ];
+/* is a key still cooling down? A time in the future (a clock that was ahead, or a save from a device whose clock was) counts as over, not as days of waiting */
+function keyCooling(last, cd){ const now = Date.now(); return !!last && last <= now && now - last < cd; }
 function checkWheelKey(){
   if (G.attract || G.score < WHEEL_SCORE_THRESHOLD) return;
   const now = Date.now();
-  if (Save.data.lastWheelKeyAt && now - Save.data.lastWheelKeyAt < WHEEL_KEY_COOLDOWN_MS) return;
+  if (keyCooling(Save.data.lastWheelKeyAt, WHEEL_KEY_COOLDOWN_MS)) return;
   Save.data.lastWheelKeyAt = now;
   Save.data.wheelKeys = (Save.data.wheelKeys | 0) + 1;
   Save.write();

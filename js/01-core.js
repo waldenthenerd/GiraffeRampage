@@ -187,13 +187,31 @@ const DEFAULT_SAVE = { gold: 0, gems: 0, meta: {}, gear: {}, equipped: { cape: n
   wheelKeys: 0, lastWheelKeyAt: 0, spottedKeys: 0, lastSpottedKeyAt: 0, runSave: null, combos: {}, fusions: 0, mastered: {}, comboClaims: {}, bestiary: null, lastForageAt: 0, menuChapter: 1,
   muted: false, autoKick: true, aimMode: 'cursor' };
 
+/* a score as a whole number that is never negative: `x | 0` wraps past 2,147,483,647 into a negative one, and scores in the late game go beyond that */
+function scoreInt(v){ v = Math.floor(+v || 0); return v > 0 ? v : 0; }
+/* a short message across the top of the screen (a save that could not be read or written); click it to dismiss */
+function gameToast(msg, ms){
+  try {
+    let el = document.getElementById('gameToast');
+    if (!el){ el = document.createElement('div'); el.id = 'gameToast'; el.setAttribute('role', 'alert'); el.addEventListener('click', function(){ el.classList.remove('on'); }); document.body.appendChild(el); }
+    el.textContent = msg; el.classList.add('on');
+    clearTimeout(gameToast.t); gameToast.t = setTimeout(function(){ el.classList.remove('on'); }, ms || 9000);
+  } catch (e) {}
+}
 const Save = {
-  data: null,
+  data: null, writeFailed: false, rescued: false,
   load(){
-    let d = null;
-    try { const raw = window.localStorage.getItem(SAVE_KEY); if (raw) d = GRPack.decode(raw); } catch (e) { d = null; }      /* packed (js/01b-savepack.js) or an older plain JSON save */
-    if (!d || typeof d !== 'object' || Array.isArray(d)) d = null;                /* a damaged or foreign save is ignored, not half-used */
+    let d = null, raw = null;
+    try { raw = window.localStorage.getItem(SAVE_KEY); if (raw) d = GRPack.decode(raw); } catch (e) { d = null; }      /* packed (js/01b-savepack.js) or an older plain JSON save */
+    if (!d || typeof d !== 'object' || Array.isArray(d)){
+      d = null;                                                                   /* a damaged or foreign save is ignored, not half-used... */
+      if (raw){                                                                   /* ...but the next write would overwrite it for good, so keep the raw text aside first (the first copy is kept, never replaced) */
+        try { if (window.localStorage.getItem(SAVE_KEY + '_unreadable') === null) window.localStorage.setItem(SAVE_KEY + '_unreadable', raw); this.rescued = true; } catch (e) {}
+        gameToast('Your saved game could not be read, so a fresh one was started. The old data has been kept aside in this browser (' + SAVE_KEY + '_unreadable) in case it can be recovered.', 14000);
+      }
+    }
     this.data = Object.assign({}, DEFAULT_SAVE, d || {});
+    this.data.best = scoreInt(this.data.best);
     if (!this.data.hintsSeen || typeof this.data.hintsSeen !== 'object' || Array.isArray(this.data.hintsSeen)) this.data.hintsSeen = {};
     if (!this.data.meta || typeof this.data.meta !== 'object') this.data.meta = {};
     if (!this.data.gear || typeof this.data.gear !== 'object') this.data.gear = {};
@@ -206,7 +224,7 @@ const Save = {
     this.data.gems = Math.max(0, Math.floor(this.data.gems) || 0);
     if (!this.data.ants || typeof this.data.ants !== 'object') this.data.ants = { soldier: 0, distractor: 0, shooter: 0 };
     this.data.food = Math.max(0, Math.round((+this.data.food || 0) * 10) / 10);
-    if ((this.data.best | 0) >= ANT_UNLOCK_SCORE) this.data.antsUnlocked = true;
+    if (scoreInt(this.data.best) >= ANT_UNLOCK_SCORE) this.data.antsUnlocked = true;
     /* Saves from before this flag existed: someone who has won at least once and has reached the very last wave has
        finished Chapter 7 (the flag is only ever set by winning it), so don't make them do it again. */
     if (!this.data.chapter7Complete && (this.data.chaptersComplete | 0) > 0 && (this.data.bestWave | 0) >= WAVES_PER_CHAPTER * 7) this.data.chapter7Complete = true;
@@ -236,11 +254,17 @@ const Save = {
     this.data.lastSpottedKeyAt = +this.data.lastSpottedKeyAt || 0;
     return this.data;
   },
-  write(){ try { window.localStorage.setItem(SAVE_KEY, JSON.stringify(GRPack.encode(this.data))); } catch (e) {} },      /* a JSON string holding the packed save */
+  write(){                                                                        /* a JSON string holding the packed save */
+    try { window.localStorage.setItem(SAVE_KEY, JSON.stringify(GRPack.encode(this.data))); this.writeFailed = false; return true; }
+    catch (e) {                                                                   /* full or blocked storage: say so once, not on every write, and again if it fails after it had worked */
+      if (!this.writeFailed){ this.writeFailed = true; gameToast('Your progress could not be saved: this browser is blocking or has run out of storage for the game. Free some space or allow site data, or what you do now will be lost when you close it.', 12000); }
+      return false;
+    }
+  },
   reset(){
     /* erasing progress keeps the player's own settings: volumes, controls, accessibility */
     const keep = {}, old = this.data || {};
-    ['muted', 'autoKick', 'aimMode', 'showGear', 'hitFlash', 'musicVol', 'sfxVol', 'ambVol', 'levelGap', 'autoPerf', 'autoPause', 'touchLeft', 'touchScale', 'fxLevel', 'keys', 'speedMode', 'speedLevel', 'calmFlash', 'npcVoice', 'textScale'].forEach(function(k){ if (old[k] !== undefined) keep[k] = old[k]; });
+    ['muted', 'autoKick', 'aimMode', 'showGear', 'hitFlash', 'musicVol', 'sfxVol', 'ambVol', 'levelGap', 'autoPerf', 'autoPause', 'touchLeft', 'touchScale', 'fxLevel', 'keys', 'speedMode', 'speedLevel', 'calmFlash', 'npcVoice', 'textScale', 'autoBread'].forEach(function(k){ if (old[k] !== undefined) keep[k] = old[k]; });
     this.data = Object.assign({}, DEFAULT_SAVE, { meta: {}, gear: {}, equipped: { cape: null, weapon: null, armor: null }, equippedTrinkets: [], ants: { soldier: 0, distractor: 0, shooter: 0 }, bestiary: { creatures: {}, cards: {} }, venusUp: {}, hintsSeen: {} }, keep);
     this.write();
   }

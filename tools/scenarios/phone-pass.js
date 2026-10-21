@@ -38,11 +38,28 @@ try {
   var keepFX = G.introFX, keepW = G.W, keepH = G.H; G.W = innerWidth; G.H = innerHeight;
   G.introFX = { t: 2, dur: 4, ch: 12, name: 'The Underground Giraffe City', desc: 'Something has been digging under the savanna for a very long time and it is finally ready to show you.', accent: '#F2B33D' };
   drawIntroFX(c); out.titleFits = drawn >= 3 && widest <= innerWidth - 8; out.titleW = Math.round(widest); G.introFX = keepFX; G.W = keepW; G.H = keepH;
+  /* in a run: the bread, corn, fish and crab buttons, Call the next wave, KICK, SLOW, ROVER, pause and the health bars share the screen, whichever side the joystick is on: no two may overlap */
+  (function(){
+    ['debug-unlockall', 'debug-ants'].forEach(function(a){ try { GR.handleAction(a); } catch (e) {} });
+    townData().n.loaves = 5; Save.data.antsUnlocked = true; var bid = Object.keys(BOAT_BY_ID)[0]; seaData().own = {}; seaData().own[bid] = 1; seaData().sel = bid; seaData().fish = 4; seaData().crab = 3; farmData().corn = 3;
+    startRun(1); G.state = 'playing'; Input.hasTouch = true; var realCan = canCallNextWave; canCallNextWave = function(){ return true; };
+    ['slowbtn', 'roverbtn'].forEach(function(id){ document.getElementById(id).classList.add('on'); });
+    var ids = ['kickbtn', 'slowbtn', 'roverbtn', 'pausebtn', 'breadBtn', 'cornBtn', 'fishBtn', 'crabBtn', 'nextWaveBtn', 'bars', 'loadout'], allHits = [], shown = 0;
+    [false, true].forEach(function(left){
+      Settings.touchLeft = left; applyTouchLayout(); for (var i = 0; i < 4; i++){ GR.step(1 / 30); try { Feedback.tick(0.1); } catch (e) {} }
+      var R = {}; ids.forEach(function(id){ var e = document.getElementById(id); if (!e) return; var cs = getComputedStyle(e), r = e.getBoundingClientRect(); if (cs.display !== 'none' && cs.visibility !== 'hidden' && +cs.opacity > 0.05 && r.width > 0 && r.height > 0) R[id] = r; });
+      shown = Math.max(shown, Object.keys(R).length);
+      for (var a = 0; a < ids.length; a++) for (var b = a + 1; b < ids.length; b++){ var p = R[ids[a]], q = R[ids[b]]; if (p && q && p.left < q.right - 1 && q.left < p.right - 1 && p.top < q.bottom - 1 && q.top < p.bottom - 1) allHits.push((left ? 'lefty ' : 'righty ') + ids[a] + '/' + ids[b]); }
+      /* nothing runs off the screen either */
+      Object.keys(R).forEach(function(id){ var r = R[id]; if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) allHits.push((left ? 'lefty ' : 'righty ') + id + ' off screen'); });
+    });
+    canCallNextWave = realCan; Settings.touchLeft = false; applyTouchLayout(); out.runHud = allHits.length === 0 && shown >= 8; out.runHudHits = allHits.join(', ');
+  })();
   /* landscape: the wheel cards are one line each and the wheel is on the first screen */
   if (land){ screens.wheel(); var cd = document.querySelector('.wpick .wcard'); out.landCards = cd.getBoundingClientRect().height < 60; out.landWheel = document.querySelector('.wwheel').getBoundingClientRect().top < innerHeight * 0.8; }
   if (screen && screens[screen]){ G.state = 'shop'; screens[screen](); }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-var need = ['noSideScroll', 'sliders', 'swatches', 'chips', 'upChips', 'gview', 'gearText', 'antsText', 'wheelText', 'hudText', 'buyRow', 'fusionRow', 'bestiary3', 'titleFits'];
+var need = ['noSideScroll', 'sliders', 'swatches', 'chips', 'upChips', 'gview', 'gearText', 'antsText', 'wheelText', 'hudText', 'buyRow', 'fusionRow', 'bestiary3', 'titleFits', 'runHud'];
 if (innerWidth > innerHeight) need = need.concat(['landCards', 'landWheel']);
 out.pass = out.errs.length === 0 && out.coarse === true && need.every(function(k){ return out[k] === true; });
 QA.done(out);

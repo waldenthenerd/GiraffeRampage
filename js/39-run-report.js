@@ -25,7 +25,7 @@ function noteKiller(sx, sy){
 function runReport(prevBest, prevBestWave){
   const cards = []; for (let i = 0; i < P.cards.length; i++) cards.push([P.cards[i].def.id, P.cards[i].level]);
   return { dmg: Object.assign({}, G.runDmg || {}), xp: G.runXp | 0, taken: Math.round(G.runTaken || 0), level: P.level | 0, killedBy: P.killedBy || null,
-    cards: cards, prevBest: prevBest | 0, prevBestWave: prevBestWave | 0, score: G.score | 0, wave: G.wave | 0 };
+    cards: cards, prevBest: scoreInt(prevBest), prevBestWave: prevBestWave | 0, score: scoreInt(G.score), wave: G.wave | 0 };
 }
 function runReportHTML(r, died){
   const R = r.report; if (!R) return '';

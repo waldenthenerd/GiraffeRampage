@@ -606,3 +606,6 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 .gs-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.12);margin:7px 0 6px;overflow:hidden}.gs-bar i{display:block;height:100%;background:var(--c)}
 .gs-now{font-size:13px;color:#E8E8F0}.gs-next{font-size:11px;color:#9AA0B4;margin-top:4px}
 .gs-ms{display:flex;gap:6px;margin-top:6px}.gs-ms em{font-style:normal;font-size:10.5px;padding:2px 7px;border-radius:9px;border:1px solid rgba(255,255,255,.2);color:#8A90A4}.gs-ms em.got{background:var(--c);border-color:var(--c);color:#12141C;font-weight:800}
+/* a message across the top: a save that could not be read or written (gameToast in 01-core.js) */
+#gameToast{position:fixed;left:50%;top:14px;transform:translate(-50%,-20px);z-index:90;max-width:min(560px,92vw);padding:10px 14px;border-radius:10px;background:rgba(20,16,14,.96);border:1px solid rgba(232,112,94,.8);color:#F6E8D4;font:500 13.5px/1.4 ui-sans-serif,"Segoe UI",Roboto,sans-serif;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+#gameToast.on{opacity:1;pointer-events:auto;transform:translate(-50%,0);cursor:pointer}
