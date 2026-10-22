@@ -7,6 +7,8 @@
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
   function tick(n){ for (var i = 0; i < n; i++) fishTick(0.03); }
   function cast(force){ fishCast(); if (force) Fg.fish = FISH.filter(function(f){ return f.id === force; })[0]; tick(120); return Fg.phase === 'bite'; }
+  /* the hook (the marker in the green) and then a fight, played by hand: wind in while the line is slack, ease off when it is tight */
+  function land(){ Fg.pos = Fg.zone + Fg.w / 2; fishReel(); Fg.str = Math.min(Fg.str || 1, 0.8); for (var i = 0; i < 4000 && Fg.phase === 'fight'; i++){ Fg.hold = Fg.ten < 0.55 || (Fg.pull < 0.3 && Fg.ten < 0.8); fishTick(0.03); } }
   function key(code){ window.dispatchEvent(new KeyboardEvent('keydown', { code: code, bubbles: true, cancelable: true })); }
   try {
     /* the list */
@@ -37,7 +39,7 @@
     var c0 = Fg.clock; GR.step(1 / 60); out.clock = Fg.clock > c0;
     function pixels(geo){ var cv = document.createElement('canvas'); cv.width = 700; cv.height = 600; var cx = cv.getContext('2d'); fishDrawAnim(cx, geo); var d = cx.getImageData(0, 0, 700, 600).data, n = 0; for (var q = 3; q < d.length; q += 4) if (d[q] > 30) n++; return n; }
     var tx = Town.x, tf = Town.face; Town.x = 150; Town.face = 1;
-    out.bite = cast('sardine'); out.animBite = Fg.phase === 'bite' && fishAnimOn() && pixels(fishPierGeo()) > 100; Fg.pos = Fg.zone + Fg.w / 2; fishReel();
+    out.bite = cast('sardine'); out.animBite = Fg.phase === 'bite' && fishAnimOn() && pixels(fishPierGeo()) > 100; land();
     out.leap = Fg.a && Fg.a.k === 'leap' && fishAnimOn(); Fg.a.t = Fg.clock - 0.4; out.leapDraws = pixels(fishPierGeo()) > 600; Fg.a.t = Fg.clock - 5; out.leapEnds = !fishAnimOn();
     out.won = fishLog().sardine === 1 && fishBook().sardine >= 12 && fishBook().sardine <= 20 && Save.data.gold > gold0 && Save.data.gems === gems0 + 5 && /Sardine, \d+ cm/.test(document.getElementById('fishMsg').textContent);
     /* a miss and a bite left alone */
@@ -45,18 +47,18 @@
     out.missed = fishLog().sardine === 1 && /got away/.test(document.getElementById('fishMsg').textContent);
     out.bite3 = cast('sardine'); tick(300); out.timeout = Fg.phase === 'idle' && /got away/.test(document.getElementById('fishMsg').textContent) && fishLog().sardine === 1;
     /* a smaller one does not break the record */
-    fishBook().sardine = 20; cast('sardine'); Fg.pos = Fg.zone + Fg.w / 2; fishReel(); out.record = fishBook().sardine === 20 && fishLog().sardine === 2;
+    fishBook().sardine = 20; cast('sardine'); land(); out.record = fishBook().sardine === 20 && fishLog().sardine === 2;
 
     /* tackle, free, unlocked by how many kinds she has caught (5, 10, 15, 20, 28, all 35) */
     var log = fishLog();
     function setKinds(n){ Object.keys(log).forEach(function(k){ delete log[k]; }); FISH.slice(0, n).forEach(function(f){ log[f.id] = 1; }); }
     setKinds(4);
     out.noRodYet = !fishUnlocked(FISH_RODS, 1) && fishTackle().rod.n === 'Plain rod';
-    var wPlain; cast('sardine'); wPlain = Fg.w; Fg.pos = Fg.zone + Fg.w / 2; fishReel();
+    var wPlain; cast('sardine'); wPlain = Fg.w; land();
     out.stillPlain = fishKinds() === 4 && fishTackle().rod.n === 'Plain rod';
-    cast('carp'); Fg.pos = Fg.zone + Fg.w / 2; fishReel();
+    cast('carp'); land();
     out.newTackle = fishKinds() === 5 && fishTackle().rod.n === 'Cane rod' && /New tackle/.test(document.getElementById('fishMsg').textContent) && /Cane rod/.test(document.getElementById('fishMsg').textContent);
-    cast('sardine'); out.rodWider = Math.abs(Fg.w / wPlain - 1.15) < 0.01; Fg.pos = Fg.zone + Fg.w / 2; fishReel();
+    cast('sardine'); out.rodWider = Math.abs(Fg.w / wPlain - 1.15) < 0.01; land();
     setKinds(10);
     out.lineNeed = fishUnlocked(FISH_LINES, 1) && !fishUnlocked(FISH_LINES, 2) && !fishUnlocked(FISH_BAITS, 1);
     fishTackle().k.line = 1; cast('sardine'); out.longerBite = Fg.k.line.win === 7.5;
@@ -74,9 +76,9 @@
 
     /* Brine's order: eight gems, once a week */
     var o = fishOrder(); out.order = !!o.id && o.done === false && fishOrder().id === o.id && FISH.filter(function(f){ return f.id === o.id; })[0].h !== 'special';
-    townData().n.fishAll = 1; delete log[o.id]; var g1 = Save.data.gems; cast(o.id); Fg.pos = Fg.zone + Fg.w / 2; fishReel();
+    townData().n.fishAll = 1; delete log[o.id]; var g1 = Save.data.gems; cast(o.id); land();
     out.orderPaid = Save.data.gems === g1 + 5 + 8 && fishOrder().done === true && townData().n.fishOrders === 1;
-    var g2 = Save.data.gems; cast(o.id); Fg.pos = Fg.zone + Fg.w / 2; fishReel(); out.orderOnce = Save.data.gems === g2;
+    var g2 = Save.data.gems; cast(o.id); land(); out.orderOnce = Save.data.gems === g2;
 
     /* the fish book */
     var l2 = fishLog(); FISH.forEach(function(f){ delete l2[f.id]; }); l2.sardine = 3; fishBook().sardine = 17;
@@ -103,9 +105,9 @@
     Fg.a = { k: 'cast', t: Fg.clock - 0.8 }; GR.render(); var tipSet = seaRiderTip.slice(); var geo = fishSeaGeo();
     out.rodSwings = Math.abs(tipWind[0] - tipSet[0]) + Math.abs(tipWind[1] - tipSet[1]) > 20 && geo.rod[0] === tipSet[0] && geo.rod[1] === tipSet[1];
     out.rodPose = seaRiderPose(1).rod && seaRiderPose(1).rod.len > 40; Fg.a = null;
-    cast(); fishDrawAnim(CTX, fishSeaGeo()); out.seaAnim = fishAnimOn() && Fg.phase === 'bite'; Fg.pos = Fg.zone + Fg.w / 2; fishReel(); Fg.a.t = Fg.clock - 0.5; GR.render(); out.seaLeapDraws = pixels(fishSeaGeo()) > 300;
+    cast(); fishDrawAnim(CTX, fishSeaGeo()); out.seaAnim = fishAnimOn() && Fg.phase === 'bite'; land(); Fg.a.t = Fg.clock - 0.5; GR.render(); out.seaLeapDraws = pixels(fishSeaGeo()) > 300;
     var before = fishLog(); var keep = {}; Object.keys(before).forEach(function(k){ keep[k] = before[k]; });
-    cast(); Fg.pos = Fg.zone + Fg.w / 2; fishReel(); out.seaCatch = Object.keys(fishLog()).some(function(k){ return fishLog()[k] !== keep[k]; }) && townData().n.seaCasts >= 1;
+    cast(); land(); out.seaCatch = Object.keys(fishLog()).some(function(k){ return fishLog()[k] !== keep[k]; }) && townData().n.seaCasts >= 1;
     key('Escape'); out.closed = G.state === 'sail' && !Fg.sea && !Fg.iv;
     if (sp.reef){ Sea.x = sp.reef.x; Sea.y = sp.reef.y; Fg.sea = true; out.habReef = fishHab() === 'reef'; }
     if (sp.shallow){ Sea.x = sp.shallow.x; Sea.y = sp.shallow.y; out.habShallow = fishHab() === 'shallows'; }
@@ -129,7 +131,7 @@
     var sv = freshSave(); Save.data = sv; log = fishLog();
     out.scalesRaw = fishScaleN() === 0 && townData().scales === undefined;
     out.scaleRates = FISH_SCALES.join() === '1,2,5,12' && FISH.every(function(f){ return fishScaleGain(f) >= 1; });
-    Town.d = 'harbour'; townShowFishing(); cast('sardine'); Fg.pos = Fg.zone + Fg.w / 2; fishReel(); out.scaleCatch = fishScaleN() >= 1 && /scale/.test(document.getElementById('fishMsg').textContent);
+    Town.d = 'harbour'; townShowFishing(); cast('sardine'); land(); out.scaleCatch = fishScaleN() >= 1 && /scale/.test(document.getElementById('fishMsg').textContent);
     var gid = Object.keys(GEAR_INDEX).filter(function(i){ return GEAR_INDEX[i].name !== 'Bare Hooves'; })[0];
     townShowBench(); out.benchEmpty = /No gear yet/.test(OV.innerHTML);
     Save.data.gear = Save.data.gear || {}; Save.data.gear[gid] = 1; townData().scales = 5; townShowBench();

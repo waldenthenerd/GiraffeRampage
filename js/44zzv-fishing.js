@@ -74,7 +74,7 @@ function fishScalesAdd(n){ const t = townData(); t.scales = fishScaleN() + Math.
 const FISH_MIX = { shallows: { shallows: 1, special: 0.4 }, reef: { reef: 1, shallows: 0.15, special: 0.4 }, water: { shallows: 0.6, reef: 0.15, deep: 0.25, special: 0.4 }, deep: { deep: 1, special: 0.4 } };
 function fishPool(where, bait){
   const night = typeof townIsNight === 'function' && townIsNight(), wx = typeof townWeatherType === 'function' ? townWeatherType() : 'clear', rain = typeof Town !== 'undefined' && Town.rainK > 0.4;
-  const mix = where === 'pier' ? null : (FISH_MIX[where] || FISH_MIX.water), bm = (bait || FISH_BAITS[0]).m, out = [];
+  const cond = fishCond(where), mix = where === 'pier' ? null : (FISH_MIX[where] || FISH_MIX.water), bm = (bait || FISH_BAITS[0]).m, out = [];
   FISH.forEach(function(f){
     if (f.night && !night) return;
     if (f.wx && f.wx !== wx) return;
@@ -83,6 +83,7 @@ function fishPool(where, bait){
     if (!(w > 0)) return;
     if (rain && f.v >= 3) w *= 1.5;
     w *= bm[fishRarity(f)];
+    const q = fishRarity(f); if (q >= 2) w *= cond.rare; else if (q === 1) w *= 1 + (cond.rare - 1) / 2;      /* dusk, storms and the good spots bring the better fish (js/44zzy-fishing-fight.js) */
     out.push({ f: f, w: w });
   });
   return out;
@@ -96,7 +97,7 @@ function fishPickAt(where, bait){
 fishPick = function(){ return fishPickAt('pier', fishTackle().bait); };      /* the old name still works */
 function fishRollLen(f, rodZ){
   const lo = f.len[0], hi = f.len[1];
-  return Math.round(lo + (hi - lo) * Math.min(1, Math.pow(Math.random(), 1.6) * (1 + (rodZ - 1) * 0.3)));
+  return Math.round(lo + (hi - lo) * Math.min(1, Math.pow(Math.random(), 1.6) * (1 + (rodZ - 1) * 0.3) * fishCond(fishHab()).size));
 }
 
 /* ---- Brine's order: one named fish a week ---- */
@@ -130,16 +131,17 @@ function fishPanel(msg){
   if (Fg.iv){ clearInterval(Fg.iv); Fg.iv = 0; }
   Fg.rodOn = true; Fg.phase = 'idle'; if (!Fg.a || Fg.a.k === 'cast') Fg.a = null; Fg.fish = null;
   const o = fishOrder(), of = FISH.filter(function(f){ return f.id === o.id; })[0];
-  const html = '<div class="tp-title">' + FISH_HABNAME[fishHab()] + '</div><div class="fishmsg" id="fishMsg">' + (msg || 'Cast a line.') + '</div>' +
-    '<div class="fishbar" id="fishBar" style="display:none"><div class="fzone" id="fishZone"></div><i id="fishMark"></i></div>' +
-    '<div class="chalkrow"><button class="chalk" data-a="fish-cast" id="fishCast">Cast</button><button class="chalk" data-a="fish-reel" id="fishReel" style="display:none">Reel in!</button></div>' +
+  const html = '<div class="tp-title">' + FISH_HABNAME[fishHab()] + '</div>' + fishCatchHTML(Fg.last) + '<div class="fishmsg" id="fishMsg">' + (msg || 'Cast a line.') + '</div>' + fishCondHTML() +
+    '<div class="fishbar" id="fishBar" style="display:none"><div class="fzone" id="fishZone"></div><i id="fishMark"></i></div>' + fishFightHTML() +
+    '<div class="chalkrow"><button class="chalk" data-a="fish-cast" id="fishCast">' + (Fg.last || Fg.recastAt ? 'Cast again' : 'Cast') + '</button><button class="chalk" data-a="fish-reel" id="fishReel" style="display:none">Reel in!</button></div>' +
     fishTackleHTML() +
-    '<div class="chalkrow"><button class="chalk" data-a="fish-book">Fish book · ' + fishKinds() + ' of ' + FISH.length + '</button></div>' +
+    '<div class="chalkrow"><button class="chalk" data-a="fish-book">Fish book · ' + fishKinds() + ' of ' + FISH.length + '</button><button class="chalk" data-a="fish-auto">Auto-recast: ' + (fishAutoOn() ? 'on' : 'off') + '</button></div>' +
     '<div class="fishlog">' + fishRows() + '</div>' +
     '<p class="tnote">Brine’s order this week: a <b>' + of.name + '</b>' + (o.done ? ' (done)' : ' · 8 gems') + (townIsNight() ? ' · the moon jelly is out' : '') + '</p>';
   if (Fg.sea){
     setOverlay('<div class="panel tp tp-fish" style="max-width:340px">' + html + '<div class="tp-foot"><button class="tbtn" data-a="fish-sea-close">Back to the boat</button></div></div>');
   } else townPanelT('fish', html, { w: 340 });
+  fishPaintCard();
   OV.classList.add('side'); Fg.side = true;                      /* a sidebar (a bottom sheet on a narrow screen), so the water and the fish stay in view */
 }
 townShowFishing = function(msg){ Fg.sea = false; fishPanel(msg); };
@@ -147,7 +149,7 @@ townShowFishing = function(msg){ Fg.sea = false; fishPanel(msg); };
 function fishCast(){
   if (Fg.phase !== 'idle') return;
   const k = fishTackle(), fish = fishPickAt(fishHab(), k.bait);
-  Fg.fish = fish; Fg.phase = 'wait'; Fg.t = 0; Fg.wait = 1 + Math.random() * 2.2; Fg.k = k;
+  Fg.fish = fish; Fg.phase = 'wait'; Fg.t = 0; Fg.wait = (1 + Math.random() * 2.2) * fishCond(fishHab()).wait; Fg.k = k; Fg.last = null; Fg.recastAt = 0; fishSound('cast');
   document.getElementById('fishMsg').textContent = 'The float drifts...'; document.getElementById('fishCast').style.display = 'none';
   SFX.click();
   Fg.a = { k: 'cast', t: Fg.clock };
@@ -175,7 +177,7 @@ function fishTick(dt){
   }
 }
 function fishReel(){ if (Fg.phase === 'bite'){ const ok = Fg.pos >= Fg.zone && Fg.pos <= Fg.zone + Fg.w; fishResult(ok); } }
-function fishResult(win){
+function fishResult(win, why){
   if (Fg.phase === 'idle') return;
   clearInterval(Fg.iv); Fg.iv = 0; Fg.phase = 'idle';
   const f = Fg.fish, k = Fg.k; let msg;
@@ -188,7 +190,8 @@ function fishResult(win){
     const o = fishOrder(); let ordered = false;
     if (o.id === f.id && !o.done){ o.done = true; ordered = true; pay.gems = (pay.gems | 0) + 8; const t = townData(); t.n.fishOrders = (t.n.fishOrders | 0) + 1; }
     townPay(pay);
-    const scl = fishScaleGain(f) + (rec && !first ? 1 : 0); fishScalesAdd(scl);
+    const scl = Math.round((fishScaleGain(f) + (rec && !first ? 1 : 0)) * fishCond(fishHab()).scales); fishScalesAdd(scl);
+    Fg.last = { f: f, len: len, rec: rec && !first, first: first, gold: gold, scl: scl, gems: pay.gems | 0, best: book[f.id] | 0, ordered: ordered };
     Fg.a = { k: 'leap', t: Fg.clock, f: f, len: len, rec: rec || first };
     msg = 'You caught a ' + f.name + ', ' + len + ' cm! +' + fmt(gold) + ' gold' + (first ? ' and 5 gems for a new kind' : '') + (rec && !first ? ' · a new record' : '') + '. +' + scl + ' scale' + (scl === 1 ? '' : 's') + '.';
     if (ordered) msg += ' That was Brine’s order: +8 gems!';
@@ -197,10 +200,11 @@ function fishResult(win){
     ['rod', 'line', 'bait'].forEach(function(key, ki){ const list = now[ki]; for (let i = 0; i < list.length; i++){ if (fishUnlocked(list, i) && !had[at + i]){ kk[key] = i; names.push(list[i].n); } } at += list.length; });
     if (names.length) msg += ' New tackle, and it is on: ' + names.join(', ') + '!';
     const t2 = townData();
-    if (FISH.every(function(x){ return log[x.id] > 0; }) && !t2.n.fishAll){ t2.n.fishAll = 1; townPay({ gems: 100 }); msg += ' Every kind caught: +100 gems!'; SFX.transform(); } else SFX.level();
-  } else { msg = 'It got away.'; SFX.deny(); Fg.a = { k: 'lost', t: Fg.clock, f: f }; }
+    if (FISH.every(function(x){ return log[x.id] > 0; }) && !t2.n.fishAll){ t2.n.fishAll = 1; townPay({ gems: 100 }); msg += ' Every kind caught: +100 gems!'; SFX.transform(); } else fishSound('catch', f);
+  } else { msg = why || 'It got away.'; Fg.last = null; fishSound('lost'); Fg.a = { k: 'lost', t: Fg.clock, f: f }; }
   Save.write();
   fishPanel(msg);
+  fishAfterResult();
 }
 townFishCast = fishCast; townFishResult = fishResult;
 
@@ -232,7 +236,7 @@ function fishCardHTML(f){
   const log = fishLog(), n = log[f.id] | 0, best = fishBook()[f.id] | 0, q = fishRarity(f);
   const hint = f.night ? 'Only at night' : f.wx ? 'Only in ' + f.wx : (f.h === 'pier' ? 'At the pier' : f.h === 'shallows' ? 'In the shallows, from a boat' : f.h === 'reef' ? 'Over reefs, from a boat' : f.h === 'deep' ? 'In deep water, from a boat' : 'From a boat, in the right weather');
   return '<div class="fcard' + (n ? ' got' : '') + '"><canvas data-fb="' + f.id + '" width="84" height="48"></canvas><b>' + (n ? f.name : '?????') + '</b>' +
-    '<span style="color:' + FISH_RCOL[q] + '">' + FISH_RARITY[q] + '</span><small>' + (n ? 'Biggest ' + best + ' cm · caught ' + n : hint) + '</small></div>';
+    '<span style="color:' + FISH_RCOL[q] + '">' + FISH_RARITY[q] + '</span><small>' + (n ? 'Biggest ' + best + ' cm · caught ' + n + ' · ' + fishBehave(f).n : hint) + '</small></div>';
 }
 function showFishBook(){
   Fg.side = false;
@@ -318,7 +322,8 @@ function fishPose(){
     if (age < 0.35){ const w = age / 0.35; back = w * w * (3 - 2 * w); bend = 0.12 + 0.2 * w; }
     else if (age < 0.5){ const w = (age - 0.35) / 0.15; back = 1 - 1.4 * w; bend = 0.7; }
     else { const w = (age - 0.5) / 0.45; back = -0.4 * (1 - w * w * (3 - 2 * w)); bend = 0.3 * (1 - w) + 0.12; }
-  } else if (Fg.phase === 'bite'){ const bt = now - (Fg.biteAt || now); back = 0.1 + 0.1 * Math.sin(bt * 18); bend = 0.35 + 0.35 * Math.abs(Math.sin(bt * 9)); }
+  } else if (Fg.phase === 'fight'){ const bt = now - (Fg.biteAt || now); back = 0.2 + 0.5 * (Fg.hold ? 1 : 0.2) * (0.6 + 0.4 * Math.sin(bt * 7)) + 0.4 * (Fg.pull || 0); bend = 0.35 + 0.5 * (Fg.ten || 0); }
+  else if (Fg.phase === 'bite'){ const bt = now - (Fg.biteAt || now); back = 0.1 + 0.1 * Math.sin(bt * 18); bend = 0.35 + 0.35 * Math.abs(Math.sin(bt * 9)); }
   else if (a && a.k === 'leap' && age < FISH_ANIM.leap){ back = age < 1.0 ? 0.85 * Math.sin(age / 1.0 * Math.PI * 0.5) : 0.85 * (1 - clamp((age - 1.0) / 1.2, 0, 1)); bend = 0.65 * (1 - clamp((age - 1.0) / 1.2, 0, 1)) + 0.1; }
   else if (a && a.k === 'lost' && age < FISH_ANIM.lost){ back = -0.3 * (1 - age / 0.5 > 0 ? 1 - age / 0.5 : 0); bend = 0.1; }
   else if (Fg.phase === 'wait') bend = 0.14 + 0.03 * Math.sin(now * 2.6);
@@ -348,7 +353,7 @@ function fishDrawAnim(ctx, p){
   let fl = p.rest.slice(), taut = 0.6, floatOn = true, e;
   const age = a ? now - a.t : 99;
   if (a && a.k === 'cast' && age < FISH_ANIM.cast){ e = clamp((age - 0.4) / 0.55, 0, 1); fl = lerp2(p.rod, p.rest, e); fl[1] -= Math.sin(e * Math.PI) * 60 * k * p.arc; taut = e > 0 ? 0.9 : 0.4; }
-  else if (Fg.phase === 'bite'){ const bt = now - (Fg.biteAt || now); fl[1] += Math.sin(bt * 26) * 2.4 * k + Math.abs(Math.sin(bt * 5)) * 7 * k; fl[0] += Math.sin(bt * 17) * 3 * k; taut = 0.97; }
+  else if (Fg.phase === 'bite' || Fg.phase === 'fight'){ const bt = now - (Fg.biteAt || now); fl[1] += Math.sin(bt * 26) * 2.4 * k + Math.abs(Math.sin(bt * 5)) * 7 * k; fl[0] += Math.sin(bt * 17) * 3 * k; taut = 0.97; }
   else if (Fg.phase === 'wait'){ fl[1] += Math.sin(now * 2.6) * 1.8 * k; taut = 0.75; }
   else floatOn = false;
   if (a && a.k === 'leap' && age < FISH_ANIM.leap || a && a.k === 'lost' && age < FISH_ANIM.lost) taut = 0.9;

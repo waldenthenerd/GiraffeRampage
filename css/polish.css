@@ -657,3 +657,17 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 .tkrow.on{border-color:#8FE0A0;background:rgba(143,224,160,.12)}
 .tkrow.lock{opacity:.6}
 .tkscroll{max-height:46vh;overflow-y:auto;padding-right:4px}
+
+/* fishing: the fight, the conditions line and the catch card (js/44zzy-fishing-fight.js) */
+.fishcond{margin:4px 0 2px;font-size:12px;opacity:.9;color:#BFE8F4}.fishcond.spot{color:#FFE9A0;font-weight:700}
+.fightui{margin:6px 0 2px;text-align:left}
+.fgl{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;font-weight:700;margin:4px 0 2px}.fgl small{font-weight:400;opacity:.75;font-size:11px}
+.fgbar{height:14px;border-radius:7px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.25);overflow:hidden;position:relative}
+.fgbar i{display:block;height:100%;width:0;background:#6BD08A;transition:width .05s linear}
+.fgbar.ten i.warm{background:#F2C230}.fgbar.ten i.hot{background:#E8503C}
+.fgbar.prog i{background:#5AB8F2}
+#fishReel{touch-action:none;user-select:none;-webkit-user-select:none}
+.fcatch{display:flex;gap:10px;align-items:center;text-align:left;margin:6px 0 4px;padding:8px;border:2px solid;border-radius:10px;background:rgba(255,255,255,.07)}
+.fcatch canvas{flex:none;width:84px;height:48px}.fcatch b{font-size:15px}.fcatch .fcl{font-size:12.5px;opacity:.9;margin:2px 0}
+.fcp{display:flex;flex-wrap:wrap;gap:4px}.fcp i{font-style:normal;font-size:11px;padding:2px 7px;border-radius:9px;background:rgba(255,224,106,.18);color:#FFE9A0}
+@media (max-width:700px){.fcatch{padding:5px;gap:7px}.fcatch canvas{width:64px;height:37px}.fcatch b{font-size:13px}.fcatch .fcl{font-size:11px;margin:0}.fishcond{font-size:11px;margin:2px 0}.fgl small{display:none}}
