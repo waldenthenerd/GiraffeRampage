@@ -158,7 +158,7 @@
         ctx.strokeStyle = '#B79C6A'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(26, 5, 3, 0, TAU); ctx.stroke();
         { const sw = Math.sin(t * 4) * 3; ctx.fillStyle = '#8A5A32'; ctx.beginPath(); ctx.ellipse(-24, -26 + sw, 2.4, 5, 0.6, 0, TAU); ctx.fill(); ctx.beginPath(); ctx.ellipse(-24, 26 - sw, 2.4, 5, -0.6, 0, TAU); ctx.fill(); }
     }
-    seaDrawRider(ctx);
+    seaDrawRider(ctx, t);
     if (moving){
       const a = 0.25 + sp * 0.4; ctx.strokeStyle = 'rgba(255,255,255,' + a.toFixed(2) + ')'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
       [-1, 1].forEach(function(sd){ ctx.beginPath(); ctx.moveTo(bow - 2, sd * 2); ctx.quadraticCurveTo(bow - 12, sd * 6, bow - 24 - sp * 10, sd * (14 + sp * 4)); ctx.stroke(); });

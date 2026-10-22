@@ -110,7 +110,7 @@ function fishOrder(){
 }
 
 /* ---- the game itself (the same on the pier and on a boat) ---- */
-const Fg = { where: 'pier', phase: 'idle', iv: 0, sea: false, fish: null, clock: 0, a: null, side: false };
+const Fg = { where: 'pier', phase: 'idle', iv: 0, sea: false, fish: null, clock: 0, a: null, side: false, rodU: 0, rodOn: false };
 function fishHab(){
   if (!Fg.sea) return 'pier';
   const t = seaTypeAt(Sea.x, Sea.y);
@@ -128,7 +128,7 @@ function fishTackleHTML(){
 }
 function fishPanel(msg){
   if (Fg.iv){ clearInterval(Fg.iv); Fg.iv = 0; }
-  Fg.phase = 'idle'; if (!Fg.a || Fg.a.k === 'cast') Fg.a = null; Fg.fish = null;
+  Fg.rodOn = true; Fg.phase = 'idle'; if (!Fg.a || Fg.a.k === 'cast') Fg.a = null; Fg.fish = null;
   const o = fishOrder(), of = FISH.filter(function(f){ return f.id === o.id; })[0];
   const html = '<div class="tp-title">' + FISH_HABNAME[fishHab()] + '</div><div class="fishmsg" id="fishMsg">' + (msg || 'Cast a line.') + '</div>' +
     '<div class="fishbar" id="fishBar" style="display:none"><div class="fzone" id="fishZone"></div><i id="fishMark"></i></div>' +
@@ -309,16 +309,45 @@ function fishSeaClose(){
    a bite (Fg.phase 'bite') makes it dip and splash; leap (a catch: the fish comes up out of the water in an arc and is held up, with its name and length); lost (a splash and a tail). */
 const FISH_ICON = {};
 function fishIcon(f){ let c = FISH_ICON[f.id]; if (!c){ c = document.createElement('canvas'); c.width = 84; c.height = 48; fishPaint(c, f, true); FISH_ICON[f.id] = c; } return c; }
-const FISH_ANIM = { cast: 0.55, leap: 2.3, lost: 0.9 };
+const FISH_ANIM = { cast: 0.95, leap: 2.3, lost: 0.9 };       /* a cast: she winds up (to 0.35 s), flicks the rod and lets go (0.4 s), and the float flies out (to 0.95 s) */
 function fishAnimOn(){ return Fg.phase !== 'idle' || (Fg.a && Fg.clock - Fg.a.t < FISH_ANIM[Fg.a.k]); }
+/* what she is doing with the rod, from the state of the game: back is how far it is swung back (1 at the top of a wind-up, below 0 in the flick forward), bend how much it bows */
+function fishPose(){
+  const a = Fg.a, now = Fg.clock, age = a ? now - a.t : 99; let back = 0, bend = 0.12;
+  if (a && a.k === 'cast' && age < FISH_ANIM.cast){
+    if (age < 0.35){ const w = age / 0.35; back = w * w * (3 - 2 * w); bend = 0.12 + 0.2 * w; }
+    else if (age < 0.5){ const w = (age - 0.35) / 0.15; back = 1 - 1.4 * w; bend = 0.7; }
+    else { const w = (age - 0.5) / 0.45; back = -0.4 * (1 - w * w * (3 - 2 * w)); bend = 0.3 * (1 - w) + 0.12; }
+  } else if (Fg.phase === 'bite'){ const bt = now - (Fg.biteAt || now); back = 0.1 + 0.1 * Math.sin(bt * 18); bend = 0.35 + 0.35 * Math.abs(Math.sin(bt * 9)); }
+  else if (a && a.k === 'leap' && age < FISH_ANIM.leap){ back = age < 1.0 ? 0.85 * Math.sin(age / 1.0 * Math.PI * 0.5) : 0.85 * (1 - clamp((age - 1.0) / 1.2, 0, 1)); bend = 0.65 * (1 - clamp((age - 1.0) / 1.2, 0, 1)) + 0.1; }
+  else if (a && a.k === 'lost' && age < FISH_ANIM.lost){ back = -0.3 * (1 - age / 0.5 > 0 ? 1 - age / 0.5 : 0); bend = 0.1; }
+  else if (Fg.phase === 'wait') bend = 0.14 + 0.03 * Math.sin(now * 2.6);
+  return { back: back, bend: bend };
+}
+/* which side of the boat she fishes over (the one away from the sidebar), as +1 (her right) or -1 (her left) */
+function fishSideSign(){
+  const nx = Math.cos(Sea.h + Math.PI / 2), ny = Math.sin(Sea.h + Math.PI / 2);
+  return (G.W < 700 ? ny > 0 : nx > 0) ? -1 : 1;
+}
+/* the rod at the pier, held out from her mouth: p.rodFrom is the mouth and p.rod the tip, p.bend how much it bows */
+function fishDrawRod(ctx, p){
+  if (!p.rodFrom) return;
+  const dx = p.rod[0] - p.rodFrom[0], dy = p.rod[1] - p.rodFrom[1], len = Math.sqrt(dx * dx + dy * dy) || 1; let nx = -dy / len, ny = dx / len; if (ny < 0){ nx = -nx; ny = -ny; }
+  const qx = (p.rod[0] + p.rodFrom[0]) / 2 + nx * (p.bend || 0) * len * 0.3, qy = (p.rod[1] + p.rodFrom[1]) / 2 + ny * (p.bend || 0) * len * 0.3;
+  ctx.save(); ctx.lineCap = 'round';
+  ctx.strokeStyle = '#6A4A2A'; ctx.lineWidth = 3.4 * p.k; ctx.beginPath(); ctx.moveTo(p.rodFrom[0], p.rodFrom[1]); ctx.quadraticCurveTo(qx, qy, p.rod[0], p.rod[1]); ctx.stroke();
+  ctx.strokeStyle = '#B8935A'; ctx.lineWidth = 1.6 * p.k; ctx.beginPath(); ctx.moveTo((p.rodFrom[0] + qx) / 2, (p.rodFrom[1] + qy) / 2); ctx.quadraticCurveTo((qx + p.rod[0]) / 2, (qy + p.rod[1]) / 2, p.rod[0], p.rod[1]); ctx.stroke();
+  ctx.fillStyle = '#3A3A44'; ctx.beginPath(); ctx.arc(p.rodFrom[0] + (qx - p.rodFrom[0]) * 0.3, p.rodFrom[1] + (qy - p.rodFrom[1]) * 0.3 + 4 * p.k, 4 * p.k, 0, TAU); ctx.fill();
+  ctx.restore();
+}
 /* one picture of the whole thing: p is { rod: [x, y] (where the line leaves the rod), rest: [x, y] (the float on the water), hold: [x, y] (where a caught fish is held up),
    k: pixels per unit (1 at the pier), flat: how flattened the rings are (a side view: 0.3, from above: 1), arc: how high a leap goes } */
 function fishDrawAnim(ctx, p){
-  if (!fishAnimOn()) return;
+  if (!fishAnimOn()){ if (Fg.rodOn) fishDrawRod(ctx, p); return; }
   const a = Fg.a, now = Fg.clock, k = p.k, lerp2 = function(u, v, e){ return [u[0] + (v[0] - u[0]) * e, u[1] + (v[1] - u[1]) * e]; };
   let fl = p.rest.slice(), taut = 0.6, floatOn = true, e;
   const age = a ? now - a.t : 99;
-  if (a && a.k === 'cast' && age < FISH_ANIM.cast){ e = age / FISH_ANIM.cast; fl = lerp2(p.rod, p.rest, e); fl[1] -= Math.sin(e * Math.PI) * 60 * k * p.arc; taut = 0.9; }
+  if (a && a.k === 'cast' && age < FISH_ANIM.cast){ e = clamp((age - 0.4) / 0.55, 0, 1); fl = lerp2(p.rod, p.rest, e); fl[1] -= Math.sin(e * Math.PI) * 60 * k * p.arc; taut = e > 0 ? 0.9 : 0.4; }
   else if (Fg.phase === 'bite'){ const bt = now - (Fg.biteAt || now); fl[1] += Math.sin(bt * 26) * 2.4 * k + Math.abs(Math.sin(bt * 5)) * 7 * k; fl[0] += Math.sin(bt * 17) * 3 * k; taut = 0.97; }
   else if (Fg.phase === 'wait'){ fl[1] += Math.sin(now * 2.6) * 1.8 * k; taut = 0.75; }
   else floatOn = false;
@@ -331,7 +360,7 @@ function fishDrawAnim(ctx, p){
     ctx.globalAlpha = 1;
   }
   /* the rod and the line: it hangs a little when slack and is straight when a fish pulls */
-  if (p.rodFrom){ ctx.strokeStyle = '#6A4A2A'; ctx.lineWidth = 3 * k; ctx.beginPath(); ctx.moveTo(p.rodFrom[0], p.rodFrom[1]); ctx.lineTo(p.rod[0], p.rod[1]); ctx.stroke(); }
+  fishDrawRod(ctx, p);
   const held = a && a.k === 'leap' && age > 1.0, tip = held ? p.hold : fl;
   if (floatOn || held || (a && a.k === 'leap') || (a && a.k === 'lost')){
     const mx = (p.rod[0] + tip[0]) / 2, my = (p.rod[1] + tip[1]) / 2 + (1 - taut) * 46 * k * p.arc;
@@ -371,20 +400,22 @@ function fishDrawAnim(ctx, p){
   ctx.restore();
 }
 function fishPierGeo(){
-  const f = Town.face < 0 ? -1 : 1, x = Town.x;
-  return { rodFrom: [x + f * 46, TG - 146], rod: [x + f * 104, TG - 204], rest: [x + f * 168, TG - 30], hold: [x + f * 112, TG - 170], k: 1.15, flat: 0.28, arc: 1, dir: f };
+  const f = Town.face < 0 ? -1 : 1, x = Town.x, q = fishPose(), from = [x + f * 46, TG - 146], th = -f * q.back * 0.9, c = Math.cos(th), sn = Math.sin(th);
+  const vx = f * 58, vy = -58, rod = [from[0] + vx * c - vy * sn, from[1] + vx * sn + vy * c];
+  return { rodFrom: from, rod: rod, rest: [x + f * 168, TG - 30], hold: [rod[0], rod[1] + 46], k: 1.15, flat: 0.28, arc: 1, dir: f, bend: q.bend };
 }
 function fishSeaGeo(){
-  const W = G.W, H = G.H, z = clamp(H / 520, 0.8, 1.7), cx = W / 2, cy = H / 2, narrow = W < 700;
-  let nx = Math.cos(Sea.h + Math.PI / 2), ny = Math.sin(Sea.h + Math.PI / 2);
-  if (narrow ? ny > 0 : nx > 0){ nx = -nx; ny = -ny; }                      /* the side away from the sidebar */
-  return { rodFrom: null, rod: [cx + nx * 26 * z, cy + ny * 26 * z], rest: [cx + nx * 120 * z, cy + ny * 120 * z], hold: [cx + nx * 34 * z, cy + ny * 34 * z], k: z, flat: 1, arc: 0.7, dir: nx < 0 ? -1 : 1 };
+  const W = G.W, H = G.H, z = clamp(H / 520, 0.8, 1.7), cx = W / 2, cy = H / 2, s = fishSideSign();
+  const nx = s * Math.cos(Sea.h + Math.PI / 2), ny = s * Math.sin(Sea.h + Math.PI / 2);
+  const rod = (Fg.rodU > 0 && seaRiderTip) ? seaRiderTip.slice() : [cx + nx * 26 * z, cy + ny * 26 * z];     /* the end of the rod she holds (drawn with the boat) */
+  return { rodFrom: null, rod: rod, rest: [cx + nx * 120 * z, cy + ny * 120 * z], hold: [rod[0] + nx * 22 * z, rod[1] + ny * 22 * z], k: z, flat: 1, arc: 0.7, dir: nx < 0 ? -1 : 1 };
 }
 (function(){
   const dyn = townDynamic;
   townDynamic = function(ctx, D, t, dark){
     dyn.apply(this, arguments);
-    if (!Fg.sea && D.id === 'harbour' && Town.on && fishAnimOn()) fishDrawAnim(ctx, fishPierGeo());
+    if (!Town.panel) Fg.rodOn = false;
+    if (!Fg.sea && D.id === 'harbour' && Town.on && (fishAnimOn() || Fg.rodOn)) fishDrawAnim(ctx, fishPierGeo());
   };
   const rn = render;
   render = function(){
@@ -392,7 +423,20 @@ function fishSeaGeo(){
     return rn.apply(this, arguments);
   };
   const st = step;
-  step = function(dt){ Fg.clock += Math.min(dt, 0.1); return st(dt); };
+  step = function(dt){
+    Fg.clock += Math.min(dt, 0.1);
+    const up = Fg.sea && G.state === 'fishing'; Fg.rodU = clamp(Fg.rodU + (up ? Math.min(dt, 0.1) / 0.4 : -Math.min(dt, 0.1) / 0.3), 0, 1);
+    return st(dt);
+  };
+  /* from a boat she holds the rod in her mouth and swings her neck to cast over the side */
+  const srp = seaRiderPose;
+  seaRiderPose = function(t){
+    const p = srp(t), u = Fg.rodU; if (!(u > 0.001)) return p;
+    const e = u * u * (3 - 2 * u), s = fishSideSign(), q = fishPose();
+    p.a = p.a * (1 - e) + s * (1.1 + 0.7 * q.back + 0.05 * Math.sin(t * 1.3)) * e; p.L += 2 * e;
+    p.rod = { len: 46 * e, da: -s * 0.55 + s * 1.3 * q.back, bend: q.bend, s: s };
+    return p;
+  };
   const dh = townDynamic && typeof townDialogHeight === 'function' ? townDialogHeight : null;
   if (dh) townDialogHeight = function(){ return Town.panel && Fg.side && G.W < 700 ? Math.round(G.H * 0.44) : dh.apply(this, arguments); };
 })();

@@ -97,6 +97,12 @@
     out.btn = document.getElementById('castBtn') && document.getElementById('castBtn').style.display === 'flex';
     key('KeyF'); out.seaSide = OV.classList.contains('side'); out.opened = G.state === 'fishing' && /OUT AT SEA/.test(OV.innerHTML) && /Back to the boat/.test(OV.innerHTML) && Fg.sea === true;
     GR.render(); out.rendersSea = true;
+    /* she holds the rod and her neck moves: the line starts at the end of the rod, and the rod swings back and flicks forward on a cast */
+    Fg.rodU = 0; out.neckMoves = Math.abs(seaRiderPose(0.5).a - seaRiderPose(3.1).a) > 0.1 && seaRiderPose(1).rod === null;
+    Fg.rodU = 1; Fg.phase = 'idle'; Fg.a = { k: 'cast', t: Fg.clock - 0.3 }; GR.render(); var tipWind = seaRiderTip.slice();
+    Fg.a = { k: 'cast', t: Fg.clock - 0.8 }; GR.render(); var tipSet = seaRiderTip.slice(); var geo = fishSeaGeo();
+    out.rodSwings = Math.abs(tipWind[0] - tipSet[0]) + Math.abs(tipWind[1] - tipSet[1]) > 20 && geo.rod[0] === tipSet[0] && geo.rod[1] === tipSet[1];
+    out.rodPose = seaRiderPose(1).rod && seaRiderPose(1).rod.len > 40; Fg.a = null;
     cast(); fishDrawAnim(CTX, fishSeaGeo()); out.seaAnim = fishAnimOn() && Fg.phase === 'bite'; Fg.pos = Fg.zone + Fg.w / 2; fishReel(); Fg.a.t = Fg.clock - 0.5; GR.render(); out.seaLeapDraws = pixels(fishSeaGeo()) > 300;
     var before = fishLog(); var keep = {}; Object.keys(before).forEach(function(k){ keep[k] = before[k]; });
     cast(); Fg.pos = Fg.zone + Fg.w / 2; fishReel(); out.seaCatch = Object.keys(fishLog()).some(function(k){ return fishLog()[k] !== keep[k]; }) && townData().n.seaCasts >= 1;
@@ -140,7 +146,7 @@
     var tt = townData(); FISH.forEach(function(f){ tt.fish = tt.fish || {}; tt.fish[f.id] = 1; }); tt.fishBook = { oarfish: 400 }; tt.n.fishOrders = 3; tt.n.seaCasts = 2;
     out.achEarn = A.every(function(a){ return a.val() >= a.goal; });
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['scalesRaw', 'scaleRates', 'scaleCatch', 'benchEmpty', 'benchLocked', 'benchBuys', 'benchMax', 'benchRows', 'shopDoor', 'shopLocked', 'shopRefuses', 'shopTakes', 'shopLine', 'shopSwap', 'shopBait', 'shopRoom', 'shopPaints', 'list', 'groups', 'rarities', 'pierOnly', 'shallows', 'reef', 'deep', 'water', 'noWeatherFish', 'storm', 'fog', 'bait', 'picks', 'panel', 'side', 'clock', 'animBite', 'leap', 'leapDraws', 'leapEnds', 'lostAnim', 'lostDraws', 'bite', 'won', 'bite2', 'missed', 'bite3', 'timeout', 'record', 'noRodYet', 'stillPlain', 'newTackle', 'rodWider', 'lineNeed', 'longerBite', 'stillBiting', 'timedOut', 'lockedLine', 'lockedBait', 'shrimp', 'deepReelNeed', 'noGlowYet', 'glow', 'all', 'deepReel', 'cycles', 'cyclesBack', 'bookTackle', 'order', 'orderPaid', 'orderOnce', 'book', 'paints', 'bookNew', 'bookBack', 'refusedMoving', 'btn', 'opened', 'seaSide', 'seaAnim', 'seaLeapDraws', 'rendersSea', 'seaCatch', 'closed', 'achs', 'achEarn'];
+  var need = ['neckMoves', 'rodSwings', 'rodPose', 'scalesRaw', 'scaleRates', 'scaleCatch', 'benchEmpty', 'benchLocked', 'benchBuys', 'benchMax', 'benchRows', 'shopDoor', 'shopLocked', 'shopRefuses', 'shopTakes', 'shopLine', 'shopSwap', 'shopBait', 'shopRoom', 'shopPaints', 'list', 'groups', 'rarities', 'pierOnly', 'shallows', 'reef', 'deep', 'water', 'noWeatherFish', 'storm', 'fog', 'bait', 'picks', 'panel', 'side', 'clock', 'animBite', 'leap', 'leapDraws', 'leapEnds', 'lostAnim', 'lostDraws', 'bite', 'won', 'bite2', 'missed', 'bite3', 'timeout', 'record', 'noRodYet', 'stillPlain', 'newTackle', 'rodWider', 'lineNeed', 'longerBite', 'stillBiting', 'timedOut', 'lockedLine', 'lockedBait', 'shrimp', 'deepReelNeed', 'noGlowYet', 'glow', 'all', 'deepReel', 'cycles', 'cyclesBack', 'bookTackle', 'order', 'orderPaid', 'orderOnce', 'book', 'paints', 'bookNew', 'bookBack', 'refusedMoving', 'btn', 'opened', 'seaSide', 'seaAnim', 'seaLeapDraws', 'rendersSea', 'seaCatch', 'closed', 'achs', 'achEarn'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);
