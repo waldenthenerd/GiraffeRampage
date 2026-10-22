@@ -106,6 +106,19 @@
     if (sp.deep){ Sea.x = sp.deep.x; Sea.y = sp.deep.y; out.habDeep = fishHab() === 'deep'; }
     Fg.sea = false; Sea.on = false; G.state = 'menu';
 
+    /* the tackle shop: a door on the shack, three stations, and taking a piece puts it on */
+    var shack = TOWN_DIST.harbour.b.filter(function(b){ return b.id === 'shack'; })[0];
+    out.shopDoor = !!shack && shack.to === 'in_tackle' && !!TOWN_DIST.in_tackle && TOWN_ROOM_PARENT.in_tackle === 'harbour' && TOWN_DIST.in_tackle.b.filter(function(b){ return /^tk-/.test(b.act); }).length === 3;
+    var ts = freshSave(); Save.data = ts; log = fishLog(); setKinds(12);
+    townShowTackle('rod'); out.shopLocked = /Golden rod/.test(OV.innerHTML) && /more kinds/.test(OV.innerHTML) && !/data-a="tk-take-rod-2"/.test(OV.innerHTML) && /data-a="tk-take-rod-1"/.test(OV.innerHTML);
+    handleAction('tk-take-rod-2'); out.shopRefuses = fishTackle().k.rod !== 2;
+    handleAction('tk-take-rod-1'); out.shopTakes = fishTackle().k.rod === 1 && /In use/.test(OV.innerHTML);
+    handleAction('tk-take-line-1'); townShowTackle('line'); out.shopLine = fishTackle().k.line === 1;
+    handleAction('tk-take-rod-0'); out.shopSwap = fishTackle().k.rod === 0;
+    townShowTackle('bait'); out.shopBait = /Shrimp/.test(OV.innerHTML) && /Glow lure/.test(OV.innerHTML) && /16 more kinds/.test(OV.innerHTML);
+    hideOverlay(); Town.panel = false;
+    townGo('in_tackle', 190, 1); out.shopRoom = Town.d === 'in_tackle'; GR.step(1 / 60); GR.render(); out.shopPaints = true;
+
     /* trophies, and a save that has never fished is not touched by looking */
     var fresh = freshSave(); var keysBefore = JSON.stringify(Object.keys(fresh));
     Save.data = fresh; var A = ['fish20', 'fish35', 'fishBig', 'fishLeg', 'fishOrd3', 'seaCast'].map(function(id){ return ACH.filter(function(a){ return a.id === id; })[0]; });
@@ -113,7 +126,7 @@
     var tt = townData(); FISH.forEach(function(f){ tt.fish = tt.fish || {}; tt.fish[f.id] = 1; }); tt.fishBook = { oarfish: 400 }; tt.n.fishOrders = 3; tt.n.seaCasts = 2;
     out.achEarn = A.every(function(a){ return a.val() >= a.goal; });
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['list', 'groups', 'rarities', 'pierOnly', 'shallows', 'reef', 'deep', 'water', 'noWeatherFish', 'storm', 'fog', 'bait', 'picks', 'panel', 'side', 'clock', 'animBite', 'leap', 'leapDraws', 'leapEnds', 'lostAnim', 'lostDraws', 'bite', 'won', 'bite2', 'missed', 'bite3', 'timeout', 'record', 'noRodYet', 'stillPlain', 'newTackle', 'rodWider', 'lineNeed', 'longerBite', 'stillBiting', 'timedOut', 'lockedLine', 'lockedBait', 'shrimp', 'deepReelNeed', 'noGlowYet', 'glow', 'all', 'deepReel', 'cycles', 'cyclesBack', 'bookTackle', 'order', 'orderPaid', 'orderOnce', 'book', 'paints', 'bookNew', 'bookBack', 'refusedMoving', 'btn', 'opened', 'seaSide', 'seaAnim', 'seaLeapDraws', 'rendersSea', 'seaCatch', 'closed', 'achs', 'achEarn'];
+  var need = ['shopDoor', 'shopLocked', 'shopRefuses', 'shopTakes', 'shopLine', 'shopSwap', 'shopBait', 'shopRoom', 'shopPaints', 'list', 'groups', 'rarities', 'pierOnly', 'shallows', 'reef', 'deep', 'water', 'noWeatherFish', 'storm', 'fog', 'bait', 'picks', 'panel', 'side', 'clock', 'animBite', 'leap', 'leapDraws', 'leapEnds', 'lostAnim', 'lostDraws', 'bite', 'won', 'bite2', 'missed', 'bite3', 'timeout', 'record', 'noRodYet', 'stillPlain', 'newTackle', 'rodWider', 'lineNeed', 'longerBite', 'stillBiting', 'timedOut', 'lockedLine', 'lockedBait', 'shrimp', 'deepReelNeed', 'noGlowYet', 'glow', 'all', 'deepReel', 'cycles', 'cyclesBack', 'bookTackle', 'order', 'orderPaid', 'orderOnce', 'book', 'paints', 'bookNew', 'bookBack', 'refusedMoving', 'btn', 'opened', 'seaSide', 'seaAnim', 'seaLeapDraws', 'rendersSea', 'seaCatch', 'closed', 'achs', 'achEarn'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);

@@ -66,7 +66,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (163 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (164 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -229,10 +229,11 @@ game. This is the complete list for this version (163 scripts; the developer pan
 | 157 | `js/44zzs-perf-cache.js` | Cheaper drawing for slow devices: a cache of pre-drawn soft shadows (`ShadowCache`, replaces `softShadow`) and a cheaper rim round the giraffe once the slow-device governor has stepped down. Changes nothing visible. Load it after `js/44zzr-engineer-ants.js` and before `js/45-test-exports.js`. |
 | 158 | `js/44zzt-together.js` | Play together: two giraffes on one screen, just for fun, keeping nothing (the real save is put aside for the game and comes back untouched; `Save.write` does nothing meanwhile). Arena fight and a kick-about yard, started from a button on the main menu. Wraps `update`, `updatePlayer`, `updateWaves`, `gainXP`, `gameOver`, `doKick`, `hurtPlayer`, `antAggroTarget`, `drawPlayer`, `showPause`, `showMenu` and `handleAction`. Must load after `js/44zzs-perf-cache.js` and before `js/44zzu-achievements.js`. |
 | 159 | `js/44zzv-fishing.js` | Fishing, grown: 35 kinds in a Fish book, sizes, tackle unlocked free by the number of kinds caught, Brine's weekly order, and casting from a boat at sea (F or a Cast button; `G.state` `fishing`). Rebuilds the pier game of `js/44zg-town-activities.js` and extends its `FISH` table. Saves in `Save.data.town` (`fish`, `fishBook`, `tackle`, `fishOrder`). Must load after `js/44zzu-achievements.js` (it adds trophies). |
-| 160 | `js/44zzu-achievements.js` | Trophies: 80 goals worked out from the save, a few gems each, once; `Save.data.ach = { done: { id: time } }`; a "Trophies" button on the main menu. Wraps `Save.write`, `showMenu` and `handleAction`. Counts nothing while `js/44zzt-together.js` is running. |
-| 161 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
-| 162 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
-| 163 | `js/46-main.js` | Starts the game. |
+| 160 | `js/44zzw-tackle-shop.js` | The Bait & Tackle shack gets an inside: a rod rack, a line wall and a bait tank, each a page listing every piece of tackle and letting her take the ones she has unlocked (still free, by kinds caught). |
+| 161 | `js/44zzu-achievements.js` | Trophies: 80 goals worked out from the save, a few gems each, once; `Save.data.ach = { done: { id: time } }`; a "Trophies" button on the main menu. Wraps `Save.write`, `showMenu` and `handleAction`. Counts nothing while `js/44zzt-together.js` is running. |
+| 162 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
+| 163 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| 164 | `js/46-main.js` | Starts the game. |
 
 CSS, in the order `index.html` links it: `css/style.css` (all the base styles), `css/polish.css` (layered on top: cards, buttons, HUD, menu, and every screen
 added later: minigames, the album book, the guide, photo studio, collection, wide panels on big screens), `css/campus.css` (the university), `css/townlife.css` (Longneck Town panels),

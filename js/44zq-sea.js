@@ -221,7 +221,7 @@ function seaDrawTerrain(ctx, W, H, z, camX, camY, t, weather){
 }
 function seaWorldToScreen(wx, wy, W, H, z, camX, camY){ return { x: (wx - camX) * z + W / 2, y: (wy - camY) * z + H / 2 }; }
 function seaDrawBoat(ctx, x, y, ang, kind, t, scale, wob){
-  const B = BOAT_BY_ID[kind] || BOATS[0], s = scale || 1, cl = typeof giraffeColours === 'function' ? giraffeColours() : { coat: '#E8B648', spot: '#8A5A24' };
+  const B = BOAT_BY_ID[kind] || BOATS[0], s = scale || 1;
   ctx.save(); ctx.translate(x, y); ctx.rotate(ang + (wob || 0)); ctx.scale(s, s);
   ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.beginPath(); ctx.ellipse(3, 4, 34, 15, 0, 0, TAU); ctx.fill();
   switch (kind){
@@ -243,7 +243,11 @@ function seaDrawBoat(ctx, x, y, ang, kind, t, scale, wob){
       ctx.fillStyle = '#8A5A32'; ctx.fillRect(-18, -12, 4, 24); ctx.fillRect(2, -12, 4, 24);
       ctx.strokeStyle = '#6A4A28'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(-8, -10); ctx.lineTo(-24, -26 + Math.sin(t * 4) * 3); ctx.moveTo(-8, 10); ctx.lineTo(-24, 26 - Math.sin(t * 4) * 3); ctx.stroke();
   }
-  /* her, from above: a tail, the body with spots, the long neck lying forward over the bow with a mane down it, and a head with ears, two horn knobs, eyes and a muzzle */
+  ctx.restore();
+}
+/* her, from above (drawn by the caller after the boat's fittings, in the boat's own space, so no rail or seat crosses her): a tail, the body with spots, the long neck lying forward over the bow with a mane down it, and a head with ears, two horn knobs, eyes and a muzzle */
+function seaDrawRider(ctx){
+  const cl = typeof giraffeColours === 'function' ? giraffeColours() : { coat: '#E8B648', spot: '#8A5A24' };
   const dk = cl.dark || cl.spot;
   ctx.strokeStyle = dk; ctx.lineWidth = 1.8; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-16, 0); ctx.quadraticCurveTo(-21, 3, -23, 6); ctx.stroke(); ctx.fillStyle = cl.spot; ctx.beginPath(); ctx.arc(-23, 6.4, 1.7, 0, TAU); ctx.fill();
   ctx.fillStyle = cl.coat; ctx.strokeStyle = 'rgba(58,34,10,.7)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(-5, 0, 12.5, 8.6, 0, 0, TAU); ctx.fill(); ctx.stroke();
@@ -258,7 +262,6 @@ function seaDrawBoat(ctx, x, y, ang, kind, t, scale, wob){
   ctx.fillStyle = dk; ctx.beginPath(); ctx.arc(26.6, -2.3, 2, 0, TAU); ctx.arc(26.6, 2.3, 2, 0, TAU); ctx.fill(); ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.arc(26.6, -2.3, 1.1, 0, TAU); ctx.arc(26.6, 2.3, 1.1, 0, TAU); ctx.fill();
   ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); ctx.arc(31, -4.3, 2, 0, TAU); ctx.arc(31, 4.3, 2, 0, TAU); ctx.fill();
   ctx.fillStyle = '#1A1208'; ctx.beginPath(); ctx.arc(31.6, -4.4, 1.05, 0, TAU); ctx.arc(31.6, 4.4, 1.05, 0, TAU); ctx.fill();
-  ctx.restore();
 }
 function seaDrawFeatures(ctx, W, H, z, camX, camY, t){
   const sc = function(wx, wy){ return seaWorldToScreen(wx, wy, W, H, z, camX, camY); }, vw = W / z / 2 + 160, vh = H / z / 2 + 160;
