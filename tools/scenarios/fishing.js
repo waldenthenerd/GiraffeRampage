@@ -126,10 +126,10 @@
     Town.d = 'harbour'; townShowFishing(); cast('sardine'); Fg.pos = Fg.zone + Fg.w / 2; fishReel(); out.scaleCatch = fishScaleN() >= 1 && /scale/.test(document.getElementById('fishMsg').textContent);
     var gid = Object.keys(GEAR_INDEX).filter(function(i){ return GEAR_INDEX[i].name !== 'Bare Hooves'; })[0];
     townShowBench(); out.benchEmpty = /No gear yet/.test(OV.innerHTML);
-    Save.data.gear = Save.data.gear || {}; Save.data.gear[gid] = 1; townData().scales = 10; townShowBench();
-    out.benchLocked = /disabled/.test(OV.innerHTML) && benchUp(gid) === false && gearLevel(gid) === 1 && fishScaleN() === 10;
-    townData().scales = 20; out.benchBuys = benchUp(gid) === true && gearLevel(gid) === 2 && fishScaleN() === 0;
-    townData().scales = 500; benchUp(gid); benchUp(gid); benchUp(gid); out.benchMax = gearLevel(gid) === GEAR_LV_MAX && fishScaleN() === 500 - 45 - 80 - 130 && benchUp(gid) === false;
+    Save.data.gear = Save.data.gear || {}; Save.data.gear[gid] = 1; townData().scales = 5; townShowBench();
+    out.benchLocked = /disabled/.test(OV.innerHTML) && benchUp(gid) === false && gearLevel(gid) === 1 && fishScaleN() === 5;
+    townData().scales = 10; out.benchBuys = benchUp(gid) === true && gearLevel(gid) === 2 && fishScaleN() === 0;
+    townData().scales = 500; benchUp(gid); benchUp(gid); benchUp(gid); out.benchMax = gearLevel(gid) === GEAR_LV_MAX && fishScaleN() === 500 - 22 - 40 - 65 && benchUp(gid) === false;
     out.benchRows = /as good as it gets/.test((townShowBench(), OV.innerHTML));
     hideOverlay(); Town.panel = false;
 

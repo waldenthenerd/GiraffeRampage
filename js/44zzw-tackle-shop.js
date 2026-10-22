@@ -7,7 +7,7 @@
    Nothing is bought: tackle is free and unlocked by the number of kinds caught (js/44zzv-fishing.js).
    The gear bench is the fourth station: the fish scales every catch leaves (town.scales; 1, 2, 5 or 12 by rarity) pay for gear levels. A piece she owns
    goes up one level (the same level a duplicate from a crate gives, up to 5) for BENCH_COST[level - 1] scales: the way to level gear that fishing, not luck, decides. */
-const BENCH_COST = [20, 45, 80, 130];
+const BENCH_COST = [10, 22, 40, 65];
 TOWN_ROOM.tackle = { wall: '#DCE4E0', wains: '#4A6A5A', stripe: 'rgba(60,110,90,.1)', floor: '#8A7048', beam: '#4A3A28' };
 const TK_STATIONS = {
   rod:  { act: 'tk-rod', list: FISH_RODS, title: 'THE ROD RACK', blurb: 'A longer, springier rod makes the sweet spot on the reeling bar bigger, so a bite is easier to land.',
