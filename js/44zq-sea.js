@@ -245,23 +245,29 @@ function seaDrawBoat(ctx, x, y, ang, kind, t, scale, wob){
   }
   ctx.restore();
 }
-/* her, from above (drawn by the caller after the boat's fittings, in the boat's own space, so no rail or seat crosses her): a tail, the body with spots, the long neck lying forward over the bow with a mane down it, and a head with ears, two horn knobs, eyes and a muzzle */
+/* her, from above (drawn by the caller after the boat's fittings, in the boat's own space, so no rail or seat crosses her), in the same style as the giraffe on land
+   (js/33-giraffe-art.js): her chosen coat, spot colour and pattern, no outline, the same head (a coat head, a dark muzzle, ossicones with knobs, ears) and small dark eyes */
 function seaDrawRider(ctx){
-  const cl = typeof giraffeColours === 'function' ? giraffeColours() : { coat: '#E8B648', spot: '#8A5A24' };
-  const dk = cl.dark || cl.spot;
-  ctx.strokeStyle = dk; ctx.lineWidth = 1.8; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-16, 0); ctx.quadraticCurveTo(-21, 3, -23, 6); ctx.stroke(); ctx.fillStyle = cl.spot; ctx.beginPath(); ctx.arc(-23, 6.4, 1.7, 0, TAU); ctx.fill();
-  ctx.fillStyle = cl.coat; ctx.strokeStyle = 'rgba(58,34,10,.7)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(-5, 0, 12.5, 8.6, 0, 0, TAU); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(4, -3.6); ctx.lineTo(24, -2.3); ctx.lineTo(24, 2.3); ctx.lineTo(4, 3.6); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = cl.spot; ctx.beginPath(); ctx.arc(-9, -2.6, 2.7, 0, TAU); ctx.arc(-2, 3, 2.4, 0, TAU); ctx.arc(-11, 3.6, 1.8, 0, TAU); ctx.arc(2, -3.4, 1.7, 0, TAU); ctx.arc(10, 1, 1.5, 0, TAU); ctx.arc(17, -0.8, 1.3, 0, TAU); ctx.fill();
-  ctx.strokeStyle = dk; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(25, 0); ctx.stroke();
-  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(24.5, -6.6, 3.4, 1.7, -0.5, 0, TAU); ctx.ellipse(24.5, 6.6, 3.4, 1.7, 0.5, 0, TAU); ctx.fill();
-  ctx.fillStyle = '#E8A8A0'; ctx.beginPath(); ctx.ellipse(24.5, -6.6, 1.9, 0.9, -0.5, 0, TAU); ctx.ellipse(24.5, 6.6, 1.9, 0.9, 0.5, 0, TAU); ctx.fill();
-  ctx.fillStyle = cl.coat; ctx.strokeStyle = 'rgba(58,34,10,.7)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(29, 0, 9, 6.6, 0, 0, TAU); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#F0DDB4'; ctx.beginPath(); ctx.ellipse(35, 0, 5.2, 4.2, 0, 0, TAU); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.arc(37.4, -1.6, 0.9, 0, TAU); ctx.arc(37.4, 1.6, 0.9, 0, TAU); ctx.fill();
-  ctx.fillStyle = dk; ctx.beginPath(); ctx.arc(26.6, -2.3, 2, 0, TAU); ctx.arc(26.6, 2.3, 2, 0, TAU); ctx.fill(); ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.arc(26.6, -2.3, 1.1, 0, TAU); ctx.arc(26.6, 2.3, 1.1, 0, TAU); ctx.fill();
-  ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); ctx.arc(31, -4.3, 2, 0, TAU); ctx.arc(31, 4.3, 2, 0, TAU); ctx.fill();
-  ctx.fillStyle = '#1A1208'; ctx.beginPath(); ctx.arc(31.6, -4.4, 1.05, 0, TAU); ctx.arc(31.6, 4.4, 1.05, 0, TAU); ctx.fill();
+  const cl = typeof giraffeColours === 'function' ? giraffeColours() : { coat: '#D6A44F', spot: '#8A5A24', dark: '#A8762F' };
+  const dark = cl.dark || cl.spot, pat = typeof giraffePattern === 'function' ? giraffePattern() : 0;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = dark; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-16, 0); ctx.quadraticCurveTo(-21, 3, -23, 6); ctx.stroke(); ctx.fillStyle = cl.spot; ctx.beginPath(); ctx.arc(-23, 6.4, 1.8, 0, TAU); ctx.fill();
+  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(-5, 0, 12.5, 8.6, 0, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(4, -3.6); ctx.lineTo(24, -2.6); ctx.lineTo(24, 2.6); ctx.lineTo(4, 3.6); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = cl.spot;
+  [[-9, -2.8, 2.9, 2.3], [-2, 3, 2.6, 2.1], [-11, 3.8, 2, 1.7], [2, -3.2, 1.8, 1.5]].forEach(function(q){ if (typeof wardSpot === 'function') wardSpot(ctx, pat, q[0], q[1], q[2], q[3], 0); else { ctx.beginPath(); ctx.ellipse(q[0], q[1], q[2], q[3], 0, 0, TAU); ctx.fill(); } });
+  ctx.beginPath(); ctx.arc(10, 0.8, 1.5, 0, TAU); ctx.arc(17, -0.8, 1.3, 0, TAU); ctx.fill();
+  ctx.strokeStyle = dark; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(24, 0); ctx.stroke();
+  /* the head, as drawn on land, a little larger */
+  ctx.save(); ctx.translate(27, 0); ctx.scale(1.25, 1.25);
+  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(2, 0, 11, 7.6, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = dark; ctx.beginPath(); ctx.ellipse(10, 0, 5.4, 4.4, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#2B1D12'; ctx.beginPath(); ctx.arc(13, -1.8, 1.1, 0, TAU); ctx.arc(13, 1.8, 1.1, 0, TAU); ctx.fill();
+  ctx.strokeStyle = dark; ctx.lineWidth = 2.6; ctx.beginPath(); ctx.moveTo(-3, -4.6); ctx.lineTo(-6, -8.6); ctx.moveTo(-3, 4.6); ctx.lineTo(-6, 8.6); ctx.stroke();
+  ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.arc(-6.4, -9, 2.3, 0, TAU); ctx.arc(-6.4, 9, 2.3, 0, TAU); ctx.fill();
+  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(-6, -7.5, 4.4, 2.3, -0.7, 0, TAU); ctx.ellipse(-6, 7.5, 4.4, 2.3, 0.7, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#2B1D12'; ctx.beginPath(); ctx.arc(5.2, -4.6, 1.3, 0, TAU); ctx.arc(5.2, 4.6, 1.3, 0, TAU); ctx.fill();
+  ctx.restore();
 }
 function seaDrawFeatures(ctx, W, H, z, camX, camY, t){
   const sc = function(wx, wy){ return seaWorldToScreen(wx, wy, W, H, z, camX, camY); }, vw = W / z / 2 + 160, vh = H / z / 2 + 160;

@@ -40,12 +40,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 164 | 53,593 | 4.02 MiB (4,210,744 bytes) |
+| JavaScript (`js/`) | 164 | 53,599 | 4.02 MiB (4,210,771 bytes) |
 | Styles (`css/`) | 6 | 1,691 | 156 KiB (159,462 bytes) |
 | Page (`index.html`) | 1 | 212 | 9.1 KiB (9,300 bytes) |
-| **Whole game** | **171** | **55,496** | **4.18 MiB (4,379,506 bytes)** |
+| **Whole game** | **171** | **55,502** | **4.18 MiB (4,379,533 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **54,926 lines, 4.13 MiB (4,335,800 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **54,932 lines, 4.13 MiB (4,335,827 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
 ## How the files fit together
 
@@ -186,7 +186,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zn-savanna-flight.js` | 272 | The flight covers only Longneck Town and the Savannah (plus the Changed Savannah after Chapter 10): `flyRegions` override, `szBuildHerd` / `szDrawAnimal` (Bestiary creatures walking about), `szLandmark` / `szSmall`, rivers in the ground, and a map HUD. Wraps `flyFeatures`, `flyGroundDetail`, `flyTakeoff`, `renderFly`. |
 | `js/44zo-town-farm.js` | 476 | Hayfield Village: the farm region and dirt strip with hay-bale stop (`flyRegions`, `flyOnRunway`, `updateFly`, `flyLand`, `flyCrash`, `flyPlane`, `renderFly` wrapped), district `farm` (not in `TOWN_IDS`), Hollis and Marge, corn (`Corn`, V key, +15% speed 60 s / 60 s cooldown via `townCarRunMul`), cargo (`FARM_JOBS`, `farmDeliver`), daily eggs, two hats. Save: `town.farm`. |
 | `js/44zp-tram-ride.js` | 136 | The tram ride picture (`townDrawRide`, replacing 44zc's): carriage interior, route map, rail and straps, window scenery in four layers blending the two streets' colours, passengers; 3.4 s. |
-| `js/44zq-sea.js` | 719 | Boats and the sea: `BOATS`, Saltwind Boats and the mooring in the Harbour, `G.state === 'sail'` (`updateSea` / `renderSea`: top-down noise-field sea of islands, shallows, reefs, rocks, weather, loot, shoals, docks), the persistent sea chart (`seaMapSave`, `town.sea.map`), district `isle` (Driftwood Cove: Brine's fish, Pearl's crab, two hats), and fish / crab run items (G and H). |
+| `js/44zq-sea.js` | 725 | Boats and the sea: `BOATS`, Saltwind Boats and the mooring in the Harbour, `G.state === 'sail'` (`updateSea` / `renderSea`: top-down noise-field sea of islands, shallows, reefs, rocks, weather, loot, shoals, docks), the persistent sea chart (`seaMapSave`, `town.sea.map`), district `isle` (Driftwood Cove: Brine's fish, Pearl's crab, two hats), and fish / crab run items (G and H). |
 | `js/44zr-interiors-farm-isle.js` | 314 | Eight interiors (corn stand, barn, hen coop, farmhouse, cottage, fish stall, crab shack, lighthouse) for Hayfield Village and Driftwood Cove (`townRoomDef`, `FR_KINDS`, `FR_PROPS`, `IV_ROOMS` entries), the lighthouse climb that fills the sea chart (`seaRevealAround`), and carrying upgrades `CARRY_UP` (corn basket, fish cooler, crab pot: two levels each, +5 per level, 60k to 190k gold; `cornCap()`, `seaCap(k)`). Needs 44zk (IV_ROOMS, ivShadow...) loaded first: the script order in index.html is now 44zj, zk, zl, zm, zn, zo, zp, zq, zr. |
 | `js/44zs-explore-rewards.js` | 176 | Explorer's finds: 4 hats, 4 boots and 6 colours (WARD 36 to 41, `WARD_MAX` now 41) hidden in the air (gift balloons, `AIR_FINDS`), at sea (islet chests, `SEA_FINDS`, gold stars on the sea chart) and in the two villages (`TOWN_ITEMS` with `d` farm / isle). `TOWN_SPECIAL_SRC` tells the Gear page where the air and sea ones are. |
 | `js/44zt-sea-deep.js` | 213 | The Deep: the sea has no wall. The water deepens toward every edge (`seaDeepF`, `seaLevel` and the colour table in `44zq-sea.js`; the last 300 units slip under too, so the map ends in open water everywhere), past the edge is open water, and the deep has sharks that stalk, lunge and bite. One bite destroys the boat and plays a cutscene (shark breaches, planks scatter, life ring, a rescue boat tows her home; repair costs 5% of the boat's price, the boat is kept). Sharks only live in deep water. Wraps `updateSea`, `seaDrawFeatures`, `seaDrawBoat`, `renderSea`, `seaMapColour`, `seaStart`. |
