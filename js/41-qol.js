@@ -182,6 +182,8 @@ function showSettings(){
         sliderRowHTML('setFlash', 'Hit flash', 'How white enemies flash when struck.', pct(s.hitFlash)) +
         toggleRowHTML('s-calm', 'Reduce flashes', 'Softens full-screen flashes, lightning and bright bursts.', !!s.calmFlash) +
         toggleRowHTML('s-text', 'Text size', 'Makes menus and the HUD larger.', (s.textScale | 0) > 0, ['Normal', 'Large', 'Larger'][s.textScale | 0], 'Normal') +
+        '<div class="sub" style="margin:14px 0 2px;font-weight:700;color:var(--sun)">Controls</div>' +
+        toggleRowHTML('s-input', 'How you play', 'Touch screen, or keyboard and mouse. The tips and buttons on screen follow this.', !!Input.hasTouch, 'Touch', 'Keyboard & mouse') +
         '<div class="sub" style="margin:14px 0 2px;font-weight:700;color:var(--sun)">Touch controls</div>' +
         toggleRowHTML('s-side', 'Joystick side', 'The joystick takes one half of the screen, the buttons the other.', !s.touchLeft, 'Left', 'Right') +
         sliderRowHTML('setTouch', 'Control size', 'Size of the buttons and joystick. 50% is the normal size, 100% is 30% bigger.', pct(s.touchScale), 50) +

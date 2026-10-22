@@ -101,7 +101,8 @@ function bindInput(){
     e.preventDefault();
   }
   stage.addEventListener('touchstart', function(e){
-    Input.hasTouch = true;
+    if (Input.forceMouse) return;                          /* she plays with keyboard and mouse: a tap is left to become a click */
+    if (!Settings.inputMode) Input.hasTouch = true;
     SFX.init(); SFX.resume();
     if (G.state === 'cutscene'){ const tc = e.changedTouches && e.changedTouches[0]; if (tc && cutSkipHit(tc.clientX, tc.clientY)) endCutscene(); e.preventDefault(); return; }
     if (G.state === 'forage' || G.state === 'mini' || G.state === 'town' || G.state === 'fly' || G.state === 'sail'){ forageTouch(e); return; }   /* the finger steers the neck; no joystick here */
@@ -114,6 +115,7 @@ function bindInput(){
     e.preventDefault();
   }, { passive: false });
   stage.addEventListener('touchmove', function(e){
+    if (Input.forceMouse) return;
     if (G.state === 'forage' || G.state === 'mini' || G.state === 'town' || G.state === 'fly' || G.state === 'sail'){ forageTouch(e); return; }
     for (let i = 0; i < e.changedTouches.length; i++){
       const t = e.changedTouches[i];
@@ -122,6 +124,7 @@ function bindInput(){
     e.preventDefault();
   }, { passive: false });
   function endTouch(e){
+    if (Input.forceMouse){ if (joyId !== null) joyEnd(); return; }
     if ((G.state === 'mini' || G.state === 'town' || G.state === 'fly' || G.state === 'sail') && (!e.touches || e.touches.length === 0)) Input.mdown = false;
     for (let i = 0; i < e.changedTouches.length; i++)
       if (e.changedTouches[i].identifier === joyId) joyEnd();
@@ -224,6 +227,7 @@ function tryFullscreen(){
 
 function handleAction(a){
   if (a === 'splash-go'){ splashGo(); return; }
+  if (a === 'input-touch' || a === 'input-mouse'){ Settings.inputMode = a === 'input-touch' ? 'touch' : 'mouse'; applyInputMode(); Settings.save(); SFX.click(); showMenu(); return; }
   if (a.indexOf('film-') === 0){ SFX.click(); startCutscene(showGallery, false, a.slice(5)); return; }
   if (a.indexOf('buymax-') === 0){ buyUpgradeMax(a.slice(7)); return; }
   if (a === 'bind-reset'){ Settings.keys = {}; G.rebinding = null; Settings.save(); SFX.click(); showSettings(); return; }
@@ -260,6 +264,7 @@ function handleAction(a){
     case 's-text': Settings.textScale = ((Settings.textScale | 0) + 1) % 3; applyTextScale(); Settings.save(); SFX.click(); showSettings(); break;
     case 's-bread': Settings.autoBread = Settings.autoBread === false; Settings.save(); SFX.click(); showSettings(); break;
     case 's-autopause': Settings.autoPause = !Settings.autoPause; Settings.save(); SFX.click(); showSettings(); break;
+    case 's-input': Settings.inputMode = Input.hasTouch ? 'mouse' : 'touch'; applyInputMode(); Settings.save(); SFX.click(); showSettings(); break;
     case 's-side': Settings.touchLeft = !Settings.touchLeft; applyTouchLayout(); Settings.save(); SFX.click(); showSettings(); break;
     case 'play': SFX.click(); tryFullscreen(); startRun(); break;
     case 'play2': SFX.click(); tryFullscreen(); startRun(2); break;

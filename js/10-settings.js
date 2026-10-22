@@ -22,12 +22,13 @@ const Settings = {
     this.calmFlash = !!d.calmFlash;
     this.npcVoice = d.npcVoice !== false;
     this.textScale = (d.textScale === 1 || d.textScale === 2) ? d.textScale : 0;
+    this.inputMode = d.inputMode === 'touch' || d.inputMode === 'mouse' ? d.inputMode : '';
     this.touchLeft = !!d.touchLeft;
     this.touchScale = typeof d.touchScale === 'number' ? clamp(d.touchScale, 0.5, 1) : 0.5;
     this.speedLevel = (d.speedLevel === 1 || d.speedLevel === 2 || d.speedLevel === 3) ? d.speedLevel : d.speedMode ? 1 : 0;
     this.speedMode = this.speedLevel > 0;
     SFX.setMuted(this.muted);
-    try { SFX.setFx(this.sfxVol); applyTouchLayout(); applyTextScale(); } catch (e) {}
+    try { SFX.setFx(this.sfxVol); applyTouchLayout(); applyTextScale(); applyInputMode(); } catch (e) {}
   },
   save(){
     Save.data.autoKick = this.autoKick;
@@ -36,6 +37,7 @@ const Settings = {
     Save.data.showGear = this.showGear;
     Save.data.hitFlash = this.hitFlash;
     Save.data.musicVol = this.musicVol; Save.data.sfxVol = this.sfxVol; Save.data.ambVol = this.ambVol; Save.data.levelGap = this.levelGap; Save.data.autoPerf = this.autoPerf; Save.data.autoBread = this.autoBread; Save.data.autoPause = this.autoPause; Save.data.touchLeft = this.touchLeft; Save.data.fxLevel = this.fxLevel; Save.data.keys = this.keys; Save.data.touchScale = this.touchScale;
+    Save.data.inputMode = this.inputMode === 'touch' || this.inputMode === 'mouse' ? this.inputMode : '';
     Save.data.speedMode = this.speedMode; Save.data.speedLevel = this.speedLevel | 0;
     Save.data.calmFlash = this.calmFlash; Save.data.npcVoice = this.npcVoice; Save.data.textScale = this.textScale | 0;
     Save.write();
@@ -43,3 +45,15 @@ const Settings = {
 };
 
 
+
+/* Touch or keyboard and mouse: asked once on the first start (js/44zzx-input-choice.js), changed in Settings. Until she has answered, a touch screen is taken to mean touch
+   (the old guess). Once she has, that answer wins: Input.hasTouch drives every control tip, and "mouse" makes the touch handlers step aside (a tap still works as a click). */
+function inputAuto(){ return 'ontouchstart' in window || (navigator.maxTouchPoints | 0) > 0; }
+function applyInputMode(){
+  const m = Settings.inputMode;
+  Input.hasTouch = m ? m === 'touch' : inputAuto(); Input.forceMouse = m === 'mouse';
+  try {
+    if (!Input.hasTouch){ TOUCH.classList.remove('on'); PAUSEBTN.classList.remove('on'); }
+    else if (G.state === 'playing'){ TOUCH.classList.add('on'); PAUSEBTN.classList.add('on'); }
+  } catch (e) {}
+}
