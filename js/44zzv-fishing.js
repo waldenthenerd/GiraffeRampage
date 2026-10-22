@@ -63,6 +63,12 @@ function fishTackle(){
   return { rod: FISH_RODS[k.rod], line: FISH_LINES[k.line], bait: FISH_BAITS[k.bait], k: k };
 }
 
+/* ---- fish scales: every catch leaves some, and the gear bench in the tackle shop turns them into gear levels (js/44zzw-tackle-shop.js) ---- */
+const FISH_SCALES = [1, 2, 5, 12];                                      /* per catch, by rarity (common to legendary); a new record adds 1 */
+function fishScaleGain(f){ return FISH_SCALES[fishRarity(f)]; }
+function fishScaleN(){ const t = townData(); return Math.max(0, Math.floor(+t.scales || 0)); }       /* read raw: a save that has never fished gets no key */
+function fishScalesAdd(n){ const t = townData(); t.scales = fishScaleN() + Math.max(0, n | 0); }
+
 /* ---- what bites ---- */
 /* where: 'pier', or 'shallows' | 'reef' | 'water' | 'deep' at sea */
 const FISH_MIX = { shallows: { shallows: 1, special: 0.4 }, reef: { reef: 1, shallows: 0.15, special: 0.4 }, water: { shallows: 0.6, reef: 0.15, deep: 0.25, special: 0.4 }, deep: { deep: 1, special: 0.4 } };
@@ -182,8 +188,9 @@ function fishResult(win){
     const o = fishOrder(); let ordered = false;
     if (o.id === f.id && !o.done){ o.done = true; ordered = true; pay.gems = (pay.gems | 0) + 8; const t = townData(); t.n.fishOrders = (t.n.fishOrders | 0) + 1; }
     townPay(pay);
+    const scl = fishScaleGain(f) + (rec && !first ? 1 : 0); fishScalesAdd(scl);
     Fg.a = { k: 'leap', t: Fg.clock, f: f, len: len, rec: rec || first };
-    msg = 'You caught a ' + f.name + ', ' + len + ' cm! +' + fmt(gold) + ' gold' + (first ? ' and 5 gems for a new kind' : '') + (rec && !first ? ' · a new record' : '') + '.';
+    msg = 'You caught a ' + f.name + ', ' + len + ' cm! +' + fmt(gold) + ' gold' + (first ? ' and 5 gems for a new kind' : '') + (rec && !first ? ' · a new record' : '') + '. +' + scl + ' scale' + (scl === 1 ? '' : 's') + '.';
     if (ordered) msg += ' That was Brine’s order: +8 gems!';
     /* new tackle: unlocked by the page she has just completed, and put on */
     const now = [FISH_RODS, FISH_LINES, FISH_BAITS], names = [], kk = fishTackle().k; let at = 0;

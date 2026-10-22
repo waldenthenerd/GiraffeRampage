@@ -656,3 +656,4 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 .tkrow .chalk{grid-column:2;grid-row:1 / span 2;min-width:92px;margin:0}
 .tkrow.on{border-color:#8FE0A0;background:rgba(143,224,160,.12)}
 .tkrow.lock{opacity:.6}
+.tkscroll{max-height:46vh;overflow-y:auto;padding-right:4px}

@@ -108,7 +108,7 @@
 
     /* the tackle shop: a door on the shack, three stations, and taking a piece puts it on */
     var shack = TOWN_DIST.harbour.b.filter(function(b){ return b.id === 'shack'; })[0];
-    out.shopDoor = !!shack && shack.to === 'in_tackle' && !!TOWN_DIST.in_tackle && TOWN_ROOM_PARENT.in_tackle === 'harbour' && TOWN_DIST.in_tackle.b.filter(function(b){ return /^tk-/.test(b.act); }).length === 3;
+    out.shopDoor = !!shack && shack.to === 'in_tackle' && !!TOWN_DIST.in_tackle && TOWN_ROOM_PARENT.in_tackle === 'harbour' && TOWN_DIST.in_tackle.b.filter(function(b){ return /^tk-/.test(b.act); }).length === 4;
     var ts = freshSave(); Save.data = ts; log = fishLog(); setKinds(12);
     townShowTackle('rod'); out.shopLocked = /Golden rod/.test(OV.innerHTML) && /more kinds/.test(OV.innerHTML) && !/data-a="tk-take-rod-2"/.test(OV.innerHTML) && /data-a="tk-take-rod-1"/.test(OV.innerHTML);
     handleAction('tk-take-rod-2'); out.shopRefuses = fishTackle().k.rod !== 2;
@@ -119,6 +119,20 @@
     hideOverlay(); Town.panel = false;
     townGo('in_tackle', 190, 1); out.shopRoom = Town.d === 'in_tackle'; GR.step(1 / 60); GR.render(); out.shopPaints = true;
 
+    /* fish scales and the gear bench */
+    var sv = freshSave(); Save.data = sv; log = fishLog();
+    out.scalesRaw = fishScaleN() === 0 && townData().scales === undefined;
+    out.scaleRates = FISH_SCALES.join() === '1,2,5,12' && FISH.every(function(f){ return fishScaleGain(f) >= 1; });
+    Town.d = 'harbour'; townShowFishing(); cast('sardine'); Fg.pos = Fg.zone + Fg.w / 2; fishReel(); out.scaleCatch = fishScaleN() >= 1 && /scale/.test(document.getElementById('fishMsg').textContent);
+    var gid = Object.keys(GEAR_INDEX).filter(function(i){ return GEAR_INDEX[i].name !== 'Bare Hooves'; })[0];
+    townShowBench(); out.benchEmpty = /No gear yet/.test(OV.innerHTML);
+    Save.data.gear = Save.data.gear || {}; Save.data.gear[gid] = 1; townData().scales = 10; townShowBench();
+    out.benchLocked = /disabled/.test(OV.innerHTML) && benchUp(gid) === false && gearLevel(gid) === 1 && fishScaleN() === 10;
+    townData().scales = 20; out.benchBuys = benchUp(gid) === true && gearLevel(gid) === 2 && fishScaleN() === 0;
+    townData().scales = 500; benchUp(gid); benchUp(gid); benchUp(gid); out.benchMax = gearLevel(gid) === GEAR_LV_MAX && fishScaleN() === 500 - 45 - 80 - 130 && benchUp(gid) === false;
+    out.benchRows = /as good as it gets/.test((townShowBench(), OV.innerHTML));
+    hideOverlay(); Town.panel = false;
+
     /* trophies, and a save that has never fished is not touched by looking */
     var fresh = freshSave(); var keysBefore = JSON.stringify(Object.keys(fresh));
     Save.data = fresh; var A = ['fish20', 'fish35', 'fishBig', 'fishLeg', 'fishOrd3', 'seaCast'].map(function(id){ return ACH.filter(function(a){ return a.id === id; })[0]; });
@@ -126,7 +140,7 @@
     var tt = townData(); FISH.forEach(function(f){ tt.fish = tt.fish || {}; tt.fish[f.id] = 1; }); tt.fishBook = { oarfish: 400 }; tt.n.fishOrders = 3; tt.n.seaCasts = 2;
     out.achEarn = A.every(function(a){ return a.val() >= a.goal; });
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['shopDoor', 'shopLocked', 'shopRefuses', 'shopTakes', 'shopLine', 'shopSwap', 'shopBait', 'shopRoom', 'shopPaints', 'list', 'groups', 'rarities', 'pierOnly', 'shallows', 'reef', 'deep', 'water', 'noWeatherFish', 'storm', 'fog', 'bait', 'picks', 'panel', 'side', 'clock', 'animBite', 'leap', 'leapDraws', 'leapEnds', 'lostAnim', 'lostDraws', 'bite', 'won', 'bite2', 'missed', 'bite3', 'timeout', 'record', 'noRodYet', 'stillPlain', 'newTackle', 'rodWider', 'lineNeed', 'longerBite', 'stillBiting', 'timedOut', 'lockedLine', 'lockedBait', 'shrimp', 'deepReelNeed', 'noGlowYet', 'glow', 'all', 'deepReel', 'cycles', 'cyclesBack', 'bookTackle', 'order', 'orderPaid', 'orderOnce', 'book', 'paints', 'bookNew', 'bookBack', 'refusedMoving', 'btn', 'opened', 'seaSide', 'seaAnim', 'seaLeapDraws', 'rendersSea', 'seaCatch', 'closed', 'achs', 'achEarn'];
+  var need = ['scalesRaw', 'scaleRates', 'scaleCatch', 'benchEmpty', 'benchLocked', 'benchBuys', 'benchMax', 'benchRows', 'shopDoor', 'shopLocked', 'shopRefuses', 'shopTakes', 'shopLine', 'shopSwap', 'shopBait', 'shopRoom', 'shopPaints', 'list', 'groups', 'rarities', 'pierOnly', 'shallows', 'reef', 'deep', 'water', 'noWeatherFish', 'storm', 'fog', 'bait', 'picks', 'panel', 'side', 'clock', 'animBite', 'leap', 'leapDraws', 'leapEnds', 'lostAnim', 'lostDraws', 'bite', 'won', 'bite2', 'missed', 'bite3', 'timeout', 'record', 'noRodYet', 'stillPlain', 'newTackle', 'rodWider', 'lineNeed', 'longerBite', 'stillBiting', 'timedOut', 'lockedLine', 'lockedBait', 'shrimp', 'deepReelNeed', 'noGlowYet', 'glow', 'all', 'deepReel', 'cycles', 'cyclesBack', 'bookTackle', 'order', 'orderPaid', 'orderOnce', 'book', 'paints', 'bookNew', 'bookBack', 'refusedMoving', 'btn', 'opened', 'seaSide', 'seaAnim', 'seaLeapDraws', 'rendersSea', 'seaCatch', 'closed', 'achs', 'achEarn'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);
