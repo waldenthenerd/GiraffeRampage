@@ -1,7 +1,7 @@
 'use strict';
 /* =============================================================================================================================
    44zzg-campus-art.js  --  LONGNECK UNIVERSITY, the painting outdoors: the Campus backdrop (spires, hills, trees), the lawns and paving,
-   the seven street buildings (the iron gate in the Town Square, the arch, Registrar's Hall, Lecture Theatre, Library, Homework Hall,
+   the seven street buildings (the iron gate in the Town Square, the arch, Registrar's Hall, Lecture Theater, Library, Homework Hall,
    Exam Hall, Cafe), the campus props, the mortarboard and loafers, and the faculty banners. Pure drawing; the rooms are in 44zzh and the
    lecture pictures in 44zzi. The rules are in 44zz and 44zze.
    Everything is built from small parts (bricks, cut stone, slates, ivy, glass with a sill, lanterns) so that it holds up at 2x.
@@ -175,7 +175,7 @@
       tRect(c, '#33281E', x - 54, TG - 140, 108, 6); tPoly(c, '#5E9A86', [x - 66, TG - 140, x + 66, TG - 140, x + 56, TG - 158, x - 56, TG - 158]); ln(c, '#8A8E98', 4, x - 54, TG - 134, x - 54, TG - 6); ln(c, '#8A8E98', 4, x + 54, TG - 134, x + 54, TG - 6);
       steps(c, x, 120, 3, 18);
       /* a banner over the door and two posters either side */
-      tRound(c, '#2B3A5A', x - 80, TG - 190, 160, 34, 4); tRect(c, GOLD, x - 76, TG - 187, 152, 1.5); ivText(c, 'LECTURE THEATRE', x, TG - 166, 14, '#F6E7B8');
+      tRound(c, '#2B3A5A', x - 80, TG - 190, 160, 34, 4); tRect(c, GOLD, x - 76, TG - 187, 152, 1.5); ivText(c, 'LECTURE THEATER', x, TG - 166, 14, '#F6E7B8');
       [[x0 + 76, '#F2C230'], [x0 + W - 104, '#E85D4A']].forEach(function(p, k){ tRect(c, '#3A2A1E', p[0] - 2, TG - 120, 32, 44); tRect(c, '#F4F1E8', p[0], TG - 118, 28, 40); tRect(c, p[1], p[0] + 3, TG - 115, 22, 12); for (let r2 = 0; r2 < 3; r2++) tRect(c, '#8A8E98', p[0] + 3, TG - 99 + r2 * 6, 22 - r2 * 5, 2); });
       lantern(c, x - 72, TG - 100); lantern(c, x + 72, TG - 100); ivy(c, x0, top + 40, 60, 90, 131);
     },
@@ -293,7 +293,7 @@
       [[-36, -106, 24, 20, '#F4F1E8'], [-8, -108, 22, 26, '#FFE79A'], [18, -106, 20, 18, '#F2B8C9'], [-30, -82, 26, 22, '#B8E0F2'], [2, -78, 20, 20, '#F4F1E8'], [22, -84, 16, 24, '#C8E8B0']].forEach(function(n, i){
         c.save(); c.translate(x + n[0] + n[2] / 2, TG + n[1] + n[3] / 2); c.rotate((i % 3 - 1) * 0.05); tRect(c, 'rgba(0,0,0,.18)', -n[2] / 2 + 1, -n[3] / 2 + 2, n[2], n[3]); tRect(c, n[4], -n[2] / 2, -n[3] / 2, n[2], n[3]);
         for (let k = 0; k < 3; k++) tRect(c, 'rgba(60,60,80,.45)', -n[2] / 2 + 3, -n[3] / 2 + 6 + k * 4, n[2] - 6 - k * 3, 1.4); tCircle(c, '#D5352B', 0, -n[3] / 2 + 2, 1.8); c.restore(); });
-      tRect(c, '#5A3A1E', x - 46, TG - 52, 92, 6); tRect(c, '#4A3A2C', x - 44, TG - 36, 88, 8); ivText(c, 'LOST: ONE PENCIL. REWARD: A BISCUIT', x, TG - 29.5, 5.5, '#FFE9A8', '600');
+      tRect(c, '#5A3A1E', x - 46, TG - 52, 92, 6); tRect(c, '#4A3A2C', x - 44, TG - 36, 88, 8); ivText(c, 'LOST: ONE PENCIL. REWARD: A COOKIE', x, TG - 29.5, 5.5, '#FFE9A8', '600');
     },
     u_bikes: function(c, D, p){
       const x = p.x; shadow(c, x, 120);

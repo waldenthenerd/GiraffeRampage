@@ -9,7 +9,7 @@
    in_ulibrary, in_uhw, in_uexam, in_ucafe).
    WHAT EACH ROOM DOES (the doors are 'u_' buildings; their act is handled below, then in 44zzf):
      Registrar's Hall   the desk (faculties and energy), the faculty board, the Hall of Degrees, the rank cabinet, the notebook
-     Lecture Theatre    the seats and the timetable: sit in on a lecture
+     Lecture Theater    the seats and the timetable: sit in on a lecture
      Library            a shelf for each faculty, and the reading table: read a book
      Homework Hall      the study desks: do a set of homework
      Exam Hall          the proctor's desk and the exam desks: sit an exam for a degree
@@ -34,7 +34,7 @@ TOWN_ROOM.ucafe    = { wall: '#EAD6B0', wains: '#7A4A2A', stripe: 'rgba(150,100,
   const b = [
     { id: 'cexit', kind: 'u_arch', x: 150, w: 170, h: 200, label: 'Back to Town Square', act: 'campus-out' },
     { id: 'chall', kind: 'u_hall', x: 760, w: 440, h: 300, label: 'Registrar’s Hall', act: 'house', to: 'in_uhall' },
-    { id: 'clec', kind: 'u_lecture', x: 1480, w: 360, h: 240, label: 'Lecture Theatre', act: 'house', to: 'in_ulecture' },
+    { id: 'clec', kind: 'u_lecture', x: 1480, w: 360, h: 240, label: 'Lecture Theater', act: 'house', to: 'in_ulecture' },
     { id: 'clib', kind: 'u_library', x: 2180, w: 400, h: 270, label: 'University Library', act: 'house', to: 'in_ulibrary' },
     { id: 'chw', kind: 'u_hw', x: 2880, w: 340, h: 230, label: 'Homework Hall', act: 'house', to: 'in_uhw' },
     { id: 'cexam', kind: 'u_exam', x: 3520, w: 380, h: 250, label: 'Exam Hall', act: 'house', to: 'in_uexam' },
@@ -61,7 +61,7 @@ TOWN_ROOM.ucafe    = { wall: '#EAD6B0', wains: '#7A4A2A', stripe: 'rgba(150,100,
     { id: 'deg', kind: 'u_degrees', x: 1760, w: 360, h: 260, label: 'The Hall of Degrees', act: 'uni-degrees' },
     { id: 'rank', kind: 'u_trophy', x: 2200, w: 220, h: 240, label: 'The rank cabinet', act: 'uni-ranks' },
     { id: 'note', kind: 'u_notebook', x: 2520, w: 200, h: 150, label: 'Your notebook', act: 'uni-notebook' }], ['quill']);
-  room('in_ulecture', 'Lecture Theatre', 'ulecture', 3000, [
+  room('in_ulecture', 'Lecture Theater', 'ulecture', 3000, [
     { id: 'tt', kind: 'u_timetable', x: 560, w: 220, h: 250, label: 'The timetable', act: 'uni-lec' },
     { id: 'stage', kind: 'u_stage', x: 1250, w: 560, h: 280, label: 'The lecture stage', act: 'uni-lec' },
     { id: 'seats', kind: 'u_seats', x: 2150, w: 720, h: 200, label: 'The seats', act: 'uni-lec' }], ['longshanks']);
@@ -93,7 +93,7 @@ Object.assign(TOWN_NPCS, {
   stack: { id: 'stack', name: 'Ms. Stack', d: 'in_ulibrary', x: 1500, range: 70, habit: 'stand', fav: 'book', look: { coat: '#D8C9A0', spot: '#6A4A2A', pat: 6, hat: 'flowers', s: 1.0 }, gift: { gems: 60, coin: 8 },
     say: ['Shh. Well, giraffes are quiet already. Take a book.', 'There is a shelf for every faculty. The high ones are for the advanced readers.', 'Every book tells you one thing worth remembering. I check.', 'Please return the ladder. It is not a toy.'], night: ['The library after dark smells of old paper. Lovely.'], rain: ['Perfect reading weather.'] },
   chalk: { id: 'chalk', name: 'Tutor Chalk', d: 'in_uhw', x: 950, range: 60, habit: 'stand', fav: 'sweets', look: { coat: '#BFD8F2', spot: '#3A5A8A', pat: 12, hat: 'beanie', s: 1.05 }, gift: { gems: 60, coin: 8 },
-    say: ['Homework is practice. Practice is how it sticks.', 'Stuck? A flashcard will remove two wrong answers.', 'Five questions, no clock. Take your time.', 'The trick to maths is to do some every day.'], night: ['Late homework is better than none.'], rain: ['Stay in and do some sums.'] },
+    say: ['Homework is practice. Practice is how it sticks.', 'Stuck? A flashcard will remove two wrong answers.', 'Five questions, no clock. Take your time.', 'The trick to math is to do some every day.'], night: ['Late homework is better than none.'], rain: ['Stay in and do some sums.'] },
   tick: { id: 'tick', name: 'Proctor Tick', d: 'in_uexam', x: 880, range: 50, habit: 'stand', fav: 'book', look: { coat: '#A8B8A0', spot: '#4A5A44', pat: 2, hat: 'cowboy', s: 1.1 }, gift: { gems: 60, coin: 8 },
     say: ['No talking in the exam hall. That includes me.', 'Seventy percent to pass. No hints, and the clock is real.', 'There are three degrees: Bachelor, Master and Doctorate.', 'Eyes on your own paper.'], night: ['Exams at night? Brave.'], rain: ['Rain never delayed an exam yet.'] },
   bean: { id: 'bean', name: 'Barista Bean', d: 'in_ucafe', x: 760, range: 60, habit: 'stand', fav: 'sweets', look: { coat: '#E0B890', spot: '#7A4A2A', pat: 11, hat: 'toque', s: 1.05 }, gift: { gems: 60, coin: 8 },
@@ -305,7 +305,7 @@ function uniShowRanks(){
   const r = uniRankIndex();
   let h = '<div class="tp-title">THE RANK CABINET</div>' + uniRankBar() + '<div class="uniranks">';
   UNI_RANKS.forEach(function(k, i){
-    const got = i <= r, rw = k.acc ? (ACC_BY_ID[k.acc] ? ACC_BY_ID[k.acc].name : k.acc) : k.swatch ? 'the coat colour ' + WARD[UNI_SWATCH[k.swatch]].name : 'nothing yet';
+    const got = i <= r, rw = k.acc ? (ACC_BY_ID[k.acc] ? ACC_BY_ID[k.acc].name : k.acc) : k.swatch ? 'the coat color ' + WARD[UNI_SWATCH[k.swatch]].name : 'nothing yet';
     h += '<div class="unirk' + (got ? ' got' : '') + '"><b>' + k.n + '</b><span>at ' + k.at + ' levels</span><em>' + k.perk + '</em><small>' + (i ? 'Reward: ' + rw : '') + '</small></div>';
   });
   h += '</div><div class="unilinks"><button class="tbtn" data-a="town-uni-reg">Back to the desk</button></div>';

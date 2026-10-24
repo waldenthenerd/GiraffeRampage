@@ -13,32 +13,32 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
 
   /* ---- Giraffe Studies ---- */
   L('giraffe', 1, "A Very Tall Animal", [
-    ["The tallest of all", "Giraffes are the tallest land animals. A grown male can reach about 5.5 metres, as high as a two-storey house, and weigh nearly 1,200 kilograms.", 'savanna'],
-    ["Seven big bones", "A giraffe's neck has only seven bones, the same number as a human's. Each one is huge, about 28 centimetres long.", 'neck'],
+    ["The tallest of all", "Giraffes are the tallest land animals. A grown male can reach about 5.5 meters, as high as a two-story house, and weigh nearly 1,200 kilograms.", 'savanna'],
+    ["Seven big bones", "A giraffe's neck has only seven bones, the same number as a human's. Each one is huge, about 28 centimeters long.", 'neck'],
     ["A coat like a fingerprint", "Every giraffe has its own pattern of patches. No two are exactly alike.", 'spots'],
-    ["Dining at the top", "Giraffes eat leaves, especially acacia. Their dark purple tongue is about 45 centimetres long and can pick leaves between thorns.", 'tongue']
+    ["Dining at the top", "Giraffes eat leaves, especially acacia. Their dark purple tongue is about 45 centimeters long and can pick leaves between thorns.", 'tongue']
   ], [
     X.mc('giraffe', 1, "How many bones are in a giraffe's neck?", ["Seven", "Five", "Twelve", "Twenty"]),
-    X.mc('giraffe', 1, "About how tall can a grown male giraffe be?", ["About 5.5 metres", "About 2 metres", "About 3 metres", "About 9 metres"]),
+    X.mc('giraffe', 1, "About how tall can a grown male giraffe be?", ["About 5.5 meters", "About 2 meters", "About 3 meters", "About 9 meters"]),
     X.tf('giraffe', 1, "Two giraffes can have exactly the same pattern.", false),
-    X.mc('giraffe', 1, "What colour is a giraffe's tongue?", ["Dark purple", "Bright pink", "Yellow", "White"])
+    X.mc('giraffe', 1, "What color is a giraffe's tongue?", ["Dark purple", "Bright pink", "Yellow", "White"])
   ]);
   L('giraffe', 1, "Calves and Towers", [
     ["Fifteen months", "A mother giraffe carries her baby for about fifteen months before it is born.", 'calf'],
-    ["A tall start", "A newborn calf is already about 1.8 metres tall. It is born standing up and falls about two metres to the ground.", 'calf'],
+    ["A tall start", "A newborn calf is already about 1.8 meters tall. It is born standing up and falls about two meters to the ground.", 'calf'],
     ["Up and running", "Within an hour a calf can stand and walk. Within a day it can run with the group.", 'run'],
     ["A tower of giraffes", "A group of giraffes is called a tower. Mothers often take turns watching the calves while the others feed.", 'savanna']
   ], [
     X.mc('giraffe', 1, "About how long is a giraffe's pregnancy?", ["About 15 months", "About 5 months", "About 9 months", "About 2 years"]),
     X.mc('giraffe', 1, "What is a group of giraffes called?", ["A tower", "A herd of ten", "A swarm", "A pod"]),
     X.tf('giraffe', 1, "A newborn giraffe cannot stand for several days.", false),
-    X.mc('giraffe', 1, "About how tall is a newborn giraffe?", ["About 1.8 metres", "About 50 centimetres", "About 1 metre", "About 3 metres"])
+    X.mc('giraffe', 1, "About how tall is a newborn giraffe?", ["About 1.8 meters", "About 50 centimeters", "About 1 meter", "About 3 meters"])
   ]);
   L('giraffe', 2, "Built to Drink and Run", [
     ["A mighty heart", "A giraffe's heart weighs about 11 kilograms. It must push blood up a very long neck to the brain.", 'heart'],
     ["High pressure", "A giraffe's blood pressure is about twice a human's. Special valves in the neck help when it bends down to drink.", 'heart'],
     ["Awkward at the waterhole", "To drink, a giraffe has to splay its front legs or bend its knees. It is at its most vulnerable then, so it drinks only now and then.", 'savanna'],
-    ["Faster than you think", "A giraffe can run about 60 kilometres an hour for short bursts. Its kick is strong enough to injure a lion.", 'run']
+    ["Faster than you think", "A giraffe can run about 60 kilometers an hour for short bursts. Its kick is strong enough to injure a lion.", 'run']
   ], [
     X.mc('giraffe', 2, "About how much does a giraffe's heart weigh?", ["About 11 kilograms", "About 1 kilogram", "About 50 kilograms", "About 100 grams"]),
     X.mc('giraffe', 2, "How does a giraffe's blood pressure compare with ours?", ["About twice as high", "Lower", "The same", "Ten times higher"]),
@@ -59,7 +59,7 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
 
   /* ---- Earth & Weather ---- */
   L('earth', 1, "Layers of the Earth", [
-    ["A thin shell", "We live on the crust, a thin outer layer of rock. Under the oceans it is only a few kilometres thick.", 'layers'],
+    ["A thin shell", "We live on the crust, a thin outer layer of rock. Under the oceans it is only a few kilometers thick.", 'layers'],
     ["Hot, thick rock", "Under the crust lies the mantle, a thick layer of hot rock that slowly flows.", 'layers'],
     ["Liquid metal", "The outer core is liquid iron and nickel. Its movement helps make the Earth's magnetic field.", 'layers'],
     ["A solid heart", "The inner core is solid metal. It is extremely hot, but the huge pressure keeps it solid.", 'layers']
@@ -81,7 +81,7 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
     X.mc('earth', 1, "Which of these is a form of precipitation?", ["Hail", "Fog", "Dew", "Frost on a window"])
   ]);
   L('earth', 2, "Moving Plates", [
-    ["A cracked shell", "The Earth's crust is broken into huge slabs called tectonic plates. They drift a few centimetres a year.", 'plates'],
+    ["A cracked shell", "The Earth's crust is broken into huge slabs called tectonic plates. They drift a few centimeters a year.", 'plates'],
     ["Earthquakes", "Earthquakes happen when plates slip and grind past each other. The point on the surface above where it starts is the epicentre.", 'plates'],
     ["Rings of fire", "Many volcanoes lie where plates meet. The Pacific Ocean is ringed by volcanoes, called the Ring of Fire.", 'plates'],
     ["Pangaea", "About 300 million years ago all the land was joined in one supercontinent, Pangaea. It slowly broke apart into today's continents.", 'plates']
@@ -195,7 +195,7 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
     X.tf('chem', 3, "Isotopes of one element have different numbers of neutrons.", true)
   ]);
 
-  /* ---- Maths ---- */
+  /* ---- Math ---- */
   L('maths', 1, "Shapes Everywhere", [
     ["Counting sides", "A triangle has three sides, a square four, a pentagon five, a hexagon six and an octagon eight.", 'shapes'],
     ["Right angles", "A right angle is a square corner. It measures 90 degrees.", 'angles'],
@@ -244,30 +244,30 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
   /* ---- Physics ---- */
   L('phys', 1, "Forces", [
     ["Push and pull", "A force is a push or a pull. Forces can start things moving, stop them, or change their direction.", 'forces'],
-    ["Gravity", "Gravity is the force that pulls everything towards the Earth. It is why things fall when you drop them.", 'forces'],
+    ["Gravity", "Gravity is the force that pulls everything toward the Earth. It is why things fall when you drop them.", 'forces'],
     ["Friction", "Friction is a force that resists sliding. It slows things down and turns movement into heat.", 'forces'],
     ["Moving energy", "Anything that moves has kinetic energy. The faster it goes, the more it has.", 'energy']
   ], [
     X.mc('phys', 1, "What is a push or a pull called?", ["A force", "A wave", "A current", "A field"]),
-    X.mc('phys', 1, "Which force pulls things towards the Earth?", ["Gravity", "Friction", "Magnetism", "Static"]),
+    X.mc('phys', 1, "Which force pulls things toward the Earth?", ["Gravity", "Friction", "Magnetism", "Static"]),
     X.mc('phys', 1, "What is the energy of movement called?", ["Kinetic energy", "Chemical energy", "Sound energy", "Heat only"]),
     X.mc('phys', 1, "What does friction do to sliding things?", ["Slows them down", "Speeds them up", "Makes them lighter", "Makes them glow"])
   ]);
   L('phys', 1, "Light and Sound", [
-    ["Fast light", "Light travels about 300,000 kilometres every second, far faster than sound. That is why you see lightning before you hear thunder.", 'light'],
+    ["Fast light", "Light travels about 300,000 kilometers every second, far faster than sound. That is why you see lightning before you hear thunder.", 'light'],
     ["Bouncing", "A mirror reflects light. An echo is sound that has bounced off a surface.", 'light'],
-    ["Colours", "A prism splits white light into a rainbow of colours. Red has the longest wavelength and violet the shortest.", 'light'],
+    ["Colors", "A prism splits white light into a rainbow of colors. Red has the longest wavelength and violet the shortest.", 'light'],
     ["Needing air", "Sound needs something to travel through, such as air, water or metal. In the vacuum of space there is no sound.", 'sound']
   ], [
     X.mc('phys', 1, "Which travels faster, light or sound?", ["Light", "Sound", "They are equal", "It varies"]),
     X.mc('phys', 1, "What is an echo?", ["Sound that has bounced off a surface", "Sound made louder", "A kind of light", "Silence"]),
     X.tf('phys', 1, "Sound can travel through the vacuum of space.", false),
-    X.mc('phys', 1, "What does a prism do to white light?", ["Splits it into colours", "Makes it vanish", "Makes it hot", "Turns it to sound"])
+    X.mc('phys', 1, "What does a prism do to white light?", ["Splits it into colors", "Makes it vanish", "Makes it hot", "Turns it to sound"])
   ]);
   L('phys', 2, "Newton's Laws", [
     ["Inertia", "Newton's first law: an object stays at rest, or keeps moving steadily, unless a force acts on it.", 'newton'],
     ["F equals m a", "Newton's second law: force equals mass times acceleration. The unit of force is the newton.", 'newton'],
-    ["Falling", "Near the Earth's surface, a falling object speeds up by about 9.8 metres per second every second.", 'newton'],
+    ["Falling", "Near the Earth's surface, a falling object speeds up by about 9.8 meters per second every second.", 'newton'],
     ["Conservation", "Energy cannot be created from nothing. It only changes from one form to another, like the wind's movement into electricity in a turbine.", 'energy']
   ], [
     X.mc('phys', 2, "What is the unit of force?", ["The newton", "The joule", "The watt", "The pascal"]),
@@ -278,18 +278,18 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
   L('phys', 3, "Big Ideas", [
     ["Mass and energy", "Einstein's famous equation E = mc squared says that mass and energy are two forms of the same thing.", 'energy'],
     ["Packets of light", "Light and other electromagnetic waves come in packets called photons. Nothing with mass can go faster than light in a vacuum.", 'waves'],
-    ["Moving sources", "The Doppler effect: the pitch of a siren rises as it comes towards you and falls as it moves away.", 'waves'],
+    ["Moving sources", "The Doppler effect: the pitch of a siren rises as it comes toward you and falls as it moves away.", 'waves'],
     ["Very small and very cold", "Quantum mechanics describes the tiny world of atoms, where the uncertainty principle says you cannot know exactly both position and momentum. Superconductors have zero electrical resistance.", 'waves']
   ], [
     X.mc('phys', 3, "Who proposed E = mc squared?", ["Albert Einstein", "Isaac Newton", "Niels Bohr", "Galileo"]),
     X.mc('phys', 3, "What is a packet of light called?", ["A photon", "An electron", "A neutron", "A quark"]),
-    X.mc('phys', 3, "What does a superconductor have?", ["Zero electrical resistance", "Infinite mass", "No magnetism at all", "A fixed colour"]),
+    X.mc('phys', 3, "What does a superconductor have?", ["Zero electrical resistance", "Infinite mass", "No magnetism at all", "A fixed color"]),
     X.mc('phys', 3, "What happens to a siren's pitch as it moves away from you?", ["It gets lower", "It gets higher", "It stays the same", "It stops"])
   ]);
 
   /* ---- Space ---- */
   L('space', 1, "The Solar System", [
-    ["Our star", "At the centre is the Sun, a star. Its gravity holds eight planets in orbit.", 'solar'],
+    ["Our star", "At the center is the Sun, a star. Its gravity holds eight planets in orbit.", 'solar'],
     ["Inner planets", "In order from the Sun: Mercury, Venus, Earth and Mars. Mercury is the closest to the Sun and Venus is the hottest.", 'solar'],
     ["Giants", "Beyond Mars come Jupiter, Saturn, Uranus and Neptune. Jupiter is the largest, and Saturn is famous for its rings.", 'planets'],
     ["Red and rusty", "Mars is called the Red Planet because iron oxide, or rust, covers its soil.", 'planets']
@@ -335,7 +335,7 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
 
   /* ---- History & Geography ---- */
   L('geo', 1, "Reading a Map", [
-    ["The key", "A map's key, or legend, explains what the symbols and colours mean.", 'map'],
+    ["The key", "A map's key, or legend, explains what the symbols and colors mean.", 'map'],
     ["Continents", "There are seven continents: Africa, Antarctica, Asia, Australia, Europe, North America and South America.", 'map'],
     ["Oceans", "The Pacific is the largest ocean. The Indian Ocean lies between Africa and Australia.", 'map'],
     ["The equator", "The equator is an imaginary line at zero degrees latitude. It divides the Earth into northern and southern halves.", 'map']
@@ -368,7 +368,7 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
     X.mc('geo', 2, "Whose expedition first sailed around the world?", ["Magellan's", "Columbus's", "Captain Cook's", "Nelson's"])
   ]);
   L('geo', 3, "Crossroads of the World", [
-    ["The Silk Road", "The Silk Road linked China with the Mediterranean world. Silk, spices and ideas travelled along it for centuries.", 'silk'],
+    ["The Silk Road", "The Silk Road linked China with the Mediterranean world. Silk, spices and ideas traveled along it for centuries.", 'silk'],
     ["The Mongols", "Genghis Khan founded the Mongol Empire, the largest land empire in history.", 'silk'],
     ["Limits on kings", "In 1215 King John agreed to the Magna Carta, which limited the power of the king.", 'colosseum'],
     ["Lines on a map", "The Prime Meridian, 0 degrees longitude, passes through Greenwich in London. The Berlin Wall came down in 1989.", 'map']

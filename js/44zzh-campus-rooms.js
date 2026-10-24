@@ -26,7 +26,7 @@
     for (let i = 0; i < 12; i++){ const a0 = i * TAU / 12; c.fillStyle = i % 3 === 0 ? col : i % 3 === 1 ? '#FFE9A0' : '#F6D7A0'; c.globalAlpha = 0.9; c.beginPath(); c.moveTo(x, y); c.arc(x, y, r, a0, a0 + TAU / 12); c.closePath(); c.fill(); }
     c.globalAlpha = 1; c.strokeStyle = '#2A2420'; c.lineWidth = 2; for (let i = 0; i < 12; i++){ const a = i * TAU / 12; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); c.stroke(); }
     c.beginPath(); c.arc(x, y, r * 0.55, 0, TAU); c.stroke(); tCircle(c, '#2A2420', x, y, 4); tCircle(c, col, x, y, 2.4);
-    c.save(); c.globalAlpha = 0.14; tPoly(c, col, [x - r * 0.6, y + r, x + r * 0.6, y + r, x + r * 1.5, TG - 12, x - r * 0.2, TG - 12]); c.restore();     /* its coloured light on the floor, faint */
+    c.save(); c.globalAlpha = 0.14; tPoly(c, col, [x - r * 0.6, y + r, x + r * 0.6, y + r, x + r * 1.5, TG - 12, x - r * 0.2, TG - 12]); c.restore();     /* its colored light on the floor, faint */
   }
   function wallClock(c, x, y, r, hh, mm){
     tCircle(c, WOOD_D, x, y, r + 5); tCircle(c, '#FBF6E6', x, y, r);
@@ -133,7 +133,7 @@
       tRect(c, WOOD_D, x0, TG - 98, W, 98); tRect(c, WOOD, x0 + 8, TG - 90, W - 16, 82); K.boards(c, x0 + 8, TG - 90, W - 16, 82, 20, true, 11); tRect(c, 'rgba(0,0,0,.2)', x0 + 14, TG - 80, W - 28, 62);
       tRect(c, WOOD_L, x0 - 6, TG - 108, W + 12, 12); tRect(c, 'rgba(255,255,255,.2)', x0 - 6, TG - 108, W + 12, 2);
       crestWall(c, b.x, TG - 52, 0.9); tRect(c, GOLD, x0 + 14, TG - 80, W - 28, 1.6);
-      tRound(c, '#12141C', x0 + 22, TG - 170, 62, 52, 5); tRound(c, '#6BD6FF', x0 + 27, TG - 165, 52, 40, 3); ivText(c, 'ENROL', x0 + 53, TG - 142, 12, '#12304A'); tRect(c, '#1E2230', x0 + 48, TG - 118, 10, 10);
+      tRound(c, '#12141C', x0 + 22, TG - 170, 62, 52, 5); tRound(c, '#6BD6FF', x0 + 27, TG - 165, 52, 40, 3); ivText(c, 'ENROLL', x0 + 53, TG - 142, 12, '#12304A'); tRect(c, '#1E2230', x0 + 48, TG - 118, 10, 10);
       tRound(c, '#D5352B', x0 + W - 60, TG - 120, 26, 12, 6); tRect(c, '#8A8E98', x0 + W - 50, TG - 108, 6, 4);
       [['#F4F1E8', 0], ['#FFE79A', 6], ['#F2B8C9', 12]].forEach(function(p){ tRect(c, 'rgba(0,0,0,.2)', x0 + 120 + p[1], TG - 111 - p[1] / 3, 40, 3); tRect(c, p[0], x0 + 120 + p[1], TG - 114 - p[1] / 3, 40, 4); });
       ln(c, '#2A2A30', 1.6, x0 + 208, TG - 108, x0 + 220, TG - 142); tPoly(c, '#F4F1E8', [x0 + 216, TG - 142, x0 + 232, TG - 150, x0 + 226, TG - 130, x0 + 222, TG - 134]);

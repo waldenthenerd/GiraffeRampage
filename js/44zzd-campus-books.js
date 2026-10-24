@@ -26,7 +26,7 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
     "How does blood get all the way up a giraffe's neck? The answer is a very big heart, about eleven kilograms of muscle.",
     "A giraffe's blood pressure is about twice as high as yours. Strong walls in the arteries keep it from bursting.",
     "When a giraffe bends down to drink, valves and a web of tiny vessels stop too much blood rushing to its head.",
-    "Giraffes are fast. For short sprints they reach about sixty kilometres an hour, which would outrun most hunters.",
+    "Giraffes are fast. For short sprints they reach about sixty kilometers an hour, which would outrun most hunters.",
     "And if a lion does get close, a giraffe's kick is one of the most powerful in the savanna."
   ], [
     X.mc('giraffe', 2, "About how heavy is a giraffe's heart?", ["About 11 kilograms", "About 1 kilogram", "About 100 grams", "About 50 kilograms"]),
@@ -59,14 +59,14 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
   ], "Thunder is the sound of air being heated by lightning so fast that it expands with a boom.");
   B('earth', 2, "The Restless Planet", "Terra Firma", '#B5602A', [
     "Deep inside the Earth, a solid iron heart is wrapped in liquid metal, then a thick layer of hot rock called the mantle.",
-    "The thin crust we live on is broken into plates. They float on the mantle and drift a few centimetres a year, about as fast as your fingernails grow.",
+    "The thin crust we live on is broken into plates. They float on the mantle and drift a few centimeters a year, about as fast as your fingernails grow.",
     "Where plates push together, mountains rise. Where they slip past each other, earthquakes shake the ground.",
     "Many volcanoes sit along plate edges. The Ring of Fire around the Pacific has hundreds of them.",
     "Three hundred million years ago all the land was one supercontinent, Pangaea. The plates carried the pieces apart."
   ], [
     X.mc('earth', 2, "What is the Earth's crust broken into?", ["Plates", "Layers of ice", "Islands only", "Stripes"]),
     X.mc('earth', 2, "What was the supercontinent called?", ["Pangaea", "Atlantis", "Eurasia", "Mu"]),
-    X.tf('earth', 2, "Plates move a few centimetres a year.", true)
+    X.tf('earth', 2, "Plates move a few centimeters a year.", true)
   ], "The Earth's plates drift about as fast as your fingernails grow.");
   B('earth', 3, "Reading the Sky", "Professor Barometer", '#7A8AFF', [
     "Our air is in layers. The troposphere is where weather happens; above it the stratosphere holds the ozone layer that shields us from ultraviolet light.",
@@ -136,7 +136,7 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
   ], [
     X.mc('chem', 2, "What gas makes the fizz of baking soda and vinegar?", ["Carbon dioxide", "Oxygen", "Hydrogen", "Helium"]),
     X.mc('chem', 2, "What is the pH of pure water?", ["7", "1", "10", "14"]),
-    X.mc('chem', 2, "What is the orange coating on old iron called?", ["Rust", "Soot", "Mould", "Verdigris"])
+    X.mc('chem', 2, "What is the orange coating on old iron called?", ["Rust", "Soot", "Mold", "Verdigris"])
   ], "Rust is iron slowly combining with oxygen and water.");
   B('chem', 3, "The Electron's Diary", "E. Lectron", '#FF6A6A', [
     "Dear diary: today I moved house. I was part of a sodium atom, and now I live on a chlorine atom. That is an ionic bond.",
@@ -150,7 +150,7 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
     X.mc('chem', 3, "Which element pulls on electrons hardest?", ["Fluorine", "Oxygen", "Carbon", "Gold"])
   ], "Fluorine is the most electronegative element: nothing else pulls on electrons harder.");
 
-  /* ---- Maths ---- */
+  /* ---- Math ---- */
   B('maths', 1, "The Number Garden", "Sum Plenty", '#F2A23C', [
     "In the number garden, every flower grew in rows. Seven rows of eight made fifty-six petals.",
     "A gardener split a pie of ten roses into halves, then quarters. A quarter is 25 percent.",
@@ -198,20 +198,20 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
     X.mc('phys', 1, "Which is faster: light or sound?", ["Light", "Sound", "They are equal", "It varies"])
   ], "On the Moon, where there is no air, a feather and a hammer dropped together hit the ground at the same time.");
   B('phys', 2, "The Speed of Everything", "Dr. Velocity", '#FFB84D', [
-    "Speed is distance divided by time. A car that goes 100 kilometres in two hours averages 50 kilometres an hour.",
-    "Sound travels at about 343 metres a second in air. Light is almost a million times faster.",
+    "Speed is distance divided by time. A car that goes 100 kilometers in two hours averages 50 kilometers an hour.",
+    "Sound travels at about 343 meters a second in air. Light is almost a million times faster.",
     "Newton's second law: force equals mass times acceleration. Push a heavy trolley and it speeds up slowly.",
-    "Near the ground, falling things speed up by about 9.8 metres a second every second.",
+    "Near the ground, falling things speed up by about 9.8 meters a second every second.",
     "Energy is never made or destroyed. A wind turbine just changes the wind's movement into electricity."
   ], [
     X.mc('phys', 2, "How do you calculate speed?", ["Distance divided by time", "Time divided by distance", "Mass times force", "Force plus mass"]),
-    X.mc('phys', 2, "About how fast does sound travel in air?", ["343 metres per second", "34 metres per second", "3,430 metres per second", "300,000 km/s"]),
+    X.mc('phys', 2, "About how fast does sound travel in air?", ["343 meters per second", "34 meters per second", "3,430 meters per second", "300,000 km/s"]),
     X.tf('phys', 2, "Energy can be created from nothing.", false)
-  ], "Sound travels at about 343 metres per second in air; light is almost a million times faster.");
+  ], "Sound travels at about 343 meters per second in air; light is almost a million times faster.");
   B('phys', 3, "Very Small, Very Fast", "Quark Quantum", '#6BB8E8', [
     "Einstein showed that mass and energy are the same thing in different forms. His equation is E = mc squared.",
     "Light comes in tiny packets called photons. Nothing with mass can go faster than light in a vacuum.",
-    "An ambulance siren sounds higher as it comes towards you and lower as it goes away. That is the Doppler effect.",
+    "An ambulance siren sounds higher as it comes toward you and lower as it goes away. That is the Doppler effect.",
     "Doubling your speed quadruples your kinetic energy, because it depends on speed squared.",
     "Cool some metals close to absolute zero and they become superconductors: electricity flows without any resistance."
   ], [
@@ -245,7 +245,7 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
   ], "On Venus, one day lasts longer than one year.");
   B('space', 3, "A Billion Suns", "Stella Nova", '#FFD84D', [
     "The Sun is only one of hundreds of billions of stars in the Milky Way galaxy.",
-    "A light-year is the distance that light travels in a year, nearly ten trillion kilometres.",
+    "A light-year is the distance that light travels in a year, nearly ten trillion kilometers.",
     "The closest star to the Sun is Proxima Centauri, about 4.2 light-years away.",
     "When a very massive star dies in a supernova, its core may collapse into a neutron star or a black hole.",
     "Distant galaxies are moving away from us, because space itself is expanding. The universe is about 13.8 billion years old."
@@ -253,11 +253,11 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
     X.mc('space', 3, "How old is the universe?", ["About 13.8 billion years", "About 4.5 billion years", "About 100 million years", "About 1 trillion years"]),
     X.mc('space', 3, "Which star is closest to the Sun?", ["Proxima Centauri", "Sirius", "Polaris", "Betelgeuse"]),
     X.mc('space', 3, "A light-year is a unit of...", ["Distance", "Time", "Speed", "Brightness"])
-  ], "A light-year is nearly ten trillion kilometres, the distance light travels in a year.");
+  ], "A light-year is nearly ten trillion kilometers, the distance light travels in a year.");
 
   /* ---- History & Geography ---- */
   B('geo', 1, "Around the World in Ten Pages", "Atlas Wanderer", '#E8D070', [
-    "Our world has seven continents. We start in Africa, where the Nile flows north towards the sea.",
+    "Our world has seven continents. We start in Africa, where the Nile flows north toward the sea.",
     "We cross to Europe. Paris is the capital of France, and London is the capital of the United Kingdom.",
     "In Asia, Tokyo is the capital of Japan, and the Great Wall winds across China.",
     "Down in Australia, kangaroos hop. Australia is both a country and a continent.",
@@ -279,7 +279,7 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
     X.mc('geo', 2, "Where did the Industrial Revolution begin?", ["Britain", "Japan", "Russia", "France"])
   ], "Magellan's expedition was the first to sail round the world, though he did not survive the trip himself.");
   B('geo', 3, "The Long Memory", "Chronos Page", '#8A6A44', [
-    "The Silk Road joined China with the Mediterranean. Along it travelled silk, spices, paper and ideas.",
+    "The Silk Road joined China with the Mediterranean. Along it traveled silk, spices, paper and ideas.",
     "Genghis Khan united the Mongol tribes and founded the largest land empire in history.",
     "In 1215 King John of England agreed to the Magna Carta, a promise that even the king was under the law.",
     "In 79 AD Vesuvius erupted and buried the Roman town of Pompeii under ash.",

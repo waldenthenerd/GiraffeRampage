@@ -40,16 +40,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 167 | 54,550 | 4.10 MiB (4,294,803 bytes) |
+| JavaScript (`js/`) | 167 | 54,550 | 4.10 MiB (4,294,754 bytes) |
 | Styles (`css/`) | 6 | 1,709 | 158 KiB (161,391 bytes) |
 | Page (`index.html`) | 1 | 215 | 9.2 KiB (9,440 bytes) |
-| **Whole game** | **174** | **56,474** | **4.26 MiB (4,465,634 bytes)** |
+| **Whole game** | **174** | **56,474** | **4.26 MiB (4,465,585 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,904 lines, 4.22 MiB (4,421,928 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 167 | 54,550 | 4.10 MiB (4,294,803 bytes) |
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,904 lines, 4.22 MiB (4,421,879 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 167 | 54,550 | 4.10 MiB (4,294,754 bytes) |
 | Styles (`css/`) | 6 | 1,709 | 158 KiB (161,391 bytes) |
 | Page (`index.html`) | 1 | 215 | 9.2 KiB (9,440 bytes) |
-| **Whole game** | **174** | **56,474** | **4.26 MiB (4,465,634 bytes)** |
+| **Whole game** | **174** | **56,474** | **4.26 MiB (4,465,585 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -203,10 +203,10 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zy-sea-detail.js` | 169 | **The open sea, the small parts.** Wraps `seaDrawTerrain` (water sparkle, starfish, shells, driftwood, crabs, bushes, flowers, palms, tree colours, rock facets, reefs), `seaDrawFeatures` (dock planks, piles and lamps, village roofs and chimneys, the lighthouse beam, barrel and gem glints, shoal fish) and `seaDrawBoat` (planking, rails, windows, lights, a bow wave and a ripple ring, per boat). |
 | `js/44zz-campus.js` | 223 | **Longneck University, the rules.** The eight faculties (`UNI_FAC`: Giraffe Studies, Earth & Weather, Biology, Chemistry, Maths, Physics, Space, History & Geography, each opening after a chapter), levels 1 to 15 (`uniNeed`), the energy (`uniEnergy`, refills at midnight, drinks can push it to twice the most), `uniAddXp`, degrees, the rank ladder (`UNI_RANKS`: Fresher to Chancellor, with a mortarboard, loafers and three coat colours), the smart-giraffe stats (`uniApply` through `applyCityStats`) and the run hooks (dodge in `hurtPlayer`, card cooldowns in `haste`, boss damage in `damageEnemy`, free rerolls in `startRun`, a fourth card in `rollOffer`, Eureka in `chooseCard`, one more slot in `maxCards`), the IQ chip over the HUD bars, and the fix for the gym's Haste stat. Saved in `Save.data.town.uni`. **Intelligence** (`intel()`, `intelPct()`): the average faculty level, 0 to 1, read raw. It is a stat, not a setting: up to 30% less screen shake (`addShake`), 60% fewer falls from boards and bikes, and a slightly wider fishing zone, slower marker and gentler fight. Shown in the university journal and the Guide. |
 | `js/44zza-campus-questions.js` | 205 | The question bank, part 1: the question types (`mc`, `tf`, `ord`, `match`, `est`), `uqFactory`, and 160 questions for Giraffe Studies, Earth & Weather, Biology and Chemistry (tiers 1 to 3, with a short explanation each). |
-| `js/44zzb-campus-questions2.js` | 183 | The question bank, part 2: 160 questions for Maths, Physics, Space and History & Geography. `UNI_Q` and `UNI_Q_BY_ID` hold all 320. |
+| `js/44zzb-campus-questions2.js` | 183 | The question bank, part 2: 160 questions for Math, Physics, Space and History & Geography. `UNI_Q` and `UNI_Q_BY_ID` hold all 320. |
 | `js/44zzc-campus-lectures.js` | 381 | `UNI_LECTURES`: 32 lectures (four per faculty), each four slides with a picture key and four questions (three are asked). |
 | `js/44zzd-campus-books.js` | 292 | `UNI_BOOKS`: 24 books (three per faculty, one per tier), each five pages, three questions (two are asked) and a fact for the notebook. |
-| `js/44zze-campus-town.js` | 372 | **The Campus district and its people.** The `campus` district (reached through an iron gate in the Town Square once Chapter 1 is done), six interiors (Registrar's Hall, Lecture Theatre, Library, Homework Hall, Exam Hall, Campus Café), nine giraffes, ten errands (the `uni` need kind), five finds, the door and action wrappers, the café shop (`UNI_SHOP`; food from the satchel gives energy too), and the panels (registrar, faculties, degrees, ranks, notebook, café, and a Study tab in the journal). |
+| `js/44zze-campus-town.js` | 372 | **The Campus district and its people.** The `campus` district (reached through an iron gate in the Town Square once Chapter 1 is done), six interiors (Registrar's Hall, Lecture Theater, Library, Homework Hall, Exam Hall, Campus Café), nine giraffes, ten errands (the `uni` need kind), five finds, the door and action wrappers, the café shop (`UNI_SHOP`; food from the satchel gives energy too), and the panels (registrar, faculties, degrees, ranks, notebook, café, and a Study tab in the journal). |
 | `js/44zzf-campus-study.js` | 396 | **The four things to do.** Lecture (2 energy), reading (1), homework (1) and exam (3): the pickers, the slides and pages, the question card in all five formats, the 30-second exam timer (7 of 10 passes), flashcards, first-time bonuses, repeat decay, degrees and badges, and the errand counters. |
 | `js/44zzg-campus-art.js` | 437 | The Campus painting outdoors: the spires, hills and trees, lawns and paving, the iron gate, the arch and the six street buildings, the hedge, notice board, bikes, founder's statue, fountain and faculty banners (`uniEmblem`), and the mortarboard and loafers. |
 | `js/44zzh-campus-rooms.js` | 294 | The six rooms of the university: walls (`IV_ROOMS.uhall` and the rest) and every piece of furniture (`UNI_FURN` by `u_` kind: the registrar's desk, faculty board, hall of degrees, rank cabinet, stage, seats, the eight faculty bookcases, reading table, desks, results board, café bar and tables). |

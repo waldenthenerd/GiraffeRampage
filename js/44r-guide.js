@@ -99,16 +99,16 @@ const GUIDE_TOPICS = [
       '<li>Each one is a short challenge with a goal. Win it for one star, and reach the two harder targets for the second and third.</li>' +
       '<li>Every minigame you finish spins the <b>wheel</b>: 65% a hat, 30% boots, 5% a rare hat. More stars make the rare hats likelier, and from two stars a duplicate is rolled again. A duplicate pays gems.</li>' +
       '<li>Your best score is kept whether you win or lose, and the first time you reach each star pays gems.</li>' +
-      '<li>Three stars in a minigame unlocks its own coat colour.</li>' +
+      '<li>Three stars in a minigame unlocks its own coat color.</li>' +
       '<li>There is one play every two minutes, shared by all of them.</li>' +
       '<li>The <b>Collection</b> shows every hat and boot, and what you have found.</li></ul>';
   } },
-  { id: 'wardrobe', title: 'Coat colours, outfits and photos', show: function(){ return true; }, html: function(){
+  { id: 'wardrobe', title: 'Coat colors, outfits and photos', show: function(){ return true; }, html: function(){
     return '<ul class="helplist">' +
-      '<li>Every chapter you finish gives a coat colour and a spot pattern. Skin, spots, pattern and gear accent are chosen separately.</li>' +
-      '<li>Hats and boots won in the minigames can be worn, and recoloured with any colour you have unlocked.</li>' +
+      '<li>Every chapter you finish gives a coat color and a spot pattern. Skin, spots, pattern and gear accent are chosen separately.</li>' +
+      '<li>Hats and boots won in the minigames can be worn, and recoloured with any color you have unlocked.</li>' +
       '<li>Up to six <b>outfits</b> can be saved and worn again.</li>' +
-      '<li>The <b>Photo</b> button takes pictures: pick a scene and a pose, then add effects and creatures you have discovered, and drag them where you want them. Up to 48 photos can be kept in the album, and any photo can be shared as a code that a friend can open and edit. Creatures a friend has not discovered yet are left out of a shared photo, but her colours, hat and boots stay.</li></ul>';
+      '<li>The <b>Photo</b> button takes pictures: pick a scene and a pose, then add effects and creatures you have discovered, and drag them where you want them. Up to 48 photos can be kept in the album, and any photo can be shared as a code that a friend can open and edit. Creatures a friend has not discovered yet are left out of a shared photo, but her colors, hat and boots stay.</li></ul>';
   } },
   { id: 'films', title: 'Films', show: guideFilms, html: function(){
     return '<p>Story scenes you have seen are kept in the Films list on the main menu, and can be replayed there at any time.</p>';
@@ -117,7 +117,7 @@ const GUIDE_TOPICS = [
     return '<p>The Peaceful Lune trinket slows time for 8 seconds when you press ' + guideKey('slow') + ' during a run. It then needs 30 seconds before it can be used again.</p>';
   } },
   { id: 'ants', title: 'The ant colony', show: guideAnts, html: function(){
-    return '<p>An anthill now sits at the centre of the arena in every run, and the ants you hire fight beside you.</p><ul class="helplist">' +
+    return '<p>An anthill now sits at the center of the arena in every run, and the ants you hire fight beside you.</p><ul class="helplist">' +
       '<li>Hire ants at the trading post with food. There are three kinds: the <b>Soldier</b> charges and bites, the <b>Distractor</b> draws enemies off you and bursts when it falls, and the <b>Shooter</b> spits acid from a distance.</li>' +
       '<li>Hired ants are permanent. Each kind returns from the anthill 15 seconds after it falls, as long as fewer are out than you own.</li>' +
       '<li>Food comes from foraging, and can also be made from gold and gems at the trading post.</li>' +

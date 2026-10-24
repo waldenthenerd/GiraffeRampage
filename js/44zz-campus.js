@@ -11,11 +11,11 @@
    EIGHT FACULTIES, each opening after a chapter. Each is a skill with levels 1 to 15 that cost 10 + 18 ln(l + 1) xp each; every level gives a
    little and levels 5, 10 and 15 give a bigger bonus, exactly as at the gym. What they give (all in a run, none of them the gym's):
      Giraffe Studies (Ch 1) xp gain · Earth & Weather (Ch 2) dodge chance · Biology (Ch 3) drop luck · Chemistry (Ch 4) free rerolls ·
-     Maths (Ch 6) gold gain · Physics (Ch 7) card cooldowns · Space (Ch 8) boss damage · History & Geography (Ch 10) pickup range.
+     Math (Ch 6) gold gain · Physics (Ch 7) card cooldowns · Space (Ch 8) boss damage · History & Geography (Ch 10) pickup range.
    The faculty's tier (level 0-4 tier 1, 5-9 tier 2, 10-15 tier 3) sets how hard its questions are, and the three exams of a faculty (Bachelor,
    Master, Doctorate) need level 5, 10 and 15. A passed exam is a degree step; the Doctorate is the faculty's badge.
    RANK is the sum of every faculty's level: Fresher, Student (a mortarboard), Scholar (loafers), Graduate, Professor, Chancellor (each of the
-   last three a coat colour). Rank also gives the SMART GIRAFFE perks in a run: a chance of a fourth card to choose from at every level-up, a
+   last three a coat color). Rank also gives the SMART GIRAFFE perks in a run: a chance of a fourth card to choose from at every level-up, a
    chance of a free card level ("Eureka!"), and at Chancellor one more card slot.
    Saved in Save.data.town.uni = { day, en, lamps, bought, fac: { id: { l, xp } }, deg: { id: 0-3 }, badge: { id: 1 }, rk: { n: 1 }, seen: { qid: n },
    read: { bookId: n }, lec: { lectureId: n }, facts: { id: 1 }, buff: { xp, flash, key }, n: { sessions, exams, passed, hw, books, lectures, correct, wrong } }
@@ -29,7 +29,7 @@ const UNI_FAC = [
   { id: 'earth', name: 'Earth & Weather', short: 'EARTH', ch: 2, col: '#6BB8E8', key: 'dodge', per: 0.004, ms: [0.01, 0.02, 0.03], fmt: 'pct', lbl: 'Dodge chance', prof: 'fern', blurb: 'Wind, rain, rocks, oceans and why the sky does what it does.' },
   { id: 'bio', name: 'Biology', short: 'BIOLOGY', ch: 3, col: '#6BD88A', key: 'dropMul', per: 0.012, ms: [0.03, 0.05, 0.08], fmt: 'pct', lbl: 'Drop luck', prof: 'fern', blurb: 'Cells, plants, bodies and the strange lives of animals.' },
   { id: 'chem', name: 'Chemistry', short: 'CHEMISTRY', ch: 4, col: '#B58AE8', key: 'rerolls', per: 0, ms: [0, 0, 0], fmt: 'rerolls', lbl: 'Free rerolls', prof: 'orbit', blurb: 'Atoms, elements, reactions and what everything is made of.' },
-  { id: 'maths', name: 'Maths', short: 'MATHS', ch: 6, col: '#F2A23C', key: 'goldMul', per: 0.012, ms: [0.03, 0.06, 0.10], fmt: 'pct', lbl: 'Gold gain', prof: 'chalk', blurb: 'Numbers, shapes, patterns and sums that behave.' },
+  { id: 'maths', name: 'Math', short: 'MATH', ch: 6, col: '#F2A23C', key: 'goldMul', per: 0.012, ms: [0.03, 0.06, 0.10], fmt: 'pct', lbl: 'Gold gain', prof: 'chalk', blurb: 'Numbers, shapes, patterns and sums that behave.' },
   { id: 'phys', name: 'Physics', short: 'PHYSICS', ch: 7, col: '#FF6A6A', key: 'cdRed', per: 0.005, ms: [0.01, 0.02, 0.03], fmt: 'pctdown', lbl: 'Card cooldowns', prof: 'orbit', blurb: 'Forces, light, sound, energy and how the world moves.' },
   { id: 'space', name: 'Space', short: 'SPACE', ch: 8, col: '#7A8AFF', key: 'bossDmg', per: 0.012, ms: [0.04, 0.08, 0.12], fmt: 'pct', lbl: 'Boss damage', prof: 'orbit', blurb: 'Planets, stars, rockets and the long way up.' },
   { id: 'geo', name: 'History & Geography', short: 'HISTORY', ch: 10, col: '#E8D070', key: 'pickupMul', per: 0.015, ms: [0.05, 0.08, 0.12], fmt: 'pct', lbl: 'Pickup range', prof: 'quill', blurb: 'Maps, countries, old empires and how people got here.' }
@@ -121,7 +121,7 @@ function uniCheckRank(){
     if (!i || n < r.at || u.rk[i]) return; u.rk[i] = 1;
     let txt = 'University rank: ' + r.n + '!';
     if (r.acc) txt += '  ' + townPay({ acc: r.acc });
-    if (r.swatch){ townData().found[r.swatch] = 1; txt += '  New coat colour: ' + WARD[UNI_SWATCH[r.swatch]].name; }
+    if (r.swatch){ townData().found[r.swatch] = 1; txt += '  New coat color: ' + WARD[UNI_SWATCH[r.swatch]].name; }
     Save.write(); msgs.push(txt);
     if (typeof townToast === 'function') townToast(txt, '#FFE9A0'); try { SFX.transform(); } catch (e) {}
   });
@@ -202,7 +202,7 @@ function uniRerolls(){ return Math.floor(uniFac('chem').l / 3); }
   };
 })();
 
-/* ---- the swatches (coat colours) and the accessories that ranks give ---- */
+/* ---- the swatches (coat colors) and the accessories that ranks give ---- */
 const UNI_SWATCH = {};
 (function(){
   [['Graduate Gown', '#2B2F4A', 'uni_grad'], ['Professor Tweed', '#8A7458', 'uni_prof'], ['Chancellor Crimson', '#8E1F3A', 'uni_chan']].forEach(function(w){ WARD_TOWN.push(w); WARD.push({ name: w[0], c: w[1] }); UNI_SWATCH[w[2]] = WARD.length - 1; });

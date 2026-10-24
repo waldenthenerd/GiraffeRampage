@@ -84,7 +84,7 @@
   function pickFaculty(kind){
     const u = uniData(), ex = kind === 'exam';
     let h = '<div class="tp-title">' + (ex ? 'THE EXAM HALL' : 'HOMEWORK DESKS') + '</div><p class="bp">' +
-      (ex ? 'Ten questions, thirty seconds each, no answers until the end. Seven right is a pass and a step towards a degree. A retake costs energy again.' : 'Six questions from the faculty bank, at the faculty\'s level. You see the answer after each one.') + '</p>' +
+      (ex ? 'Ten questions, thirty seconds each, no answers until the end. Seven right is a pass and a step toward a degree. A retake costs energy again.' : 'Six questions from the faculty bank, at the faculty\'s level. You see the answer after each one.') + '</p>' +
       energyLine(ex ? 3 : 1) + '<div class="unicards">';
     UNI_FAC.forEach(function(F){
       const open = uniOpen(F), k = uniFac(F.id), d = u.deg[F.id] | 0;

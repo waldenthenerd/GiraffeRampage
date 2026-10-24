@@ -50,11 +50,11 @@
   Q.mc('maths', 3, "What is the area of a circle of radius 3?", ["9 pi", "6 pi", "3 pi", "18 pi"], "Pi times the radius squared.");
 
   /* ---------------------------------------------- PHYSICS ---------------------------------------------- */
-  Q.mc('phys', 1, "Which force pulls objects towards the Earth?", ["Gravity", "Magnetism", "Friction", "Static"], "Gravity keeps us on the ground.");
+  Q.mc('phys', 1, "Which force pulls objects toward the Earth?", ["Gravity", "Magnetism", "Friction", "Static"], "Gravity keeps us on the ground.");
   Q.mc('phys', 1, "Roughly how fast does light travel?", ["300,000 km per second", "300 km per second", "3,000 km per second", "30 million km per second"], "It could circle the Earth about seven times in a second.");
   Q.mc('phys', 1, "Which travels faster: light or sound?", ["Light", "Sound", "They are equal", "It depends on the weather"], "You see lightning before you hear thunder.");
   Q.mc('phys', 1, "What do we call energy of movement?", ["Kinetic energy", "Potential energy", "Chemical energy", "Nuclear energy"], "Anything moving has kinetic energy.");
-  Q.mc('phys', 1, "Which metal is attracted to a magnet?", ["Iron", "Gold", "Aluminium", "Copper"], "Iron, nickel and cobalt are magnetic.");
+  Q.mc('phys', 1, "Which metal is attracted to a magnet?", ["Iron", "Gold", "Aluminum", "Copper"], "Iron, nickel and cobalt are magnetic.");
   Q.tf('phys', 1, "In a vacuum, a heavy ball and a feather fall at the same speed.", true, "Without air, gravity pulls everything equally.");
   Q.tf('phys', 1, "Sound can travel through the vacuum of space.", false, "Sound needs a material to travel through.");
   Q.mc('phys', 1, "What is a push or a pull called?", ["A force", "A wave", "A current", "A field"], "Forces change how things move.");
@@ -70,15 +70,15 @@
   Q.mc('phys', 2, "Newton's first law says an object keeps still or moves steadily unless what happens?", ["A force acts on it", "It gets hot", "It runs out of energy", "It is touched"], "That tendency is called inertia.");
   Q.mc('phys', 2, "What is the unit of force?", ["The newton", "The joule", "The watt", "The pascal"], "Named for Isaac Newton.");
   Q.mc('phys', 2, "Which equation links force, mass and acceleration?", ["F = ma", "E = mc squared", "V = IR", "P = IV"], "Newton's second law.");
-  Q.mc('phys', 2, "How do you work out speed?", ["Distance divided by time", "Time divided by distance", "Mass times time", "Force times distance"], "Metres per second, miles per hour...");
+  Q.mc('phys', 2, "How do you work out speed?", ["Distance divided by time", "Time divided by distance", "Mass times time", "Force times distance"], "Meters per second, miles per hour...");
   Q.mc('phys', 2, "What kind of wave is sound?", ["A longitudinal (pressure) wave", "A transverse wave", "An electromagnetic wave", "A gamma wave"], "It squeezes and stretches the air.");
   Q.ord('phys', 2, "Put these in order of increasing frequency.", ["Radio waves", "Microwaves", "Visible light", "X-rays"], "From long, low-energy waves to short, high-energy ones.");
   Q.match('phys', 2, "Match each unit to what it measures.", [["Newton", "Force"], ["Joule", "Energy"], ["Watt", "Power"], ["Volt", "Electrical potential"]], "SI units named after scientists.");
   Q.tf('phys', 2, "Energy can be created from nothing.", false, "Energy is conserved: it only changes form.");
-  Q.mc('phys', 2, "What does a prism do to white light?", ["Splits it into colours", "Makes it brighter", "Makes it vanish", "Turns it to sound"], "Different colours bend by different amounts.");
-  Q.mc('phys', 2, "Near the Earth's surface, a falling object accelerates at about...", ["9.8 metres per second every second", "1 metre per second every second", "98 metres per second every second", "It falls at constant speed"], "That is g.");
-  Q.est('phys', 2, "About how fast does sound travel in air, in metres per second?", 343, 45, "m/s", 0, 1000, "Around 343 m/s at room temperature.");
-  Q.mc('phys', 2, "Which colour of visible light has the longest wavelength?", ["Red", "Violet", "Green", "Blue"], "Violet is the shortest.");
+  Q.mc('phys', 2, "What does a prism do to white light?", ["Splits it into colors", "Makes it brighter", "Makes it vanish", "Turns it to sound"], "Different colors bend by different amounts.");
+  Q.mc('phys', 2, "Near the Earth's surface, a falling object accelerates at about...", ["9.8 meters per second every second", "1 meter per second every second", "98 meters per second every second", "It falls at constant speed"], "That is g.");
+  Q.est('phys', 2, "About how fast does sound travel in air, in meters per second?", 343, 45, "m/s", 0, 1000, "Around 343 m/s at room temperature.");
+  Q.mc('phys', 2, "Which color of visible light has the longest wavelength?", ["Red", "Violet", "Green", "Blue"], "Violet is the shortest.");
   Q.mc('phys', 2, "In which unit is electric current measured?", ["Amperes", "Volts", "Ohms", "Watts"], "Often called amps.");
   Q.mc('phys', 2, "A wind turbine turns kinetic energy of the wind into what?", ["Electrical energy", "Chemical energy", "Nuclear energy", "Sound only"], "The blades drive a generator.");
 
@@ -121,7 +121,7 @@
   Q.mc('space', 2, "Which planet spins tipped almost on its side?", ["Uranus", "Mars", "Earth", "Jupiter"], "Its axis is tilted about 98 degrees.");
   Q.tf('space', 2, "A day on Venus is longer than its year.", true, "Venus turns very slowly: one spin takes longer than one orbit.");
   Q.mc('space', 2, "What was the first artificial satellite?", ["Sputnik 1", "Explorer 1", "Apollo 1", "Vostok 1"], "The Soviet Union launched it in 1957.");
-  Q.est('space', 2, "About how far away is the Moon, in thousands of kilometres?", 384, 50, "thousand km", 100, 1000, "About 384,000 km.");
+  Q.est('space', 2, "About how far away is the Moon, in thousands of kilometers?", 384, 50, "thousand km", 100, 1000, "About 384,000 km.");
   Q.mc('space', 2, "A comet is mostly made of what?", ["Ice and dust", "Solid iron", "Hot gas", "Liquid water"], "Its tail forms as the ice melts near the Sun.");
   Q.mc('space', 2, "Which space telescope, launched in 1990, has taken famous deep-space photographs?", ["Hubble", "Kepler", "Spitzer", "Voyager"], "It orbits Earth above the blurring atmosphere.");
   Q.mc('space', 2, "What was the name of the Apollo 11 lunar module that landed on the Moon?", ["Eagle", "Columbia", "Odyssey", "Falcon"], "Columbia was the command module.");
@@ -130,7 +130,7 @@
   Q.mc('space', 3, "Which star is closest to the Sun?", ["Proxima Centauri", "Sirius", "Betelgeuse", "Polaris"], "About 4.2 light-years away.");
   Q.mc('space', 3, "Which planet is farthest from the Sun?", ["Neptune", "Uranus", "Saturn", "Pluto"], "Pluto is a dwarf planet.");
   Q.mc('space', 3, "What is the boundary around a black hole called, beyond which nothing can escape?", ["The event horizon", "The corona", "The singularity belt", "The photosphere"], "Even light cannot get out.");
-  Q.mc('space', 3, "Hubble's observations showed that distant galaxies are doing what?", ["Moving away from us", "Moving towards us", "Standing still", "Spinning faster"], "The universe is expanding.");
+  Q.mc('space', 3, "Hubble's observations showed that distant galaxies are doing what?", ["Moving away from us", "Moving toward us", "Standing still", "Spinning faster"], "The universe is expanding.");
   Q.mc('space', 3, "What is Saturn's largest moon?", ["Titan", "Europa", "Ganymede", "Triton"], "It has a thick atmosphere and lakes of liquid methane.");
   Q.mc('space', 3, "Which planet's moon Europa is thought to hide an ocean under its ice?", ["Jupiter", "Saturn", "Mars", "Neptune"], "A target in the search for life.");
   Q.mc('space', 3, "In which year did humans first land on the Moon?", ["1969", "1961", "1972", "1957"], "Apollo 11, July 1969.");
@@ -147,7 +147,7 @@
   Q.mc('geo', 1, "What is the capital of the United States?", ["Washington, D.C.", "New York", "Los Angeles", "Chicago"], "Named after the first president.");
   Q.mc('geo', 1, "Which country is shaped like a boot?", ["Italy", "Spain", "Greece", "Portugal"], "It has a heel and a toe.");
   Q.mc('geo', 1, "Which ancient people built the pyramids of Giza?", ["The Egyptians", "The Romans", "The Greeks", "The Maya"], "About 4,500 years ago.");
-  Q.mc('geo', 1, "What is the tallest mountain on Earth above sea level?", ["Mount Everest", "K2", "Kilimanjaro", "Mont Blanc"], "It is 8,849 metres high.");
+  Q.mc('geo', 1, "What is the tallest mountain on Earth above sea level?", ["Mount Everest", "K2", "Kilimanjaro", "Mont Blanc"], "It is 8,849 meters high.");
   Q.tf('geo', 1, "Australia is both a country and a continent.", true, "It is the only one that is.");
   Q.mc('geo', 1, "Which animal is a symbol of Australia?", ["The kangaroo", "The giraffe", "The lion", "The bison"], "It appears on the coat of arms.");
   Q.mc('geo', 1, "What is the capital of the United Kingdom?", ["London", "Edinburgh", "Cardiff", "Dublin"], "On the River Thames.");
@@ -161,7 +161,7 @@
   Q.mc('geo', 2, "Which river flows through Cairo?", ["The Nile", "The Congo", "The Tigris", "The Niger"], "It flows north to the sea.");
   Q.ord('geo', 2, "Put these in order, earliest first.", ["The pyramids of Giza", "The Roman Colosseum", "Columbus's voyage", "The Moon landing"], "About 2500 BC, 80 AD, 1492 and 1969.");
   Q.match('geo', 2, "Match each country to its capital.", [["Kenya", "Nairobi"], ["Canada", "Ottawa"], ["Brazil", "Brasilia"], ["Turkey", "Ankara"]], "None of them are the biggest city.");
-  Q.mc('geo', 2, "Which ancient civilisation built Machu Picchu?", ["The Inca", "The Aztec", "The Maya", "The Olmec"], "It sits high in the Andes of Peru.");
+  Q.mc('geo', 2, "Which ancient civilization built Machu Picchu?", ["The Inca", "The Aztec", "The Maya", "The Olmec"], "It sits high in the Andes of Peru.");
   Q.mc('geo', 2, "In which country did the Renaissance begin?", ["Italy", "England", "France", "Germany"], "Florence was its birthplace.");
   Q.tf('geo', 2, "The Berlin Wall came down in 1989.", true, "It marked the end of a divided Germany.");
   Q.mc('geo', 2, "Which continent has the most countries?", ["Africa", "Asia", "Europe", "South America"], "Fifty-four.");
@@ -173,7 +173,7 @@
   Q.mc('geo', 3, "Which king agreed to the Magna Carta in 1215?", ["King John", "Henry VIII", "Richard the Lionheart", "Edward I"], "It limited the king's power.");
   Q.mc('geo', 3, "Which Roman town was buried by the eruption of Vesuvius in 79 AD?", ["Pompeii", "Athens", "Carthage", "Alexandria"], "The ash preserved it.");
   Q.mc('geo', 3, "What is the smallest country in the world?", ["Vatican City", "Monaco", "Liechtenstein", "San Marino"], "It is inside the city of Rome.");
-  Q.mc('geo', 3, "The Silk Road linked China with which region?", ["The Mediterranean and Europe", "Australia", "North America", "Antarctica"], "Goods and ideas travelled along it for centuries.");
+  Q.mc('geo', 3, "The Silk Road linked China with which region?", ["The Mediterranean and Europe", "Australia", "North America", "Antarctica"], "Goods and ideas traveled along it for centuries.");
   Q.mc('geo', 3, "Whose expedition was the first to sail all the way around the world, starting in 1519?", ["Ferdinand Magellan's", "Christopher Columbus's", "Vasco da Gama's", "Captain Cook's"], "Magellan died on the way; part of his crew finished the trip.");
   Q.tf('geo', 3, "The Nile flows from south to north.", true, "It runs from central Africa to the Mediterranean.");
   Q.mc('geo', 3, "Which line of longitude is 0 degrees?", ["The Prime Meridian", "The equator", "The International Date Line", "The Tropic of Cancer"], "It passes through Greenwich in London.");
