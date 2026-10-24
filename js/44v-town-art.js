@@ -81,12 +81,11 @@ function townGiraffe(ctx, x, gy, o){
       else { ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.ellipse(fx + 1, fy + 3, 4.6, 3.4, 0, 0, TAU); ctx.fill(); }
     }
     ctx.strokeStyle = cl.dark; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-22, -2); ctx.quadraticCurveTo(-32, 0, -34, (seated ? (lie ? 12 : 24) : 9) + Math.sin(t * 5 + (o.seed || 0)) * (seated ? 1.5 : 3)); ctx.stroke();
-    ctx.save(); if (seated) ctx.rotate(lie ? 0.02 : -0.13);
+    ctx.save(); if (seated){ ctx.translate(-1, lie ? 0 : 4); ctx.rotate(lie ? 0.02 : -0.3); }              /* sitting is the body itself: the rump settles down and the chest comes up (no extra shape under her) */
     ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(0, 0, 24, 15, 0, 0, TAU); ctx.fill();
     ctx.save(); ctx.beginPath(); ctx.ellipse(0, 0, 24, 15, 0, 0, TAU); ctx.clip(); ctx.fillStyle = cl.spot;
     if (typeof SPOTS !== 'undefined') for (let i = 0; i < SPOTS.length; i++){ const sp = SPOTS[i]; wardSpot(ctx, pat, sp.x, sp.y * 0.9, sp.r, sp.r * 0.82, i * 0.7); }
     ctx.restore();
-    if (seated){ ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(-12, lie ? 6 : 15, 11, 10, 0.5, 0, TAU); ctx.fill(); }     /* the folded haunch */
     ctx.restore();
     /* the neck: from the shoulder to the head, with spots that spread out as it stretches */
     ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.moveTo(10, -8); ctx.lineTo(hx - 8, hy + 4); ctx.lineTo(hx + 4, hy + 4); ctx.lineTo(20, 2); ctx.closePath(); ctx.fill();
