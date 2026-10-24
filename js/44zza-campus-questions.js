@@ -1,7 +1,7 @@
 'use strict';
 /* =============================================================================================================================
    44zza-campus-questions.js  --  LONGNECK UNIVERSITY: the question bank, part 1 (Giraffe Studies, Earth & Weather, Biology, Chemistry).
-   Part 2 (Maths, Physics, Space, History & Geography) is 44zzb; the lectures and books are 44zzc.
+   Part 2 (Math, Physics, Space, History & Geography) is 44zzb, parts 3 to 6 (more of every faculty) are 44zzb1 to 44zzb4; the lectures and books are 44zzc.
 
    Every question has a faculty (f), a tier (t: 1 easy, 2 medium, 3 hard; it follows the faculty level, see uniTier), a type and an id.
    Types and what they hold:
@@ -13,10 +13,10 @@
    e is the short explanation shown after an answer. Questions in the main bank (UNI_Q) are used by homework and exams; the ones inside
    a lecture or a book are only for that lecture or book (see 44zzc).
    ============================================================================================================================= */
-const UNI_Q = [], UNI_Q_BY_ID = {};
-function uqFactory(register){
-  const n = {};
-  const add = function(o){ n[o.f] = (n[o.f] | 0) + 1; o.id = (register ? 'q_' : 'x_') + o.f + n[o.f]; if (register){ UNI_Q.push(o); UNI_Q_BY_ID[o.id] = o; } return o; };
+const UNI_Q = [], UNI_Q_BY_ID = {}, UQ_N = {}, UQ_NY = {};                      /* UQ_N counts the main bank per faculty, shared by every part, so a part added later carries on the ids (q_geo41...) */
+function uqFactory(register, later){                             /* later: a lecture or book part added after the first (ids y_giraffe1...), so the older x_ ids stay as they were */
+  const n = register ? UQ_N : later ? UQ_NY : {};
+  const add = function(o){ n[o.f] = (n[o.f] | 0) + 1; o.id = (register ? 'q_' : later ? 'y_' : 'x_') + o.f + n[o.f]; if (register){ UNI_Q.push(o); UNI_Q_BY_ID[o.id] = o; } return o; };
   return {
     mc: function(f, t, q, o, e){ return add({ f: f, t: t, type: 'mc', q: q, o: o, e: e || '' }); },
     tf: function(f, t, q, a, e){ return add({ f: f, t: t, type: 'tf', q: q, a: !!a, e: e || '' }); },
@@ -83,7 +83,7 @@ function uqFactory(register){
   Q.mc('earth', 1, "What is hot liquid rock called when it erupts from a volcano?", ["Lava", "Magma", "Ash", "Pumice"], "Underground it is called magma; on the surface it is lava.");
   Q.mc('earth', 1, "Which continent is the coldest?", ["Antarctica", "Asia", "Europe", "North America"], "Antarctica is the coldest, driest and windiest continent.");
   Q.tf('earth', 1, "A bolt of lightning is hotter than the surface of the Sun.", true, "Lightning can heat the air to around 30,000 degrees Celsius.");
-  Q.mc('earth', 1, "In the water cycle, what is it called when vapour turns into droplets?", ["Condensation", "Evaporation", "Erosion", "Freezing"], "Condensation makes clouds.");
+  Q.mc('earth', 1, "In the water cycle, what is it called when vapor turns into droplets?", ["Condensation", "Evaporation", "Erosion", "Freezing"], "Condensation makes clouds.");
   Q.mc('earth', 1, "What is the longest river in Africa?", ["The Nile", "The Congo", "The Niger", "The Zambezi"], "The Nile flows north to the Mediterranean.");
   Q.mc('earth', 1, "Which instrument measures air pressure?", ["A barometer", "A thermometer", "An anemometer", "A compass"], "Falling pressure often means rain is coming.");
   Q.mc('earth', 1, "What do we call a spinning column of air touching the ground?", ["A tornado", "A drizzle", "A breeze", "A frost"], "Tornadoes can be very destructive.");
@@ -199,7 +199,7 @@ function uqFactory(register){
   Q.tf('chem', 3, "Isotopes of the same element have different numbers of neutrons.", true, "Carbon-12 and carbon-14 are both carbon.");
   Q.mc('chem', 3, "Which is the most electronegative element?", ["Fluorine", "Oxygen", "Chlorine", "Nitrogen"], "Fluorine pulls on electrons harder than any other.");
   Q.mc('chem', 3, "What is the chemical formula of methane?", ["CH4", "C2H6", "CO2", "H2O2"], "It is the main part of natural gas.");
-  Q.mc('chem', 3, "Which acid is found in the human stomach?", ["Hydrochloric acid", "Sulphuric acid", "Nitric acid", "Citric acid"], "It helps break down food and kills germs.");
+  Q.mc('chem', 3, "Which acid is found in the human stomach?", ["Hydrochloric acid", "Sulfuric acid", "Nitric acid", "Citric acid"], "It helps break down food and kills germs.");
   Q.mc('chem', 3, "In chemistry, oxidation is the loss of what?", ["Electrons", "Protons", "Neutrons", "Heat"], "Remember: OIL RIG, oxidation is loss.");
   Q.mc('chem', 3, "A base is best described as a substance that...", ["Accepts protons or neutralizes acids", "Tastes sour", "Turns litmus red", "Always dissolves metals"], "Bases react with acids to form salts.");
 })();
