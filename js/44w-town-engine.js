@@ -324,10 +324,16 @@ function townDig(i){
 }
 
 /* ---- drawing ---- */
-function townLayerCanvas(w, h, R, paint, D){
+function townLayerCanvas(w, h, R, paint, D, splittable){
   const cv = document.createElement('canvas'); cv.width = Math.ceil(w * R); cv.height = Math.ceil(h * R);
-  const c = cv.getContext('2d'); c.scale(R, R); paint(c, D, w, h, R);
-  return { cv: cv, w: w, h: h };
+  const c = cv.getContext('2d'); c.scale(R, R);
+  let back = null;
+  if (splittable) c.split = function(){                                    /* everything painted so far becomes the back picture; the canvas is cleared for what stands in front */
+    back = document.createElement('canvas'); back.width = cv.width; back.height = cv.height; back.getContext('2d').drawImage(cv, 0, 0);
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, cv.width, cv.height); c.restore();
+  };
+  paint(c, D, w, h, R);
+  return { cv: cv, w: w, h: h, back: back ? { cv: back, w: w, h: h } : null };
 }
 function townGetLayers(D, V){
   const R = clamp(V.sc * (G.dpr || 1), 0.55, 1.5), RR = Math.min(R, 4096 / D.w);
@@ -338,7 +344,7 @@ function townGetLayers(D, V){
   const L = {
     far: townLayerCanvas(Math.ceil(fw), 600, Math.min(RR, 1), townPaintFar, D),
     mid: townLayerCanvas(Math.ceil(mw), 600, Math.min(RR, 1.1), townPaintMid, D),
-    field: townLayerCanvas(D.w, 600, RR, townPaintField, D)
+    field: townLayerCanvas(D.w, 600, RR, townPaintField, D, !!D.behind)
   };
   Town.layers = L; Town.layerKey = key;
   return L;
@@ -391,6 +397,13 @@ function townNpcProp(ctx, n, hd, t){
   }
   ctx.restore();
 }
+/* The draw order of a street, back to front (nothing may fake depth with clip shapes: put it in the right tier instead):
+     1 sky, far and mid scenery (cached, js 44v)     2 the street's back picture: water and ground (cached, only when D.behind is set)
+     3 townDynamicBehind: moving things that live behind the props (sailboats)
+     4 the street's front picture: every prop and building (cached)     5 lit windows, then townDynamic: everything else that moves
+     6 the herd, then her     7 the glow of the lights and the evening tint     8 weather     9 the interface
+   A street gets tier 2 and 3 by setting D.behind = true (js/44zc-town-life.js does this for the harbour). */
+function townDynamicBehind(ctx, D, t, dark){}
 function townDynamic(ctx, D, t, dark){
   const h = townHour();
   if (D.id === 'square'){
@@ -461,6 +474,7 @@ function renderTown(ctx){
   ctx.save(); ctx.translate(-cam, 0);
   ctx.drawImage(L.far.cv, cam * 0.75, 0, L.far.w, 600);
   ctx.drawImage(L.mid.cv, cam * 0.45, 0, L.mid.w, 600);
+  if (L.field.back){ ctx.drawImage(L.field.back.cv, 0, 0, D.w, 600); townDynamicBehind(ctx, D, t, dark); }       /* the things that live behind the props go between the two pictures: whatever stands in front hides them by itself */
   ctx.drawImage(L.field.cv, 0, 0, D.w, 600);
   townDrawWindows(ctx, D, dark);                                           /* the lit glass sits on the street; everything that moves is drawn over it */
   townDynamic(ctx, D, t, dark);

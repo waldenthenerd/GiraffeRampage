@@ -226,6 +226,7 @@ function townPaintField(c, D, W, H, R){
   c.fillStyle = 'rgba(0,0,0,.15)'; c.fillRect(0, TG, W, 3);
   /* edge of the street: a low wall or fence so the world has a front */
   if (D.theme === 'roofs'){ tRect(c, '#8D919B', 0, TG + 70, W, 30); tRect(c, '#A9ADB6', 0, TG + 66, W, 6); }
+  if (c.split) c.split();                                                    /* a street with things that move behind its props (D.behind) keeps what is painted so far as its own back picture; props and buildings go on a clear one */
   for (let i = 0; i < D.p.length; i++) townProp(c, D, D.p[i], P, r);
   for (let i = 0; i < D.b.length; i++) townBuilding(c, D, D.b[i], P, r);
 }

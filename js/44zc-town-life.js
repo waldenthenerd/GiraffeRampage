@@ -171,24 +171,6 @@ function townDynX(ctx, D, t, dark){
       break;
     }
     case 'harbour': {
-      /* the sailboats sit out on the water, behind the quay: the buildings and the moored boat hide them, so each shape is cut out of the clip */
-      const hide = [];
-      D.b.forEach(function(b){
-        if (!b.h) return; const top = TG - b.h;
-        if (b.kind === 'lighthouse'){ hide.push([b.x - 70, TG, b.x - 40, top + 60, b.x + 40, top + 60, b.x + 70, TG]); hide.push([b.x - 54, top - 26, b.x + 54, top - 26, b.x + 54, top + 62, b.x - 54, top + 62]); }
-        else hide.push([b.x - b.w / 2, top - 44, b.x + b.w / 2, top - 44, b.x + b.w / 2, TG, b.x - b.w / 2, TG]);
-      });
-      D.p.forEach(function(p){
-        if (p.k === 'boat') hide.push([p.x - 120, TG - 62, p.x + 120, TG - 62, p.x + 90, TG - 28, p.x - 90, TG - 28], [p.x - 3, TG - 280, p.x + 3, TG - 280, p.x + 3, TG - 60, p.x - 3, TG - 60], [p.x + 6, TG - 270, p.x + 70, TG - 90, p.x + 6, TG - 90], [p.x - 6, TG - 240, p.x - 56, TG - 90, p.x - 6, TG - 90], [p.x - 100, TG - 86, p.x - 50, TG - 86, p.x - 50, TG - 62, p.x - 100, TG - 62]);
-        if (p.k === 'crane') hide.push([p.x - 6, TG - 330, p.x + 6, TG - 330, p.x + 6, TG, p.x - 6, TG]);
-      });
-      ctx.save();
-      hide.forEach(function(h){ ctx.beginPath(); ctx.rect(-1e5, -1e5, 2e5, 2e5); ctx.moveTo(h[0], h[1]); for (let i = 2; i < h.length; i += 2) ctx.lineTo(h[i], h[i + 1]); ctx.closePath(); ctx.clip('evenodd'); });
-      for (let k = 0; k < 2; k++){
-        const bx = ((t * 12 + k * 1100) % (D.w + 400)) - 200, by = TG - 72 + Math.sin(t * 1.3 + k) * 2;
-        tPoly(ctx, '#F4F1E8', [bx - 30, by, bx + 30, by, bx + 22, by + 14, bx - 22, by + 14]); tRect(ctx, '#6A5848', bx - 1.5, by - 56, 3, 56); tPoly(ctx, k ? '#E8D8B0' : '#FFFFFF', [bx + 4, by - 52, bx + 30, by - 6, bx + 4, by - 6]);
-      }
-      ctx.restore();
       const wx = 2560, wy = TG - 150;
       ctx.save(); ctx.translate(wx, wy); ctx.rotate(t * 0.7);
       for (let i = 0; i < 4; i++){ ctx.rotate(Math.PI / 2); tRect(ctx, '#8A6642', -3, 0, 6, 100); tRect(ctx, '#F4F1E8', 4, 12, 26, 70); ctx.strokeStyle = '#B8A890'; ctx.lineWidth = 1; for (let k = 1; k < 4; k++){ ctx.beginPath(); ctx.moveTo(4, 12 + k * 17); ctx.lineTo(30, 12 + k * 17); ctx.stroke(); } }
@@ -272,6 +254,17 @@ function townDynX(ctx, D, t, dark){
   renderTown = function(ctx){
     if (Town.ride){ townDrawRide(ctx); return; }
     return rt(ctx);
+  };
+  /* the sailboats sit out on the water, behind everything on the quay: drawn between the back and front pictures, so nothing in front can be overdrawn */
+  TOWN_DIST.harbour.behind = true;
+  const db = townDynamicBehind;
+  townDynamicBehind = function(ctx, D, t, dark){
+    db(ctx, D, t, dark);
+    if (D.id !== 'harbour') return;
+    for (let k = 0; k < 2; k++){
+      const bx = ((t * 12 + k * 1100) % (D.w + 400)) - 200, by = TG - 72 + Math.sin(t * 1.3 + k) * 2;
+      tPoly(ctx, '#F4F1E8', [bx - 30, by, bx + 30, by, bx + 22, by + 14, bx - 22, by + 14]); tRect(ctx, '#6A5848', bx - 1.5, by - 56, 3, 56); tPoly(ctx, k ? '#E8D8B0' : '#FFFFFF', [bx + 4, by - 52, bx + 30, by - 6, bx + 4, by - 6]);
+    }
   };
   townDynamic = function(ctx, D, t, dark){
     dy(ctx, D, t, dark);
