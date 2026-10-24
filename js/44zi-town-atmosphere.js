@@ -85,6 +85,8 @@ function townThunder(delay){
     if (Town.car){
       TownSound.engT -= dt;
       if (TownSound.engT <= 0){ TownSound.engT = 0.14; try { SFX.tone('sawtooth', 52 + v * 0.1, 52 + v * 0.1, 0.16, 0.022 + Math.min(0.03, v * 0.00008), 0, 0, SFX.eventGain); } catch (e) {} }
+    } else if (Town.wheels){
+      if (v > 30){ TownSound.stepT -= dt; if (TownSound.stepT <= 0){ TownSound.stepT = 0.16; try { SFX.burst(0.12, 0.012 + Math.min(0.03, v * 0.0001), 500 + v * 2, 260, 0.8, 0, 'lowpass', SFX.eventGain); } catch (e) {} } }
     } else if (v > 40){
       TownSound.stepT -= dt * (v / 235);
       if (TownSound.stepT <= 0){

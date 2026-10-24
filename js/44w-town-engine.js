@@ -161,7 +161,7 @@ function townInRect(R, x, y){ return !!R && x >= R.x && x <= R.x + R.w && y >= R
 
 /* ---- the update ---- */
 function townHeadPos(){
-  const sc = 1.5, hx = 27 + Math.max(0, Town.reach) * 7, hy = -55 - Town.reach * 105, by = TG - (Town.car ? 26 : 37) * sc;
+  const sc = 1.5, hx = 27 + Math.max(0, Town.reach) * 7, hy = -55 - Town.reach * 105, by = TG - (Town.car ? 26 : Town.wheels ? wheelsBodyUnits() : 37) * sc;
   return { x: Town.x + Town.face * hx * sc, y: by + hy * sc };
 }
 function townNpcStep(n, dt){
@@ -229,8 +229,8 @@ function updateTown(dt, frozen){
     if (inp.cy < headTop - 30 * V.sc) up = true;
   }
   mx = clamp(mx, -1, 1);
-  const target = mx * TOWN_WALK * (Town.car ? townCarMul() : 1);
-  Town.vx += (target - Town.vx) * Math.min(1, dt * 9);
+  const target = mx * TOWN_WALK * (Town.car ? townCarMul() : Town.wheels ? wheelsMul() : 1);
+  Town.vx += (target - Town.vx) * Math.min(1, dt * (Town.wheels ? 4.5 : 9));                    /* on wheels she speeds up and slows down slowly */
   if (Math.abs(Town.vx) > 6) Town.face = Town.vx > 0 ? 1 : -1;
   Town.x += Town.vx * dt; Town.ph += Math.abs(Town.vx) * dt * 0.05;
   Town.reach += ((up ? 1 : down ? -0.4 : 0) - Town.reach) * Math.min(1, dt * 7);
@@ -272,6 +272,7 @@ function townButton(id){
   else if (id === 'map') townShowMap();
   else if (id === 'menu') townShowMenu();
   else if (id === 'car') townCarToggle();
+  else if (id === 'ride') wheelsToggle();
 }
 function townEscape(){
   if (typeof townDialogOpen === 'function' && townDialogOpen()){ townCloseDialog(); return; }
@@ -558,6 +559,7 @@ function townDrawHud(ctx, D, h){
   /* buttons, top right */
   const labels = [['journal', Input.hasTouch ? 'Journal' : 'Journal J'], ['map', Input.hasTouch ? 'Map' : 'Map M'], ['menu', Input.hasTouch ? 'Menu' : 'Menu Esc']];
   if (typeof townCarOwned === 'function' && townCarOwned() && !D.indoor && !D.cave) labels.unshift(['car', Town.car ? 'Get out' : (Input.hasTouch ? 'Car' : 'Car C')]);
+  if (typeof wheelsOwned === 'function' && wheelsOwned()) labels.unshift(['ride', Town.wheels ? 'Hop off' : (Input.hasTouch ? 'Ride' : 'Ride ' + keyName(keyOf('ride')))]);       /* a skateboard or a bicycle goes indoors too */
   labels.forEach(function(b, i){
     const x = W - 10 - (labels.length - i) * (bw + 6) + 6, y = rowY;
     ctx.fillStyle = 'rgba(14,10,8,.62)'; ctx.beginPath(); ctx.roundRect(x, y, bw, bh, 8); ctx.fill();

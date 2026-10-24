@@ -36,7 +36,7 @@
   const FLOOR = { square: 'paving', market: 'paving', park: 'grass', harbour: 'planks', roofs: 'metal', launch: 'concrete', burrows: 'dirt', runway: 'concrete', campus: 'paving', farm: 'dirt', isle: 'sand',
     in_library: 'carpet', in_hall: 'carpet', in_house1: 'carpet', in_house2: 'carpet', in_tailor: 'carpet', in_myhome: 'boards', in_cafe: 'tile', in_bakery: 'tile', in_garage: 'concrete', in_hangar: 'concrete', in_arcade: 'carpet', in_studio: 'concrete',
     in_gym: 'rubber', in_uhall: 'carpet', in_ulecture: 'carpet', in_ulibrary: 'carpet', in_uhw: 'boards', in_uexam: 'tile', in_ucafe: 'tile',
-    in_fstand: 'boards', in_barn: 'dirt', in_coop: 'dirt', in_fhouse: 'boards', in_icottage: 'boards', in_ifish: 'tile', in_icrab: 'tile', in_ilight: 'concrete', in_tackle: 'boards' };
+    in_fstand: 'boards', in_barn: 'dirt', in_coop: 'dirt', in_fhouse: 'boards', in_icottage: 'boards', in_ifish: 'tile', in_icrab: 'tile', in_ilight: 'concrete', in_tackle: 'boards', in_wheels: 'concrete' };
   const ts = townStepSound;
   townStepSound = function(D){
     const k = FLOOR[D.id]; if (!k){ return ts(D); }
@@ -45,7 +45,7 @@
 
   /* ---------- door sounds ---------- */
   const DOOR = { in_cafe: 'bright', in_bakery: 'bright', in_tailor: 'bright', in_garage: 'bell', in_arcade: 'blip', in_studio: 'bell', in_hall: 'soft', in_library: 'soft', in_ulibrary: 'soft', in_uhall: 'soft', in_ulecture: 'soft', in_uhw: 'soft', in_uexam: 'soft', in_ucafe: 'bright',
-    in_house1: 'creak', in_house2: 'creak', in_myhome: 'creak', in_fhouse: 'creak', in_icottage: 'creak', in_barn: 'creak', in_coop: 'creak', in_fstand: 'bell', in_ifish: 'bell', in_icrab: 'bell', in_tackle: 'bell', in_ilight: 'creak', in_hangar: 'clank', in_gym: 'gym' };
+    in_house1: 'creak', in_house2: 'creak', in_myhome: 'creak', in_fhouse: 'creak', in_icottage: 'creak', in_barn: 'creak', in_coop: 'creak', in_fstand: 'bell', in_ifish: 'bell', in_icrab: 'bell', in_tackle: 'bell', in_wheels: 'bell', in_ilight: 'creak', in_hangar: 'clank', in_gym: 'gym' };
   function doorIn(kind){
     const s = SFX, B = bus(); if (!s.ctx || s.muted) return;
     switch (kind){
@@ -86,6 +86,7 @@
     in_ifish: { water: 0.05, chirp: ['wave', 3, 7] },
     in_icrab: { water: 0.04, chirp: ['clink', 4, 9] },
     in_tackle: { water: 0.035, chirp: ['clink', 5, 11] },
+    in_wheels: { hum: 0.01, chirp: ['clink', 3, 8] },
     in_ilight: { wind: 0.06, windF: 380, water: 0.04, chirp: ['buoy', 7, 14] },
     in_uhall: { hum: 0.006, chirp: ['page', 7, 15] },
     in_ulecture: { hum: 0.008, chirp: ['chalk', 3, 8] },

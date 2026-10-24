@@ -28,6 +28,13 @@
       '<li><b>Kick-about yard:</b> kick the ball into the other side’s goal; first to five wins.</li>' +
       '<li>Giraffe 1 uses ' + guideKey('up') + guideKey('left') + guideKey('down') + guideKey('right') + ' and <b>Space</b> (or the mouse button); giraffe 2 uses the <b>arrow keys</b> and <b>Enter</b>. With two controllers, the first plays giraffe 1 and the second giraffe 2; with one, it plays giraffe 2.</li></ul>';
   } }, 'ants');
+  place({ id: 'wheels', title: 'Skateboards and bicycles', show: function(){ return typeof wheelsOwned === 'function' && wheelsOwned(); }, html: function(){
+    return '<p>Buy a skateboard, a cruiser board, a bicycle or a racing bike at <b>Spoke &amp; Board</b>, at the far end of Willow Park.</p><ul class="helplist">' +
+      '<li><b>Get on and off</b> with the Ride button' + (Input.hasTouch ? '' : ' or <b>' + keyName(keyOf('ride')) + '</b>') + '. Pick which one in the shop. Opening any panel, sitting down or getting in a car takes her off.</li>' +
+      '<li>On wheels she is quicker, but speeds up and slows down slowly. Hold up to stretch her neck as usual. Unlike a car, a board or bike goes <b>indoors</b>.</li>' +
+      '<li>Fast riding has a small chance of a <b>fall</b>, more indoors and when she turns right round at speed. She gets up on foot; nothing is lost.</li>' +
+      '<li>The people inside have opinions about a giraffe on a bicycle in their bakery. Crazy is the kind word.</li></ul>';
+  } }, 'town');
   /* how she plays */
   const b = GUIDE_TOPICS[at('basics')];
   if (b){ const base = b.html; b.html = function(){ return base().replace(/<\/ul>\s*$/, '<li>The game asked once whether you play with <b>touch</b> or <b>keyboard and mouse</b>; the tips and buttons follow that. Change it any time in Settings, under <b>Controls</b>.</li></ul>'); }; }
