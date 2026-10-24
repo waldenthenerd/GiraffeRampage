@@ -5,10 +5,10 @@
    spaceplane in four stages, paid for with everything the game has taught her to collect: sulfur and basalt from Venus, and gems
    and gold from everywhere else. Finishing it lets her fly home (the homecoming film). Sulfur and basalt are the scarce ones. */
 const SHIP_STAGES = [
-  { id: 'frame',   icon: '@t-x-hull', name: 'Hull Frame',            desc: 'Ribs and spars on the launch pad, cut from Venus basalt and welded with sulfur.',                          cost: { s: 150, b: 250, gems: 4000,  gold: 500000 } },
-  { id: 'wings',   icon: '@t-x-plane', name: 'Wings and Heat Tiles',  desc: 'Skin, swept wings and a belly of black tiles, to survive the way back down.',                               cost: { s: 200, b: 200, gems: 6000,  gold: 800000 } },
-  { id: 'engine',  icon: '@t-x-cog', name: 'Fit the Engine Core', desc: 'The spaceship engine part goes into the tail. It still glows. Nobody is quite sure why.',                  cost: { s: 250, b: 150, gems: 8000,  gold: 1200000 } },
-  { id: 'cockpit', icon: '@t-x-fuel',    name: 'Fuel and Cockpit',       desc: 'A tall cockpit dome, built for a long neck, and enough fuel to cross the void.',                            cost: { s: 300, b: 200, gems: 12000, gold: 1500000 } }
+  { id: 'frame',   icon: '@t-x-hull', name: 'Hull Frame',            desc: 'Ribs and spars on the launch pad, cut from Venus basalt and welded with sulfur.',                          cost: { s: 263, b: 438, gems: 2000,  gold: 500000 } },
+  { id: 'wings',   icon: '@t-x-plane', name: 'Wings and Heat Tiles',  desc: 'Skin, swept wings and a belly of black tiles, to survive the way back down.',                               cost: { s: 350, b: 350, gems: 3000,  gold: 800000 } },
+  { id: 'engine',  icon: '@t-x-cog', name: 'Fit the Engine Core', desc: 'The spaceship engine part goes into the tail. It still glows. Nobody is quite sure why.',                  cost: { s: 438, b: 263, gems: 4000,  gold: 1200000 } },
+  { id: 'cockpit', icon: '@t-x-fuel',    name: 'Fuel and Cockpit',       desc: 'A tall cockpit dome, built for a long neck, and enough fuel to cross the void.',                            cost: { s: 525, b: 350, gems: 6000,  gold: 1500000 } }
 ];
 const SHIP_CUR = [['s', 'sulfur', 'sulfur', '#F2D43A'], ['b', 'basalt', 'basalt', '#AEB8E0'], ['gems', 'gems', 'gems', '#7AD8FF'], ['gold', 'gold', 'gold', '#FFD27A']];
 function shipUnlocked(){ return !!(Save.data && Save.data.enginePart); }
