@@ -16,7 +16,7 @@
     out.boot = fishBehave(FISH.filter(function(f){ return f.id === 'boot'; })[0]).str < 0.5;
 
     /* 1 the hook, then the fight */
-    Save.data = JSON.parse(JSON.stringify(DEFAULT_SAVE)); Save.data.town = { n: {}, fish: {}, fishBook: {} }; townData(); pier();
+    Save.data = JSON.parse(JSON.stringify(DEFAULT_SAVE)); Save.data.town = { n: {}, fish: {}, fishBook: {} }; townData().n.fights = 99; pier();
     out.fightHtml = !!document.getElementById('fightUi') && document.getElementById('fightUi').style.display === 'none';
     out.bite = cast('sardine'); out.hooked = hook() && document.getElementById('fightUi').style.display === 'block' && document.getElementById('fishBar').style.display === 'none' && /Hooked/.test(document.getElementById('fishMsg').textContent);
     /* holding all the time snaps the line */
@@ -37,6 +37,39 @@
     var cv = OV.querySelector('canvas[data-fc]'), px = cv ? cv.getContext('2d').getImageData(0, 0, 84, 48).data : [], ink = 0; for (var q = 3; q < px.length; q += 4) if (px[q] > 0) ink++; out.cardPaints = ink > 200;
     out.cardGoes = (cast('minnow'), !OV.querySelector('.fcatch'));
 
+    /* the numbers of the fight, played by four kinds of player (a fixed seed): holding all the time never wins, mashing wins easy fish only, a careful player wins, a better kit helps and is quicker */
+    FISH.forEach(function(f){ fishLog()[f.id] = 1; }); townData().n.fights = 99; pier();
+    var seed = 777; function rnd(){ seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+    var POL = {
+      greedy: function(){ return true; },
+      mash: function(st){ if (st.t <= 0){ st.hold = rnd() < 0.5; st.t = 0.12 + rnd() * 0.15; } st.t -= 0.03; return st.hold; },
+      expert: function(st){ st.h.push(Fg.ten); var o = st.h.length > 4 ? st.h[st.h.length - 5] : 0.3; return o < 0.64; }
+    };
+    function bout(id, pol, kit){
+      var f = FISH.filter(function(x){ return x.id === id; })[0], k = fishTackle(); k.k.rod = kit; k.k.line = kit; Fg.fish = f; Fg.k = fishTackle(); Fg.phase = 'bite'; fightStart();
+      var st = { t: 0, hold: false, h: [] }, i = 0, res = null, rf = fishResult; fishResult = function(w){ res = w; Fg.phase = 'idle'; };
+      while (Fg.phase === 'fight' && i < 3000){ Fg.hold = POL[pol](st); fightTick(0.03); i++; } fishResult = rf; return { win: res === true, secs: i * 0.03 };
+    }
+    function rate(id, pol, kit){ var w = 0, tt = 0, N = 10; for (var j = 0; j < N; j++){ var r = bout(id, pol, kit); w += r.win ? 1 : 0; tt += r.secs; } return { win: w / N, secs: tt / N }; }
+    var bal = {}; ['sardine', 'eel', 'coelacanth'].forEach(function(id){ bal[id] = { greedy: rate(id, 'greedy', 0), mash: rate(id, 'mash', 0), expert: rate(id, 'expert', 0), top: rate(id, 'expert', 2) }; });
+    out.balance = JSON.stringify(Object.keys(bal).map(function(id){ return id + ' ' + ['greedy', 'mash', 'expert', 'top'].map(function(k){ return k + '=' + Math.round(bal[id][k].win * 100) + '%@' + bal[id][k].secs.toFixed(1); }).join(' '); }));
+    out.greedyLoses = ['sardine', 'eel', 'coelacanth'].every(function(id){ return bal[id].greedy.win === 0 && bal[id].greedy.secs < 2.5; });
+    out.mashEasyOnly = bal.sardine.mash.win >= 0.4 && bal.eel.mash.win <= 0.5 && bal.coelacanth.mash.win <= 0.1;
+    out.carefulWins = bal.sardine.expert.win >= 0.95 && bal.eel.expert.win >= 0.9 && bal.coelacanth.expert.win >= 0.8;
+    out.lengths = bal.sardine.expert.secs >= 2.5 && bal.sardine.expert.secs <= 8 && bal.coelacanth.expert.secs >= 8 && bal.coelacanth.expert.secs <= 25;
+    out.kitHelps = bal.coelacanth.top.secs < bal.coelacanth.expert.secs && bal.eel.top.secs < bal.eel.expert.secs && bal.eel.mash.win <= 0.6;
+    /* the first fights teach: a calm start, a hint that follows what she does, and a clean fight pays more */
+    townData().n.fights = 0; pier(); cast('sardine'); hook();
+    out.teachOn = Fg.teach === true && Fg.grace > 1 && townData().n.fights === 1 && /Hold the Reel/.test(document.getElementById('fgHint').textContent);
+    Fg.hold = true; for (var ti = 0; ti < 20; ti++) fishTick(0.03); out.teachHint = /Winding|Careful|LET GO/.test(document.getElementById('fgHint').textContent);
+    Fg.ten = 0.95; fightDraw(); out.teachHot = /LET GO/.test(document.getElementById('fgHint').textContent) && document.getElementById('fgHint').className.indexOf('hot') >= 0;
+    Fg.hold = false; Fg.phase = 'idle'; clearInterval(Fg.iv); Fg.iv = 0;
+    townData().n.fights = 99; pier(); cast('sardine'); hook(); out.teachOff = Fg.teach === false;
+    var coin = townCoin(), gold1, gold2; Fg.phase = 'idle'; clearInterval(Fg.iv); Fg.iv = 0;
+    function goldFor(peak){ pier(); cast('sardine'); hook(); Fg.str = 0.5; Fg.peak = peak; Fg.prog = 1; Fg.ten = 0.3; Fg.hold = true; fightTick(0.03); return Fg.last; }
+    var cleanL = goldFor(0.5), dirtyL = goldFor(0.95);
+    out.cleanPays = !!cleanL && cleanL.clean === true && !!dirtyL && dirtyL.clean === false && cleanL.scl === dirtyL.scl + 1 && /clean fight/.test(fishCatchHTML(cleanL));
+
     /* 5 conditions */
     var keepH = Town.fixHour, keepW = Town.fixWeather;
     Town.fixWeather = 'clear'; Town.fixHour = 6; var dawn = fishCond('pier'); Town.fixHour = 12.5; var noon = fishCond('pier'); Town.fixHour = 22; var night = fishCond('pier');
@@ -56,7 +89,7 @@
     var hot = sp.filter(function(s){ return s.k === 'hot'; })[0];
     var sd = seaData(); sd.own.skiff = 1; sd.sel = 'skiff'; G.state = 'menu'; seaStart('harbour'); GR.step(1 / 60);
     Sea.x = hot.x; Sea.y = hot.y; Sea.v = 0; Sea.thr = 0; Sea.nearDock = ''; GR.step(1 / 60); GR.step(1 / 60);
-    var inHot = fishSpotAt(Sea.x, Sea.y); out.inSpot = !!inHot && inHot.k === 'hot'; Fg.sea = true; var c = fishCond('deep'); out.hotCond = c.rare >= 2.5 && c.wait < 0.5 && c.scales === 2 && /HOT SPOT/.test(c.msg) && c.spot === inHot;
+    Town.fixHour = 22; Town.fixWeather = 'clear'; var inHot = fishSpotAt(Sea.x, Sea.y); out.inSpot = !!inHot && inHot.k === 'hot'; Fg.sea = true; var c = fishCond('deep'); out.hotCond = c.rare >= 2.5 && c.wait < 0.5 && c.scales === 2 && /HOT SPOT/.test(c.msg) && c.spot === inHot;
     Sea.x = hot.x + SPOT_R + 80; out.outSpot = !fishSpotAt(Sea.x, Sea.y) && fishCond('deep').scales === 1; Sea.x = hot.x; out.pierNoSpot = fishCond('pier').spot === null;
     GR.render(); G.state = 'sail'; GR.render(); out.drawsSea = true; Fg.sea = false;
     key('KeyM'); out.mapOk = true;
@@ -86,7 +119,7 @@
     /* 3 sound never throws */
     out.sounds = ['cast', 'splash', 'bite', 'hook', 'reel', 'warn', 'snap', 'lost', 'catch'].every(function(k){ try { fishSound(k, FISH[3]); return true; } catch (e) { return false; } });
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['how', 'pulls', 'boot', 'fightHtml', 'bite', 'hooked', 'snaps', 'bite2', 'shakes', 'bite3', 'wins', 'betterLine', 'card', 'cardPaints', 'cardGoes', 'dawn', 'noon', 'night', 'weather', 'condLine', 'waitScaled', 'stormBigger', 'spots', 'wet', 'same', 'newDay', 'inSpot', 'hotCond', 'outSpot', 'pierNoSpot', 'drawsSea', 'btnLabel', 'mounts', 'mountSig', 'homePaints', 'noMounts', 'autoBtn', 'autoOn', 'recastSet', 'recasts', 'autoOff', 'repeatIgnored', 'lockHolds', 'lockEnds', 'spaceCasts', 'fCasts', 'shopBtn', 'shopGo', 'sounds'];
+  var need = ['greedyLoses', 'mashEasyOnly', 'carefulWins', 'lengths', 'kitHelps', 'teachOn', 'teachHint', 'teachHot', 'teachOff', 'cleanPays', 'how', 'pulls', 'boot', 'fightHtml', 'bite', 'hooked', 'snaps', 'bite2', 'shakes', 'bite3', 'wins', 'betterLine', 'card', 'cardPaints', 'cardGoes', 'dawn', 'noon', 'night', 'weather', 'condLine', 'waitScaled', 'stormBigger', 'spots', 'wet', 'same', 'newDay', 'inSpot', 'hotCond', 'outSpot', 'pierNoSpot', 'drawsSea', 'btnLabel', 'mounts', 'mountSig', 'homePaints', 'noMounts', 'autoBtn', 'autoOn', 'recastSet', 'recasts', 'autoOff', 'repeatIgnored', 'lockHolds', 'lockEnds', 'spaceCasts', 'fCasts', 'shopBtn', 'shopGo', 'sounds'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);

@@ -41,6 +41,8 @@
   NEW.forEach(function(f){ FISH.push(f); });
 })();
 const FISH_GROUPS = [['pier', 'The pier'], ['shallows', 'The shallows'], ['reef', 'The reef'], ['deep', 'The deep'], ['special', 'Weather fish']];
+/* what a catch pays: coin * v * FISH_PAY * (0.7 to 1.3 by size). A clean fight (the line never went red) pays a quarter more and leaves a scale extra. Raised from 0.6 when the fight made a catch take about twice as long. */
+const FISH_PAY = 0.96, CLEAN_PEAK = 0.85;
 const FISH_RARITY = ['common', 'uncommon', 'rare', 'legendary'], FISH_RCOL = ['#BFD8E0', '#8FE0A0', '#8FB4F2', '#F2B33D'];
 function fishRarity(f){ return f.r >= 15 ? 0 : f.r >= 8 ? 1 : f.r >= 3 ? 2 : 3; }
 /* tackle is unlocked by how many kinds of fish she has caught: `need` is that number */
@@ -135,13 +137,13 @@ function fishPanel(msg){
     '<div class="fishbar" id="fishBar" style="display:none"><div class="fzone" id="fishZone"></div><i id="fishMark"></i></div>' + fishFightHTML() +
     '<div class="chalkrow"><button class="chalk" data-a="fish-cast" id="fishCast">' + (Fg.last || Fg.recastAt ? 'Cast again' : 'Cast') + '</button><button class="chalk" data-a="fish-reel" id="fishReel" style="display:none">Reel in!</button></div>' +
     fishTackleHTML() +
-    '<div class="chalkrow"><button class="chalk" data-a="fish-book">Fish book · ' + fishKinds() + ' of ' + FISH.length + '</button><button class="chalk" data-a="fish-auto">Auto-recast: ' + (fishAutoOn() ? 'on' : 'off') + '</button></div>' +
+    '<div class="chalkrow fbrow"><button class="chalk" data-a="fish-book">Fish book · ' + fishKinds() + ' of ' + FISH.length + '</button><button class="chalk" data-a="fish-auto">Auto-recast: ' + (fishAutoOn() ? 'on' : 'off') + '</button></div>' +
     '<div class="fishlog">' + fishRows() + '</div>' +
     '<p class="tnote">Brine’s order this week: a <b>' + of.name + '</b>' + (o.done ? ' (done)' : ' · 8 gems') + (townIsNight() ? ' · the moon jelly is out' : '') + '</p>';
   if (Fg.sea){
     setOverlay('<div class="panel tp tp-fish" style="max-width:340px">' + html + '<div class="tp-foot"><button class="tbtn" data-a="fish-sea-close">Back to the boat</button></div></div>');
   } else townPanelT('fish', html, { w: 340 });
-  fishPaintCard();
+  OV.classList.remove('fighting'); fishPaintCard();
   OV.classList.add('side'); Fg.side = true;                      /* a sidebar (a bottom sheet on a narrow screen), so the water and the fish stay in view */
 }
 townShowFishing = function(msg){ Fg.sea = false; fishPanel(msg); };
@@ -185,15 +187,15 @@ function fishResult(win, why){
     const log = fishLog(), book = fishBook(), first = !(log[f.id] > 0), had = FISH_RODS.map(function(r, i){ return fishUnlocked(FISH_RODS, i); }).concat(FISH_LINES.map(function(r, i){ return fishUnlocked(FISH_LINES, i); }), FISH_BAITS.map(function(r, i){ return fishUnlocked(FISH_BAITS, i); }));
     const len = fishRollLen(f, k.rod.z), rec = !(book[f.id] >= len); if (rec) book[f.id] = len;
     log[f.id] = (log[f.id] | 0) + 1;
-    const frac = (len - f.len[0]) / Math.max(1, f.len[1] - f.len[0]), gold = Math.round(townCoin() * f.v * 0.6 * (0.7 + 0.6 * frac));
+    const frac = (len - f.len[0]) / Math.max(1, f.len[1] - f.len[0]), clean = typeof Fg.peak === 'number' && Fg.peak <= CLEAN_PEAK, gold = Math.round(townCoin() * f.v * FISH_PAY * (0.7 + 0.6 * frac) * (clean ? 1.25 : 1));
     const pay = { gold: gold }; if (first) pay.gems = 5;
     const o = fishOrder(); let ordered = false;
     if (o.id === f.id && !o.done){ o.done = true; ordered = true; pay.gems = (pay.gems | 0) + 8; const t = townData(); t.n.fishOrders = (t.n.fishOrders | 0) + 1; }
     townPay(pay);
-    const scl = Math.round((fishScaleGain(f) + (rec && !first ? 1 : 0)) * fishCond(fishHab()).scales); fishScalesAdd(scl);
-    Fg.last = { f: f, len: len, rec: rec && !first, first: first, gold: gold, scl: scl, gems: pay.gems | 0, best: book[f.id] | 0, ordered: ordered };
+    const scl = Math.round((fishScaleGain(f) + (rec && !first ? 1 : 0) + (clean ? 1 : 0)) * fishCond(fishHab()).scales); fishScalesAdd(scl);
+    Fg.last = { clean: clean, secs: Fg.ft || 0, f: f, len: len, rec: rec && !first, first: first, gold: gold, scl: scl, gems: pay.gems | 0, best: book[f.id] | 0, ordered: ordered };
     Fg.a = { k: 'leap', t: Fg.clock, f: f, len: len, rec: rec || first };
-    msg = 'You caught a ' + f.name + ', ' + len + ' cm! +' + fmt(gold) + ' gold' + (first ? ' and 5 gems for a new kind' : '') + (rec && !first ? ' · a new record' : '') + '. +' + scl + ' scale' + (scl === 1 ? '' : 's') + '.';
+    msg = 'You caught a ' + f.name + ', ' + len + ' cm! +' + fmt(gold) + ' gold' + (first ? ' and 5 gems for a new kind' : '') + (rec && !first ? ' · a new record' : '') + (clean ? ' · a clean fight' : '') + '. +' + scl + ' scale' + (scl === 1 ? '' : 's') + '.';
     if (ordered) msg += ' That was Brine’s order: +8 gems!';
     /* new tackle: unlocked by the page she has just completed, and put on */
     const now = [FISH_RODS, FISH_LINES, FISH_BAITS], names = [], kk = fishTackle().k; let at = 0;
@@ -405,7 +407,7 @@ function fishDrawAnim(ctx, p){
   ctx.restore();
 }
 function fishPierGeo(){
-  const f = Town.face < 0 ? -1 : 1, x = Town.x, q = fishPose(), from = [x + f * 46, TG - 146], th = -f * q.back * 0.9, c = Math.cos(th), sn = Math.sin(th);
+  const f = Town.face < 0 ? -1 : 1, x = Town.x, q = fishPose(), hd = Fg.head && Fg.clock - Fg.head.t < 0.5 ? Fg.head : null, from = hd ? [hd.x + f * 8, hd.y + 4] : [x + f * 46, TG - 146], th = -f * q.back * 0.9, c = Math.cos(th), sn = Math.sin(th);
   const vx = f * 58, vy = -58, rod = [from[0] + vx * c - vy * sn, from[1] + vx * sn + vy * c];
   return { rodFrom: from, rod: rod, rest: [x + f * 168, TG - 30], hold: [rod[0], rod[1] + 46], k: 1.15, flat: 0.28, arc: 1, dir: f, bend: q.bend };
 }
@@ -420,7 +422,19 @@ function fishSeaGeo(){
   townDynamic = function(ctx, D, t, dark){
     dyn.apply(this, arguments);
     if (!Town.panel) Fg.rodOn = false;
-    if (!Fg.sea && D.id === 'harbour' && Town.on && (fishAnimOn() || Fg.rodOn)) fishDrawAnim(ctx, fishPierGeo());
+  };
+  /* at the pier she moves herself: her neck swings back as she casts and heaves on a fish, and the rod, line and fish are drawn with her (over her head), not behind her */
+  const dp = townDrawPlayer;
+  townDrawPlayer = function(ctx, t){
+    const pier = !Fg.sea && Town.d === 'harbour' && Town.on;
+    const mine = pier && Town.panel && Fg.rodOn && !Town.car && !Town.seat && !Town.gym;
+    if (!mine) dp.apply(this, arguments);
+    else {
+      const q = fishPose(), idle = 0.06 * Math.sin(t * 1.3) + 0.14 * Math.pow(Math.max(0, Math.sin(t * 0.37)), 6);
+      const hd = townGiraffe(ctx, Town.x, TG, { s: 1.5, flip: Town.face < 0, ph: Town.ph, moving: false, reach: Math.max(-0.15, idle + 0.35 * q.back), lean: -5 * q.back, t: t });
+      Fg.head = { x: hd.x, y: hd.y, t: Fg.clock };
+    }
+    if (pier && (fishAnimOn() || Fg.rodOn)) fishDrawAnim(ctx, fishPierGeo());
   };
   const rn = render;
   render = function(){

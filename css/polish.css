@@ -671,3 +671,6 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 .fcatch canvas{flex:none;width:84px;height:48px}.fcatch b{font-size:15px}.fcatch .fcl{font-size:12.5px;opacity:.9;margin:2px 0}
 .fcp{display:flex;flex-wrap:wrap;gap:4px}.fcp i{font-style:normal;font-size:11px;padding:2px 7px;border-radius:9px;background:rgba(255,224,106,.18);color:#FFE9A0}
 @media (max-width:700px){.fcatch{padding:5px;gap:7px}.fcatch canvas{width:64px;height:37px}.fcatch b{font-size:13px}.fcatch .fcl{font-size:11px;margin:0}.fishcond{font-size:11px;margin:2px 0}.fgl small{display:none}}
+.fgbar.ten{background:linear-gradient(90deg,rgba(0,0,0,.35) 85%,rgba(232,80,60,.4) 85%)}
+.fghint{min-height:16px;margin-top:5px;font-size:12.5px;font-weight:700;color:#FFE9A0;text-align:center}.fghint.hot{color:#FF8A78}
+#overlay.fighting .fishtk,#overlay.fighting .fishlog,#overlay.fighting .tnote,#overlay.fighting .fbrow,#overlay.fighting .fishcond{display:none}

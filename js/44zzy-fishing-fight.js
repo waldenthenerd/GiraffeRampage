@@ -111,15 +111,19 @@ function fishSound(kind, f){
 }
 
 /* ---- 1 the fight ---- */
-const FIGHT = { win: 1, snapAfter: 0.33, up: 0.55, down: 0.7 };
+/* the numbers of the fight: tension rises by `up` a second while she winds and by (pull - 0.2) * `pull` from the fish, falls by `down` when she lets go; a better line divides the rises; `prog` is how fast the fish comes in (times the rod) */
+const FIGHT = { win: 1, snapAfter: 0.33, up: 0.7, down: 0.62, pull: 0.9, prog: 0.38, drain: 0.05, maxAmp: 0.9, timeout: 60 };
 function fishFightHTML(){
-  return '<div class="fightui" id="fightUi" style="display:none"><div class="fgl"><span>Line</span><small id="fgHint">Hold to reel. Ease off when it goes red.</small></div>' +
-    '<div class="fgbar ten"><i id="fgTen"></i></div><div class="fgl"><span>Fish</span></div><div class="fgbar prog"><i id="fgProg"></i></div></div>';
+  return '<div class="fightui" id="fightUi" style="display:none"><div class="fgl"><span>Line</span><small>the red end snaps it</small></div>' +
+    '<div class="fgbar ten"><i id="fgTen"></i></div><div class="fgl"><span>Fish</span></div><div class="fgbar prog"><i id="fgProg"></i></div><div class="fghint" id="fgHint"></div></div>';
 }
 function fightStart(){
   const f = Fg.fish, B = fishBehave(f), kind = FISH_HOW[f.id] || 'steady', c = fishCond(fishHab());
-  Fg.phase = 'fight'; Fg.ft = 0; Fg.prog = 0.15; Fg.ten = 0.3; Fg.snap = 0; Fg.hold = false; Fg.pull = 0; Fg.kind = kind; Fg.click = 0; Fg.warn = 0;
-  Fg.str = clamp(0.55 + 0.04 * Math.min(f.v, 24), 0.6, 1.5) * B.str * c.pull;
+  const tn = townData().n, nth = tn.fights | 0; tn.fights = nth + 1;                   /* the first three fights teach: a weaker fish, a calm start, a kinder snap and hints that follow what she does */
+  Fg.teach = nth < 3; Fg.grace = Fg.teach ? 1.6 : 0.4;
+  Fg.phase = 'fight'; Fg.ft = 0; Fg.prog = 0.15; Fg.ten = 0.3; Fg.peak = 0.3; Fg.snap = 0; Fg.hold = false; Fg.pull = 0; Fg.kind = kind; Fg.click = 0; Fg.warn = 0;
+  Fg.str = clamp(0.55 + 0.04 * Math.min(f.v, 24), 0.6, 1.5) * B.str * c.pull * (nth === 0 ? 0.6 : nth === 1 ? 0.8 : 1);
+  OV.classList.add('fighting');                              /* the tackle, the book and the log wait: the fight has the sidebar to itself */
   const bar = document.getElementById('fishBar'); if (bar) bar.style.display = 'none';
   const ui = document.getElementById('fightUi'); if (ui) ui.style.display = 'block';
   const rb = document.getElementById('fishReel'); if (rb) rb.textContent = 'Hold to reel';
@@ -130,23 +134,31 @@ function fightDraw(){
   const t = document.getElementById('fgTen'), p = document.getElementById('fgProg'); if (!t || !p) return;
   t.style.width = clamp(Fg.ten, 0, 1) * 100 + '%'; t.className = Fg.ten > 0.85 ? 'hot' : Fg.ten > 0.65 ? 'warm' : '';
   p.style.width = clamp(Fg.prog, 0, 1) * 100 + '%';
+  const h = document.getElementById('fgHint'); if (!h) return;
+  let txt = '';
+  if (Fg.teach){
+    txt = Fg.ten > 0.85 ? 'LET GO! The line is about to snap!' : (!Fg.hold && Fg.prog < 0.2 && Fg.ft < 4) ? 'Hold the Reel button (or Space) to wind it in.' : Fg.ten > 0.65 ? 'Careful... ease off.' : Fg.hold ? 'Winding in. Keep the line out of the red.' : 'Let it rest, then wind again.';
+  } else if (Fg.ten > 0.85) txt = 'Ease off!';
+  if (h.textContent !== txt) h.textContent = txt;
+  h.className = 'fghint' + (Fg.ten > 0.85 ? ' hot' : '');
 }
 function fightTick(dt){
   if (!document.getElementById('fgTen')) return;
-  const k = Fg.k, lineF = Math.sqrt(k.line.win / 5.5), z = k.rod.z;
+  const k = Fg.k, lineF = Math.pow(k.line.win / 5.5, 0.35), z = k.rod.z;
   Fg.ft += dt;
-  const pull = clamp(fishPullAt(Fg.kind, Fg.ft) * Fg.str, 0, 1.4); Fg.pull = pull;
-  Fg.ten = clamp(Fg.ten + ((Fg.hold ? FIGHT.up : -FIGHT.down) + (pull - 0.2) * 0.9 / lineF) * dt, 0, 1.3);
-  if (Fg.hold) Fg.prog += 0.38 * z / (0.6 + 0.4 * Fg.str) * (1 - Math.min(0.6, pull * 0.5)) * dt;
-  else Fg.prog -= (pull * 0.1 + (Fg.ten < 0.05 ? 0.06 : 0)) * dt;
+  const pull = clamp(fishPullAt(Fg.kind, Math.max(0, Fg.ft - Fg.grace)) * (Fg.ft < Fg.grace ? 0.25 : 1) * clamp(0.55 + 0.2 * Fg.str, 0.65, FIGHT.maxAmp), 0, 1.1); Fg.pull = pull;       /* a surge never beats letting go by much, so a careful player can always ride it out; the strong ones surge more and tire slowly */
+  Fg.ten = clamp(Fg.ten + ((Fg.hold ? FIGHT.up / lineF : -FIGHT.down) + (pull - 0.2) * FIGHT.pull / lineF) * dt, 0, 1.3);
+  if (Fg.hold) Fg.prog += FIGHT.prog * Math.sqrt(z) / (0.8 + 0.2 * Fg.str) * (1 - Math.min(0.6, pull * 0.5)) * dt;
+  else Fg.prog -= (pull * FIGHT.drain * Fg.str + (Fg.ten < 0.05 ? 0.06 : 0)) * dt;
+  Fg.peak = Math.max(Fg.peak, Fg.ten);
   if (Fg.ten >= 1) Fg.snap += dt; else Fg.snap = Math.max(0, Fg.snap - dt);
   Fg.click -= dt; if (Fg.hold && Fg.click <= 0){ fishSound('reel'); Fg.click = 0.13 - 0.06 * clamp(Fg.prog, 0, 1); }
   Fg.warn -= dt; if (Fg.ten > 0.85 && Fg.warn <= 0){ fishSound('warn'); Fg.warn = 0.22; }
   fightDraw();
-  if (Fg.snap > FIGHT.snapAfter){ fishSound('snap'); fishResult(false, 'The line snapped!'); return; }
+  if (Fg.snap > FIGHT.snapAfter * (Fg.teach ? 2.4 : 1)){ fishSound('snap'); fishResult(false, 'The line snapped!'); return; }
   if (Fg.prog >= FIGHT.win){ fishResult(true); return; }
   if (Fg.prog <= 0 && Fg.ft > 1){ fishResult(false, 'It shook the hook.'); return; }
-  if (Fg.ft > 45) fishResult(false, 'It got away.');
+  if (Fg.ft > FIGHT.timeout) fishResult(false, 'It got away.');
 }
 (function(){
   const reel = fishReel;
@@ -180,6 +192,7 @@ function fishCatchHTML(L){
   if (!L) return '';
   const q = fishRarity(L.f), pills = ['+' + fmt(L.gold) + ' gold', '+' + L.scl + ' scale' + (L.scl === 1 ? '' : 's')];
   if (L.gems) pills.push('+' + L.gems + ' gems');
+  if (L.clean) pills.push('clean fight +25%');
   return '<div class="fcatch" style="border-color:' + FISH_RCOL[q] + '"><canvas data-fc="1" width="84" height="48"></canvas><div><b>' + L.f.name + '</b> <span style="color:' + FISH_RCOL[q] + '">' + FISH_RARITY[q] + '</span>' +
     '<div class="fcl">' + L.len + ' cm · ' + (L.first ? 'a new kind!' : L.rec ? 'NEW RECORD' : 'best ' + L.best + ' cm') + '</div><div class="fcp">' + pills.map(function(p){ return '<i>' + p + '</i>'; }).join('') + '</div></div></div>';
 }
