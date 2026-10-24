@@ -166,7 +166,8 @@ function fishTick(dt){
   const f = Fg.fish, k = Fg.k;
   if (Fg.phase === 'wait' && Fg.t > Fg.wait){
     Fg.phase = 'bite'; Fg.biteAt = Fg.clock; Fg.t = 0; Fg.zone = 0.18 + Math.random() * 0.5;
-    Fg.w = clamp((0.28 - Math.min(f.v, 22) * 0.012) * k.rod.z, 0.1, 0.5); Fg.speed = Math.min(4.2, 1.4 + f.v * 0.12) * k.line.sp;
+    Fg.w = clamp((0.28 - Math.min(f.v, 22) * 0.012) * k.rod.z, 0.1, 0.5); Fg.speed = Math.min(4.2, 1.4 + f.v * 0.12) * k.line.sp * (1 - 0.12 * intel());
+    Fg.w = Math.min(0.5, Fg.w * (1 + 0.15 * intel()));
     if (Fg.zone + Fg.w > 0.98) Fg.zone = 0.98 - Fg.w;
     document.getElementById('fishMsg').textContent = 'A bite! Reel when the marker is in the green.';
     document.getElementById('fishBar').style.display = 'block'; document.getElementById('fishReel').style.display = 'inline-block';

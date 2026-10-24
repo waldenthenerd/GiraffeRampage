@@ -35,6 +35,12 @@
       '<li>Fast riding has a small chance of a <b>fall</b>, more indoors and when she turns right round at speed. She gets up on foot; nothing is lost.</li>' +
       '<li>The people inside have opinions about a giraffe on a bicycle in their bakery. Crazy is the kind word.</li></ul>';
   } }, 'town');
+  place({ id: 'intel', title: 'Intelligence', show: function(){ return typeof intel === 'function' && intel() > 0; }, html: function(){
+    return '<p><b>Intelligence</b> is the average level across all the university faculties, shown as a percentage in the university journal. Yours is <b>' + intelPct() + '%</b>. It is a stat, not a setting: it grows only by studying.</p><ul class="helplist">' +
+      '<li>Up to <b>60% fewer falls</b> off boards and bikes.</li>' +
+      '<li>Fishing: a slightly <b>wider green zone</b>, a slightly <b>slower marker</b> and a slightly <b>gentler fight</b> (up to 15%, 12% and 10%).</li>' +
+      '<li>Up to <b>30% less screen shake</b>, from every source.</li></ul>';
+  } }, 'wheels');
   /* how she plays */
   const b = GUIDE_TOPICS[at('basics')];
   if (b){ const base = b.html; b.html = function(){ return base().replace(/<\/ul>\s*$/, '<li>The game asked once whether you play with <b>touch</b> or <b>keyboard and mouse</b>; the tips and buttons follow that. Change it any time in Settings, under <b>Controls</b>.</li></ul>'); }; }

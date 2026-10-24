@@ -320,6 +320,7 @@ function sfx(name, ms, x, y){
 
 function addShake(a, ang){
   if (cityLevel('c_neck') > 0) a *= 0.5;
+  if (typeof intel === 'function') a *= 1 - 0.3 * intel();                /* a clever giraffe braces for it */
   G.shake = Math.min(28, G.shake + a); G.shakeMax = Math.max(G.shakeMax, G.shake);
   if (ang !== undefined){ G.shakeAng = ang; G.shakeBias = 0.8; }       /* a hit shoves the picture along its own direction, not at random */
   if (a >= 12) padRumble(0.35, 0.7, 140);

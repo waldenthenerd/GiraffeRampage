@@ -78,6 +78,14 @@ function uniBonusText(F, l){
 function uniTotal(){ let n = 0; UNI_FAC.forEach(function(F){ n += uniFac(F.id).l; }); return n; }
 function uniRankIndex(){ const n = uniTotal(); let r = 0; UNI_RANKS.forEach(function(k, i){ if (n >= k.at) r = i; }); return r; }
 function uniIQ(){ return 100 + uniTotal(); }
+/* Intelligence: the average faculty level, 0 to 1 (15 in every faculty). Read raw, so asking never writes to a fresh save. It is a stat, not a setting:
+   fewer falls off boards and bikes, a slightly kinder fishing bar and fight, and a little less screen shake. */
+function intel(){
+  const t = (typeof Save !== 'undefined' && Save.data) ? Save.data.town : null, f = t && t.uni && t.uni.fac; if (!f || typeof f !== 'object') return 0;
+  let n = 0; UNI_FAC.forEach(function(F){ const k = f[F.id]; n += k && typeof k === 'object' ? Math.max(0, Math.min(UNI_MAX, k.l | 0)) : 0; });
+  return n / (UNI_FAC.length * UNI_MAX);
+}
+function intelPct(){ return Math.round(intel() * 100); }
 function uniEnergyMax(){ return UNI_EN_BASE + uniRankIndex() + uniData().lamps; }
 function uniEnergy(){                                                                    /* today's energy: it refills at midnight, and never past the most, unless a drink put it there */
   const u = uniData(), today = townDayKey();

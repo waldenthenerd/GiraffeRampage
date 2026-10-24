@@ -144,7 +144,7 @@ function fightDraw(){
 }
 function fightTick(dt){
   if (!document.getElementById('fgTen')) return;
-  const k = Fg.k, lineF = Math.pow(k.line.win / 5.5, 0.35), z = k.rod.z;
+  const k = Fg.k, lineF = Math.pow(k.line.win / 5.5, 0.35) * (1 + 0.1 * intel()), z = k.rod.z * (1 + 0.1 * intel());
   Fg.ft += dt;
   const pull = clamp(fishPullAt(Fg.kind, Math.max(0, Fg.ft - Fg.grace)) * (Fg.ft < Fg.grace ? 0.25 : 1) * clamp(0.55 + 0.2 * Fg.str, 0.65, FIGHT.maxAmp), 0, 1.1); Fg.pull = pull;       /* a surge never beats letting go by much, so a careful player can always ride it out; the strong ones surge more and tire slowly */
   Fg.ten = clamp(Fg.ten + ((Fg.hold ? FIGHT.up / lineF : -FIGHT.down) + (pull - 0.2) * FIGHT.pull / lineF) * dt, 0, 1.3);

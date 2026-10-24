@@ -139,7 +139,7 @@ function wheelsRideStep(dt, D){
   const sp = Math.min(1, Math.abs(v) / (TOWN_WALK * W.mul));
   if (Town.wlast && Math.sign(Town.wlast) !== Math.sign(v) && Math.abs(Town.wlast) > 90 && Math.abs(v) > 20) Town.wbump = (Town.wbump || 0) + 0.12;           /* turning right round at speed */
   Town.wlast = Math.abs(v) > 20 ? v : 0;
-  const p = (W.fall * (D.indoor ? 1.35 : 1) * sp * sp + (Town.wbump || 0) * 0.5) * dt;
+  const p = (W.fall * (D.indoor ? 1.35 : 1) * sp * sp + (Town.wbump || 0) * 0.5) * (1 - 0.6 * intel()) * dt;
   Town.wbump = Math.max(0, (Town.wbump || 0) - dt);
   if (sp > 0.45 && (Town.fixFall || Math.random() < p)){ Town.fixFall = false; wheelsFall(); return; }
   Town.wcT = (Town.wcT || 0) - dt;
@@ -242,11 +242,31 @@ IV_ROOMS.wheels = function(c, D, K){
   ivBoard(c, 640, 56, 190, 70, '#F4F1E8', '#2A3644'); ivText(c, 'RIDE!', 735, 100, 30, '#D5352B'); c.strokeStyle = '#2A3644'; c.lineWidth = 3; c.beginPath(); c.moveTo(660, 112); c.lineTo(710, 112); c.moveTo(760, 112); c.lineTo(810, 112); c.stroke();
   ivLine(c, '#2A2A30', 2, 940, 34, 940, 64); tRound(c, '#E8C24A', 905, 64, 70, 44, 6); ivText(c, 'NO HELMET', 940, 84, 9, '#2A2A34'); ivText(c, 'NO PROBLEM', 940, 98, 9, '#2A2A34');
 };
+/* the shop seen from the street: a flat-roofed storefront with a striped awning, a display window and a wheel on the sign */
+function wheelsStorefront(c, D, b){
+  const x = b.x, W = b.w, h = b.h, x0 = x - W / 2, top = TG - h;
+  tRect(c, '#E9E4D6', x0, top, W, h); tRect(c, '#2A3644', x0 - 6, top - 14, W + 12, 16); tRect(c, 'rgba(0,0,0,.08)', x0, top + 2, W, 8);
+  tRect(c, '#2A3644', x0, TG - 16, W, 16);                                                            /* a dark plinth */
+  c.fillStyle = '#F4F1E8'; c.beginPath(); c.arc(x, top - 14, 34, Math.PI, 0); c.fill();             /* the wheel on the roof: a half-circle sign */
+  c.strokeStyle = '#2A3644'; c.lineWidth = 4; c.beginPath(); c.arc(x, top - 14, 30, Math.PI, 0); c.stroke();
+  c.lineWidth = 1.5; for (let k = 1; k < 6; k++){ const a = Math.PI + k * Math.PI / 6; c.beginPath(); c.moveTo(x, top - 14); c.lineTo(x + Math.cos(a) * 28, top - 14 + Math.sin(a) * 28); c.stroke(); }
+  tCircle(c, '#D5352B', x, top - 14, 5);
+  tSign(c, b.label, x, top + 22, 200, '#2A3644');
+  tAwning(c, x0 + 4, top + 38, W - 8, 28, '#D5352B', '#F4F1E8');
+  tWin(c, D, x0 + 18, top + 78, 128, 82, '#CFE9F4');                                                  /* the display window, with a bike and a board in it */
+  c.save(); c.beginPath(); c.rect(x0 + 18, top + 78, 128, 82); c.clip();
+  wheelsSide(c, x0 + 66, TG - 38, { kind: 'bike', spin: 0.6, crank: 0.4 });
+  c.translate(x0 + 118, TG - 40); c.rotate(-0.9); wheelsSide(c, 0, 0, { kind: 'skate' });
+  c.restore();
+  tDoor(c, x0 + W - 66, 52, 96, '#2A3644');
+  tRound(c, '#E8C24A', x0 + W - 62, TG - 112, 44, 14, 3); c.fillStyle = '#2A2A34'; c.font = '700 9px system-ui'; c.textAlign = 'center'; c.fillText('OPEN', x0 + W - 40, TG - 102);
+}
 (function(){
   const bx = townBuildingX, px = townPropX;
   townBuildingX = function(c, D, b, P, r){
     const f = WH_KINDS[b.kind];
     if (f && D.indoor){ c.save(); try { f(c, D, b); } finally { c.restore(); } return true; }
+    if (b.kind === 'wh_front' && !D.indoor){ c.save(); try { wheelsStorefront(c, D, b); } finally { c.restore(); } return true; }
     return bx(c, D, b, P, r);
   };
   townPropX = function(c, D, p, P, r){
@@ -273,7 +293,7 @@ IV_ROOMS.wheels = function(c, D, K){
     night: ['I leave the lights on for the night riders.'], rain: ['Puddles are an extra challenge. I do not sell extra challenge, but I do not stop it.'] } });
   TOWN_NPC_LIST.push('spoke');
   const P = TOWN_DIST.park; P.w = 4200;
-  P.b.push({ id: 'wheels', kind: 'house', x: 3900, w: 260, h: 205, label: 'Spoke & Board', act: 'house', to: 'in_wheels', tint: '#8CC8E0' });
+  P.b.push({ id: 'wheels', kind: 'wh_front', x: 3900, w: 260, h: 205, label: 'Spoke & Board', act: 'house', to: 'in_wheels', tint: '#8CC8E0' });
   P.p.push({ k: 'lamp', x: 3760 }, { k: 'wheelrack', x: 4090 }, { k: 'bush', x: 4150 });
   P.L.push({ x: 3760, y: 360, r: 110 }, { x: 3900, y: 400, r: 130 });
   [{ id: 'wh_c1', d: 'park', in: 'in_wheels', t: 'coin', x: 400, h: 262, note: 'on top of the board rack in the bike shop' }].forEach(function(it){ TOWN_ITEMS.push(it); TOWN_ITEM_BY_ID[it.id] = it; });
