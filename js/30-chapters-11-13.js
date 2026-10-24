@@ -573,7 +573,7 @@ const DUST_AI = {
   d_spore(e, dt, ux, uy, d){                            /* Spore Puff: drifts in on the wind, swells, and bursts */
     e.ang = (e.ang || 0) + dt * 0.8;
     if (e.state === 'swell'){
-      e.stateT -= dt;
+      e.stateT = (e.stateT || 0) - dt;                    /* a missing or broken timer ends the swell at once instead of never */
       if (e.stateT <= 0){ e.detonated = true; hostileBlast(e.x, e.y, 120, e.dmg * 1.1, '#F0A8C0', { kb: 50, source: e }); hostileZone(e.x, e.y, 80, 3, e.dmg * 0.25, '#E888B0'); e.dead = true; }
       return [0, 0];
     }

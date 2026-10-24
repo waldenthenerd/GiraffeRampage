@@ -17,7 +17,7 @@
    Controls: giraffe 1 is WASD (the keys in Settings) with Space, or the mouse button, to kick; giraffe 2 is the arrow keys with Enter. Gamepads:
    with two, the first drives giraffe 1 and the second giraffe 2; with one, it drives giraffe 2. Auto-kick in Settings kicks for both. */
 const CO_SW = ['x', 'y', 'vx', 'vy', 'face', 'aim', 'walk', 'hp', 'maxHp', 'invuln', 'hurtT', 'kickCd', 'kickAnim', 'dead', 'rage', 'regenAcc'];
-const CO_CHAPTERS = [1, 2, 3, 5];                   /* the backdrops that need nothing special (no water, buildings or space) */
+const CO_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];       /* every chapter's backdrop and creatures, each opening once the one before it is finished in the real save */
 const CO_ROUND_WAVES = [1, 2, 3, 4, 6, 7, 8, 9];     /* the waves of the chapter a round is built from (no boss waves) */
 /* without cards or experience the pair are weaker than a real run's giraffe: a third as many creatures, with a third of the health and a third of the damage */
 const CO_EASE = 3;
@@ -172,11 +172,16 @@ function coHelp(dt){
   });
 }
 /* a creature touching a giraffe, or a shot reaching her: the hit is dealt by the real hurtPlayer, with her standing in for P */
-function coHits(){
+function coHits(dt){
   const es = G.enemies, ep = G.eproj;
   Co.pl.forEach(function(r){
     if (r.down) return;
     coAs(r, function(){
+      /* a hurting patch of ground under her */
+      if (SCEN.zones.length){
+        const z = sceneryZoneAt(P.x, P.y, -P.r * 0.3);
+        if (z && z.kind === 'hurt'){ r.zt = (r.zt || 0) - dt; if (r.zt <= 0){ r.zt = 0.7; hurtPlayer(4 + P.maxHp * (z.def.dmgFrac || 0.012), P.x, P.y); } } else r.zt = 0;
+      }
       if (P.invuln <= 0){
         const near = enemiesNear(P.x, P.y, 140);
         for (let i = 0; i < near.length; i++){
@@ -299,7 +304,7 @@ function coGoal(team){
     if (Co.over){ coBothDown(); return; }                                     /* the game-over screen was closed by Escape: it comes back */
     const pads = coPads();
     Co.pl.forEach(function(r){ if (!r.down) coStepGiraffe(r, dt, pads); });
-    coHelp(dt); coHits();
+    coHelp(dt); coHits(dt);
     coShell();
     G.pendingLevels = 0; HUD.classList.remove('on'); PAUSEBTN.classList.remove('on');
     up(dt);
@@ -328,7 +333,7 @@ function coGoal(team){
   const hp = hurtPlayer;
   hurtPlayer = function(amount, sx, sy){
     if (!Co.on || Co.cur) return hp.apply(this, arguments);
-    if (sx === undefined) return;
+    if (sx === undefined || (sx === P.x && sy === P.y)) return;                  /* the ground under the shell hurts nobody: coHits tests the ground under each giraffe */
     let best = null, bd = 150;
     for (let i = 0; i < Co.pl.length; i++){ const r = Co.pl[i]; if (r.down) continue; const d = hyp(r.x - sx, r.y - sy); if (d < bd){ bd = d; best = r; } }
     if (!best) return;
@@ -479,5 +484,59 @@ function coAction(a){
       if (left && !OV.querySelector('[data-a="co-open"]')) left.insertAdjacentHTML('beforeend', '<button class="btn ghost" data-a="co-open">Play together<small>Two giraffes, one screen, just for fun</small></button>');
     }
     return r;
+  };
+})();
+
+/* ---- hostile blasts, swings, zones and beams: tested against each giraffe, not against the shell between them ---- */
+/* The real ones test P, which in Play together is the shell at the middle of the pair, so a blast on one giraffe or a beam across the other did nothing unless the middle
+   happened to be in it. Each runs as before with the shell moved far away (so it hits nobody, and nothing hits twice), then the same tests are made for each giraffe. */
+(function(){
+  const hb = hostileBlast, hs = hostileSwing, uz = updateHZones, ub = updateBeams;
+  const far = function(fn){ const x = P.x, y = P.y; P.x = -1e5; P.y = -1e5; try { return fn(); } finally { P.x = x; P.y = y; } };
+  const each = function(fn){ Co.pl.forEach(function(g, i){ if (!g.down) fn(g, i); }); };
+  const check = function(g){ if (g.hp <= 0 && !g.down) coDown(g); };
+  hostileBlast = function(x, y, r, dmg, color, o){
+    if (!Co.on) return hb.apply(this, arguments);
+    const res = far(function(){ return hb(x, y, r, dmg, color, o); }); o = o || {};
+    each(function(g){
+      if (hyp(g.x - x, g.y - y) >= r + P.r * 0.6) return;
+      coAs(g, function(){
+        hurtPlayer(dmg, x, y);
+        if (o.kb){ const a = Math.atan2(P.y - y, P.x - x), k = typeof o.kb === 'number' && o.kb > 1 ? o.kb : 70; P.x = clamp(P.x + Math.cos(a) * k, 26, ARENA_W - 26); P.y = clamp(P.y + Math.sin(a) * k, 26, ARENA_H - 26); }
+      });
+      check(g);
+    });
+    return res;
+  };
+  hostileSwing = function(e, range, arc, dmg, kb){
+    if (!Co.on) return hs.apply(this, arguments);
+    const res = far(function(){ return hs(e, range, arc, dmg, kb); });
+    each(function(g){
+      const dx = g.x - e.x, dy = g.y - e.y, d = hyp(dx, dy);
+      if (!(d < range + P.r && (d < 40 || Math.abs(angDiff(Math.atan2(dy, dx), e.ang)) < arc))) return;
+      coAs(g, function(){ hurtPlayer(dmg, e.x, e.y); const a = d < 40 ? e.ang : Math.atan2(dy, dx); P.x = clamp(P.x + Math.cos(a) * kb, 26, ARENA_W - 26); P.y = clamp(P.y + Math.sin(a) * kb, 26, ARENA_H - 26); });
+      check(g);
+    });
+    return res;
+  };
+  updateHZones = function(dt){
+    if (!Co.on) return uz(dt);
+    far(function(){ uz(dt); });
+    G.hzones.forEach(function(z){
+      z.ct = z.ct || [0.2, 0.2];
+      each(function(g, i){ z.ct[i] -= dt; if (z.ct[i] <= 0 && hyp(g.x - z.x, g.y - z.y) < z.r + P.r * 0.5){ coAs(g, function(){ hurtPlayer(z.dps, z.x, z.y); }); z.ct[i] = 0.5; check(g); } });
+    });
+  };
+  updateBeams = function(dt){
+    if (!Co.on) return ub(dt);
+    far(function(){ ub(dt); });
+    G.beams.forEach(function(b){
+      if (!(b.dmg > 0 && b.t >= b.warn && b.t < b.warn + b.dur)) return;
+      b.cht = b.cht || [false, false]; b.ctk = b.ctk || [0, 0];
+      each(function(g, i){
+        b.ctk[i] -= dt;
+        if (segDist(g.x, g.y, b.x1, b.y1, b.x2, b.y2) < b.w / 2 + P.r * 0.8 && (b.once ? !b.cht[i] : b.ctk[i] <= 0)){ coAs(g, function(){ hurtPlayer(b.dmg, b.x1, b.y1); }); b.cht[i] = true; b.ctk[i] = 0.3; check(g); }
+      });
+    });
   };
 })();

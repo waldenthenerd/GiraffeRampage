@@ -41,6 +41,19 @@
     G.enemies.length = 0; g0.invuln = 0; g1.invuln = 0; var h0 = g0.hp, h1 = g1.hp;
     var f = spawnEnemy('hyena', g1.x + 5, g1.y, G.wave); f.atkCd = 0; run(3);
     out.hitTheOneTouched = g1.hp < h1 && g0.hp === h0;
+    /* hostile zones, beams, blasts and swings hurt the giraffe they touch, even when the middle of the pair is nowhere near them */
+    G.enemies.length = 0; Co.queue = []; g0.x = 700; g0.y = 700; g1.x = 1250; g1.y = 700; Co.calm = -99;
+    function fresh(){ g0.invuln = 0; g1.invuln = 0; g0.hp = g0.maxHp; g1.hp = g1.maxHp; g0.down = false; g1.down = false; G.hzones.length = 0; G.beams.length = 0; }
+    fresh(); hostileZone(g1.x, g1.y, 60, 3, 25, '#FF0000'); run(30);
+    out.zoneHurts = g1.hp < g1.maxHp && g0.hp === g0.maxHp;
+    fresh(); addBeam(g0.x - 120, g0.y, g0.x + 120, g0.y, 50, 0.05, 0.6, 12, '#FF00FF'); run(25);
+    out.beamHurts = g0.hp < g0.maxHp && g1.hp === g1.maxHp;
+    fresh(); hostileBlast(g1.x, g1.y, 90, 14, '#FFAA00', { kb: 60 }); out.blastHurts = g1.hp < g1.maxHp && g0.hp === g0.maxHp;
+    fresh(); var sw = spawnEnemy('hyena', g0.x - 40, g0.y, G.wave); sw.ang = 0; sw.atkCd = 9; G.enemies.forEach(function(q){ if (q !== sw) q.dead = true; });
+    hostileSwing(sw, 110, 1.6, 13, 20); out.swingHurts = g0.hp < g0.maxHp && g1.hp === g1.maxHp; sw.dead = true;
+    /* both at once: each is hurt once, not twice, when the middle is also inside */
+    fresh(); g1.x = g0.x + 120; hostileBlast((g0.x + g1.x) / 2, g0.y, 150, 10, '#FFAA00'); var d0 = g0.maxHp - g0.hp, d1 = g1.maxHp - g1.hp; out.noDoubleHit = d0 > 0 && d1 > 0 && Math.abs(d0 - d1) < 1.5; g1.x = g0.x + 600;
+
     /* and creatures walk toward the nearer giraffe */
     G.enemies.length = 0; var h = spawnEnemy('hyena', g1.x + 500, g1.y, G.wave); out.aggro = antAggroTarget(h) === g1;
 
@@ -81,9 +94,20 @@
     var P1 = Co.pl[0]; P1.x = Co.ball.x - 70; P1.y = Co.ball.y; P1.face = 0; P1.aim = 0; Input.keys['Space'] = true; run(6); clearKeys();
     out.ballKicked = Math.abs(Co.ball.vx) > 100 || Co.ball.x > (Y.x0 + Y.x1) / 2 + 20;
     GR.render(); out.draws = true;
+    /* two controllers: the first plays giraffe 1, the second giraffe 2; with one controller it plays giraffe 2 */
+    function mkPad(){ var pd = { connected: true, id: 'fake', axes: [0, 0, 0, 0], buttons: [] }; for (var bi = 0; bi < 17; bi++) pd.buttons.push({ pressed: false, value: 0 }); return pd; }
+    var pa = mkPad(), pb = mkPad(), realPads = navigator.getGamepads; clearKeys(); G.enemies.length = 0;
+    var q0 = { x: Co.pl[0].x, y: Co.pl[0].y }, q1 = { x: Co.pl[1].x, y: Co.pl[1].y };
+    navigator.getGamepads = function(){ return [pa, pb]; }; pa.axes[0] = 1; pb.axes[1] = -1; run(25); pa.axes[0] = 0; pb.axes[1] = 0;
+    out.twoPads = Co.pl[0].x > q0.x + 20 && Math.abs(Co.pl[0].y - q0.y) < 8 && Co.pl[1].y < q1.y - 20 && Math.abs(Co.pl[1].x - q1.x) < 8;
+    var r0 = { x: Co.pl[0].x, y: Co.pl[0].y }, r1 = { x: Co.pl[1].x, y: Co.pl[1].y };
+    navigator.getGamepads = function(){ return [pa]; }; pa.axes[1] = 1; run(25); pa.axes[1] = 0;
+    out.onePad = Co.pl[1].y > r1.y + 20 && Math.abs(Co.pl[0].y - r0.y) < 8 && Math.abs(Co.pl[0].x - r0.x) < 40;
+    navigator.getGamepads = realPads;
     handleAction('co-quit'); out.left2 = !Co.on && Save.data === real;
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['menuBtn', 'menuBtnPhone', 'panel', 'started', 'freshSave', 'hudHidden', 'noHint', 'movesApart', 'shellMid', 'kick', 'kickOnlyForOne', 'hitTheOneTouched', 'aggro', 'down', 'helped', 'noLevelUp', 'nextRound', 'saveUntouched', 'bothDown', 'again', 'paused', 'left', 'yard', 'goal', 'reset', 'match', 'newMatch', 'ballKicked', 'draws', 'left2'];
+  var need = ['menuBtn', 'menuBtnPhone', 'panel', 'started', 'freshSave', 'hudHidden', 'noHint', 'movesApart', 'shellMid', 'kick', 'kickOnlyForOne', 'hitTheOneTouched', 'aggro', 'zoneHurts', 'beamHurts', 'blastHurts', 'swingHurts', 'noDoubleHit', 'down', 'helped', 'noLevelUp', 'nextRound', 'saveUntouched', 'bothDown', 'again', 'paused', 'left', 'yard', 'goal', 'reset', 'match', 'newMatch', 'ballKicked', 'draws', 'left2', 'twoPads', 'onePad'];
+  out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && need.every(function(k){ return out[k] === true; });
   QA.done(out);
 })();

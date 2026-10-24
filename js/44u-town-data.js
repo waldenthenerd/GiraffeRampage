@@ -18,7 +18,8 @@ const TOWN_H = 600, TOWN_GROUND = 500;
 const TOWN_ORDER = ['harbour', 'market', 'square', 'park', 'roofs', 'launch'];
 function townDoneCh(n){ return !!(Save.data && Save.data['chapter' + n + 'Complete']); }
 function townChaptersDone(){ let n = 0; for (let c = 1; c <= 13; c++) if (townDoneCh(c)) n++; return n; }
-function townCoin(){ return 80 * (1 + townChaptersDone()); }                       /* what one coin is worth in gold: it grows with her progress */
+/* what one coin is worth in gold: it grows with her progress, and faster the further she is (3 times what it was after all 13 chapters, 1.5 times after 3), so the town and fishing keep up with what late chapters and the spaceplane cost */
+function townCoin(){ const d = townChaptersDone(); return Math.round(80 * (1 + d) * (1 + d / 6.5)); }
 
 /* ---- save data ---- */
 function townData(){

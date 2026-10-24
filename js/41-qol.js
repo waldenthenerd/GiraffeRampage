@@ -45,7 +45,7 @@ const Nav = {
     return true;
   },
   click(){ const a = document.activeElement; if (a && OV.contains(a) && (a.tagName === 'BUTTON' || a.tagName === 'SUMMARY') && !a.disabled){ a.click(); return true; } return false; },
-  back(){ const b = OV.querySelector('[data-a="resume"],[data-a="settings-back"],[data-a="gallery-back"],[data-a="menu"],[data-a="mini-back"],[data-a="town-close"],[data-a="back"]'); if (b && !b.disabled){ b.click(); return true; } return false; },
+  back(){ const b = OV.querySelector('[data-a="resume"],[data-a="settings-back"],[data-a="gallery-back"],[data-a="menu"],[data-a="mini-back"],[data-a="town-close"],[data-a="fish-book-back"],[data-a="fish-sea-close"],[data-a="back"]'); if (b && !b.disabled){ b.click(); return true; } return false; },
   overlayOpen(){ return OV.className.indexOf('on') >= 0 && G.state !== 'playing' && G.state !== 'cutscene'; }
 };
 

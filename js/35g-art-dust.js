@@ -264,7 +264,7 @@ const DUST_DRAW = {
     for (const sd of [-1, 1]){ lkLN(ctx, [6.6 * s, bob + sd * 0.8 * s, 9 * s, bob + sd * 0.2 * s], 1.1 * s, d.pale); fillCircle(ctx, 5.6 * s, bob + sd * 1.7 * s, 1.1 * s, DU_TEAL); }
   },
   dust_spore(ctx, e, b, dk, bob, wind, d){                                          /* a puffball of spores that swells and bursts */
-    const s = e.r / 13, sw = e.state === 'swell' ? 1 + (0.55 - Math.max(0, e.stateT)) * 1.2 : 1 + 0.06 * Math.sin(e.anim * 1.2), a = e.ang || 0, hi = du_li(b, 0.5), sh = du_sh(b, 0.2);
+    const s = e.r / 13, sw = e.state === 'swell' ? 1 + (0.55 - Math.max(0, e.stateT || 0)) * 1.2 : 1 + 0.06 * Math.sin(e.anim * 1.2), a = e.ang || 0, hi = du_li(b, 0.5), sh = du_sh(b, 0.2);
     softBlob(ctx, 0, bob, 22 * s * sw, d.pale, 0.2);
     for (let k = 0; k < 12; k++){
       const an = k / 12 * TAU + a, big = k % 2 === 0, rr = (big ? 11 : 8.4) * s * sw + 4 * s, ca = Math.cos(an), sn = Math.sin(an);

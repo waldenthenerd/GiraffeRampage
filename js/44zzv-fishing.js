@@ -201,7 +201,7 @@ function fishResult(win, why){
     const now = [FISH_RODS, FISH_LINES, FISH_BAITS], names = [], kk = fishTackle().k; let at = 0;
     ['rod', 'line', 'bait'].forEach(function(key, ki){ const list = now[ki]; for (let i = 0; i < list.length; i++){ if (fishUnlocked(list, i) && !had[at + i]){ kk[key] = i; names.push(list[i].n); } } at += list.length; });
     if (names.length) msg += ' New tackle, and it is on: ' + names.join(', ') + '!';
-    const t2 = townData();
+    const t2 = townData(); t2.n.fishCaught = (t2.n.fishCaught | 0) + 1; if (clean) t2.n.fishClean = (t2.n.fishClean | 0) + 1;
     if (FISH.every(function(x){ return log[x.id] > 0; }) && !t2.n.fishAll){ t2.n.fishAll = 1; townPay({ gems: 100 }); msg += ' Every kind caught: +100 gems!'; SFX.transform(); } else fishSound('catch', f);
   } else { msg = why || 'It got away.'; Fg.last = null; fishSound('lost'); Fg.a = { k: 'lost', t: Fg.clock, f: f }; }
   Save.write();

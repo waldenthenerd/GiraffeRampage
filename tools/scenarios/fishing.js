@@ -5,6 +5,7 @@
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
+  Town.fixHour = 21; Town.fixWeather = 'clear';                 /* the hour and the weather change how fast they bite (fishCond): pin them, or a test run at midday would wait too long */
   function tick(n){ for (var i = 0; i < n; i++) fishTick(0.03); }
   function cast(force){ fishCast(); if (force) Fg.fish = FISH.filter(function(f){ return f.id === force; })[0]; tick(120); return Fg.phase === 'bite'; }
   /* the hook (the marker in the green) and then a fight, played by hand: wind in while the line is slack, ease off when it is tight */

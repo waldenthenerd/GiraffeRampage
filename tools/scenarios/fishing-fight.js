@@ -4,6 +4,7 @@
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
+  Town.fixHour = 21; Town.fixWeather = 'clear';                 /* the hour and the weather change the fight and the bites: pin them so a run at midday or in a storm does not change the numbers */
   function tick(n){ for (var i = 0; i < n; i++) fishTick(0.03); }
   function key(code){ window.dispatchEvent(new KeyboardEvent('keydown', { code: code, bubbles: true, cancelable: true })); }
   function pier(){ Town.d = 'harbour'; G.state = 'town'; Fg.sea = false; townShowFishing(); }
@@ -92,6 +93,16 @@
     Town.fixHour = 22; Town.fixWeather = 'clear'; var inHot = fishSpotAt(Sea.x, Sea.y); out.inSpot = !!inHot && inHot.k === 'hot'; Fg.sea = true; var c = fishCond('deep'); out.hotCond = c.rare >= 2.5 && c.wait < 0.5 && c.scales === 2 && /HOT SPOT/.test(c.msg) && c.spot === inHot;
     Sea.x = hot.x + SPOT_R + 80; out.outSpot = !fishSpotAt(Sea.x, Sea.y) && fishCond('deep').scales === 1; Sea.x = hot.x; out.pierNoSpot = fishCond('pier').spot === null;
     GR.render(); G.state = 'sail'; GR.render(); out.drawsSea = true; Fg.sea = false;
+    /* only charted spots show on the sea chart */
+    var hc = Math.floor(hot.x / SEA_MAP_C) + Math.floor(hot.y / SEA_MAP_C) * SEA_MAP_N, arcs = 0, arc0 = CTX.arc;
+    CTX.arc = function(){ arcs++; return arc0.apply(this, arguments); };
+    Sea.seen.fill(0); seaDrawMap(CTX, G.W, G.H, 1); var a0 = arcs; arcs = 0; Sea.seen[hc] = 1; seaDrawMap(CTX, G.W, G.H, 1); var a1 = arcs; CTX.arc = arc0;
+    out.chartSeen = a1 === a0 + 1;
+    /* the town coin grows faster than it did: 80 at the start, 3 times the old value after all 13 chapters */
+    var keepCh = {}; for (var cc = 1; cc <= 13; cc++){ keepCh[cc] = Save.data['chapter' + cc + 'Complete']; Save.data['chapter' + cc + 'Complete'] = false; }
+    var c0 = townCoin(); for (cc = 1; cc <= 3; cc++) Save.data['chapter' + cc + 'Complete'] = true; var c3 = townCoin(); for (cc = 1; cc <= 13; cc++) Save.data['chapter' + cc + 'Complete'] = true; var c13 = townCoin();
+    for (cc = 1; cc <= 13; cc++) Save.data['chapter' + cc + 'Complete'] = keepCh[cc];
+    out.coinGrows = c0 === 80 && c3 === 468 && c13 === 3360;
     key('KeyM'); out.mapOk = true;
     var btn = document.getElementById('castBtn'); if (btn){ btn.style.display = 'flex'; btn._on = true; GR.step(1 / 60); out.btnLabel = /Cast a line/.test(btn.textContent) && /\(F\)|\(/.test(btn.textContent) && /HOT SPOT/.test(btn.textContent); } else out.btnLabel = false;
     G.state = 'menu'; Sea.on = false;
@@ -116,10 +127,37 @@
     pier(); key('KeyF'); out.fCasts = Fg.phase === 'wait'; Fg.phase = 'idle'; clearInterval(Fg.iv); Fg.iv = 0;
     pier(); showFishBook(); out.shopBtn = /fish-shop/.test(OV.innerHTML); GR.handleAction('fish-shop'); out.shopGo = Town.d === 'in_tackle' && Town.back && Town.back.d === 'harbour';
 
+    /* the tackle shop has a keeper, two things to find and two errands that follow fishing */
+    var tn = townData().n; tn.fishCaught = 4; tn.fishClean = 1; var e1 = TOWN_ERR_BY_ID.cl1, e2 = TOWN_ERR_BY_ID.cl2;
+    out.shopKeeper = TOWN_DIST.in_tackle.npcs[0] === 'cleat' && TOWN_NPCS.cleat.d === 'in_tackle' && TOWN_NPC_LIST.indexOf('cleat') >= 0 && townInItems('in_tackle').length === 2 && townInItems('in_tackle').every(function(it){ return it.d === 'harbour' && !!TOWN_ITEM_BY_ID[it.id]; });
+    var n1 = townNeed(e1), n2 = townNeed(e2); out.errandsCount = n1.cur === 4 && n1.max === 10 && n2.cur === 1 && n2.max === 3; tn.fishCaught = 10; tn.fishClean = 3; out.errandsDone = townNeed(e1).cur === 10 && townNeed(e2).cur === 3;
+    pier(); cast('sardine'); hook(); Fg.str = 0.5; Fg.peak = 0.4; Fg.prog = 1; Fg.hold = true; var kc = tn.fishCaught | 0, kk2 = tn.fishClean | 0; fightTick(0.03); out.countersGrow = (tn.fishCaught | 0) === kc + 1 && (tn.fishClean | 0) === kk2 + 1;
+
+    /* a controller: A casts, hooks and (held) winds in, B closes; at sea A casts when the boat is still */
+    var fake = { connected: true, id: 'fake', axes: [0, 0, 0, 0], buttons: [] }; for (var bi = 0; bi < 17; bi++) fake.buttons.push({ pressed: false, value: 0 });
+    var realPads = navigator.getGamepads; navigator.getGamepads = function(){ return [fake]; };
+    function press(i, on){ fake.buttons[i].pressed = on; fake.buttons[i].value = on ? 1 : 0; Pad.poll(0.03); }
+    townData().n.fights = 99; pier(); Fg.castLock = 0;
+    press(0, true); out.padCasts = Fg.phase === 'wait'; press(0, false);
+    Fg.fish = FISH.filter(function(f){ return f.id === 'sardine'; })[0]; tick(200); out.padBite = Fg.phase === 'bite';
+    Fg.pos = Fg.zone + Fg.w / 2; press(0, true); press(0, false); out.padHooks = Fg.phase === 'fight';
+    press(0, true); out.padHolds = Fg.hold === true; press(0, false); out.padReleases = Fg.hold === false;
+    Fg.phase = 'idle'; clearInterval(Fg.iv); Fg.iv = 0; pier(); press(1, true); press(1, false); out.padBackPier = !Town.panel;
+    var hs = fishSpots().filter(function(s){ return s.k === 'hot'; })[0]; sd.own.skiff = 1; sd.sel = 'skiff'; G.state = 'menu'; seaStart('harbour'); GR.step(1 / 60);
+    Sea.x = hs.x; Sea.y = hs.y; Sea.v = 0; Sea.thr = 0; Sea.nearDock = ''; GR.step(1 / 60); GR.step(1 / 60);
+    press(0, true); press(0, false); out.padSeaOpens = G.state === 'fishing' && Fg.sea === true;
+    press(1, true); press(1, false); out.padSeaCloses = G.state === 'sail' && !Fg.sea; Sea.on = false; G.state = 'menu';
+    navigator.getGamepads = realPads; Input.padUsed = false; Input.padOn = false;
+
+    /* the Guide has topics for fishing (once she has been to the Harbour), Trophies and Play together */
+    var keepFish = townData().fish; townData().fish = {}; delete townData().vis.harbour; var g0 = guideTopicsHTML(); townData().vis.harbour = 1; townData().fish = keepFish; var g1 = guideTopicsHTML();
+    out.guideTopics = g0.indexOf('data-topic="fishing"') < 0 && g1.indexOf('data-topic="fishing"') >= 0 && g1.indexOf('data-topic="trophies"') >= 0 && g1.indexOf('data-topic="together"') >= 0 && /hot spot/.test(g1) && /gear bench/.test(g1) && /snaps/.test(g1);
+    Input.padUsed = true; var gp = guideTopicsHTML(); Input.padUsed = false; out.guidePad = /hold<\/b> <b>A<\/b>/.test(gp);
+
     /* 3 sound never throws */
     out.sounds = ['cast', 'splash', 'bite', 'hook', 'reel', 'warn', 'snap', 'lost', 'catch'].every(function(k){ try { fishSound(k, FISH[3]); return true; } catch (e) { return false; } });
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['greedyLoses', 'mashEasyOnly', 'carefulWins', 'lengths', 'kitHelps', 'teachOn', 'teachHint', 'teachHot', 'teachOff', 'cleanPays', 'how', 'pulls', 'boot', 'fightHtml', 'bite', 'hooked', 'snaps', 'bite2', 'shakes', 'bite3', 'wins', 'betterLine', 'card', 'cardPaints', 'cardGoes', 'dawn', 'noon', 'night', 'weather', 'condLine', 'waitScaled', 'stormBigger', 'spots', 'wet', 'same', 'newDay', 'inSpot', 'hotCond', 'outSpot', 'pierNoSpot', 'drawsSea', 'btnLabel', 'mounts', 'mountSig', 'homePaints', 'noMounts', 'autoBtn', 'autoOn', 'recastSet', 'recasts', 'autoOff', 'repeatIgnored', 'lockHolds', 'lockEnds', 'spaceCasts', 'fCasts', 'shopBtn', 'shopGo', 'sounds'];
+  var need = ['greedyLoses', 'mashEasyOnly', 'carefulWins', 'lengths', 'kitHelps', 'teachOn', 'teachHint', 'teachHot', 'teachOff', 'cleanPays', 'how', 'pulls', 'boot', 'fightHtml', 'bite', 'hooked', 'snaps', 'bite2', 'shakes', 'bite3', 'wins', 'betterLine', 'card', 'cardPaints', 'cardGoes', 'dawn', 'noon', 'night', 'weather', 'condLine', 'waitScaled', 'stormBigger', 'spots', 'wet', 'same', 'newDay', 'inSpot', 'hotCond', 'outSpot', 'pierNoSpot', 'drawsSea', 'chartSeen', 'coinGrows', 'btnLabel', 'mounts', 'mountSig', 'homePaints', 'noMounts', 'autoBtn', 'autoOn', 'recastSet', 'recasts', 'autoOff', 'repeatIgnored', 'lockHolds', 'lockEnds', 'spaceCasts', 'fCasts', 'shopBtn', 'shopGo', 'sounds', 'guideTopics', 'guidePad', 'shopKeeper', 'errandsCount', 'errandsDone', 'countersGrow', 'padCasts', 'padBite', 'padHooks', 'padHolds', 'padReleases', 'padBackPier', 'padSeaOpens', 'padSeaCloses'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);

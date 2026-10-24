@@ -25,7 +25,7 @@ function csHex(c1, c2, t){
 function csRGBA(c, a){ return 'rgba(' + parseInt(c.substr(1, 2), 16) + ',' + parseInt(c.substr(3, 2), 16) + ',' + parseInt(c.substr(5, 2), 16) + ',' + a + ')'; }
 /* a soft radial glow (the game's softBlob is a flat disc, which reads as a bubble at this size) */
 function csGlow(ctx, x, y, r, color, alpha){
-  if (alpha <= 0.003 || r <= 0.5) return;
+  if (!(alpha > 0.003) || !(r > 0.5) || !isFinite(x + y + r)) return;                      /* also false for a non-finite size, which would throw */
   const g = ctx.createRadialGradient(x, y, 0, x, y, r);
   g.addColorStop(0, csRGBA(color, alpha)); g.addColorStop(0.45, csRGBA(color, alpha * 0.42)); g.addColorStop(1, csRGBA(color, 0));
   ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
