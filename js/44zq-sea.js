@@ -132,10 +132,12 @@ function seaMapReveal(){
   if (!Sea.seen) return;
   const w = typeof townWeatherType === 'function' ? townWeatherType() : 'clear', rad = w === 'fog' ? 1 : w === 'storm' ? 2 : 3;
   const cx = Math.floor(Sea.x / SEA_MAP_C), cy = Math.floor(Sea.y / SEA_MAP_C), g = SEA_MAPCV.getContext('2d');
-  for (let dy = -rad; dy <= rad; dy++) for (let dx = -rad; dx <= rad; dx++){
-    if (dx * dx + dy * dy > rad * rad + 1) continue;
+  const land = rad * 2 + 1;                                                    /* she cannot sail onto the shore, so the land is charted from twice as far: 7 cells in clear weather, 5 in a storm, 3 in fog */
+  for (let dy = -land; dy <= land; dy++) for (let dx = -land; dx <= land; dx++){
+    const d2 = dx * dx + dy * dy; if (d2 > land * land + 1) continue;
     const X = cx + dx, Y = cy + dy; if (X < 0 || Y < 0 || X >= SEA_MAP_N || Y >= SEA_MAP_N) continue;
     const i = Y * SEA_MAP_N + X;
+    if (d2 > rad * rad + 1){ const ty = seaTypeAt(X * SEA_MAP_C + SEA_MAP_C / 2, Y * SEA_MAP_C + SEA_MAP_C / 2); if (ty < SEA_SAND || ty > SEA_ROCK) continue; }       /* beyond the water's range only land is seen */
     if (!Sea.seen[i]){ Sea.seen[i] = 1; Sea.seenN++; g.fillStyle = seaMapColour(i); g.fillRect(X, Y, 1, 1); }
   }
 }
