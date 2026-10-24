@@ -70,9 +70,7 @@
       c.save(); c.globalAlpha = 0.1; tPoly(c, '#FFF1C0', [wx + 4, bot, wx + 74, bot, wx + 74 + off, TG, wx + 10 + off, TG]); c.globalAlpha = 0.06; tPoly(c, '#FFF1C0', [wx + 30, bot, wx + 48, bot, wx + 48 + off, TG, wx + 34 + off, TG]); c.restore();
       for (let k = 0; k < 9; k++){ const t = r(), px = wx + 12 + t * (off + 60) - (1 - t) * 0, py = bot + (TG - bot) * t; c.fillStyle = 'rgba(255,250,220,' + (0.18 + r() * 0.25).toFixed(2) + ')'; c.fillRect(px + (r() - 0.5) * 30, py + (r() - 0.5) * 14, 1.6, 1.6); }
     }
-    /* by the door: a switch and a socket */
-    tRect(c, '#EDE6D2', 252, TG - 128, 14, 22); tRect(c, 'rgba(0,0,0,.2)', 252, TG - 106, 14, 1.5); tRect(c, '#B8B2A4', 256, TG - 122, 6, 10); tRect(c, '#4A4A52', 258, TG - 121, 2, 5);
-    tRect(c, '#EDE6D2', 252, TG - 62, 14, 18); tCircle(c, '#2A2A30', 256, TG - 55, 1.3); tCircle(c, '#2A2A30', 262, TG - 55, 1.3); tRect(c, '#2A2A30', 257, TG - 50, 4, 1.4);
+    if (D.room !== 'home') roomSwitchSocket(c);                                       /* her home paints them itself, before the furniture (js/44zf-town-economy.js), or the sofa would sit behind the socket */
     /* the walls between the windows */
     const art = ART[D.room] || [];
     for (let i = 0; i < Math.min(art.length, Math.max(0, winN - 1)); i++){
@@ -89,3 +87,9 @@
     try { c.save(); detail(c, D, K2); c.restore(); } catch (e) {}
   };
 })();
+
+/* by the door: a switch and a socket (flat on the wall: anything standing in front of them is painted after) */
+function roomSwitchSocket(c){
+  tRect(c, '#EDE6D2', 252, TG - 128, 14, 22); tRect(c, 'rgba(0,0,0,.2)', 252, TG - 106, 14, 1.5); tRect(c, '#B8B2A4', 256, TG - 122, 6, 10); tRect(c, '#4A4A52', 258, TG - 121, 2, 5);
+  tRect(c, '#EDE6D2', 252, TG - 62, 14, 18); tCircle(c, '#2A2A30', 256, TG - 55, 1.3); tCircle(c, '#2A2A30', 262, TG - 55, 1.3); tRect(c, '#2A2A30', 257, TG - 50, 4, 1.4);
+}
