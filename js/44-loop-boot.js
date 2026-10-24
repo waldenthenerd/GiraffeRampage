@@ -92,7 +92,7 @@ function boot(){
   resize();
   window.addEventListener('resize', resize);
   window.addEventListener('orientationchange', function(){ setTimeout(resize, 120); });
-  if ('ontouchstart' in window || (navigator.maxTouchPoints | 0) > 0) Input.hasTouch = true;
+  applyInputMode();                   /* touch or keyboard and mouse: her answer, or a guess from the device until she gives it */
   buildGround();
   buildGroundSnow();
   buildGroundSwamp();

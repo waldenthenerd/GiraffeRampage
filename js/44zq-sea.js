@@ -223,7 +223,7 @@ function seaDrawTerrain(ctx, W, H, z, camX, camY, t, weather){
 }
 function seaWorldToScreen(wx, wy, W, H, z, camX, camY){ return { x: (wx - camX) * z + W / 2, y: (wy - camY) * z + H / 2 }; }
 function seaDrawBoat(ctx, x, y, ang, kind, t, scale, wob){
-  const B = BOAT_BY_ID[kind] || BOATS[0], s = scale || 1, cl = typeof giraffeColours === 'function' ? giraffeColours() : { coat: '#E8B648', spot: '#8A5A24' };
+  const B = BOAT_BY_ID[kind] || BOATS[0], s = scale || 1;
   ctx.save(); ctx.translate(x, y); ctx.rotate(ang + (wob || 0)); ctx.scale(s, s);
   ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.beginPath(); ctx.ellipse(3, 4, 34, 15, 0, 0, TAU); ctx.fill();
   switch (kind){
@@ -245,12 +245,52 @@ function seaDrawBoat(ctx, x, y, ang, kind, t, scale, wob){
       ctx.fillStyle = '#8A5A32'; ctx.fillRect(-18, -12, 4, 24); ctx.fillRect(2, -12, 4, 24);
       ctx.strokeStyle = '#6A4A28'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(-8, -10); ctx.lineTo(-24, -26 + Math.sin(t * 4) * 3); ctx.moveTo(-8, 10); ctx.lineTo(-24, 26 - Math.sin(t * 4) * 3); ctx.stroke();
   }
-  /* her, from above: a head with two horns and spots, and the long neck lying forward over the bow */
-  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(-4, 0, 11, 7, 0, 0, TAU); ctx.fill(); ctx.fillRect(-4, -2.4, 24, 4.8);
-  ctx.beginPath(); ctx.ellipse(22, 0, 8, 5.4, 0, 0, TAU); ctx.fill();
-  ctx.fillStyle = cl.spot; ctx.beginPath(); ctx.arc(-8, -2, 2.6, 0, TAU); ctx.arc(-1, 2.6, 2.2, 0, TAU); ctx.arc(8, 0, 1.8, 0, TAU); ctx.fill();
-  ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.arc(18, -4.6, 1.8, 0, TAU); ctx.arc(18, 4.6, 1.8, 0, TAU); ctx.arc(27, -1.8, 1, 0, TAU); ctx.arc(27, 1.8, 1, 0, TAU); ctx.fill();
   ctx.restore();
+}
+/* her, from above (drawn by the caller after the boat's fittings, in the boat's own space, so no rail or seat crosses her), in the same style as the giraffe on land
+   (js/33-giraffe-art.js): her chosen coat, spot colour and pattern, no outline, the same head (a coat head, a dark muzzle, ossicones with knobs, ears) and small dark eyes.
+   Her neck is a bent line from the shoulder to the head and it moves by itself: she sways her head and now and then looks about, so she is not stuck to the boat.
+   seaRiderPose(t) says where the head is (a: the neck's angle, 0 is straight ahead and positive is to the boat's right; L: its length) and, when she holds a rod
+   (js/44zzv-fishing.js), { len, da (the rod's angle from the head's), bend, s (the side) }. The end of the rod is kept in seaRiderTip, in screen pixels, for the line. */
+let seaRiderTip = null;
+function seaRiderPose(t){
+  const look = Math.pow(Math.max(0, Math.sin(t * 0.37)), 6) * (Math.sin(t * 0.11) > 0 ? 1 : -1);
+  return { a: 0.26 * Math.sin(t * 1.1) + 0.55 * look, L: 22 + 1.6 * Math.sin(t * 1.7), rod: null };
+}
+function seaDrawRider(ctx, t){
+  const cl = typeof giraffeColours === 'function' ? giraffeColours() : { coat: '#D6A44F', spot: '#8A5A24', dark: '#A8762F' };
+  const dark = cl.dark || cl.spot, pat = typeof giraffePattern === 'function' ? giraffePattern() : 0, P = seaRiderPose(t || 0);
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = dark; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-16, 0); ctx.quadraticCurveTo(-21, 3, -23, 6); ctx.stroke(); ctx.fillStyle = cl.spot; ctx.beginPath(); ctx.arc(-23, 6.4, 1.8, 0, TAU); ctx.fill();
+  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(-5, 0, 12.5, 8.6, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = cl.spot;
+  [[-9, -2.8, 2.9, 2.3], [-2, 3, 2.6, 2.1], [-11, 3.8, 2, 1.7], [2, -3.2, 1.8, 1.5]].forEach(function(q){ if (typeof wardSpot === 'function') wardSpot(ctx, pat, q[0], q[1], q[2], q[3], 0); else { ctx.beginPath(); ctx.ellipse(q[0], q[1], q[2], q[3], 0, 0, TAU); ctx.fill(); } });
+  /* the neck: from the shoulder, in a gentle curve, to the head */
+  const bx = 3, hx = bx + P.L * Math.cos(P.a), hy = P.L * Math.sin(P.a), cx = bx + P.L * 0.55 * Math.cos(P.a * 0.35), cy = P.L * 0.55 * Math.sin(P.a * 0.35);
+  ctx.strokeStyle = cl.coat; ctx.lineWidth = 6.6; ctx.beginPath(); ctx.moveTo(bx, 0); ctx.quadraticCurveTo(cx, cy, hx, hy); ctx.stroke();
+  ctx.strokeStyle = dark; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(bx, 0); ctx.quadraticCurveTo(cx, cy, hx, hy); ctx.stroke();
+  ctx.fillStyle = cl.spot;
+  [0.3, 0.6].forEach(function(u){ const x = (1 - u) * (1 - u) * bx + 2 * u * (1 - u) * cx + u * u * hx, y = 2 * u * (1 - u) * cy + u * u * hy; ctx.beginPath(); ctx.arc(x, y + 1.2, 1.5, 0, TAU); ctx.fill(); });
+  /* the head, as drawn on land, a little smaller than the body */
+  ctx.save(); ctx.translate(hx, hy); ctx.rotate(P.a); ctx.scale(0.92, 0.92);
+  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(2, 0, 11, 7.6, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = dark; ctx.beginPath(); ctx.ellipse(10, 0, 5.4, 4.4, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#2B1D12'; ctx.beginPath(); ctx.arc(13, -1.8, 1.1, 0, TAU); ctx.arc(13, 1.8, 1.1, 0, TAU); ctx.fill();
+  ctx.strokeStyle = dark; ctx.lineWidth = 2.6; ctx.beginPath(); ctx.moveTo(-3, -4.6); ctx.lineTo(-6, -8.6); ctx.moveTo(-3, 4.6); ctx.lineTo(-6, 8.6); ctx.stroke();
+  ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.arc(-6.4, -9, 2.3, 0, TAU); ctx.arc(-6.4, 9, 2.3, 0, TAU); ctx.fill();
+  ctx.fillStyle = cl.coat; ctx.beginPath(); ctx.ellipse(-6, -7.5, 4.4, 2.3, -0.7, 0, TAU); ctx.ellipse(-6, 7.5, 4.4, 2.3, 0.7, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#2B1D12'; ctx.beginPath(); ctx.arc(5.2, -4.6, 1.3, 0, TAU); ctx.arc(5.2, 4.6, 1.3, 0, TAU); ctx.fill();
+  ctx.restore();
+  /* a rod held in her mouth: it bends with the fish, and its end is where the line starts */
+  if (P.rod && P.rod.len > 1){
+    const mx = hx + Math.cos(P.a) * 11.5, my = hy + Math.sin(P.a) * 11.5, ang = P.a + P.rod.da, len = P.rod.len;
+    const tx = mx + len * Math.cos(ang), ty = my + len * Math.sin(ang), bend = P.rod.bend * len * 0.3 * P.rod.s;
+    const qx = (mx + tx) / 2 - Math.sin(ang) * bend, qy = (my + ty) / 2 + Math.cos(ang) * bend;
+    ctx.strokeStyle = '#6A4A2A'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(mx, my); ctx.quadraticCurveTo(qx, qy, tx, ty); ctx.stroke();
+    ctx.strokeStyle = '#B8935A'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(mx + (qx - mx) * 0.5, my + (qy - my) * 0.5); ctx.quadraticCurveTo((qx + tx) / 2, (qy + ty) / 2, tx, ty); ctx.stroke();
+    ctx.fillStyle = '#3A3A44'; ctx.beginPath(); ctx.arc(mx + (qx - mx) * 0.3, my + (qy - my) * 0.3 + 1.4, 2.2, 0, TAU); ctx.fill();
+    try { const m = ctx.getTransform(), pt = m.transformPoint(new DOMPoint(tx, ty)); seaRiderTip = [pt.x / (G.dpr || 1), pt.y / (G.dpr || 1)]; } catch (e) { seaRiderTip = null; }
+  }
 }
 function seaDrawFeatures(ctx, W, H, z, camX, camY, t){
   const sc = function(wx, wy){ return seaWorldToScreen(wx, wy, W, H, z, camX, camY); }, vw = W / z / 2 + 160, vh = H / z / 2 + 160;

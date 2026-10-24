@@ -29,7 +29,22 @@ function splashGo(){
   G.splash = false;
   try { SFX.init(); SFX.resume(); } catch (e) {}
   SFX.click();
+  if (!Settings.inputMode){ showInputChoice(); return; }       /* the first time: how is she playing? */
   showMenu();
+}
+/* asked once, then kept in Settings (changed under Controls there): it decides every control tip and whether the touch buttons show */
+function showInputChoice(){
+  G.state = 'menu'; G.attract = true; G.subScreen = 'inputchoice';
+  const guess = inputAuto() ? 'touch' : 'mouse';
+  setOverlay(
+    '<div class="panel slab" style="max-width:460px">' +
+      '<h2 class="head">How are you playing?</h2>' +
+      '<p class="sub">The tips and buttons on screen will match. You can change this any time in Settings.</p>' +
+      '<div class="menucol" style="width:100%;margin-top:12px">' +
+        '<button class="btn' + (guess === 'touch' ? '' : ' ghost') + '" data-a="input-touch">Touch screen' + (guess === 'touch' ? ' (this looks like it)' : '') + '</button>' +
+        '<button class="btn' + (guess === 'mouse' ? '' : ' ghost') + '" data-a="input-mouse">Keyboard and mouse' + (guess === 'mouse' ? ' (this looks like it)' : '') + '</button>' +
+      '</div>' +
+    '</div>');
 }
 
 /* ---- one-time hints: a short note the first time something happens, never again ---- */

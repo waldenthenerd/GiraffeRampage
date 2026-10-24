@@ -54,6 +54,8 @@ try { browser = await chromium.launch({ args: launchArgs }); }
 catch (e) { const exe = findChromium(); if (!exe) throw e; browser = await chromium.launch({ args: launchArgs, executablePath: exe }); }
 const touch = args.includes('--touch');                                              // a phone: touch input, so (pointer:coarse) and (hover:none) match
 const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: scale, hasTouch: touch, isMobile: touch });
+/* the game asks once how she plays (touch or keyboard and mouse); a test has already answered, so the question does not stand in front of the menu */
+await ctx.addInitScript(function(mode){ try { if (!localStorage.getItem('giraffe_rampage_save_v1')) localStorage.setItem('giraffe_rampage_save_v1', JSON.stringify({ inputMode: mode })); } catch (e) {} }, touch ? 'touch' : 'mouse');
 const pg = await ctx.newPage();
 const pageErrors = [];
 pg.on('pageerror', e => pageErrors.push(String(e)));
