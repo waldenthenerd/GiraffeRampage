@@ -59,7 +59,7 @@
       const open = uniOpen(F), k = uniFac(F.id), u = uniData();
       h += '<div class="uqfac' + (open ? '' : ' lock') + '" style="--c:' + F.col + '"><b>' + F.name + '</b>';
       if (!open){ h += '<small>' + lockText(F) + '</small></div>'; return; }
-      UNI_LECTURES.filter(function(L){ return L.f === F.id; }).forEach(function(L){
+      UNI_LECTURES.filter(function(L){ return L.f === F.id; }).sort(function(a, b){ return a.t - b.t; }).forEach(function(L){
         const ok = k.l >= tierNeed(L.t), n = u.lec[L.id] | 0;
         h += '<button class="uqrow" data-a="town-uq-lec-' + L.id + '"' + (ok ? '' : ' disabled') + '><span>' + esc(L.title) + '</span><small>' + (ok ? (n ? 'heard ' + n + 'x' : 'new') : 'level ' + tierNeed(L.t)) + '</small></button>';
       });
@@ -73,7 +73,7 @@
       const open = uniOpen(F), k = uniFac(F.id), u = uniData();
       h += '<div class="uqfac' + (open ? '' : ' lock') + '" style="--c:' + F.col + '"><b>' + F.name + '</b>';
       if (!open){ h += '<small>' + lockText(F) + '</small></div>'; return; }
-      UNI_BOOKS.filter(function(B){ return B.f === F.id; }).forEach(function(B){
+      UNI_BOOKS.filter(function(B){ return B.f === F.id; }).sort(function(a, b){ return a.t - b.t; }).forEach(function(B){
         const ok = k.l >= tierNeed(B.t), n = u.read[B.id] | 0;
         h += '<button class="uqrow" data-a="town-uq-book-' + B.id + '"' + (ok ? '' : ' disabled') + '><span>' + esc(B.title) + '<em>' + esc(B.author) + '</em></span><small>' + (ok ? (n ? 'read ' + n + 'x' : 'new') : 'level ' + tierNeed(B.t)) + '</small></button>';
       });

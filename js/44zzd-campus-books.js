@@ -49,7 +49,7 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
   B('earth', 1, "Why the Wind Blows", "Gale Breezeway", '#6BB8E8', [
     "The Sun warms the Earth, but not evenly. The land near the equator gets much more heat than the poles.",
     "Warm air is light, so it rises. Cooler air rushes in to take its place. That moving air is the wind.",
-    "When warm damp air rises high, it cools and the water vapour turns into tiny droplets. That is how clouds form.",
+    "When warm damp air rises high, it cools and the water vapor turns into tiny droplets. That is how clouds form.",
     "When droplets get heavy they fall as rain. In very cold, tall clouds they can freeze and fall as hail.",
     "Lightning heats the air so quickly that the air booms. The boom is thunder, and light is faster than sound, so you see the flash first."
   ], [

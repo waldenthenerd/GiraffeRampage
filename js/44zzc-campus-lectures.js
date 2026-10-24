@@ -70,12 +70,12 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
     X.mc('earth', 1, "What is the outer core mostly made of?", ["Liquid iron and nickel", "Ice", "Solid gold", "Sand"])
   ]);
   L('earth', 1, "The Water Cycle", [
-    ["Evaporation", "The Sun warms oceans, lakes and puddles. Water turns into an invisible gas called water vapour and rises.", 'watercycle'],
-    ["Condensation", "High up, the vapour cools and turns back into tiny droplets. Together they make clouds.", 'watercycle'],
+    ["Evaporation", "The Sun warms oceans, lakes and puddles. Water turns into an invisible gas called water vapor and rises.", 'watercycle'],
+    ["Condensation", "High up, the vapor cools and turns back into tiny droplets. Together they make clouds.", 'watercycle'],
     ["Precipitation", "When the droplets grow heavy they fall as rain, hail, sleet or snow.", 'watercycle'],
     ["Water everywhere", "About 71 percent of the Earth's surface is covered by water, and most of it is in the oceans.", 'watercycle']
   ], [
-    X.mc('earth', 1, "What is it called when water vapour turns into droplets?", ["Condensation", "Evaporation", "Erosion", "Freezing"]),
+    X.mc('earth', 1, "What is it called when water vapor turns into droplets?", ["Condensation", "Evaporation", "Erosion", "Freezing"]),
     X.mc('earth', 1, "What warms the water so that it evaporates?", ["The Sun", "The Moon", "The wind", "The tide"]),
     X.mc('earth', 1, "About how much of the Earth's surface is water?", ["About 71 percent", "About 10 percent", "About 30 percent", "About 99 percent"]),
     X.mc('earth', 1, "Which of these is a form of precipitation?", ["Hail", "Fog", "Dew", "Frost on a window"])
@@ -180,7 +180,7 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
   ], [
     X.mc('chem', 2, "What is the pH of pure water?", ["7", "1", "10", "14"]),
     X.mc('chem', 2, "What does blue litmus do in an acid?", ["Turns red", "Turns green", "Turns yellow", "Stays blue"]),
-    X.mc('chem', 2, "Which acid is in your stomach?", ["Hydrochloric acid", "Sulphuric acid", "Citric acid", "Nitric acid"]),
+    X.mc('chem', 2, "Which acid is in your stomach?", ["Hydrochloric acid", "Sulfuric acid", "Citric acid", "Nitric acid"]),
     X.mc('chem', 2, "Which gas is released when baking soda meets vinegar?", ["Carbon dioxide", "Oxygen", "Hydrogen", "Nitrogen"])
   ]);
   L('chem', 3, "Bonds and Reactions", [
