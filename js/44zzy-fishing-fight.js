@@ -167,7 +167,7 @@ function fightTick(dt){
   document.addEventListener('pointerup', rel, true); document.addEventListener('pointercancel', rel, true); window.addEventListener('blur', rel);
   window.addEventListener('keydown', function(e){
     if ((e.code === 'Space' || e.code === 'Enter') && Fg.phase === 'fight'){ e.preventDefault(); e.stopPropagation(); Fg.hold = true; }
-    else if ((e.code === 'Space' || e.code === 'Enter' || e.code === keyOf('cast')) && Fg.phase === 'idle' && document.getElementById('fishCast') && document.getElementById('fishCast').style.display !== 'none' && (document.activeElement === document.body || document.activeElement === document.getElementById('fishCast'))){
+    else if (!e.repeat && Fg.clock >= (Fg.castLock || 0) && (e.code === 'Space' || e.code === 'Enter' || e.code === keyOf('cast')) && Fg.phase === 'idle' && document.getElementById('fishCast') && document.getElementById('fishCast').style.display !== 'none' && (document.activeElement === document.body || document.activeElement === document.getElementById('fishCast'))){
       if (G.state === 'fishing' || (G.state === 'town' && Town.panel)){ e.preventDefault(); e.stopPropagation(); fishCast(); }
     }
   }, true);
@@ -184,7 +184,8 @@ function fishCatchHTML(L){
     '<div class="fcl">' + L.len + ' cm · ' + (L.first ? 'a new kind!' : L.rec ? 'NEW RECORD' : 'best ' + L.best + ' cm') + '</div><div class="fcp">' + pills.map(function(p){ return '<i>' + p + '</i>'; }).join('') + '</div></div></div>';
 }
 function fishPaintCard(){ const cv = OV && OV.querySelector('canvas[data-fc]'); if (cv && Fg.last) fishPaint(cv, Fg.last.f, true); }
-function fishAfterResult(){ Fg.hold = false; Fg.recastAt = fishAutoOn() && document.getElementById('fishCast') ? Fg.clock + 2.6 : 0; }
+/* a key still held from winding in must not cast again before she has seen the catch: key repeats never cast, and a fresh press waits out castLock */
+function fishAfterResult(){ Fg.castLock = Fg.clock + 1.5; Fg.hold = false; Fg.recastAt = fishAutoOn() && document.getElementById('fishCast') ? Fg.clock + 2.6 : 0; }
 (function(){
   const fc = fishCast;
   fishCast = function(){ const was = Fg.phase; fc.apply(this, arguments); if (was === 'idle' && Fg.phase !== 'idle'){ const card = OV.querySelector('.fcatch'); if (card) card.remove(); } };

@@ -75,6 +75,10 @@
     out.recastSet = Fg.recastAt > Fg.clock && /Cast again/.test(OV.innerHTML);
     for (var i = 0; i < 200 && Fg.phase === 'idle'; i++) GR.step(0.05); out.recasts = Fg.phase === 'wait';
     Fg.phase = 'idle'; clearInterval(Fg.iv); Fg.iv = 0; GR.handleAction('fish-auto'); out.autoOff = !fishAutoOn();
+    /* a key still held from the fight does not cast again: repeats are ignored and a fresh press waits a moment after the catch */
+    pier(); cast('sardine'); hook(); n = 0; while (Fg.phase === 'fight' && n++ < 4000){ Fg.hold = Fg.ten < 0.55 || (Fg.pull < 0.3 && Fg.ten < 0.8); fishTick(0.03); }
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', repeat: true, bubbles: true, cancelable: true })); out.repeatIgnored = Fg.phase === 'idle';
+    key('Space'); out.lockHolds = Fg.phase === 'idle'; for (var li = 0; li < 40; li++) GR.step(0.05); key('Space'); out.lockEnds = Fg.phase === 'wait'; Fg.phase = 'idle'; clearInterval(Fg.iv); Fg.iv = 0;
     pier(); key('Space'); out.spaceCasts = Fg.phase === 'wait'; Fg.phase = 'idle'; clearInterval(Fg.iv); Fg.iv = 0;
     pier(); key('KeyF'); out.fCasts = Fg.phase === 'wait'; Fg.phase = 'idle'; clearInterval(Fg.iv); Fg.iv = 0;
     pier(); showFishBook(); out.shopBtn = /fish-shop/.test(OV.innerHTML); GR.handleAction('fish-shop'); out.shopGo = Town.d === 'in_tackle' && Town.back && Town.back.d === 'harbour';
@@ -82,7 +86,7 @@
     /* 3 sound never throws */
     out.sounds = ['cast', 'splash', 'bite', 'hook', 'reel', 'warn', 'snap', 'lost', 'catch'].every(function(k){ try { fishSound(k, FISH[3]); return true; } catch (e) { return false; } });
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['how', 'pulls', 'boot', 'fightHtml', 'bite', 'hooked', 'snaps', 'bite2', 'shakes', 'bite3', 'wins', 'betterLine', 'card', 'cardPaints', 'cardGoes', 'dawn', 'noon', 'night', 'weather', 'condLine', 'waitScaled', 'stormBigger', 'spots', 'wet', 'same', 'newDay', 'inSpot', 'hotCond', 'outSpot', 'pierNoSpot', 'drawsSea', 'btnLabel', 'mounts', 'mountSig', 'homePaints', 'noMounts', 'autoBtn', 'autoOn', 'recastSet', 'recasts', 'autoOff', 'spaceCasts', 'fCasts', 'shopBtn', 'shopGo', 'sounds'];
+  var need = ['how', 'pulls', 'boot', 'fightHtml', 'bite', 'hooked', 'snaps', 'bite2', 'shakes', 'bite3', 'wins', 'betterLine', 'card', 'cardPaints', 'cardGoes', 'dawn', 'noon', 'night', 'weather', 'condLine', 'waitScaled', 'stormBigger', 'spots', 'wet', 'same', 'newDay', 'inSpot', 'hotCond', 'outSpot', 'pierNoSpot', 'drawsSea', 'btnLabel', 'mounts', 'mountSig', 'homePaints', 'noMounts', 'autoBtn', 'autoOn', 'recastSet', 'recasts', 'autoOff', 'repeatIgnored', 'lockHolds', 'lockEnds', 'spaceCasts', 'fCasts', 'shopBtn', 'shopGo', 'sounds'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);
