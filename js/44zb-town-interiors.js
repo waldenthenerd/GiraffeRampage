@@ -182,7 +182,7 @@ function townPaintRoom(c, D, W, H, R){
   const winN = Math.floor(W / 330);
   for (let i = 0; i < winN; i++){
     const wx = 220 + i * (W - 300) / Math.max(1, winN), wy = 80;
-    if (D.room === 'arcade' || D.room === 'ilight' || D.room === 'gym' || D.room === 'garage' && i % 2 || window.UNI_ROOMS && UNI_ROOMS[D.room]) continue;
+    if (D.room === 'home' && i === 0 || D.room === 'arcade' || D.room === 'ilight' || D.room === 'gym' || D.room === 'garage' && i % 2 || window.UNI_ROOMS && UNI_ROOMS[D.room]) continue;
     tRect(c, '#4A3A2C', wx - 3, wy - 3, 84, 124); tRect(c, '#BFE3F6', wx, wy, 78, 118); tRect(c, 'rgba(255,255,255,.4)', wx + 6, wy + 6, 20, 106);
     tRect(c, '#4A3A2C', wx + 38, wy, 3, 118); tRect(c, '#4A3A2C', wx, wy + 56, 78, 3);
     tRect(c, '#C9A27A', wx - 10, wy + 118, 98, 8);

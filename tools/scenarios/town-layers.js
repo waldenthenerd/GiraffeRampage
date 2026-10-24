@@ -31,12 +31,20 @@
     /* streets with nothing behind their props keep a single picture */
     TOWN_DIST.square.open = function(){ return true; }; townGo('square', 1200, 1); GR.step(1 / 60); GR.render();
     out.singlePicture = !Town.layers.field.back && !TOWN_DIST.square.behind;
+    /* her home: the window she can dress has no second window hidden under it, and all three windows show the night and the rain */
+    var HD = TOWN_DIST.in_myhome, rc = document.createElement('canvas'); rc.width = HD.w; rc.height = 600; var rg = rc.getContext('2d'); townPaintRoom(rg, HD, HD.w, 600, 1);
+    function px(x, y){ var d = rg.getImageData(x, y, 1, 1).data; return d[0] + ',' + d[1] + ',' + d[2]; }
+    var under = rg.getImageData(225, 80, 1, 1).data;                                                     /* just above the dressed window's frame: wall, not the glass of a second window */
+    out.homeOneWindowUnder = under[2] < under[0] && px(610, 100) === '191,227,246' && px(940, 100) === '191,227,246';
+    function sky(hour, wx){ Town.fixHour = hour; Town.fixWeather = wx; var cc = document.createElement('canvas'); cc.width = 200; cc.height = 200; var g = cc.getContext('2d'); homeSkyWindow(g, 1, 10, 10, 78, 118); var d = g.getImageData(0, 0, 200, 200).data, n = 0; for (var i = 3; i < d.length; i += 4) if (d[i] > 0) n++; return n; }
+    out.homeSkyDay = sky(13, 'clear') === 0; out.homeSkyNight = sky(22, 'clear') > 5000; out.homeSkyRain = sky(13, 'rain') > 5000;
+    Town.fixHour = 12; Town.fixWeather = 'clear';
     /* the sailboats are drawn by the behind slot, and the old cut-out shapes are gone for good */
     var xhr = new XMLHttpRequest(), bad = [];
     ['js/44zc-town-life.js', 'js/44w-town-engine.js', 'js/44v-town-art.js', 'js/44zw-town-detail.js', 'js/44zb-town-interiors.js', 'js/44zzo-town-sound.js'].forEach(function(f){ xhr.open('GET', '/' + f, false); xhr.send(); if (/clip\('evenodd'\)|hide\.push/.test(xhr.responseText)) bad.push(f); });
     out.noClipHacks = bad.length === 0; out.clipHacks = bad;
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['harbourBehind', 'solids', 'visibleElsewhere', 'eachChecked', 'singlePicture', 'noClipHacks'];
+  var need = ['homeOneWindowUnder', 'homeSkyDay', 'homeSkyNight', 'homeSkyRain', 'harbourBehind', 'solids', 'visibleElsewhere', 'eachChecked', 'singlePicture', 'noClipHacks'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);

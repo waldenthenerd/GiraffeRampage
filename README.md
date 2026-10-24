@@ -40,12 +40,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 166 | 54,179 | 4.06 MiB (4,260,652 bytes) |
+| JavaScript (`js/`) | 166 | 54,186 | 4.06 MiB (4,261,351 bytes) |
 | Styles (`css/`) | 6 | 1,709 | 158 KiB (161,391 bytes) |
 | Page (`index.html`) | 1 | 214 | 9.2 KiB (9,397 bytes) |
-| **Whole game** | **173** | **56,102** | **4.23 MiB (4,431,440 bytes)** |
+| **Whole game** | **173** | **56,109** | **4.23 MiB (4,432,139 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,532 lines, 4.18 MiB (4,387,734 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,539 lines, 4.19 MiB (4,388,433 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
 ## How the files fit together
 
@@ -179,7 +179,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zg-town-activities.js` | 272 | Cafe shift (`townShowCafeGame`), tournament (`townTour`, `townTourRecord`), fishing (`FISH`, extended by `js/44zzv-fishing.js`), post (`townMailToday`, `townMailTake`). |
 | `js/44zh-town-qol.js` | 119 | `townLeftText` (HUD), `townHintExact`, `townShowGear`, tap-to-walk (`townAutoMx`) and the `touch` body class. |
 | `js/44zi-town-atmosphere.js` | 226 | `TOWN_AMB` and `townChirp`, footsteps, `townNpcSlot` / `townApplyRoutines` (schedules), `townWeatherType` and `townWeatherFX`, `townAuroraNow`, `flyNightFX`. `Town.fixWeather` / `Town.fixAurora` / `Town.fixHour` fix them for tests. |
-| `js/44zj-town-home.js` | 291 | Her Home in detail: `homePaintBase` (window, clock, bed, hooks, souvenir shelf), live pets, `Town.seat` (sit on the sofa/armchair/hammock, lie in the bed), `homeInteract` (pet, parrot, goldfish, lamp, plant, window), first pet of the day gives 5 gems. |
+| `js/44zj-town-home.js` | 298 | Her Home in detail: `homePaintBase` (window, clock, bed, hooks, souvenir shelf), live pets, `Town.seat` (sit on the sofa/armchair/hammock, lie in the bed), `homeInteract` (pet, parrot, goldfish, lamp, plant, window), first pet of the day gives 5 gems. |
 | `js/44zk-town-interiors2.js` | 443 | Interiors redrawn: `IV_KINDS` (door, counter, oven, table, bar, turntable, tool bench, shelves, mirror, mannequins, cases, statue, cabinets, score board, camera, sofa, fireplace/stove, bed) and `IV_ROOMS` (each room's wall furniture, curtains, baseboard). Rule: everything stands on the floor or hangs from something visible. `townBuildingX`, `townPropX` (statue) and `townRoomProps` wrappers. |
 | `js/44zl-photo-props.js` | 111 | Photo props: 4 cars, 4 planes and 9 things (bread, balloon, tree, lamp, bench, rocket, saucer, chest, present) appended to `PHOTO_FX` / `PHOTO_FXDRAW`. Boats (side view) took it past 32, so photo codes are now version 4 with a 6-bit effect index (up to 64; versions 2 and 3 still read). The Effects tab groups them as Effects, Vehicles (cars, planes, boats) and Things. |
 | `js/44zm-close-x.js` | 65 | An X button in the corner of every panel that has a back/close/resume/done button (it clicks that button), and on the town conversation card. A MutationObserver on the overlay adds them; none on the title menu, level-up, death screen or cutscenes. |

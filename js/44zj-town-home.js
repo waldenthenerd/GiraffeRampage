@@ -103,6 +103,21 @@ function homeDrawFish(c, x, t, food){
   if (food > 0){ c.fillStyle = '#C9A24A'; for (let k = 0; k < 6; k++) c.fillRect(x - 14 + k * 5, TG - 64 + (1 - food) * 40 + (k % 2) * 5, 2, 2); }
   tRect(c, '#8A6A44', x - 28, TG - 14, 56, 6);
 }
+/* what the weather and the hour do to a pane of glass at x, y: a dark sky with stars and a moon at night, a grey tint and falling rain when it rains */
+function homeSkyWindow(ctx, t, x, y, w, h){
+  const k = w / 94;
+  if (townIsNight()){
+    ctx.fillStyle = 'rgba(8,14,48,.72)'; ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = '#FFF'; for (let i = 0; i < 9; i++) ctx.fillRect(x + 6 * k + ((i * 37) % 82) * k, y + 6 * k + ((i * 23) % 60) * k, 2, 2);
+    tCircle(ctx, '#EEF2FF', x + 72 * k, y + 20 * k, 7 * k);
+  } else if (townRainNow()){
+    ctx.fillStyle = 'rgba(70,80,100,.4)'; ctx.fillRect(x, y, w, h);
+  }
+  if (townRainNow()){
+    ctx.strokeStyle = 'rgba(210,230,255,.7)'; ctx.lineWidth = 1.4;
+    for (let i = 0; i < 12; i++){ const px = x + 4 * k + ((i * 29) % 88) * k, py = y + 2 + ((t * 120 + i * 37) % (h - 4)); ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px - 2, py + 8); ctx.stroke(); }
+  }
+}
 (function(){
   /* the pet is painted live now, so the cached room leaves it out */
   _homeFx.pet = [null, null, null, null];
@@ -112,18 +127,10 @@ function homeDrawFish(c, x, t, food){
   townDynX = function(ctx, D, t, dark){
     dx(ctx, D, t, dark);
     if (D.id !== 'in_myhome') return;
-    /* the window: night and rain over the painted day */
-    if (townIsNight()){
-      ctx.fillStyle = 'rgba(8,14,48,.72)'; ctx.fillRect(204, 94, 94, 122);
-      ctx.fillStyle = '#FFF'; for (let i = 0; i < 9; i++) ctx.fillRect(210 + (i * 37) % 82, 100 + (i * 23) % 60, 2, 2);
-      tCircle(ctx, '#EEF2FF', 276, 114, 7);
-    } else if (townRainNow()){
-      ctx.fillStyle = 'rgba(70,80,100,.4)'; ctx.fillRect(204, 94, 94, 122);
-    }
-    if (townRainNow()){
-      ctx.strokeStyle = 'rgba(210,230,255,.7)'; ctx.lineWidth = 1.4;
-      for (let i = 0; i < 12; i++){ const px = 208 + (i * 29) % 88, py = 96 + ((t * 120 + i * 37) % 118); ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px - 2, py + 8); ctx.stroke(); }
-    }
+    /* the windows: night and rain over the painted day. The one she can dress (the decor slot) is at 204, 94; the two plain ones on the wall are painted by townPaintRoom (js/44zb) */
+    homeSkyWindow(ctx, t, 204, 94, 94, 122);
+    const wn = Math.floor(D.w / 330);
+    for (let i = 1; i < wn; i++) homeSkyWindow(ctx, t, 220 + i * (D.w - 300) / wn, 80, 78, 118);
     /* the clock hands tell the real time */
     const d = new Date(), hr = (d.getHours() % 12) + d.getMinutes() / 60;
     ctx.strokeStyle = '#2A1A0A'; ctx.lineCap = 'round';

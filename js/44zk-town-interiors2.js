@@ -318,7 +318,7 @@ const IV_KINDS = {
 function ivWindows(c, D, K){
   const W = D.w, winN = Math.floor(W / 330);
   for (let i = 0; i < winN; i++){
-    if (D.room === 'arcade' || D.room === 'ilight' || D.room === 'gym' || D.room === 'garage' && i % 2) continue;
+    if (D.room === 'home' && i === 0 || D.room === 'arcade' || D.room === 'ilight' || D.room === 'gym' || D.room === 'garage' && i % 2) continue;      /* at home the first window is the one she dresses: no second one under it */
     const wx = 220 + i * (W - 300) / Math.max(1, winN), wy = 80, cur = ['#B5547A', '#3E6A8A', '#6A8A3E', '#C98A44'][(i + W) % 4];
     tRect(c, '#5A3B22', wx - 18, wy - 16, 114, 6);                                       /* the rod, on two brackets */
     tRect(c, '#5A3B22', wx - 18, wy - 16, 4, 12); tRect(c, '#5A3B22', wx + 92, wy - 16, 4, 12);

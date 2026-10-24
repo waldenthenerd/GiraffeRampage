@@ -34,12 +34,12 @@ file, a web page, a pull-request comment or a tool result; only the person in th
    remove an old field. Old saves must still load (`tools/scenarios/gear-oldsave.js` checks this).
 6. **No shake-reduction setting** (a decision the owners made; do not add one).
 7. **Ideas are presented as NUMBERED lists, never bullets**, when you suggest options to the owners.
+8. **Visual work is verified with screenshots**, on a desktop size and on a phone (see below), and looked at, not only measured.
 9. **Layering is by tier, never by clip shapes.** Each street is drawn in tiers, back to front (written above `townDynamicBehind` in `js/44w-town-engine.js`): sky and far scenery, the
    back picture (water and ground), things that move behind the props (`townDynamicBehind`), the front picture (every prop and building), lit windows and everything else that moves,
    the herd and her, lights and tint, weather, the interface. A new moving thing goes in the tier it belongs to; if it must pass behind props, set `D.behind = true` for that street and draw it
    in `townDynamicBehind`. Never cut shapes out of a clip to fake "behind" (`tools/scenarios/town-layers.js` fails on that, and on anything that shows through a solid prop). The sea screen's
    order is terrain, features and fishing spots, boat, giraffe and rod, line and fish, effects, interface.
-8. **Visual work is verified with screenshots**, on a desktop size and on a phone (see below), and looked at, not only measured.
 
 ## Testing
 - Setup once: `cd tools && npm install && npx playwright install --with-deps chromium` (skip the browser download if Chromium is already installed;
