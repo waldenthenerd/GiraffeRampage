@@ -36,6 +36,10 @@
     function px(x, y){ var d = rg.getImageData(x, y, 1, 1).data; return d[0] + ',' + d[1] + ',' + d[2]; }
     var under = rg.getImageData(225, 80, 1, 1).data;                                                     /* just above the dressed window's frame: wall, not the glass of a second window */
     out.homeOneWindowUnder = under[2] < under[0] && px(610, 100) === '191,227,246' && px(940, 100) === '191,227,246';
+    /* the wall socket is behind the sofa when there is one, and on show when there is not */
+    function socketPx(){ var c2 = document.createElement('canvas'); c2.width = HD.w; c2.height = 600; var g2 = c2.getContext('2d'); townPaintRoom(g2, HD, HD.w, 600, 1); var d2 = g2.getImageData(255, TG - 60, 1, 1).data; return d2[0] + ',' + d2[1] + ',' + d2[2]; }
+    var keepSofa = homeData().set.sofa; homeData().set.sofa = 0; var bare = socketPx(); homeData().set.sofa = 1; var covered = socketPx(); homeData().set.sofa = keepSofa;
+    out.socketBehindSofa = bare === '237,230,210' && covered !== bare && /^\d+,\d+,\d+$/.test(covered);
     function sky(hour, wx){ Town.fixHour = hour; Town.fixWeather = wx; var cc = document.createElement('canvas'); cc.width = 200; cc.height = 200; var g = cc.getContext('2d'); homeSkyWindow(g, 1, 10, 10, 78, 118); var d = g.getImageData(0, 0, 200, 200).data, n = 0; for (var i = 3; i < d.length; i += 4) if (d[i] > 0) n++; return n; }
     out.homeSkyDay = sky(13, 'clear') === 0; out.homeSkyNight = sky(22, 'clear') > 5000; out.homeSkyRain = sky(13, 'rain') > 5000;
     Town.fixHour = 12; Town.fixWeather = 'clear';
@@ -44,7 +48,7 @@
     ['js/44zc-town-life.js', 'js/44w-town-engine.js', 'js/44v-town-art.js', 'js/44zw-town-detail.js', 'js/44zb-town-interiors.js', 'js/44zzo-town-sound.js'].forEach(function(f){ xhr.open('GET', '/' + f, false); xhr.send(); if (/clip\('evenodd'\)|hide\.push/.test(xhr.responseText)) bad.push(f); });
     out.noClipHacks = bad.length === 0; out.clipHacks = bad;
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['homeOneWindowUnder', 'homeSkyDay', 'homeSkyNight', 'homeSkyRain', 'harbourBehind', 'solids', 'visibleElsewhere', 'eachChecked', 'singlePicture', 'noClipHacks'];
+  var need = ['socketBehindSofa', 'homeOneWindowUnder', 'homeSkyDay', 'homeSkyNight', 'homeSkyRain', 'harbourBehind', 'solids', 'visibleElsewhere', 'eachChecked', 'singlePicture', 'noClipHacks'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);

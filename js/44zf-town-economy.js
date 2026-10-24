@@ -247,6 +247,7 @@ function homeSig(){ const h = homeData(); return HOME_ORDER.map(function(s){ ret
   townRoomProps = function(c, D, K, r){
     rp(c, D, K, r);
     if (D.room === 'home'){
+      if (typeof roomSwitchSocket === 'function') roomSwitchSocket(c);                 /* on the wall, before the furniture that stands in front of it */
       HOME_ORDER.forEach(function(s){ const i = homeSet(s), f = _homeFx[s][i]; if (f) f(c, HOME_SLOTS[s].x); });
     }
   };
