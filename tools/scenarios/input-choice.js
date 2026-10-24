@@ -32,13 +32,16 @@
     G.splash = true; GR.handleAction('splash-go'); out.notAgain = G.subScreen !== 'inputchoice' && /Trophies/.test(OV.innerHTML);
     GR.handleAction('input-touch'); out.touchChoice = Settings.inputMode === 'touch';
 
+    /* the Guide says it */
+    out.guideBasics = /asked once whether you play with <b>touch<\/b> or <b>keyboard and mouse<\/b>/.test(guideTopicsHTML());
+
     /* odd values are tidied, and erasing progress keeps her answer */
     Save.data.inputMode = 'banana'; Settings.load(); out.tidyS = Settings.inputMode === '';
     Settings.inputMode = 'mouse'; Settings.save(); Save.reset(); out.keptErase = Save.data.inputMode === 'mouse';
     localStorage.setItem(SAVE_KEY, JSON.stringify({ gold: 5, inputMode: 7 })); Save.load(); out.tidyLoad = Save.data.inputMode === '' && Save.data.gold === 5;
     localStorage.setItem(SAVE_KEY, JSON.stringify({ gold: 5 })); Save.load(); out.oldSave = Save.data.inputMode === '' && DEFAULT_SAVE.inputMode === '';
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['auto', 'asks', 'noMenuYet', 'mouse', 'keyTips', 'touchIgnored', 'buttonsHidden', 'row', 'toTouch', 'touchTips', 'touchWorks', 'toMouse', 'notAgain', 'touchChoice', 'tidyS', 'keptErase', 'tidyLoad', 'oldSave'];
+  var need = ['auto', 'asks', 'noMenuYet', 'mouse', 'keyTips', 'touchIgnored', 'buttonsHidden', 'row', 'toTouch', 'touchTips', 'touchWorks', 'toMouse', 'notAgain', 'touchChoice', 'guideBasics', 'tidyS', 'keptErase', 'tidyLoad', 'oldSave'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);

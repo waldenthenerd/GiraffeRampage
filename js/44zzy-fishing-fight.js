@@ -137,7 +137,7 @@ function fightDraw(){
   const h = document.getElementById('fgHint'); if (!h) return;
   let txt = '';
   if (Fg.teach){
-    txt = Fg.ten > 0.85 ? 'LET GO! The line is about to snap!' : (!Fg.hold && Fg.prog < 0.2 && Fg.ft < 4) ? 'Hold the Reel button (or Space) to wind it in.' : Fg.ten > 0.65 ? 'Careful... ease off.' : Fg.hold ? 'Winding in. Keep the line out of the red.' : 'Let it rest, then wind again.';
+    txt = Fg.ten > 0.85 ? 'LET GO! The line is about to snap!' : (!Fg.hold && Fg.prog < 0.2 && Fg.ft < 4) ? (Input.padUsed ? 'Hold A to wind it in.' : 'Hold the Reel button (or Space) to wind it in.') : Fg.ten > 0.65 ? 'Careful... ease off.' : Fg.hold ? 'Winding in. Keep the line out of the red.' : 'Let it rest, then wind again.';
   } else if (Fg.ten > 0.85) txt = 'Ease off!';
   if (h.textContent !== txt) h.textContent = txt;
   h.className = 'fghint' + (Fg.ten > 0.85 ? ' hot' : '');
@@ -213,7 +213,7 @@ function fishAfterResult(){ Fg.castLock = Fg.clock + 1.5; Fg.hold = false; Fg.re
     if (Fg.recastAt && Fg.clock >= Fg.recastAt){ Fg.recastAt = 0; if (Fg.phase === 'idle' && document.getElementById('fishCast') && fishAutoOn() && (G.state === 'fishing' || (G.state === 'town' && Town.panel))) fishCast(); }
     /* the Cast button at sea says where it is good and which key */
     const b = document.getElementById('castBtn');
-    if (b && b._on){ const sp = typeof Sea !== 'undefined' ? fishSpotAt(Sea.x, Sea.y) : null, txt = (sp ? SPOT_KINDS[sp.k].n + ': ' : '') + 'Cast a line' + (Input.hasTouch ? '' : ' (' + keyName(keyOf('cast')) + ')'); if (b._t !== txt){ b._t = txt; b.textContent = txt; } }
+    if (b && b._on){ const sp = typeof Sea !== 'undefined' ? fishSpotAt(Sea.x, Sea.y) : null, txt = (sp ? SPOT_KINDS[sp.k].n + ': ' : '') + 'Cast a line' + (Input.hasTouch ? '' : ' (' + (Input.padUsed ? 'A' : keyName(keyOf('cast'))) + ')'); if (b._t !== txt){ b._t = txt; b.textContent = txt; } }
     return r;
   };
   const ha = handleAction;
@@ -248,7 +248,8 @@ function fishAfterResult(){ Fg.castLock = Fg.clock + 1.5; Fg.hold = false; Fg.re
   seaDrawMap = function(ctx, W, H, s){
     dm.apply(this, arguments);
     const ms = Math.min(150 * s, W * 0.3), mx = W - ms - 12, my = H - ms - 12, k = ms / SEA_W;
-    fishSpots().forEach(function(sp){ ctx.fillStyle = SPOT_KINDS[sp.k].col; ctx.beginPath(); ctx.arc(mx + sp.x * k, my + sp.y * k, sp.k === 'hot' ? 3.6 : 2.2, 0, TAU); ctx.fill(); if (sp.k === 'hot'){ ctx.strokeStyle = '#7A5A10'; ctx.lineWidth = 1; ctx.stroke(); } });
+    fishSpots().forEach(function(sp){ if (!Sea.seen || !Sea.seen[Math.floor(sp.x / SEA_MAP_C) + Math.floor(sp.y / SEA_MAP_C) * SEA_MAP_N]) return;       /* only where the chart has been filled in */
+      ctx.fillStyle = SPOT_KINDS[sp.k].col; ctx.beginPath(); ctx.arc(mx + sp.x * k, my + sp.y * k, sp.k === 'hot' ? 3.6 : 2.2, 0, TAU); ctx.fill(); if (sp.k === 'hot'){ ctx.strokeStyle = '#7A5A10'; ctx.lineWidth = 1; ctx.stroke(); } });
   };
 })();
 
@@ -272,4 +273,28 @@ function fishMounts(){
   };
   const D = TOWN_DIST.in_myhome;
   if (D && !D._fishWired){ D._fishWired = true; const sg = D.sig; D.sig = function(){ return (sg ? sg.apply(this, arguments) : '') + '|fm' + fishMounts().map(function(m){ return m.f.id + m.len; }).join(','); }; }
+})();
+
+/* ---- a controller: A (or a trigger) casts, hooks and, held, winds in; B closes (js/41-qol.js); at sea A or X casts when the boat is still ---- */
+(function(){
+  const pp = Pad.poll; let pv = { A: false, X: false };
+  const pad = function(){ const g = navigator.getGamepads ? navigator.getGamepads() : []; for (let i = 0; i < g.length; i++) if (g[i] && g[i].connected) return g[i]; return null; };
+  Pad.poll = function(dt){
+    const g = pad(), b = function(i){ const x = g && g.buttons[i]; return !!(x && (x.pressed || x.value > 0.5)); };
+    const A = b(0) || b(5) || b(7), X = b(2), edgeA = A && !pv.A, edgeX = X && !pv.X;
+    pv = { A: A, X: X };
+    const panel = g && document.getElementById('fishCast') && (G.state === 'fishing' || (G.state === 'town' && Town.panel));
+    if (panel){
+      Input.padUsed = true; Input.padOn = true;
+      if (Fg.phase === 'fight'){ Fg.hold = A; return; }
+      if (edgeA){
+        if (Fg.phase === 'bite') fishReel();
+        else if (Fg.phase === 'idle' && Fg.clock >= (Fg.castLock || 0)) fishCast();
+        return;
+      }
+      if (Fg.phase === 'bite' || Fg.phase === 'wait') return;                 /* the menu pad must not click a focused button meanwhile */
+    }
+    pp.apply(this, arguments);
+    if (g && Sea.on && G.state === 'sail' && (edgeA || edgeX) && fishSeaOk() && !Sea.nearDock) fishSeaOpen();
+  };
 })();

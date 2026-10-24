@@ -64,6 +64,15 @@ function tackleTake(kind, i){
       { id: 'bench', kind: 'tk_bench', x: 1170, w: 190, h: 130, label: 'The gear bench', act: 'tk-bench' }]),
     p: [{ k: 'fr_barrels', x: 270 }], L: [{ x: 440, y: 80, r: 160 }, { x: 720, y: 80, r: 150 }, { x: 970, y: 80, r: 150 }, { x: 1170, y: 80, r: 150 }], npcs: [] });
   TOWN_IN_IDS.push('in_tackle'); TOWN_ROOM_PARENT.in_tackle = 'harbour';
+  /* the keeper, two things to find, and two errands */
+  TOWN_DIST.in_tackle.npcs = ['cleat'];
+  Object.assign(TOWN_NPCS, { cleat: { id: 'cleat', name: 'Cleat', d: 'in_tackle', x: 700, range: 40, habit: 'stand', fav: 'book', look: { coat: '#D9C28E', spot: '#7A5A2A', pat: 2, hat: 'souwester', s: 1.02 }, gift: { gems: 60, coin: 8 },
+    say: ['Tackle is free in here. You only have to catch something new to earn it.', 'Let go when the line goes red. Always. The fish will wait; the line will not.', 'The hot spot moves every day. Check your sea chart, it is the golden dot.', 'Scales go to the bench by the tank. A fish gives up its scales, you give your gear a level.', 'The old cat? Not for sale. Not even for the golden rod.'],
+    night: ['I keep the shop open for the night fish. Jelly likes a lantern.'], rain: ['Rain makes them bite. Rain makes me stay indoors. We are all happy.'] } });
+  TOWN_NPC_LIST.push('cleat');
+  [{ id: 'tk_c1', d: 'harbour', in: 'in_tackle', t: 'coin', x: 440, h: 262, note: 'on top of the rod rack in the tackle shop' }, { id: 'tk_g1', d: 'harbour', in: 'in_tackle', t: 'gem', x: 980, h: 150, note: 'glinting by the bait tank in the tackle shop' }].forEach(function(it){ TOWN_ITEMS.push(it); TOWN_ITEM_BY_ID[it.id] = it; });
+  [{ id: 'cl1', npc: 'cleat', title: 'Ten fish', offer: 'Catch ten fish, any fish. Then you will know what the shop is for.', done: 'Ten! Now you smell of the sea.', need: { k: 'stat', key: 'fishCaught', n: 10 }, r: { coin: 3 } },
+   { id: 'cl2', npc: 'cleat', title: 'Steady hands', offer: 'Land three fish without the line ever going into the red. Slow and steady.', done: 'Three clean fights. You could do my job.', need: { k: 'stat', key: 'fishClean', n: 3 }, r: { gems: 25 } }].forEach(function(e){ TOWN_ERRANDS.push(e); TOWN_ERR_BY_ID[e.id] = e; });
   const b = TOWN_DIST.harbour.b.find(function(x){ return x.id === 'shack'; }); if (b){ b.to = 'in_tackle'; b.act = 'house'; }
   const labels = { 'tk-rod': 'Look at the rods', 'tk-line': 'Look at the lines', 'tk-bait': 'Look at the bait', 'tk-bench': 'Use the gear bench' };
   const tu = townUse, nr = townNearest, bx = townBuildingX, ha = handleAction;
