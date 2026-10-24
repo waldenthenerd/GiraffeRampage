@@ -430,6 +430,7 @@ function fishSeaGeo(){
   const st = step;
   step = function(dt){
     Fg.clock += Math.min(dt, 0.1);
+    if (Sea.on && G.state === 'fishing'){ const d = Math.min(dt, 0.05); Sea.t += d; G.time += d; }      /* the sea's own clock only runs while she sails: keep the rain, waves and the boat's bob going while she fishes */
     const up = Fg.sea && G.state === 'fishing'; Fg.rodU = clamp(Fg.rodU + (up ? Math.min(dt, 0.1) / 0.4 : -Math.min(dt, 0.1) / 0.3), 0, 1);
     return st(dt);
   };
