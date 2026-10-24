@@ -40,16 +40,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 173 | 55,658 | 4.23 MiB (4,439,921 bytes) |
+| JavaScript (`js/`) | 173 | 55,940 | 4.27 MiB (4,476,335 bytes) |
 | Styles (`css/`) | 6 | 1,709 | 158 KiB (161,391 bytes) |
 | Page (`index.html`) | 1 | 221 | 9.5 KiB (9,765 bytes) |
-| **Whole game** | **180** | **57,588** | **4.40 MiB (4,611,077 bytes)** |
+| **Whole game** | **180** | **57,870** | **4.43 MiB (4,647,491 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **57,018 lines, 4.36 MiB (4,567,371 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 173 | 55,658 | 4.23 MiB (4,439,921 bytes) |
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **57,300 lines, 4.39 MiB (4,603,785 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 173 | 55,940 | 4.27 MiB (4,476,335 bytes) |
 | Styles (`css/`) | 6 | 1,709 | 158 KiB (161,391 bytes) |
 | Page (`index.html`) | 1 | 221 | 9.5 KiB (9,765 bytes) |
-| **Whole game** | **180** | **57,588** | **4.40 MiB (4,611,077 bytes)** |
+| **Whole game** | **180** | **57,870** | **4.43 MiB (4,647,491 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -216,7 +216,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zzf-campus-study.js` | 396 | **The four things to do.** Lecture (2 energy), reading (1), homework (1) and exam (3): the pickers, the slides and pages, the question card in all five formats, the 30-second exam timer (7 of 10 passes), flashcards, first-time bonuses, repeat decay, degrees and badges, and the errand counters. |
 | `js/44zzg-campus-art.js` | 437 | The Campus painting outdoors: the spires, hills and trees, lawns and paving, the iron gate, the arch and the six street buildings, the hedge, notice board, bikes, founder's statue, fountain and faculty banners (`uniEmblem`), and the mortarboard and loafers. |
 | `js/44zzh-campus-rooms.js` | 294 | The six rooms of the university: walls (`IV_ROOMS.uhall` and the rest) and every piece of furniture (`UNI_FURN` by `u_` kind: the registrar's desk, faculty board, hall of degrees, rank cabinet, stage, seats, the eight faculty bookcases, reading table, desks, results board, café bar and tables). |
-| `js/44zzi-campus-pics.js` | 100 | `UNI_PICS`: the 49 pictures on the lecture slides (a giraffe in profile, the layers of the Earth, an atom, the solar system, the Colosseum and so on). |
+| `js/44zzi-campus-pics.js` | 382 | `UNI_PICS`: the 61 pictures on the lecture slides (a giraffe in profile, the layers of the Earth with leader lines, a labeled plant cell, the body, the finches' beaks, a circuit, the solar system, a world map, the Colosseum and so on). Labels sit on their own pills or beside a leader line so they never cover the drawing, and every picture gets a little paper grain and a soft edge. Text is never smaller than 14 px, so it stays readable when the picture shrinks on a phone. |
 | `js/44zzj-window-glow.js` | 73 | **Lit windows only where the glass shows.** Keeps a copy of each recorded window (`D._win`) while a street is painted (`townPaintField` wrapper) and, once it is finished, lights only the pixels that are still glass, so awnings, columns, signs and props in front of a window stay dark; arched, round and triangular windows keep only what is inside their outline. `townDrawWindows` (in `44w`) draws the glow before the herd and the player, not after them. |
 | `js/44zzk-town-routines.js` | 111 | **The herd's day.** `TOWN_ROUTINES`: a timetable for each street giraffe (nine of them move between districts by the hour: the Mayor, Tilly, Barnaby, Penny, Rio, Gus, Marina, Skye, Nova). They walk off the edge of the street when their slot changes and walk in from the side they came from. Keeps the old rules (lunch at the café 12:00-13:30, the fountain 18:00-21:00, away at night for the seven keepers) and replaces 44zi's `townNpcSlot` and `townApplyRoutines`. `townNpcNow(id)` says where one is right now. |
 | `js/44zzl-town-book.js` | 117 | **The collection book and the tram map.** `townShowBook` (a Book tab in the journal, a Collection button on the town menu): every district's coins, stars, gems, hats, boots, colours and tracks, plus cards for hats and boots, colours, photos, errands, friends, creatures, minigame stars, the gym and the university. Also wraps `townShowMap` to show who is at each stop, who has an errand, how many finds are left, and a Who is where list. |

@@ -33,6 +33,7 @@
     var ids2 = {}, d2 = 0; UNI_LECTURES.concat(UNI_BOOKS).forEach(function(o){ if (ids2[o.id]) d2++; ids2[o.id] = 1; }); out.noClashIds = d2 === 0;
     var qids = {}, qd = 0; UNI_LECTURES.forEach(function(L){ L.q.forEach(function(q){ if (qids[q.id]) qd++; qids[q.id] = 1; }); }); UNI_BOOKS.forEach(function(B){ B.q.forEach(function(q){ if (qids[q.id] && /^y_/.test(q.id)) qd++; qids[q.id] = 1; }); }); out.lectureQIds = qd === 0;
     out.oldLecturesKept = UNI_LEC_BY_ID.l1.title === 'A Very Tall Animal' && UNI_BOOK_BY_ID.b1.title === 'Up Where the Leaves Are' && UNI_LEC_BY_ID.l32.f === 'geo' && UNI_BOOK_BY_ID.b24.f === 'geo';
+    out.picKeys = UNI_LECTURES.every(function(L){ return L.slides.every(function(sl){ return typeof UNI_PICS[sl.pic] === 'function'; }); }) && Object.keys(UNI_PICS).length === 61;
     out.tiers = UNI_FAC.every(function(F){ var t = function(a, n){ return a.filter(function(o){ return o.f === F.id && o.t === n; }).length; }; return t(UNI_LECTURES, 1) === 2 && t(UNI_LECTURES, 2) === 2 && t(UNI_LECTURES, 3) === 2 && t(UNI_BOOKS, 1) === 1 && t(UNI_BOOKS, 2) === 2 && t(UNI_BOOKS, 3) === 2; });
 
     /* the sessions are the same size as before */
@@ -47,7 +48,7 @@
     out.exam = tryStart('town-uq-exam-giraffe'); reset();
     out.sessions = out.hw === 6 && out.lec === 3 && out.book === 2;
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['threeTimes', 'perFaculty', 'uniqueIds', 'uniqueText', 'oldIdsKept', 'noBritish', 'lectures', 'books', 'noClashIds', 'lectureQIds', 'oldLecturesKept', 'tiers', 'sessions'];
+  var need = ['threeTimes', 'perFaculty', 'uniqueIds', 'uniqueText', 'oldIdsKept', 'noBritish', 'lectures', 'books', 'noClashIds', 'picKeys', 'lectureQIds', 'oldLecturesKept', 'tiers', 'sessions'];
   out.failed = need.filter(function(k){ return out[k] !== true; }).concat(out.badQs && out.badQs.length ? ['badQs'] : [], out.shape && out.shape.length ? ['shape'] : []);
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);
