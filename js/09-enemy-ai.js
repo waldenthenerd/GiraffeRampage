@@ -269,7 +269,7 @@ function updateEnemies(dt){
         }
 
         default: {                                                /* the Space Marines' behaviours live in MARINE_AI */
-          const f = MARINE_AI[e.ai] || DUST_AI[e.ai];
+          const f = MARINE_AI[e.ai] || DUST_AI[e.ai] || DOME_AI[e.ai];
           if (f){ e.spdE = spd; const r = f(e, dt, ux, uy, d, dx, dy); mvx = r[0]; mvy = r[1]; }
         }
       }

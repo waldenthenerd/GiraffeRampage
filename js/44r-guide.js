@@ -25,7 +25,7 @@ const GUIDE_TOPICS = [
       '<li>Your health is the bar at the top. Hearts that drop from enemies heal you.</li></ul>';
   } },
   { id: 'runs', title: 'Runs, waves and chapters', show: function(){ return true; }, html: function(){
-    return '<p>A <b>run</b> is one attempt. Enemies come in waves, and every chapter is ' + WAVES_PER_CHAPTER + ' waves long. Every fifth wave is a boss. Clear a chapter and the next one opens.</p>' +
+    return '<p>A <b>run</b> is one attempt. Enemies come in waves, and every chapter is ' + WAVES_PER_CHAPTER + ' waves long (Chapter 13.5 is a short one, ' + DOME_WAVES + '). Every fifth wave is a boss. Clear a chapter and the next one opens.</p>' +
       '<ul class="helplist">' +
       '<li>The window in the middle of the menu picks the chapter. Chapter 1 starts at wave one. Starting a later chapter you have opened goes straight to its first wave, with no cards to begin with.</li>' +
       '<li>When you fall, 0.2% of your score is banked as gold. Spend it at the trading post. A run can be as short or as long as you like: the score is what you take with you.</li>' +
@@ -90,7 +90,7 @@ const GUIDE_TOPICS = [
     for (let ch = 1; ch <= TOTAL_CHAPTERS; ch++){
       if (!chapterUnlocked(ch)) continue;
       const i = CHAPTER_INFO[ch - 1];
-      h += '<li><b>Chapter ' + ch + ': ' + i.name + '.</b> ' + i.desc + (guideDone(ch) ? ' <span class="gtag">cleared</span>' : '') + '</li>';
+      h += '<li><b>Chapter ' + chapterLabel(ch) + ': ' + i.name + '.</b> ' + i.desc + (guideDone(ch) ? ' <span class="gtag">cleared</span>' : '') + '</li>';
     }
     return h + '</ul>';
   } },

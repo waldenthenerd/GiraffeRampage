@@ -31,7 +31,9 @@ const CHAPTER_INFO = [
   { name: 'Area 51', biome: 'area51',
     desc: 'The glimmer came from somewhere.' },
   { name: 'Mars', biome: 'mars',
-    desc: 'The vial points off the Earth.' }
+    desc: 'The vial points off the Earth.' },
+  { name: 'The Domes', biome: 'dome', cast: ['hyena', 'cheetah', 'vulture', 'thawed'],       /* Chapter 13.5, a short one: ten waves */
+    desc: 'A ring of mirrored domes shimmers in the savannah heat. Inside, it is freezing.' }
 ];
 const MENU_PREVIEW_CAST = ['hyena', 'cheetah', 'vulture', 'lion'];
 function chapterUnlocked(ch){ if (ch === 11) return !!(Save.data && Save.data.homecoming); return ch <= 1 || !!(Save.data && Save.data['chapter' + (ch - 1) + 'Complete']); }       /* Chapter 11 opens when she has flown home */
@@ -70,16 +72,17 @@ function drawMenuPreview(){  const cv = document.getElementById('chPreview');
     else if (info.biome === 'space'){ G.buildings = []; G.rocket = { x: cx + 64, y: cy - 22, s: 0.4 }; }
     else if (info.biome === 'moon'){ G.buildings = []; G.rocket = null; }
     else if (info.biome === 'venus'){ G.buildings = []; G.rocket = null; }
-    else if (info.biome === 'area51' || info.biome === 'mars'){ G.buildings = []; G.rocket = null; }
+    else if (info.biome === 'area51' || info.biome === 'mars' || info.biome === 'dome'){ G.buildings = []; G.rocket = null; }
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.clearRect(0, 0, W, H);
     c.translate(W / 2, H / 2); c.scale(z, z); c.translate(-cx, -cy);
     const dxp = Math.sin(G.time * 0.22) * 16, dyp = Math.cos(G.time * 0.17) * 10;
     c.save(); c.translate(dxp, dyp); drawGround(c, cx, cy, W / z + 90, H / z + 90); c.restore();
     let firstAng = 0;
-    for (let i = 0; i < MENU_PREVIEW_CAST.length; i++){
-      const type = MENU_PREVIEW_CAST[i], def = table[type];
-      const a = i / MENU_PREVIEW_CAST.length * TAU + G.time * 0.12, dist = def.big ? 128 : 104;
+    const cast = info.cast || MENU_PREVIEW_CAST;
+    for (let i = 0; i < cast.length; i++){
+      const type = cast[i], def = table[type];
+      const a = i / cast.length * TAU + G.time * 0.12, dist = def.big ? 128 : 104;
       const ex = cx + Math.cos(a) * dist, ey = cy + Math.sin(a) * dist * 0.85;
       if (i === 0) firstAng = Math.atan2(ey - cy, ex - cx);
       drawEnemy(c, { portrait: true, def: def, type: type, x: ex, y: ey, r: def.r, ang: Math.atan2(cy - ey, cx - ex),
@@ -102,27 +105,27 @@ function drawMenuPreview(){  const cv = document.getElementById('chPreview');
 }
 function chapterSelectorHTML(){
   const ch = menuChapter(), info = CHAPTER_INFO[ch - 1], open = chapterUnlocked(ch);
-  const first = (ch - 1) * WAVES_PER_CHAPTER + 1, last = ch * WAVES_PER_CHAPTER;
+  const first = chapterFirstWave(ch), last = first + chapterLen(ch) - 1, bosses = Math.floor(chapterLen(ch) / 5);
   let dots = '';
   for (let i = 1; i <= TOTAL_CHAPTERS; i++)
     dots += '<span class="chdot' + (i === ch ? ' on' : '') + (chapterUnlocked(i) ? '' : ' locked') + '"></span>';
   const start = !open
-    ? '<button class="btn chstart" disabled>Locked<small>' + (ch === 11 ? 'Fly home in the spaceplane' : 'Clear Chapter ' + (ch - 1)) + ' to unlock</small></button>'
+    ? '<button class="btn chstart" disabled>Locked<small>' + (ch === 11 ? 'Fly home in the spaceplane' : 'Clear Chapter ' + chapterLabel(ch - 1)) + ' to unlock</small></button>'
     : ch === 1
       ? '<button class="btn chstart" data-a="play">Start a run<small>Wave one. Nothing personal.</small></button>'
-      : '<button class="btn chstart" data-a="play' + ch + '">Start Chapter ' + ch + '<small>Straight to wave ' + first + '. No cards to start.</small></button>';
+      : '<button class="btn chstart" data-a="play' + ch + '">Start Chapter ' + chapterLabel(ch) + '<small>Straight to wave ' + first + '. No cards to start.</small></button>';
   return '<div class="chsel">' +
       '<button class="charrow" data-a="ch-prev" aria-label="Previous chapter"' + (ch <= 1 ? ' disabled' : '') + '>\u276E</button>' +
       '<div class="chpic' + (open ? '' : ' locked') + '">' +
         '<canvas id="chPreview" width="400" height="400"></canvas>' +
-        (open ? '' : '<div class="chlock"><div>' + ico('@t-x-lock') + '<small>' + (ch === 11 ? 'Fly home in the spaceplane' : 'Clear Chapter ' + (ch - 1)) + ' to unlock</small></div></div>') +
+        (open ? '' : '<div class="chlock"><div>' + ico('@t-x-lock') + '<small>' + (ch === 11 ? 'Fly home in the spaceplane' : 'Clear Chapter ' + chapterLabel(ch - 1)) + ' to unlock</small></div></div>') +
       '</div>' +
       '<button class="charrow" data-a="ch-next" aria-label="Next chapter"' + (ch >= TOTAL_CHAPTERS ? ' disabled' : '') + '>\u276F</button>' +
     '</div>' +
-    '<div class="chname display">Chapter ' + ch + ' \u00b7 ' + info.name + '</div>' +
+    '<div class="chname display">Chapter ' + chapterLabel(ch) + ' \u00b7 ' + info.name + '</div>' +
     '<div class="chdots">' + dots + '</div>' +
     '<p class="chdesc">' + info.desc + '</p>' +
-    '<p class="chmeta">Waves ' + first + '\u2013' + last + ' \u00b7 5 bosses</p>' +
+    '<p class="chmeta">Waves ' + first + '\u2013' + last + ' \u00b7 ' + bosses + ' bosses</p>' +
     '<div class="chgo">' + start + speedButtonHTML() + '</div>';
 }
 /* Speed mode is chosen here, beside Start, and is then locked for the whole

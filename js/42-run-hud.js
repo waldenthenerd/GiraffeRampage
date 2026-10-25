@@ -17,7 +17,7 @@ function resetWorld(){
 let wakeLock = null;
 function keepAwake(){ try { if (Input.hasTouch && navigator.wakeLock && (!wakeLock || wakeLock.released)) navigator.wakeLock.request('screen').then(function(l){ wakeLock = l; }).catch(function(){}); } catch (e) {} }
 function startRun(startChapter, waveOverride, snap){
-  const forcedWave = waveOverride ? clamp(Math.round(waveOverride), 1, WAVES_PER_CHAPTER * TOTAL_CHAPTERS) : null;
+  const forcedWave = waveOverride ? clamp(Math.round(waveOverride), 1, CHAPTER_LAST_WAVE) : null;
   const chapter = forcedWave ? chapterOf(forcedWave) : clamp(Math.round(startChapter) || 1, 1, TOTAL_CHAPTERS);
   SFX.init(); SFX.resume(); keepAwake();
   resetWorld();
@@ -54,6 +54,7 @@ function startRun(startChapter, waveOverride, snap){
     else if (G.biome === 'venus') buildVenusWorld();
     else if (G.biome === 'area51') buildArea51World();
     else if (G.biome === 'mars') buildMarsWorld();
+    else if (G.biome === 'dome') buildDomeWorld();
   buildScenery();
   G.state = 'playing';
   if (forcedWave && chapterOf(forcedWave) === 13 && chapterWaveOf(forcedWave) > MARS_SWITCH_WAVE) G.marsShipsSeen = true;
@@ -69,7 +70,7 @@ function startRun(startChapter, waveOverride, snap){
   }
   G.noSnap = !!snap;
   startIntroFX(chapter);
-  startWave(forcedWave || ((chapter - 1) * WAVES_PER_CHAPTER + 1));
+  startWave(forcedWave || chapterFirstWave(chapter));
   G.noSnap = false;
   hideOverlay();
   HUD.classList.add('on');
@@ -126,7 +127,7 @@ function chapterComplete(){
   d.gems = (d.gems | 0) + (G.runGems | 0);
   d.sulfur = (d.sulfur | 0) + (G.runSulfur | 0); d.basalt = (d.basalt | 0) + (G.runBasalt | 0); d.grubs = (d.grubs | 0) + (G.runGrubs | 0); d.iron = (d.iron | 0) + (G.runIron | 0); d.argon = (d.argon | 0) + (G.runArgon | 0);
   d.chaptersComplete = (d.chaptersComplete | 0) + 1;
-  const hadPart = !!d.enginePart; if (G.wave >= 175) d.chapter7Complete = true; if (G.wave >= 200) d.chapter8Complete = true; if (G.wave >= 225) d.chapter9Complete = true; if (G.wave >= 250){ d.chapter10Complete = true; d.enginePart = true; } if (G.wave >= 275) d.chapter11Complete = true; if (G.wave >= 300){ d.chapter12Complete = true; d.mutationVial = true; } if (G.wave >= CHAPTER_LAST_WAVE) d.chapter13Complete = true; G.vialNew = false; G.enginePartNew = !hadPart && G.wave === 250;     /* finishing a chapter completes it and every one before it */     /* the Inferno's reward: a spaceship engine part */   /* finishing the last chapter counts every chapter before it */
+  const hadPart = !!d.enginePart; if (G.wave >= 175) d.chapter7Complete = true; if (G.wave >= 200) d.chapter8Complete = true; if (G.wave >= 225) d.chapter9Complete = true; if (G.wave >= 250){ d.chapter10Complete = true; d.enginePart = true; } if (G.wave >= 275) d.chapter11Complete = true; if (G.wave >= 300){ d.chapter12Complete = true; d.mutationVial = true; } if (G.wave >= WAVES_PER_CHAPTER * MAIN_CHAPTERS) d.chapter13Complete = true; if (G.wave >= CHAPTER_LAST_WAVE) d.chapter14Complete = true; G.vialNew = false; G.enginePartNew = !hadPart && G.wave === 250;     /* finishing a chapter completes it and every one before it */     /* the Inferno's reward: a spaceship engine part */   /* finishing the last chapter counts every chapter before it */
   if (G.score > scoreInt(d.best)) d.best = G.score;
   if (G.wave > (d.bestWave | 0)) d.bestWave = G.wave;
   Save.write();
@@ -205,8 +206,8 @@ function updateHUD(){
   hudTxt('hpTxt', Math.max(0, Math.ceil(P.hp)) + ' / ' + Math.round(P.maxHp));
   hudTxt('xpTxt', 'Level ' + P.level + (G.pendingLevels > 0 && G.levelGate > 0 ? ' \u00b7 ' + G.pendingLevels + ' to pick in ' + Math.ceil(G.levelGate) + 's' : ''));
   hudTxt('hWave', String(G.wave));
-  hudTxt('hChapter', G.chapter === 13 ? 'CH.13 MARS' : G.chapter === 12 ? 'CH.12 AREA 51' : G.chapter === 11 ? 'CH.11 GLIMMER' : G.chapter === 10 ? 'CH.10 INFERNO' : G.chapter === 9 ? 'CH.9 VENUS' : G.chapter === 8 ? 'CH.8 THE MOON' : G.chapter === 7 ? 'CH.7 SPACE CENTER' : G.chapter === 6 ? 'CH.6 HOUSTON' : G.chapter === 5 ? 'CH.5 THE CANOPY' : G.chapter === 4 ? 'CH.4 THE DEEP' : G.chapter === 3 ? 'CH.3 MURKFEN' : G.chapter === 2 ? 'CH.2 FROSTREACH' : '');
-  hudCls('hChapter', 'chaptag' + (G.chapter === 13 ? ' mars' : G.chapter === 12 ? ' a51' : G.chapter === 11 ? ' glim' : G.chapter === 10 ? ' inferno' : G.chapter === 9 ? ' venus' : G.chapter === 8 ? ' moon' : G.chapter === 7 ? ' space' : G.chapter === 6 ? ' city' : G.chapter === 5 ? ' jungle' : G.chapter === 4 ? ' ocean' : G.chapter === 3 ? ' swamp' : G.chapter === 2 ? ' snow' : ''));
+  hudTxt('hChapter', G.chapter === DOME_CHAPTER ? 'CH.13.5 THE DOMES' : G.chapter === 13 ? 'CH.13 MARS' : G.chapter === 12 ? 'CH.12 AREA 51' : G.chapter === 11 ? 'CH.11 GLIMMER' : G.chapter === 10 ? 'CH.10 INFERNO' : G.chapter === 9 ? 'CH.9 VENUS' : G.chapter === 8 ? 'CH.8 THE MOON' : G.chapter === 7 ? 'CH.7 SPACE CENTER' : G.chapter === 6 ? 'CH.6 HOUSTON' : G.chapter === 5 ? 'CH.5 THE CANOPY' : G.chapter === 4 ? 'CH.4 THE DEEP' : G.chapter === 3 ? 'CH.3 MURKFEN' : G.chapter === 2 ? 'CH.2 FROSTREACH' : '');
+  hudCls('hChapter', 'chaptag' + (G.chapter === DOME_CHAPTER ? ' dome' : G.chapter === 13 ? ' mars' : G.chapter === 12 ? ' a51' : G.chapter === 11 ? ' glim' : G.chapter === 10 ? ' inferno' : G.chapter === 9 ? ' venus' : G.chapter === 8 ? ' moon' : G.chapter === 7 ? ' space' : G.chapter === 6 ? ' city' : G.chapter === 5 ? ' jungle' : G.chapter === 4 ? ' ocean' : G.chapter === 3 ? ' swamp' : G.chapter === 2 ? ' snow' : ''));
   hudTxt('hSpeed', G.runSpeed ? '\u00d7' + runSpeedMul() + (G.runSpeedLevel === 3 ? ' ULTRAFAST' : G.runSpeedLevel === 2 ? ' HYPERSPEED' : ' SPEED') : '');
   /* the score and kill counters roll up to their new value instead of jumping */
   const sc = G._dispScore === undefined || G.score < G._dispScore ? G.score : G._dispScore + (G.score - G._dispScore) * 0.25;

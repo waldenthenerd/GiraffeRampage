@@ -106,6 +106,9 @@ function showDebugPanel(){
           '<button class="btn ghost" data-a="debug-play11">Start Chapter 11 \u2014 The Changed Savannah</button>' +
           '<button class="btn ghost" data-a="debug-play12">Start Chapter 12 \u2014 Area 51</button>' +
           '<button class="btn ghost" data-a="debug-play13">Start Chapter 13 \u2014 Mars</button>' +
+          '<button class="btn ghost" data-a="debug-play14">Start Chapter 13.5 \u2014 the Domes</button>' +
+          '<button class="btn ghost" data-a="debug-cutscene-domeflight">Play the dome flight film<small>The town helicopter over the mirrored domes. Keys 1\u20134 jump between its scenes</small></button>' +
+          '<button class="btn ghost" data-a="debug-cutscene-domeout">Play the escape to New York film<small>The end of Chapter 13.5. Keys 1\u20134 jump between its scenes</small></button>' +
           '<button class="btn ghost" data-a="debug-cutscene">Play the ending cutscene<small>Chapter 7 film: the Moon landing. Keys 1\u20138 jump between its scenes; Esc leaves</small></button>' +
           '<button class="btn ghost" data-a="debug-cutscene-venus">Play the Venus cutscene<small>Chapter 8 film: the stolen ship. Keys 1\u20136 jump between its scenes; Esc leaves</small></button>' +
           '<button class="btn ghost" data-a="debug-cutscene-home">Play the homecoming film<small>The flight home to the Underground Giraffe City. Keys 1\u20138 jump between its scenes; Esc leaves</small></button>' +
@@ -121,9 +124,9 @@ function showDebugPanel(){
           'style="width:70px;padding:7px;background:var(--soil);border:1px solid var(--bark2);' +
           'border-radius:4px;color:var(--bone);font-size:14px">' +
         '<button class="btn sm" data-a="debug-cutscene-short">Play</button></div></div>' +
-      '<div class="kv"><div>Jump to a specific wave<small>Starts a fresh run at that exact wave (1\u2013' + (WAVES_PER_CHAPTER * TOTAL_CHAPTERS) + ').</small></div>' +
+      '<div class="kv"><div>Jump to a specific wave<small>Starts a fresh run at that exact wave (1\u2013' + CHAPTER_LAST_WAVE + ').</small></div>' +
         '<div style="display:flex;gap:8px;align-items:center">' +
-        '<input id="debugWaveNum" type="number" value="1" min="1" max="' + (WAVES_PER_CHAPTER * TOTAL_CHAPTERS) + '" ' +
+        '<input id="debugWaveNum" type="number" value="1" min="1" max="' + CHAPTER_LAST_WAVE + '" ' +
           'style="width:70px;padding:7px;background:var(--soil);border:1px solid var(--bark2);' +
           'border-radius:4px;color:var(--bone);font-size:14px">' +
         '<button class="btn sm" data-a="debug-wave">Go</button></div></div>' +
@@ -188,6 +191,9 @@ function handleDebugAction(a){
     case 'debug-cutscene-mships': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'mships'); break;
     case 'debug-cutscene-marshome': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'marshome'); break;
     case 'debug-play13': SFX.click(); startRun(13); break;
+    case 'debug-play14': SFX.click(); startRun(DOME_CHAPTER); break;
+    case 'debug-cutscene-domeflight': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'domeflight'); break;
+    case 'debug-cutscene-domeout': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'domeout'); break;
     case 'debug-lab': { const d = Save.data; d.chapter12Complete = true; d.mutationVial = true; d.chapter13Complete = true; d.antsUnlocked = true; d.chapter8Complete = true; d.vials = (d.vials | 0) + 3; if (!d.venusUp) d.venusUp = {}; ['hab1', 'hab2', 'hab3', 'col1', 'col2', 'col3'].forEach(k => { d.venusUp[k] = 1; }); d.iron = (d.iron | 0) + 3000; d.argon = (d.argon | 0) + 1500; d.sulfur = (d.sulfur | 0) + 1500; d.basalt = (d.basalt | 0) + 1500; Save.write(); SFX.buy(); showDebugPanel(); break; }
     case 'debug-combos': unlockAllCombos(); SFX.buy(); showDebugPanel(); break;
     case 'debug-mars': Save.data.chapter12Complete = true; Save.data.mutationVial = true; Save.data.iron = (Save.data.iron | 0) + 600; Save.data.argon = (Save.data.argon | 0) + 300; Save.data.sulfur = (Save.data.sulfur | 0) + 600; Save.data.basalt = (Save.data.basalt | 0) + 600; Save.write(); SFX.buy(); showDebugPanel(); break;
@@ -279,7 +285,7 @@ function handleDebugAction(a){
    on. Nothing it does is banked: no gold, gems, best score or run save is written, and the player's own Continue save is kept.
    It works by wrapping a few game functions below (gainXP, hurtPlayer, updateWaves, gameOver, saveRunNow, saveRunAtBoundary),
    so the rest of the game has no idea it exists, and it is gone with this file. */
-const DEV_WAVE_MAX = WAVES_PER_CHAPTER * TOTAL_CHAPTERS;
+const DEV_WAVE_MAX = CHAPTER_LAST_WAVE;
 function devOn(){ return !!(G.dev && G.dev.on); }
 function devUI(){ if (!G.devUI) G.devUI = { card: 'weaponry', cardLv: 10, combo: '', comboLv: 3, ech: 1, etype: '', eside: 'alien', ecount: 5, ewave: 1, gch: 1, gwave: 1, xp: 500, lv: 1, open: {}, msg: '' }; return G.devUI; }
 
@@ -334,19 +340,19 @@ function devTableFor(ch, side){
     case 1: return ETYPES; case 2: return ETYPES_FROST; case 3: return ETYPES_SWAMP; case 4: return ETYPES_OCEAN; case 5: return ETYPES_JUNGLE;
     case 6: return ETYPES_CITY; case 7: return ETYPES_SPACE; case 8: return ETYPES_MARINE;
     case 9: return side === 'marine' ? ETYPES_VENUS_MARINE : ETYPES_VENUS;
-    case 10: return ETYPES_INFERNO; case 11: return ETYPES_GLIM; case 12: return ETYPES_A51;
+    case 10: return ETYPES_INFERNO; case 11: return ETYPES_GLIM; case 12: return ETYPES_A51; case 14: return ETYPES_DOME;
     default: return side === 'marine' ? ETYPES_MARS_MARINE : ETYPES_MARS;
   }
 }
-const DEV_CHAPTERS = ['1 Savanna', '2 Frostreach', '3 Murkfen', '4 The Deep', '5 The Canopy', '6 Houston', '7 Space Center', '8 The Moon', '9 Venus', '10 The Inferno', '11 The Changed Savannah', '12 Area 51', '13 Mars'];
+const DEV_CHAPTERS = ['1 Savanna', '2 Frostreach', '3 Murkfen', '4 The Deep', '5 The Canopy', '6 Houston', '7 Space Center', '8 The Moon', '9 Venus', '10 The Inferno', '11 The Changed Savannah', '12 Area 51', '13 Mars', '13.5 The Domes'];
 function devRead(){
   const u = devUI(), g = function(id){ return document.getElementById(id); };
   if (!g('dvCard')) return;
   const num = function(id, d, lo, hi){ const e = g(id); const v = e ? Math.round(parseFloat(e.value)) : NaN; return isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d; };
   const str = function(id, d){ const e = g(id); return e ? e.value : d; };
   u.card = str('dvCard', u.card); u.cardLv = num('dvCardLv', u.cardLv, 1, 10); u.combo = str('dvCombo', u.combo); u.comboLv = num('dvComboLv', u.comboLv, 1, 3);
-  u.ech = num('dvECh', u.ech, 1, 13); u.etype = str('dvEType', u.etype); u.eside = str('dvESide', u.eside); u.ecount = num('dvECount', u.ecount, 1, MAX_ENEMIES); u.ewave = num('dvEWave', u.ewave, 1, WAVES_PER_CHAPTER);
-  u.gch = num('dvGCh', u.gch, 1, 13); u.gwave = num('dvGWave', u.gwave, 1, WAVES_PER_CHAPTER); u.xp = num('dvXp', u.xp, 0, 1e9); u.lv = num('dvLv', u.lv, 1, 40);
+  u.ech = num('dvECh', u.ech, 1, TOTAL_CHAPTERS); u.etype = str('dvEType', u.etype); u.eside = str('dvESide', u.eside); u.ecount = num('dvECount', u.ecount, 1, MAX_ENEMIES); u.ewave = num('dvEWave', u.ewave, 1, WAVES_PER_CHAPTER);
+  u.gch = num('dvGCh', u.gch, 1, TOTAL_CHAPTERS); u.gwave = num('dvGWave', u.gwave, 1, WAVES_PER_CHAPTER); u.xp = num('dvXp', u.xp, 0, 1e9); u.lv = num('dvLv', u.lv, 1, 40);
   OV.querySelectorAll('details[data-sec]').forEach(function(d){ u.open[d.getAttribute('data-sec')] = d.open; });
 }
 function showDevRun(msg){
@@ -490,7 +496,7 @@ function devSpawn(){
   if (!tbl[u.etype]) return 'Pick an enemy first.';
   let cw = u.ewave;
   if (u.ech === 13) cw = u.eside === 'marine' ? Math.max(cw, MARS_SWITCH_WAVE + 1) : Math.min(cw, MARS_SWITCH_WAVE);
-  const w = (u.ech - 1) * WAVES_PER_CHAPTER + cw, kind = u.ech === 9 ? u.eside : undefined;
+  const w = chapterFirstWave(u.ech) - 1 + cw, kind = u.ech === 9 ? u.eside : undefined;
   let n = 0, err = '';
   for (let i = 0; i < u.ecount; i++){
     const a = Math.random() * TAU, r = rand(200, 360);
@@ -518,11 +524,11 @@ function devRunAction(a){
       if (d.auto){ if (G.waveState === 'idle' || G.waveState === 'clear') startWave(G.wave); msg = 'This wave is running, and the next ones follow.'; }
       else { G.spawnQueue = []; G.waveState = 'idle'; msg = 'Waves stopped. Enemies already out stay.'; }
       break;
-    case 'go': devGoto((u.gch - 1) * WAVES_PER_CHAPTER + u.gwave); return;
+    case 'go': devGoto(chapterFirstWave(u.gch) - 1 + u.gwave); return;
     case 'prev': devGoto(G.wave - 1); return;
     case 'next': devGoto(G.wave + 1); return;
     case 'restart': devGoto(G.wave); return;
-    case 'wv5': case 'wv10': case 'wv15': case 'wv20': case 'wv25': devGoto((G.chapter - 1) * WAVES_PER_CHAPTER + parseInt(k.slice(2), 10)); return;
+    case 'wv5': case 'wv10': case 'wv15': case 'wv20': case 'wv25': devGoto(chapterFirstWave(G.chapter) - 1 + parseInt(k.slice(2), 10)); return;
     case 'cardset': { const i = devSetCard(u.card, u.cardLv); devAfterCards(); msg = i ? CARDMAP[u.card].name + ' set to level ' + i.level + '.' : 'No such card.'; break; }
     case 'cardremove': { const i = devFindCard(u.card); if (i && !i.hidden){ devRemoveCard(i); devAfterCards(); msg = CARDMAP[u.card].name + ' removed.'; } else msg = i ? 'That card is inside a combo. Remove the combo.' : 'You do not hold it.'; break; }
     case 'cardmax': CARDS.forEach(function(c){ devSetCard(c.id, 10); }); devAfterCards(); msg = 'Every card is at level 10.'; break;

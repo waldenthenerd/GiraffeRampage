@@ -19,7 +19,8 @@ const MIX_ENV = {
   10: [0.24, 2600],     /* the Inferno: a cavern of fire */
   11: [0.20, 9000],     /* the Changed Savannah: shimmer */
   12: [0.30, 4800],     /* Area 51: a hangar */
-  13: [0.08, 4200]      /* Mars: thin air */
+  13: [0.08, 4200],     /* Mars: thin air */
+  14: [0.30, 5200]      /* a dome: a big cold hall */
 };
 const MIX_FOOT_BIOME = ['savanna', 'snow', 'swamp', 'ocean', 'jungle', 'city', 'space', 'moon', 'venus', 'area51', 'mars'];
 
@@ -82,7 +83,7 @@ const Mix = {
     let env;
     if (s === 'cutscene') env = [0.14, 6000];
     else {
-      const ch = G.attract || s === 'menu' || s === 'help' ? (typeof atmosChapter === 'function' ? atmosChapter() : 1) : clamp(G.chapter | 0 || 1, 1, 13);
+      const ch = G.attract || s === 'menu' || s === 'help' ? (typeof atmosChapter === 'function' ? atmosChapter() : 1) : clamp(G.chapter | 0 || 1, 1, TOTAL_CHAPTERS);
       env = MIX_ENV[ch] || MIX_ENV[1];
       if (s === 'shop') env = [0.12, 6500];
     }
@@ -97,7 +98,7 @@ const Mix = {
     }
     /* the place's own sounds: gusts of wind that sweep across, and calls from far away */
     if (run && Amb.built && Amb.mul > 0.5 && (Settings.ambVol === undefined || Settings.ambVol > 0)){
-      const ch = clamp(G.chapter | 0 || 1, 1, 13), prof = AMB_PROFILES[ch] || {};
+      const ch = clamp(G.chapter | 0 || 1, 1, TOTAL_CHAPTERS), prof = AMB_PROFILES[ch] || {};
       let wind = prof.wind || 0;
       const addW = function(key, k){ const w = AMB_WEATHER[key]; if (!w) return; for (let i = 0; i < w.length; i++) if (w[i][0] === 'wind') wind += w[i][1] * k; };
       if (typeof Atmos !== 'undefined' && Atmos.state) addW(Atmos.state.weather, 1);
@@ -294,7 +295,7 @@ Object.assign(SFX, {
     const b = this.abilityGain, v = (0.5 + 0.5 * Mix.fv) * (Mix.lr ? 1.06 : 0.94), bio = G.biome;
     const L = function(x){ return x * v; };
     switch (bio){
-      case 'snow':   this.burst(0.07, L(0.10), 3000 * v, 1500, 1, 0, 'bandpass', b); break;
+      case 'snow': case 'dome':   this.burst(0.07, L(0.10), 3000 * v, 1500, 1, 0, 'bandpass', b); break;
       case 'swamp':  this.burst(0.1, L(0.10), 500, 180, 0.9, 0, 'lowpass', b); this.tone('sine', 200 * v, 110, 0.08, L(0.04), 0, 0, b); break;
       case 'ocean':  this.burst(0.12, L(0.08), 1200, 400, 0.8, 0, 'lowpass', b); break;
       case 'jungle': this.burst(0.08, L(0.08), 2200, 900, 0.8, 0, 'bandpass', b); this.tone('sine', 120 * v, 70, 0.06, L(0.04), 0, 0, b); break;

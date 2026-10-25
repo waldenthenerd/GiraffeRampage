@@ -31,7 +31,8 @@ const AMB_PROFILES = {
   10: { rumble: 0.09, hiss: 0.02, chirp: { kind: 'pop', every: [0.6, 2.2] } },
   11: { wind: 0.04, windF: 640, hum: 0.02, chirp: { kind: 'sparkle', every: [2.5, 6] } },
   12: { wind: 0.05, windF: 480, hum: 0.03 },
-  13: { wind: 0.09, windF: 260, rumble: 0.02 }
+  13: { wind: 0.09, windF: 260, rumble: 0.02 },
+  14: { wind: 0.03, windF: 700, hum: 0.04, chirp: { kind: 'sparkle', every: [3, 7] } }
 };
 /* weather adds to the bed: [layer, extra gain at full strength] */
 const AMB_WEATHER = {
@@ -93,7 +94,7 @@ const Amb = {
     this.mul += (want - this.mul) * Math.min(1, dt * 2);
     const av = typeof Settings.ambVol === 'number' ? Settings.ambVol : 1;          /* the Ambience volume setting */
     this.bus.gain.setTargetAtTime(this.mul * av, now, 0.4);
-    const ch = G.attract || s === 'menu' || s === 'help' ? (typeof atmosChapter === 'function' ? atmosChapter() : 1) : clamp(G.chapter | 0 || 1, 1, 13);
+    const ch = G.attract || s === 'menu' || s === 'help' ? (typeof atmosChapter === 'function' ? atmosChapter() : 1) : clamp(G.chapter | 0 || 1, 1, TOTAL_CHAPTERS);
     const prof = AMB_PROFILES[ch] || AMB_PROFILES[1];
     const lv = { wind: prof.wind || 0, water: prof.water || 0, rumble: prof.rumble || 0, hiss: prof.hiss || 0, hum: prof.hum || 0 };
     /* the weather that is actually falling right now */

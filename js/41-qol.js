@@ -233,6 +233,8 @@ function filmList(){
   L.push({ kind: 'mships', title: 'The Marines Arrive', sub: 'Ships come down through the red sky.', un: (d.bestWave | 0) >= 315 });
   L.push({ kind: 'fusion', title: 'The Fusion Machine', sub: 'Building the Card Fusion Machine.', un: cityLevel('c_fusion') > 0 });
   L.push({ kind: 'marshome', title: 'Home from Mars', sub: 'The long way back to the lab.', un: !!d.chapter13Complete });
+  L.push({ kind: 'domeflight', title: 'The Mirrored Domes', sub: 'The town helicopter, and a ring of foil-covered domes.', un: !!d.chapter13Complete });
+  L.push({ kind: 'domeout', title: 'The Long Flight to New York', sub: 'The domes light up, and the trail goes north.', un: !!d.chapter14Complete });
   return L;
 }
 function galleryButtonHTML(){
@@ -272,7 +274,7 @@ function saveRunNow(){
   try { Save.data.runSave = runSnapshot(); Save.write(); } catch (e) {}
 }
 function validRunSave(r){
-  if (!(r && r.v === 1 && r.wave >= 1 && r.wave <= WAVES_PER_CHAPTER * TOTAL_CHAPTERS && Array.isArray(r.cards))) return false;
+  if (!(r && r.v === 1 && r.wave >= 1 && r.wave <= CHAPTER_LAST_WAVE && Array.isArray(r.cards))) return false;
   /* every number the restore uses is made a real, in-range number, so a damaged save cannot put NaN into the run */
   const num = function(k, lo, hi, d){ const v = +r[k]; r[k] = isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
   num('score', 0, 1e12, 0); num('kills', 0, 1e9, 0); num('bonusGold', 0, 1e12, 0); num('runTime', 0, 1e7, 0);
@@ -307,7 +309,7 @@ function restoreRun(r){
 function continueButtonHTML(){
   const r = Save.data.runSave;
   if (!validRunSave(r)) return '';
-  return '<button class="btn" data-a="continue" style="width:100%;margin:0 0 8px">Continue your run<small>Chapter ' + r.chapter + ', wave ' + r.wave + ' · ' + fmt(r.score) + ' points · level ' + r.level + '</small></button>';
+  return '<button class="btn" data-a="continue" style="width:100%;margin:0 0 8px">Continue your run<small>Chapter ' + chapterLabel(r.chapter) + ', wave ' + r.wave + ' · ' + fmt(r.score) + ' points · level ' + r.level + '</small></button>';
 }
 
 
@@ -701,6 +703,7 @@ function showDeath(){
 
 function victoryText(mins, secs){
   const tm = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's';
+  if (G.chapter >= DOME_CHAPTER) return 'The Ice Heart breaks apart in a rain of cold light, and the glowing root under the dome goes dark. You held the glass for ' + tm + ' while the mylar rang like a bell all round you. The helicopter is still turning on its pad. Among the wreckage was a shipping label, stamped with a city: New York.';
   if (G.chapter >= 13) return 'Fleet Marshal Dray’s flagship comes apart in the red sky, and the dust aliens melt back into the dunes. You held the Martian plain for ' + tm + ' between two armies. The vial hums in your harness, and there is a long way home.';
   if (G.chapter >= 12) return 'General Mercer goes down, and the klaxons wind to silence across Area 51. You held the base for ' + tm + ' of the Nevada night. Under the hatch in the middle of it, something in a glass case was still glowing green: the thing that changed the animals.';
   if (G.chapter >= 11) return 'The last of the glimmering creatures falls, and the grass stops glittering. You held the savannah for ' + tm + ' of its strangest night. It is quiet now, but whatever changed it has not gone far.';
@@ -715,7 +718,7 @@ function showVictory(){
   const mins = Math.floor(r.time / 60), secs = Math.floor(r.time % 60);
   setOverlay(
     '<div class="panel slab" style="border-top-color:#FFD84D">' +
-      '<h2 class="victorytitle display">CHAPTER ' + G.chapter + ' COMPLETE</h2>' +
+      '<h2 class="victorytitle display">CHAPTER ' + chapterLabel(G.chapter) + ' COMPLETE</h2>' +
       '<p class="sub">' + victoryText(mins, secs) + '</p>' +
       '<div class="summary">' +
         '<div class="sum"><span>Wave</span><b>' + r.wave + '</b></div>' +

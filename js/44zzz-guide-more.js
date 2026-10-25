@@ -35,6 +35,12 @@
       '<li>Fast riding has a small chance of a <b>fall</b>, more indoors and when she turns right round at speed. She gets up on foot; nothing is lost.</li>' +
       '<li>The people inside have opinions about a giraffe on a bicycle in their bakery. Crazy is the kind word.</li></ul>';
   } }, 'town');
+  place({ id: 'domes', title: 'Chapter 13.5: the Domes', show: function(){ return !!(Save.data && Save.data.chapter13Complete); }, html: function(){
+    return '<p>A short chapter between Mars and the next place: <b>ten waves</b>, 326 to 335, with a boss on wave 330 and another on 335. It opens when you finish Chapter 13, and begins with the town helicopter flying out to a ring of mirrored domes.</p><ul class="helplist">' +
+      '<li>It is hot outside and freezing inside. The creatures are Chapter 2\u2019s, changed by the glimmer, and they hit <b>two to three times</b> harder than the end of Chapter 13.</li>' +
+      '<li>Finish wave 335 and the helicopter takes off, and you win the coat colour <b>Frost Mylar</b>. There is no minigame after it.</li>' +
+      '<li>You can play it from the menu with its own card, and in Play together.</li></ul>';
+  } }, 'chapters');
   place({ id: 'intel', title: 'Intelligence', show: function(){ return typeof intel === 'function' && intel() > 0; }, html: function(){
     return '<p><b>Intelligence</b> is the average level across all the university faculties, shown as a percentage in the university journal. Yours is <b>' + intelPct() + '%</b>. It is a stat, not a setting: it grows only by studying.</p><ul class="helplist">' +
       '<li>Up to <b>60% fewer falls</b> off boards and bikes.</li>' +

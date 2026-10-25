@@ -20,7 +20,8 @@ const GRADE = {
   10: { tint: [255, 84, 28, 0.42],   vig: [76, 10, 0, 0.30],   shadow: [34, 4, 0],   sun: -1.57, glow: 1.7, k: 0.55 },
   11: { tint: [186, 116, 255, 0.36], vig: [32, 6, 54, 0.30],   shadow: [28, 10, 44], sun: -2.3,  shafts: [220, 170, 255, 0.06], glow: 1.2 },
   12: { tint: [80, 190, 230, 0.28],  vig: [0, 16, 32, 0.30],   shadow: [4, 16, 30],  sun: -2.0,  glow: 1.3 },
-  13: { tint: [255, 116, 66, 0.36],  vig: [66, 16, 4, 0.32],   shadow: [44, 12, 4],  sun: -2.4,  glow: 1.0 }
+  13: { tint: [255, 116, 66, 0.36],  vig: [66, 16, 4, 0.32],   shadow: [44, 12, 4],  sun: -2.4,  glow: 1.0 },
+  14: { tint: [120, 200, 255, 0.34], vig: [6, 24, 48, 0.30],   shadow: [14, 34, 58], sun: -2.3,  shafts: [255, 246, 200, 0.07], glow: 1.1 }
 };
 
 /* things that give off light: colour, radius and where on the prop the light sits */
@@ -96,7 +97,7 @@ const Light = {
     const A = (typeof ATMOS !== 'undefined' && ATMOS[ch]) || null;
     if (!A || !A.cycle || G.attract) return null;
     const cw = G.wave > 0 ? chapterWaveOf(G.wave) : 3;
-    return clamp((cw - 1) / (WAVES_PER_CHAPTER - 1), 0, 1);
+    return clamp((cw - 1) / (chapterLen(chapterOf(G.wave)) - 1), 0, 1);
   },
   update(dt, ch, S){
     this.on = fxLevelNow() > 0;

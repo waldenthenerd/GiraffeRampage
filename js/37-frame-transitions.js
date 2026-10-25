@@ -191,7 +191,9 @@ const CHAPTER_TRANSITIONS = {
   11: { title: 'CHAPTER 11 COMPLETE', sub: 'The giraffe drops into the Nevada desert. Area 51 is awake.',
        color: '#B8E86A', flashColor: '#F0FFD8', burstColor: '#9BE86A', biome: 'area51', saveFlag: 'chapter11Complete' },
   12: { title: 'CHAPTER 12 COMPLETE', sub: 'The SP-1 carries the giraffe and the Mutation Vial to Mars.',
-       color: '#FF9A6A', flashColor: '#FFE0C8', burstColor: '#E8764A', biome: 'mars', saveFlag: 'chapter12Complete' }
+       color: '#FF9A6A', flashColor: '#FFE0C8', burstColor: '#E8764A', biome: 'mars', saveFlag: 'chapter12Complete' },
+  13: { title: 'CHAPTER 13 COMPLETE', sub: 'The helicopter finds a ring of mirrored domes in the heat. Something is wrong inside.',
+       color: '#BFEFFF', flashColor: '#F0FFFF', burstColor: '#9FE8FF', biome: 'dome', saveFlag: 'chapter13Complete' }
 };
 /* Chapter 1 is always the savanna; every later chapter's biome comes from
    the transition that leads into it, so this is the one place that mapping
@@ -217,6 +219,9 @@ function finishChapter(){
   } else if (chapterOf(G.wave) === 12){
     Save.data.chapter12Complete = true; Save.data.mutationVial = true; Save.write();           /* saved first: the vial, and the way to Mars */
     startCutscene(beginChapterTransition, false, 'mars');
+  } else if (chapterOf(G.wave) === 13){
+    if (!Save.data.chapter13Complete){ Save.data.chapter13Complete = true; Save.write(); }   /* saved first: the lab, the dust squad, and the way to the domes */
+    startCutscene(function(){ marsRestoreHUD(); startCutscene(beginChapterTransition, false, 'domeflight'); }, false, 'marshome');       /* home from Mars, then the helicopter over the domes */
   } else if (SH_FILMS[chapterOf(G.wave)]){                                         /* the short travel films: Chapters 1-6, 9 and 10 */
     const sc = chapterOf(G.wave), inf = CHAPTER_TRANSITIONS[sc];
     if (inf && !Save.data[inf.saveFlag]){ Save.data[inf.saveFlag] = true; Save.write(); }
@@ -281,6 +286,7 @@ function updateChapterTrans(dt){
     else if (G.biome === 'venus') buildVenusWorld();
     else if (G.biome === 'area51') buildArea51World();
     else if (G.biome === 'mars') buildMarsWorld();
+    else if (G.biome === 'dome') buildDomeWorld();
   }
   if (G.chapterFX.t >= G.chapterFX.dur){
     G.chapterFX = null;

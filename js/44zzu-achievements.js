@@ -55,7 +55,8 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   add('ch1', R, 'Savanna Done', 'Clear a chapter', 1, 5, cleared);
   add('ch5', R, 'Halfway There', 'Clear 5 chapters', 5, 10, cleared);
   add('ch10', R, 'Ten Down', 'Clear 10 chapters', 10, 20, cleared);
-  add('ch13', R, 'The Whole Journey', 'Clear all ' + TOTAL_CHAPTERS + ' chapters', TOTAL_CHAPTERS, 40, cleared);
+  add('ch13', R, 'The Whole Journey', 'Clear all ' + MAIN_CHAPTERS + ' chapters', MAIN_CHAPTERS, 40, function(){ return Math.min(MAIN_CHAPTERS, cleared()); });
+  add('ch135', R, 'Under the Mylar', 'Clear Chapter 13.5, the Domes', 1, 25, function(){ return D().chapter14Complete ? 1 : 0; });
   add('home', R, 'Home Again', 'Fly the spaceplane home', 1, 20, function(){ return D().homecoming ? 1 : 0; });
   add('gold1m', R, 'Gold Hoarder', 'Hold 1,000,000 gold at once', 1e6, 10, function(){ return goldInt(D().gold); });
   add('gems500', R, 'Gem Cache', 'Hold 500 gems at once', 500, 10, function(){ return scoreInt(D().gems); });
