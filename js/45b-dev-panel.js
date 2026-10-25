@@ -145,6 +145,8 @@ function showDebugPanel(){
         '<button class="btn ghost" data-a="debug-wheelkey">Add 1 wheel key</button>' +
         '<button class="btn ghost" data-a="debug-spottedkey">Add 10 Spotted keys</button>' +
         '<button class="btn ghost" data-a="debug-bestiary">Reveal the whole bestiary</button>' +
+        '<button class="btn ghost" data-a="debug-gym-max">Gym: max every skill, earn every rank, unlock today\u2019s Legend pass</button>' +
+        '<button class="btn ghost" data-a="debug-uni-max">University: max every faculty and earn every rank</button>' +
         '<button class="btn ghost" data-a="debug-forage">Reset the foraging cooldown</button>' +
         '<button class="btn ghost" data-a="debug-mini-cd">Reset the minigame cooldown</button>' +
         '<button class="btn ghost" data-a="debug-mini-own">Own every hat and boot</button>' +
@@ -226,6 +228,15 @@ function handleDebugAction(a){
     case 'debug-town-reset': { Save.data.town = {}; Save.write(); SFX.buy(); showDebugPanel(); break; }
     case 'debug-mini-colours': { const md = miniData(); for (let n = 1; n <= 13; n++) md.stars[n] = 3; Save.write(); SFX.buy(); showDebugPanel(); break; }
     case 'debug-mini-unlock': for (let n = 1; n <= 13; n++) Save.data['chapter' + n + 'Complete'] = true; Save.write(); SFX.buy(); showDebugPanel(); break;
+    case 'debug-gym-max': {
+      const d = gymData(); d.day = townDayKey(); d.pass = GYM_PASSES.length;
+      GYM_SKILLS.forEach(function(S){ const k = gymSkill(S.id); k.l = GYM_MAX; k.xp = 0; });
+      try { recalcStats(); } catch (e) {} gymCheckRank(); Save.write(); SFX.buy(); showDebugPanel(); break;
+    }
+    case 'debug-uni-max': {
+      UNI_FAC.forEach(function(F){ const k = uniFac(F.id); k.l = UNI_MAX; k.xp = 0; });
+      try { recalcStats(); } catch (e) {} uniCheckRank(); Save.write(); SFX.buy(); showDebugPanel(); break;
+    }
     case 'debug-bestiary': {
       const b = bestiaryData();
       for (let ch = 1; ch <= BESTIARY_CHAPTERS.length; ch++) for (let i = 0; i < BESTIARY_ORDER.length; i++){ const k = ch + ':' + BESTIARY_ORDER[i]; if (!b.creatures[k]) b.creatures[k] = 1; }

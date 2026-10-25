@@ -40,16 +40,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 177 | 56,800 | 4.37 MiB (4,577,321 bytes) |
+| JavaScript (`js/`) | 177 | 56,811 | 4.37 MiB (4,578,124 bytes) |
 | Styles (`css/`) | 6 | 1,710 | 158 KiB (161,420 bytes) |
 | Page (`index.html`) | 1 | 225 | 9.7 KiB (9,950 bytes) |
-| **Whole game** | **184** | **58,735** | **4.53 MiB (4,748,691 bytes)** |
+| **Whole game** | **184** | **58,746** | **4.53 MiB (4,749,494 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **58,159 lines, 4.49 MiB (4,704,161 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 177 | 56,800 | 4.37 MiB (4,577,321 bytes) |
+| JavaScript (`js/`) | 177 | 56,811 | 4.37 MiB (4,578,124 bytes) |
 | Styles (`css/`) | 6 | 1,710 | 158 KiB (161,420 bytes) |
 | Page (`index.html`) | 1 | 225 | 9.7 KiB (9,950 bytes) |
-| **Whole game** | **184** | **58,735** | **4.53 MiB (4,748,691 bytes)** |
+| **Whole game** | **184** | **58,746** | **4.53 MiB (4,749,494 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -245,7 +245,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zzy-fishing-fight.js` | 300 | **Fishing, third part.** A real fight after the hook (hold Reel/Space to wind in; `Fg.ten` tension snaps the line, `Fg.prog` brings the fish in; rod and line give room), each kind pulling its own way (`FISH_BEHAVE`, `FISH_HOW`, `fishPullAt`), sound (`fishSound`), conditions (`fishCond`: dawn, dusk, midday, night, rain, storm, fog), daily spots at sea (`fishSpots`: shoals, wrecks, reef edges and one hot spot, shown on the water and the chart), a catch card, the four best catches mounted at home (`fishMounts`), and easier recasting (Cast again with Space/Enter/F, auto-recast `town.fishAuto`, a way to the tackle shop from the Fish book). The numbers are in `FIGHT` and were tuned with simulated players (holding all the time never wins, mashing wins easy fish only, careful play wins, better tackle is quicker); the first three fights teach (a weaker fish, a calm start, hints that follow what she does; `town.n.fights`), and a clean fight (the line never past 85%) pays a quarter more and one scale extra. At the pier her neck swings back as she casts and heaves on a fish, and the rod is drawn over her head. |
 | `js/44zzz-guide-more.js` | 53 | Guide topics for the newer parts: Fishing, Trophies and Play together (written for touch, keyboard or controller), and a line in The basics about the touch or keyboard-and-mouse choice. |
 | `js/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
-| `js/45b-dev-panel.js` | 576 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| `js/45b-dev-panel.js` | 587 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/46-main.js` | 4 | Starts the game. |
 
 ## Tests
