@@ -152,7 +152,7 @@ function saveRunAtBoundary(keepCards){
     s.wave = G.wave + 1; s.chapter = chapterOf(s.wave);
     if (!keepCards){ s.cards = []; s.level = 1; s.xp = 0; s.xpNext = xpForLevel(1); s.pending = 0; }
     s.hp = P.maxHp;
-    if (s.wave <= WAVES_PER_CHAPTER * TOTAL_CHAPTERS){ Save.data.runSave = s; Save.write(); }
+    if (s.wave <= CHAPTER_LAST_WAVE){ Save.data.runSave = s; Save.write(); }
   } catch (e) {}
 }
 

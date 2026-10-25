@@ -23,6 +23,7 @@ const MUSIC_THEMES = {
   glimmer:  { bpm: 96,  root: 55, scale: 'lydian',   prog: [0,4,2,7],   minor: false, bass: 'triangle', lead: 'sine',     drum: 'soft' },
   area51:   { bpm: 100, root: 45, scale: 'minor',    prog: [0,0,3,1],   minor: true,  bass: 'square',   lead: 'square',   drum: 'beat' },
   mars:     { bpm: 94,  root: 47, scale: 'dorian',   prog: [0,3,0,10],  minor: true,  bass: 'sawtooth', lead: 'triangle', drum: 'beat' },
+  dome:     { bpm: 92,  root: 48, scale: 'dorian',   prog: [0,5,3,1],   minor: true,  bass: 'triangle', lead: 'sine',     drum: 'soft' },
   marswar:  { bpm: 118, root: 45, scale: 'harm',     prog: [0,0,3,1],   minor: true,  bass: 'sawtooth', lead: 'square',   drum: 'beat' },
   /* the minigames: bright and quick */
   minigame: { bpm: 124, root: 52, scale: 'pent',   prog: [0,5,3,7],   minor: false, bass: 'triangle', lead: 'square',   drum: 'beat' },
@@ -55,9 +56,10 @@ const MUSIC_THEMES = {
   boss10: { bpm: 144, root: 38, scale: 'harm',     prog: [0,1,0,1],   minor: true, bass: 'sawtooth', lead: 'square',   drum: 'heavy', boss: true },
   boss11: { bpm: 124, root: 50, scale: 'minor',    prog: [0,3,8,7],   minor: true, bass: 'sawtooth', lead: 'sine',     drum: 'heavy', boss: true },
   boss12: { bpm: 132, root: 43, scale: 'minor',    prog: [0,6,0,5],   minor: true, bass: 'square',   lead: 'square',   drum: 'heavy', boss: true },
+  boss14: { bpm: 122, root: 46, scale: 'phrygian', prog: [0,1,0,8],   minor: true, bass: 'sawtooth', lead: 'square',   drum: 'heavy', boss: true },
   boss13: { bpm: 128, root: 45, scale: 'harm',     prog: [0,0,3,8],   minor: true, bass: 'sawtooth', lead: 'square',   drum: 'heavy', boss: true }
 };
-const MUSIC_BY_CHAPTER = [null, 'savanna', 'frost', 'swamp', 'ocean', 'jungle', 'city', 'space', 'moon', 'venus', 'inferno', 'glimmer', 'area51', 'mars'];
+const MUSIC_BY_CHAPTER = [null, 'savanna', 'frost', 'swamp', 'ocean', 'jungle', 'city', 'space', 'moon', 'venus', 'inferno', 'glimmer', 'area51', 'mars', 'dome'];
 const Music = {
   gain: null, stemG: null, stems: { bass: 1, drums: 1, lead: 1, near: 0, spike: 0, low: 0 }, dest: null, stemOn: false, timer: null, step: 0, nextT: 0, cur: null, want: { theme: 'menu', lvl: 0, tempo: 1 }, duck: 1, started: false,
   vol(){ return typeof Settings.musicVol === 'number' ? Settings.musicVol : 0.6; },
@@ -93,7 +95,7 @@ const Music = {
       theme = (G.chapter === 13 && chapterWaveOf(G.wave) > MARS_SWITCH_WAVE) ? 'marswar' : chTheme; lvl = 1;
       dense = chapterWaveOf(G.wave) >= 13;
       if (G.bossAlive){
-        theme = 'boss' + chap; if (!MUSIC_THEMES[theme]) theme = chTheme; lvl = (G.wave % WAVES_PER_CHAPTER === 0) ? 3 : 2;
+        theme = 'boss' + chap; if (!MUSIC_THEMES[theme]) theme = chTheme; lvl = isChapterFinaleWave(G.wave) ? 3 : 2;
         if (G.boss && G.boss.maxHp && G.boss.hp / G.boss.maxHp < 0.5) lvl = 3;       /* the boss is half gone: the whole band comes in */
       } else {
         const cwv = chapterWaveOf(G.wave);                                            /* the key climbs through the chapter, five waves at a time */
@@ -107,7 +109,7 @@ const Music = {
     else if (s === 'cutscene' && G.cut){
       const K = G.cut.kind, shn = shChapterOf(K);
       theme = shn ? (MUSIC_BY_CHAPTER[shn + 1] || chTheme) : K === 'a51' ? 'film51' : K === 'home' ? 'filmhome' : K === 'venus' ? 'filmvenus'
-            : K === 'marshome' || K === 'fusion' ? 'filmhome' : K === 'mships' ? 'filmwar' : MARS_FILMS[K] ? 'filmmars' : 'film';
+            : K === 'marshome' || K === 'fusion' || K === 'domeflight' ? 'filmhome' : K === 'mships' || K === 'domeout' ? 'filmwar' : MARS_FILMS[K] ? 'filmmars' : 'film';
       lvl = (!shn && G.cut.t > 14) ? 1 : 0;
     }
     else if (s === 'cutscene'){ theme = 'film'; lvl = 0; }

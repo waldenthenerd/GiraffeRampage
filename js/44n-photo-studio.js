@@ -373,7 +373,7 @@ function showPhoto(){
         ' title="' + (known ? nm : 'Defeat this creature in a run to unlock it') + '"><canvas width="72" height="72" data-pch="' + PHOTO.foeCh + '" data-pfoe="' + type + '"></canvas><span>' + (known ? nm : '???') + '</span></button>';
     });
     body = '<div class="sub" style="margin:2px 0">Creatures you have defeated can be placed in the picture. Chapter ' + PHOTO.foeCh + ' (' + BESTIARY_CHAPTERS[PHOTO.foeCh - 1] + '): ' + found + ' found.</div>' +
-      '<div class="pchips">' + BESTIARY_CHAPTERS.map(function(_, i){ return '<button class="pchip' + (i + 1 === PHOTO.foeCh ? ' on' : '') + '" data-a="ward-photo-foech-' + (i + 1) + '">' + (i + 1) + '</button>'; }).join('') + '</div>' +
+      '<div class="pchips">' + BESTIARY_CHAPTERS.map(function(_, i){ return '<button class="pchip' + (i + 1 === PHOTO.foeCh ? ' on' : '') + '" data-a="ward-photo-foech-' + (i + 1) + '">' + chapterLabel(i + 1) + '</button>'; }).join('') + '</div>' +
       '<div class="pgrid">' + cells + '</div>';
   }
   setOverlay(

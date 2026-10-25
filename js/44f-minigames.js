@@ -763,7 +763,7 @@ function miniOffer(ch, proceed){
       (typeof tipOnce === 'function' ? tipOnce('offer', 'Stars: win the minigame for one star, and reach the two harder targets for the second and third. More stars give better odds at the rare hats, and three stars in a minigame unlocks its own coat colour.') : '') +
       '<div class="menucol" style="margin-top:6px;width:100%">' +
         '<button class="btn" data-a="mini-go" data-mini-play' + (ready ? '' : ' disabled') + '>Play the minigame<small data-mini-cd>' + miniCdText() + '</small></button>' +
-        '<button class="btn ghost" data-a="mini-skip">Start Chapter ' + (ch + 1) + '<small>' + next + '</small></button>' +
+        '<button class="btn ghost" data-a="mini-skip">Start Chapter ' + chapterLabel(ch + 1) + '<small>' + next + '</small></button>' +
       '</div>' +
     '</div>');
   return true;
@@ -773,7 +773,7 @@ function miniOffer(ch, proceed){
 let _wheel = null;
 function showMiniResult(){
   const m = G.mini, def = m.def, md = miniData();
-  const nextLabel = m.then ? 'Start Chapter ' + (m.ch + 1) : G.townReturn ? 'Back to town' : 'Back to the menu';
+  const nextLabel = m.then ? 'Start Chapter ' + chapterLabel(m.ch + 1) : G.townReturn ? 'Back to town' : 'Back to the menu';
   const starLine = (m.abandon || typeof miniStarsHTML !== 'function') ? '' : miniStarsHTML(m);
   setOverlay(
     '<div class="panel slab" style="max-width:480px">' +

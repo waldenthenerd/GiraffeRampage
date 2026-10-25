@@ -104,6 +104,7 @@ function boot(){
   buildGroundVenus();
   buildGroundArea51();
   buildGroundMars();
+  buildGroundDome();
   bindSpeedSlider();
   applyTextScale();
   bindInput();

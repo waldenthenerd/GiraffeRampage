@@ -8,8 +8,9 @@
    creatures show as a dark silhouette of their real artwork -- a hint of
    the shape, but no name. */
 const BESTIARY_ORDER = ['hyena', 'jackal', 'cheetah', 'warthog', 'rhino', 'baboon', 'honeybadger', 'vulture', 'mamba',
-  'termite', 'grub', 'ember', 'lion', 'matriarch', 'buffalo', 'crocodile', 'wildfire'];
-const BESTIARY_CHAPTERS = ['Savanna', 'Frostreach', 'Murkfen', 'The Deep', 'The Canopy', 'Houston', 'Space Center', 'The Moon', 'Venus', 'The Inferno', 'The Changed Savannah', 'Area 51', 'Mars'];
+  'termite', 'grub', 'ember', 'lion', 'matriarch', 'buffalo', 'crocodile', 'wildfire',
+  'thawed', 'iceheart'];                  /* Chapter 13.5's two bosses: added at the end (photo codes point into this list), and a chapter without them simply skips them */
+const BESTIARY_CHAPTERS = ['Savanna', 'Frostreach', 'Murkfen', 'The Deep', 'The Canopy', 'Houston', 'Space Center', 'The Moon', 'Venus', 'The Inferno', 'The Changed Savannah', 'Area 51', 'Mars', 'The Domes'];
 const CH1_NAMES = {
   hyena: 'Spotted Hyena', jackal: 'Jackal', cheetah: 'Cheetah', warthog: 'Warthog', rhino: 'Rhino', baboon: 'Baboon',
   honeybadger: 'Honey Badger', vulture: 'Vulture', mamba: 'Black Mamba', termite: 'Termite', grub: 'Termite Grub',
@@ -54,13 +55,14 @@ const LOOK_NAMES = {
   dust_alpha: 'Dune Alpha', dust_matron: 'Hive Matron', dust_titan: 'Dust Titan', mars_warden: 'Gravity Warden', mars_admiral: 'Fleet Marshal',
   cinderspitter: 'Cinder Spitter', flareleaper: 'Flare Leaper', obsidianbrute: 'Obsidian Brute', magmaegg: 'Magma Egg', firewisp: 'Fire Wisp', ashseer: 'Ash Seer',
   magmalobber: 'Magma Lobber', forgetender: 'Forge-Tender', emberpriest: 'Ember Priest', pyrecrusher: 'Pyre Crusher', smokewraith: 'Smoke Wraith', sporeimp: 'Spore Imp',
+  dome_thawed: 'Polar Bear, half melted', dome_iceheart: 'Crystal Colossus',
   pyrax: 'Fire Warlord', pyreseer: 'Fire Seer', magmacolossus: 'Magma Colossus', maelstrom: 'Living Maelstrom', infernoqueen: 'Inferno Queen'
 };
-const BESTIARY_TOTAL_CREATURES = BESTIARY_ORDER.length * BESTIARY_CHAPTERS.length;
-function bestiaryTable(ch){ return [ETYPES, ETYPES_FROST, ETYPES_SWAMP, ETYPES_OCEAN, ETYPES_JUNGLE, ETYPES_CITY, ETYPES_SPACE, ETYPES_MARINE, ETYPES_VENUS, ETYPES_INFERNO, ETYPES_GLIM, ETYPES_A51, ETYPES_MARS_BEST][ch - 1]; }
+let BESTIARY_TOTAL_CREATURES = 17 * 13;                       /* worked out again, exactly, once every chapter's table exists (js/30a-chapter-domes.js) */
+function bestiaryTable(ch){ return [ETYPES, ETYPES_FROST, ETYPES_SWAMP, ETYPES_OCEAN, ETYPES_JUNGLE, ETYPES_CITY, ETYPES_SPACE, ETYPES_MARINE, ETYPES_VENUS, ETYPES_INFERNO, ETYPES_GLIM, ETYPES_A51, ETYPES_MARS_BEST, ETYPES_DOME][ch - 1]; }
 function bestiaryName(ch, type){
   const def = bestiaryTable(ch)[type];
-  const species = ch === 1 ? CH1_NAMES[type] : (LOOK_NAMES[def.look] || type);
+  const species = ch === 1 ? CH1_NAMES[type] : ch === DOME_CHAPTER && !def.big ? 'Changed ' + (LOOK_NAMES[def.look] || type) : (LOOK_NAMES[def.look] || type);
   return def.big && def.title ? { title: def.title, species: species } : { title: species, species: null };
 }
 function bestiaryData(){
@@ -129,9 +131,11 @@ function bestiaryCreaturesHTML(){
   let out = '';
   for (let ch = 1; ch <= BESTIARY_CHAPTERS.length; ch++){
     const table = bestiaryTable(ch);
-    let found = 0, cells = '';
+    let found = 0, cells = '', shown = 0;
     for (let i = 0; i < BESTIARY_ORDER.length; i++){
-      const type = BESTIARY_ORDER[i], def = table[type], kills = b.creatures[ch + ':' + type] | 0, known = kills > 0;
+      const type = BESTIARY_ORDER[i], def = table[type]; if (!def) continue;
+      shown++;
+      const kills = b.creatures[ch + ':' + type] | 0, known = kills > 0;
       if (known) found++;
       const nm = bestiaryName(ch, type);
       cells +=
@@ -143,8 +147,8 @@ function bestiaryCreaturesHTML(){
             : (def.big ? 'Undiscovered boss' : 'Undiscovered')) + '</div>' +
         '</div>';
     }
-    out += '<h3 class="gh">Chapter ' + ch + ' \u2014 ' + BESTIARY_CHAPTERS[ch - 1] +
-      '<small style="font-weight:400;color:var(--dust);font-size:12px"> \u2014 ' + found + ' / ' + BESTIARY_ORDER.length + '</small></h3>' +
+    out += '<h3 class="gh">Chapter ' + chapterLabel(ch) + ' \u2014 ' + BESTIARY_CHAPTERS[ch - 1] +
+      '<small style="font-weight:400;color:var(--dust);font-size:12px"> \u2014 ' + found + ' / ' + shown + '</small></h3>' +
       '<div class="bst-grid">' + cells + '</div>';
   }
   return out;

@@ -279,6 +279,7 @@ function handleAction(a){
     case 'play11': SFX.click(); tryFullscreen(); startRun(11); break;
     case 'play12': SFX.click(); tryFullscreen(); startRun(12); break;
     case 'play13': SFX.click(); tryFullscreen(); startRun(13); break;
+    case 'play14': SFX.click(); tryFullscreen(); startCutscene(function(){ startRun(DOME_CHAPTER); }, false, 'domeflight'); break;        /* Chapter 13.5 opens with the helicopter film */
     case 'shop': SFX.click(); crateResult = null; showShop(); break;
     case 'venus': SFX.click(); showVenus(); break;
     case 'venus-tab-scout': SFX.click(); showVenus('scout'); break;

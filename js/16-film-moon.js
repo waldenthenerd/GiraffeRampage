@@ -384,7 +384,6 @@ function csGiraffe(ctx, g){
   const px = nx, py = ny;
   ctx.fillStyle = coat; ctx.beginPath();
   ctx.moveTo(geo.bx - px * 13, geo.by - py * 13 + 6); ctx.lineTo(geo.tx - px * 7.6, geo.ty - py * 7.6); ctx.lineTo(geo.tx + px * 7.6, geo.ty + py * 7.6); ctx.lineTo(geo.bx + px * 13, geo.by + py * 13 + 10); ctx.closePath(); ctx.fill();
-  ctx.strokeStyle = '#6A4020'; ctx.lineWidth = 3.4; ctx.beginPath(); ctx.moveTo(geo.bx - px * 12, geo.by - py * 12 + 4); ctx.lineTo(geo.tx - px * 7.2, geo.ty - py * 7.2); ctx.stroke();       /* the mane */
   ctx.fillStyle = spot;
   for (let k = 1; k < 6; k++){ const f = k / 6.4, cx0 = csLerp(geo.bx, geo.tx, f) + (k % 2 ? 3 : -3), cy0 = csLerp(geo.by, geo.ty, f); if (pt) wardSpot(ctx, pt, cx0, cy0, 5.4 - f * 1.6, 4.4 - f * 1.2, geo.nk); else { ctx.beginPath(); ctx.ellipse(cx0, cy0, 5.4 - f * 1.6, 4.4 - f * 1.2, geo.nk, 0, TAU); ctx.fill(); } }
   /* head */

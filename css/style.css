@@ -55,6 +55,7 @@ body{
 .chaptag.glim{color:#4AF0D8}
 .chaptag.a51{color:#9BE86A}
 .chaptag.mars{color:#FF8A5A}
+.chaptag.dome{color:#9FE8FF}
 #squadhud{position:fixed;right:10px;top:84px;display:none;flex-direction:column;gap:6px;z-index:30;width:164px}
 #squadhud .sq{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;background:rgba(20,16,14,.72);border:1px solid rgba(243,234,216,.28);cursor:pointer;position:relative}
 #squadhud .sq canvas{width:34px;height:34px;flex:none;border-radius:50%;background:rgba(0,0,0,.35)}

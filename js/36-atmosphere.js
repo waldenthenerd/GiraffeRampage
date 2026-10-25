@@ -16,9 +16,10 @@ const ATMOS = {
   10: { base: [255, 70, 20, 0.14],                accent: '#FF7A2A', fog: [200, 60, 30],   fogA: 0.10, weather: 'embers' },
   11: { cycle: true, base: [190, 120, 255, 0.08], accent: '#D8A8FF', fog: [200, 150, 255], fogA: 0.10, weather: 'glints' },
   12: { base: [10, 24, 50, 0.10], night: 0.3,     accent: '#7FE8FF', fog: [90, 120, 150],  fogA: 0.08, weather: 'dust' },
-  13: { base: [255, 120, 60, 0.10],               accent: '#FF9A5A', fog: [220, 120, 70],  fogA: 0.12, weather: 'storm' }
+  13: { base: [255, 120, 60, 0.10],               accent: '#FF9A5A', fog: [220, 120, 70],  fogA: 0.12, weather: 'storm' },
+  14: { base: [150, 214, 255, 0.10],              accent: '#9FE8FF', fog: [200, 236, 255], fogA: 0.12, weather: 'snow' }           /* inside a dome: cold, still, a little snow that should not be there */
 };
-const BIOME_CHAPTER = { savanna: 1, snow: 2, swamp: 3, ocean: 4, jungle: 5, city: 6, space: 7, moon: 8, venus: 9, area51: 12, mars: 13 };
+const BIOME_CHAPTER = { savanna: 1, snow: 2, swamp: 3, ocean: 4, jungle: 5, city: 6, space: 7, moon: 8, venus: 9, area51: 12, mars: 13, dome: 14 };
 /* type: streak (a line along its motion), dot, glow (soft additive point) */
 const WEATHER_KINDS = {
   dust:     { n: 34,  type: 'streak', vx: 90,   vy: 6,    len: [14, 34], col: '230,210,160', a: 0.20 },
@@ -34,7 +35,7 @@ const WEATHER_KINDS = {
 };
 function atmosChapter(){
   if (G.attract || G.state === 'menu' || G.state === 'help' || G.state === 'shop') return BIOME_CHAPTER[G.biome] || 1;
-  return clamp(G.chapter | 0 || 1, 1, 13);
+  return clamp(G.chapter | 0 || 1, 1, TOTAL_CHAPTERS);
 }
 /* what the player chose in Settings, and what is actually running: the slow-device governor (js/44c-perf.js) can hold it lower for a while */
 function fxLevelSetting(){ return typeof Settings.fxLevel === 'number' ? Settings.fxLevel : 2; }
@@ -47,7 +48,7 @@ function atmosState(ch){
   if (A.base[3] > 0) layers.push({ rgb: A.base, a: A.base[3] });
   let dark = A.night || 0;
   if (A.cycle && !G.attract){
-    const cw = G.wave > 0 ? chapterWaveOf(G.wave) : 3, f = clamp((cw - 1) / (WAVES_PER_CHAPTER - 1), 0, 1);
+    const cw = G.wave > 0 ? chapterWaveOf(G.wave) : 3, f = clamp((cw - 1) / (chapterLen(chapterOf(G.wave)) - 1), 0, 1);
     if (f < 0.15) layers.push({ rgb: [255, 170, 110], a: 0.14 * (1 - f / 0.15) });
     else if (f > 0.55 && f <= 0.8) layers.push({ rgb: [255, 115, 70], a: 0.17 * ((f - 0.55) / 0.25) });
     else if (f > 0.8) layers.push({ rgb: [255, 115, 70], a: 0.17 * (1 - (f - 0.8) / 0.2) });
@@ -270,7 +271,7 @@ function drawIntroFX(ctx){
   ctx.globalAlpha = clamp(a, 0, 1); ctx.textAlign = 'center';
   const size = Math.min(60, Math.max(28, W * 0.056)), y = H * 0.4, slide = (1 - Math.min(1, k / 0.25)) * 36;
   ctx.font = '700 ' + Math.max(12, size * 0.3) + 'px ui-sans-serif, "Segoe UI", Roboto, sans-serif';
-  ctx.fillStyle = '#EFE6D4'; ctx.fillText('CHAPTER ' + f.ch, W / 2 - slide, y - size * 0.9);
+  ctx.fillStyle = '#EFE6D4'; ctx.fillText('CHAPTER ' + chapterLabel(f.ch), W / 2 - slide, y - size * 0.9);
   ctx.font = '900 ' + size + 'px "Arial Black", "Helvetica Neue", Impact, sans-serif';
   const nw = ctx.measureText(f.name.toUpperCase()).width, fitSize = nw > W - 36 ? size * (W - 36) / nw : size;          /* a long name on a narrow phone shrinks to fit */
   if (fitSize !== size) ctx.font = '900 ' + fitSize + 'px "Arial Black", "Helvetica Neue", Impact, sans-serif';

@@ -101,6 +101,7 @@ function drawGround(ctx, cx, cy, vw, vh){
   if (G.biome === 'venus'){ drawGroundVenus(ctx, cx, cy, vw, vh); return; }
   if (G.biome === 'area51'){ drawGroundArea51(ctx, cx, cy, vw, vh); return; }
   if (G.biome === 'mars'){ drawGroundMars(ctx, cx, cy, vw, vh); return; }
+  if (G.biome === 'dome'){ drawGroundDome(ctx, cx, cy, vw, vh); return; }
   const snow = G.biome === 'snow', swamp = G.biome === 'swamp', ocean = G.biome === 'ocean';
   const x0 = cx - vw / 2, y0 = cy - vh / 2;
   const pattern = ocean ? groundPatternOcean : swamp ? groundPatternSwamp : snow ? groundPatternSnow : groundPattern;
