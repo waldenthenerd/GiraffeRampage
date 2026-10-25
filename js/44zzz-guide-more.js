@@ -37,7 +37,7 @@
   } }, 'town');
   place({ id: 'domes', title: 'Chapter 13.5: the Domes', show: function(){ return !!(Save.data && Save.data.chapter13Complete); }, html: function(){
     return '<p>A short chapter between Mars and the next place: <b>ten waves</b>, 326 to 335, with a boss on wave 330 and another on 335. It opens when you finish Chapter 13, and begins with the town helicopter flying out to a ring of mirrored domes.</p><ul class="helplist">' +
-      '<li>It is hot outside and freezing inside. The creatures are Chapter 2\u2019s, changed by the glimmer, and they hit <b>two to three times</b> harder than the end of Chapter 13.</li>' +
+      '<li>It is hot outside and freezing inside. The creatures are Chapter 2\u2019s, changed by the glimmer, and they hit <b>about one and a third to two times</b> harder than the end of Chapter 13.</li>' +
       '<li>Finish wave 335 and the helicopter takes off, and you win the coat colour <b>Frost Mylar</b>. There is no minigame after it.</li>' +
       '<li>You can play it from the menu with its own card, and in Play together.</li></ul>';
   } }, 'chapters');

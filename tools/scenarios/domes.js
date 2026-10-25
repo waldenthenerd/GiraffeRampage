@@ -13,7 +13,7 @@
       CHAPTER_LAST_WAVE === 335 && chapterFirstWave(14) === 326 && chapterFirstWave(13) === 301 && chapterFirstWave(2) === 26 && chapterLen(14) === 10 && chapterLabel(14) === '13.5' && chapterLabel(13) === '13' && TOTAL_CHAPTERS === 14;
     out.bossWaves = bossForWave(330) === 'thawed' && bossForWave(335) === 'iceheart' && bossForWave(25) === 'wildfire' && bossForWave(5) === 'lion';
     var s1 = enemyScale(25), d1 = domeScale(1), d10 = domeScale(10);
-    out.difficulty = Math.abs(d1.hp / s1.hp - 2) < 1e-9 && Math.abs(d10.hp / s1.hp - 3) < 1e-9 && d1.dmg / s1.dmg >= 1.5 && d10.dmg / s1.dmg <= 2.3 && d10.dmg > d1.dmg;
+    out.difficulty = Math.abs(d1.hp / s1.hp - 4 / 3) < 1e-9 && Math.abs(d10.hp / s1.hp - 2) < 1e-9 && d1.dmg / s1.dmg >= 1 && d10.dmg / s1.dmg <= 1.6 && d10.dmg > d1.dmg;
 
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter14Complete === false;
@@ -70,6 +70,14 @@
     G.waveState = 'intro'; G.waveTimer = 1e9; var th = spawnEnemy('thawed', P.x + 300, P.y, 330); th.hp = th.maxHp * 0.4; th.state = 'idle'; th.stateT = 0.01; for (var i = 0; i < 90; i++){ GR.step(1 / 30); P.hp = P.maxHp; }
     out.phase2 = th.p2 === true; G.enemies.length = 0;
 
+    /* the Ice Heart falling ends wave 335 at once, stray monsters and all */
+    freshSave(); Save.data.chapter13Complete = true;
+    startRun(14, 335); steps(5); G.introFX = null; G.banner = null; P.invuln = 1e9; P.hp = P.maxHp = 1e12;
+    for (var q = 0; q < 900 && (G.spawnQueue.length || !G.bossAlive); q++) GR.step(1 / 30);
+    spawnEnemy('frostling', P.x + 500, P.y, 335); var strays = G.enemies.filter(function(e){ return !e.dead && e !== G.boss; }).length;
+    damageEnemy(G.boss, 1e18, { noCrit: true, quiet: true }); for (var q = 0; q < 6; q++) GR.step(1 / 30);
+    out.bossEnds = strays > 0 && G.waveState === 'clear' && G.enemies.every(function(e){ return e.dead; });
+
     /* the end of the run: the last wave clears, the film, then the report; the save and the coat colour follow */
     freshSave(); Save.data.chapter13Complete = true;
     startRun(14, 335); steps(5); G.introFX = null; G.banner = null; P.invuln = 1e9; P.hp = P.maxHp = 1e12;
@@ -109,7 +117,7 @@
     out.achieve = ACH.filter(function(a){ return a.id === 'ch135'; }).length === 1 && ACH.filter(function(a){ return a.id === 'ch13'; })[0].goal === 13;
     out.guideChapters = /Chapter 13\.5: The Domes/.test(guideTopicsHTML());
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 4).join(' | ')); }
-  var need = ['table', 'bossWaves', 'difficulty', 'saveDefault', 'saveSane', 'wardLocked', 'wardOpen', 'wardChoice', 'menuChapter', 'menuLocked', 'menuOpen', 'menuOld', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runStart', 'bosses', 'noOldBosses', 'cast', 'domeLook', 'bossBehaviour', 'phase2', 'lastWave', 'endFilm', 'endVictory', 'victoryText', 'ch13Film1', 'ch13Film2', 'ch13Mini', 'ch13Trans', 'ch13To14', 'bestTotal', 'bestName', 'bestKill', 'bestHtml', 'coLocked', 'coOpen', 'achieve', 'guideChapters'];
+  var need = ['table', 'bossWaves', 'difficulty', 'saveDefault', 'saveSane', 'wardLocked', 'wardOpen', 'wardChoice', 'menuChapter', 'menuLocked', 'menuOpen', 'menuOld', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runStart', 'bosses', 'noOldBosses', 'cast', 'domeLook', 'bossBehaviour', 'phase2', 'bossEnds', 'lastWave', 'endFilm', 'endVictory', 'victoryText', 'ch13Film1', 'ch13Film2', 'ch13Mini', 'ch13Trans', 'ch13To14', 'bestTotal', 'bestName', 'bestKill', 'bestHtml', 'coLocked', 'coOpen', 'achieve', 'guideChapters'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);

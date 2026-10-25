@@ -40,16 +40,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 177 | 56,811 | 4.37 MiB (4,578,124 bytes) |
+| JavaScript (`js/`) | 177 | 56,813 | 4.37 MiB (4,578,518 bytes) |
 | Styles (`css/`) | 6 | 1,710 | 158 KiB (161,420 bytes) |
 | Page (`index.html`) | 1 | 225 | 9.7 KiB (9,950 bytes) |
-| **Whole game** | **184** | **58,746** | **4.53 MiB (4,749,494 bytes)** |
+| **Whole game** | **184** | **58,748** | **4.53 MiB (4,749,888 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **58,159 lines, 4.49 MiB (4,704,161 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 177 | 56,811 | 4.37 MiB (4,578,124 bytes) |
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **58,161 lines, 4.49 MiB (4,704,555 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 177 | 56,813 | 4.37 MiB (4,578,518 bytes) |
 | Styles (`css/`) | 6 | 1,710 | 158 KiB (161,420 bytes) |
 | Page (`index.html`) | 1 | 225 | 9.7 KiB (9,950 bytes) |
-| **Whole game** | **184** | **58,746** | **4.53 MiB (4,749,494 bytes)** |
+| **Whole game** | **184** | **58,748** | **4.53 MiB (4,749,888 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -105,8 +105,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/28-spaceplane.js` | 102 | The spaceplane. |
 | `js/29-city.js` | 123 | The Underground Giraffe City. |
 | `js/30-chapters-11-13.js` | 756 | Chapters 11, 12 and 13. |
-| `js/30a-chapter-domes.js` | 173 | **Chapter 13.5: the Domes** (internal chapter 14, waves 326 to 335). `ETYPES_DOME`: Chapter 2's creatures (`ARCTIC_LOOKS`) with Chapter 11's twists and glimmer, at Mars strength, and two new bosses, The Thawed (wave 330) and The Ice Heart (wave 335). `domeScale` takes the strength from 2x to 3x of Chapter 13's last wave (`DOME_TUNE` holds the numbers to tune), `buildDomeWave` builds the ten waves, `DOME_AI` holds both bosses' behaviour (shards, slides, splashes and falling ice; novas, volleys, beams and spikes). |
-| `js/31-waves-update.js` | 688 | Banners, the wave director, entity updates, the main update. |
+| `js/30a-chapter-domes.js` | 173 | **Chapter 13.5: the Domes** (internal chapter 14, waves 326 to 335). `ETYPES_DOME`: Chapter 2's creatures (`ARCTIC_LOOKS`) with Chapter 11's twists and glimmer, at Mars strength, and two new bosses, The Thawed (wave 330) and The Ice Heart (wave 335). `domeScale` takes the strength from 1.33x to 2x of Chapter 13's last wave (`DOME_TUNE` holds the numbers to tune), `buildDomeWave` builds the ten waves, `DOME_AI` holds both bosses' behaviour (shards, slides, splashes and falling ice; novas, volleys, beams and spikes). |
+| `js/31-waves-update.js` | 690 | Banners, the wave director, entity updates, the main update. |
 | `js/32-render.js` | 754 | Ground textures and the render pass. |
 | `js/33-giraffe-art.js` | 510 | Drawing the giraffe and armour designs. |
 | `js/33a-gear-art-capes.js` | 257 | **Twenty-two capes.** One design per gear set (`CAPE_DESIGNS`) on a shared cloth frame (`capeFrame`) so the wind and flutter are the same; `capeDraw()` is called by `drawPlayer`; level 3 adds a trim, level 5 a glint. Also keeps `P.capeSet`, `P.capeLevel`, `P.weaponLevel`, `P.armorLevel` up to date. |

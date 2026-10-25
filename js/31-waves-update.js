@@ -371,11 +371,13 @@ function updateWaves(dt){
         G.huntWarned = true;
         addText(P.x, P.y - 58, 'The herd is closing in', '#E8604A', 17, false);
       }
-      if (G.enemies.length === 0 || (!finale && G.waveOver > WAVE_PATIENCE_S)){
+      const domeBossDown = finale && G.chapter === DOME_CHAPTER && !G.bossAlive;     /* the Domes end the moment the Ice Heart falls: whatever is left of the crowd goes with it */
+      if (domeBossDown) G.enemies.forEach(e => { if (!e.dead){ burstParticles(e.x, e.y, 8, e.blood || '#9AE8FF', 160, 4); e.dead = true; } });
+      if (G.enemies.length === 0 || domeBossDown || (!finale && G.waveOver > WAVE_PATIENCE_S)){
         G.waveState = 'clear';
         G.waveTimer = WAVE_CLEAR_S;
         G.hunt = 0; G.huntWarned = false;
-        const cleared = G.enemies.length === 0;
+        const cleared = G.enemies.length === 0 || domeBossDown;
         /* A boss that outlasts the patience timer on a non-finale wave must
            not be allowed to wander on into later waves -- otherwise it can
            still be alive when the NEXT boss wave's boss spawns, and they
