@@ -63,7 +63,7 @@ function townShowHall(){
   townPanelT('hall', '<div class="tp-title">HERD HALL</div><div class="shelf">' + cups + '</div><div class="plaque">' +
     row('Best run', fmt(scoreInt(d.best)) + ' points, wave ' + (d.bestWave | 0)) + row('Runs', (d.runs | 0) + '  ·  ' + fmt(d.totalKills | 0) + ' kills') +
     row('Chapters finished', townChaptersDone() + ' of 13' + (d.chaptersComplete ? '  ·  whole journeys: ' + d.chaptersComplete : '')) +
-    row('Minigame stars', (typeof miniStarTotal === 'function' ? miniStarTotal() : 0) + ' of 39') + row('Hats and boots', accOwnedCount() + ' of ' + ACC_ITEMS.length) +
+    row('Minigame stars', (typeof miniStarTotal === 'function' ? miniStarTotal() : 0) + ' of ' + (typeof MINI_STAR_CHAPTERS !== 'undefined' ? MINI_STAR_CHAPTERS.length * 3 : 42)) + row('Hats and boots', accOwnedCount() + ' of ' + ACC_ITEMS.length) +
     row('Photos in the album', photoAlbum().length + ' of ' + PHOTO_ALBUM_MAX) + row('Found in town', townFoundTotal() + ' of ' + TOWN_ITEMS.length) +
     row('Best friends', TOWN_NPC_LIST.filter(function(i){ return townBondLevel(i) >= 3; }).length + ' of ' + TOWN_NPC_LIST.length) + '</div>', { w: 640 });
 }

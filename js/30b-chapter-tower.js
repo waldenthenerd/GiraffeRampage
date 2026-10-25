@@ -89,6 +89,7 @@ function buildTowerWave(w, isBoss){
    ux and uy already point along the way round the walls when she is out of sight (towerSteer in js/30c-tower-floors.js), and every shot dies on a wall, but
    the shooters still check towerSight so they do not waste a volley on a wall. ---- */
 function twSight(e){ return towerSight(e.x, e.y, P.x, P.y); }
+function twLat(e){ return e.navV ? 0 : 1; }                /* sideways drift is for open floor: on the way round a wall a creature goes straight along the path */
 function twFan(e, n, spread, speed, dmgMul, color, r, a0){
   const a = a0 === undefined ? leadAim(e, speed) : a0;
   for (let k = 0; k < n; k++) fireBullet(e, a + (k - (n - 1) / 2) * spread, speed, dmgMul, color, r);
@@ -105,7 +106,7 @@ const TOWER_AI = {
     if (e.jSeed === undefined) e.jSeed = Math.random() * 10;
     const w = Math.sin(e.anim * 0.9 + e.jSeed) * 0.9; e.ang = Math.atan2(uy, ux);
     if (d < 170 && e.stateT <= 0 && twSight(e)){ e.state = 'lunge'; e.stateT = 0.28; e.dashVX = ux * spd * 3.2; e.dashVY = uy * spd * 3.2; return [e.dashVX, e.dashVY]; }
-    return [(ux - uy * w) * spd, (uy + ux * w) * spd];
+    return [(ux - uy * w * twLat(e)) * spd, (uy + ux * w * twLat(e)) * spd];
   },
   t_courier(e, dt, ux, uy, d){                              /* Courier Drone: circles at a distance, then delivers itself straight through her */
     const spd = e.spdE; e.stateT -= dt;
@@ -115,7 +116,7 @@ const TOWER_AI = {
     if (e.dirS === undefined) e.dirS = Math.random() < 0.5 ? 1 : -1;
     const rad = d > 340 ? 1 : d < 250 ? -0.6 : 0;
     if (e.stateT <= 0 && d < 520 && twSight(e)){ e.state = 'wind'; e.stateT = 0.45; }
-    return [ux * spd * rad - uy * spd * 0.9 * e.dirS, uy * spd * rad + ux * spd * 0.9 * e.dirS];
+    const lat = 0.9 * twLat(e); return [ux * spd * rad - uy * spd * lat * e.dirS, uy * spd * rad + ux * spd * lat * e.dirS];
   },
   t_roller(e, dt, ux, uy, d){                               /* Swivel Charger: an office chair that spins up, then rolls flat out, and has a hard time stopping */
     const want = Math.atan2(uy, ux); e.stateT -= dt;
@@ -182,7 +183,7 @@ const TOWER_AI = {
     if (e.jSeed === undefined) e.jSeed = Math.random() * 10;
     const w = Math.sin(e.anim * 0.7 + e.jSeed) * 0.8;
     if (e.stateT <= 0 && d < 190){ e.state = 'whip'; e.stateT = 0.45; addMarker(e.x + Math.cos(e.ang) * 70, e.y + Math.sin(e.ang) * 70, 70, 0.45, '#8A90A0', null, { owner: e }); }
-    return [(ux - uy * w) * e.spdE, (uy + ux * w) * e.spdE];
+    return [(ux - uy * w * twLat(e)) * e.spdE, (uy + ux * w * twLat(e)) * e.spdE];
   },
   t_hive(e, dt, ux, uy, d){                                 /* Server Hive: crawls closer and lets out a few Staple Mites every few seconds */
     e.ang = turnTo(e.ang, Math.atan2(uy, ux), 1.6 * dt); e.stateT -= dt;
@@ -209,7 +210,7 @@ const TOWER_AI = {
     if (e.state === 'idle'){
       const dir = d > 300 ? 1 : d < 190 ? -0.7 : 0.1;
       if (e.stateT <= 0){ const p = e.pat++ % 3; e.state = p === 0 ? 'memowind' : p === 1 ? 'cordwind' : 'ring'; e.stateT = p === 2 ? 0.8 : 0.6; e.shotsLeft = e.p2 ? 3 : 2; }
-      return [ux * e.spdE * dir - uy * e.spdE * 0.4 * e.strafe, uy * e.spdE * dir + ux * e.spdE * 0.4 * e.strafe];
+      return [ux * e.spdE * dir - uy * e.spdE * 0.4 * e.strafe * twLat(e), uy * e.spdE * dir + ux * e.spdE * 0.4 * e.strafe * twLat(e)];
     }
     if (e.state === 'memowind'){
       if (e.stateT <= 0){ twFan(e, e.p2 ? 7 : 5, 0.16, 430, 0.45, '#FFFFF4', 5); sfx('spit', 0.1); e.shotsLeft--; if (e.shotsLeft > 0) e.stateT = 0.5; else { e.state = 'idle'; e.stateT = 1.4 * fast; e.strafe *= -1; } }
@@ -307,7 +308,7 @@ const TOWER_AI = {
     if (e.state === 'idle'){
       const dir = d > 320 ? 1 : d < 210 ? -0.8 : 0.1;
       if (e.stateT <= 0){ const p = e.pat++ % 3; e.state = p === 0 ? 'flaskwind' : p === 1 ? 'sprintwind' : 'flaskwind'; e.stateT = p === 1 ? 0.7 : 0.6; e.shotsLeft = e.p2 ? 3 : 2; if (p === 1){ const a = Math.atan2(P.y - e.y, P.x - e.x); addBeam(e.x, e.y, e.x + Math.cos(a) * 1200, e.y + Math.sin(a) * 1200, 60, 0.7, 0.1, 0, '#8AE86A', { owner: e }); } }
-      return [ux * e.spdE * dir - uy * e.spdE * 0.4 * e.strafe, uy * e.spdE * dir + ux * e.spdE * 0.4 * e.strafe];
+      return [ux * e.spdE * dir - uy * e.spdE * 0.4 * e.strafe * twLat(e), uy * e.spdE * dir + ux * e.spdE * 0.4 * e.strafe * twLat(e)];
     }
     if (e.state === 'flaskwind'){
       if (e.stateT <= 0){
@@ -331,7 +332,7 @@ const TOWER_AI = {
     if (e.state === 'idle'){
       const dir = d > 330 ? 1 : d < 220 ? -0.7 : 0.1;
       if (e.stateT <= 0){ const p = e.pat++ % 4; e.state = ['penwind', 'chartwind', 'takeover', 'chutewind'][p]; e.stateT = p === 2 ? 1 : 0.7; e.shotsLeft = ph === 3 ? 4 : 3; }
-      return [ux * e.spdE * dir - uy * e.spdE * 0.3 * e.strafe, uy * e.spdE * dir + ux * e.spdE * 0.3 * e.strafe];
+      return [ux * e.spdE * dir - uy * e.spdE * 0.3 * e.strafe * twLat(e), uy * e.spdE * dir + ux * e.spdE * 0.3 * e.strafe * twLat(e)];
     }
     if (e.state === 'roar'){ if (e.stateT <= 0){ e.state = 'idle'; e.stateT = 0.8; e.strafe *= -1; } return [0, 0]; }
     if (e.state === 'penwind'){

@@ -41,6 +41,13 @@ function buildTowerWorld(){ G.buildings = []; G.rocket = null; G.tower = true; T
 const towerBaseStartWave = startWave;
 startWave = function(n){ if (chapterOf(n) === TOWER_CHAPTER) towerPrepareFloor(n); return towerBaseStartWave.apply(this, arguments); };
 
+/* the last floor's boss has fallen: the vial and the coat colour are saved before the film, so quitting during it loses nothing */
+function towerFinishSave(){
+  const d = Save.data; if (!d) return;
+  if (!d.chapter15Complete){ d.vials = (d.vials | 0) + 1; G.vialNew = true; }
+  d.chapter14Complete = true; d.chapter15Complete = true; Save.write();
+}
+
 /* ---- seeing, steering, and finding a place ---- */
 function twCell(x, y){ return (y / TW_NAV | 0) * TW_NX + (x / TW_NAV | 0); }
 function twIn(x, y){ return x >= 0 && y >= 0 && x < ARENA_W && y < ARENA_H; }

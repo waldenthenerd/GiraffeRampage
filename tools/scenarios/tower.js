@@ -21,7 +21,7 @@
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter15Complete === false;
     Save.data.chapter15Complete = 'junk'; Save.load(); out.saveSane = typeof Save.data.chapter15Complete === 'boolean';
-    freshSave(); out.wardLen = WARD.length === 48 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
+    freshSave(); out.wardLen = WARD.length === 49 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
     Save.data.chapter15Complete = true; out.wardOpen = wardUnlocked(47) === true;
 
     /* the floor plans: twenty-five different ones, every room reachable, both lifts joined, vents everywhere, nothing outside the arena */
@@ -107,10 +107,24 @@
     G.spawnQueue = []; G.enemies.length = 0; G.bossAlive = false; G.waveState = 'clear'; G.waveTimer = 0.01; steps(3);
     out.endFilm = G.state === 'cutscene' && G.cut && G.cut.kind === 'towerout';
     G.cut.t = TW_OUT_T.END - 0.01; steps(3);
+    out.endOffer = G.state === 'miniask' && G.miniCh === TOWER_CHAPTER && /Rush Hour/.test(document.getElementById('overlay') ? document.getElementById('overlay').innerHTML : 'Rush Hour') && Save.data.chapter15Complete === true;
+    handleAction('mini-skip'); steps(60);
     out.endVictory = G.state === 'victory' && Save.data.chapter15Complete === true && Save.data.chapter14Complete === true && Save.data.chapter13Complete === true && wardUnlocked(47);
     out.vial = (Save.data.vials | 0) === v0 + 1;
     var vials1 = Save.data.vials | 0; Save.data.chapter15Complete = true; var d = Save.data; steps(1); out.vialOnce = (Save.data.vials | 0) === vials1;
     G.chapter = TOWER_CHAPTER; out.victoryText = /Chief Executive/.test(victoryText(3, 4));
+
+    /* Rush Hour, the minigame after the Tower: the lanes, the lift, a hit, and the stars and the coat colour */
+    freshSave(); out.rushDef = !!MINI[TOWER_CHAPTER] && MINI[TOWER_CHAPTER].name === 'Rush Hour' && typeof MINI[TOWER_CHAPTER].draw === 'function' && MINI_STAR[TOWER_CHAPTER].t[1] === 12 && MINI_STAR_CHAPTERS.length === 14;
+    out.rushLocked = miniUnlocked(TOWER_CHAPTER) === false; Save.data.chapter15Complete = true; out.rushOpen = miniUnlocked(TOWER_CHAPTER) === true;
+    Save.data.mini = { own: {}, best: {}, stars: {}, last: 0, plays: 0, hat: '', boot: '' };
+    out.rushStart = startMini(TOWER_CHAPTER, null, 'menu') && G.state === 'mini'; var rm = G.mini; rm.phase = 'play';
+    steps(30); var rg = miniGeom(); out.rushLanes = rm.lanes.length === 6 && rm.lives === 3 && rm.lanes.every(function(L){ return L.objs.length >= 2; });
+    rm.p.x = rg.W / 2; rm.p.y = rg.H * 0.06; steps(2); out.rushFloor = rm.score === 1 && rm.p.y > rg.H * 0.8;
+    var L0 = rm.lanes[0]; rm.inv = 0; rm.p.x = L0.objs[0].x; rm.p.y = L0.y; var lives0 = rm.lives; steps(1); out.rushHit = rm.lives === lives0 - 1 && rm.p.y > rg.H * 0.8;
+    rm.score = 12; rm.over = true; steps(2); out.rushStars = G.mini && G.mini.won === true && G.mini.stars === 3 || (Save.data.mini.stars[TOWER_CHAPTER] | 0) === 3;
+    G.state = 'menu'; G.mini = null; out.rushCoat = WARD[48] && WARD[48].name === 'Brass Button' && wardUnlocked(48) === true;
+    out.rushTotals = miniStarTotal() >= 3 && /42/.test(String(MINI_STAR_CHAPTERS.length * 3));
 
     /* the menu card, and the films from the menu */
     freshSave(); setMenuChapter(15); showMenu(); var html = chapterSelectorHTML();
@@ -130,7 +144,7 @@
     freshSave(); Save.data.chapter14Complete = true; out.togetherList = coChapters().indexOf(15) >= 0;
     coStart('arena', 15); steps(30, 1 / 30); out.together = Co.on && G.chapter === TOWER_CHAPTER && G.tower === true && !!TW.floor && G.buildings.length > 10 && Co.pl[0].x === Co.pl[0].x; coEnd(true);
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['table', 'bossWaves', 'tuneRising', 'cast', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'plans', 'giraffeBlocked', 'shotStops', 'finds', 'kindsOk', 'bossBehaviour', 'floor1', 'spawns', 'liftOpens', 'rideStarts', 'rideDone', 'nextWave', 'bossFloor', 'bossEndsFloor', 'lastFloor', 'endFilm', 'endVictory', 'vial', 'vialOnce', 'menuLocked', 'menuOpen', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runSaved', 'restored', 'togetherList', 'together', 'bestiary', 'victoryText'];
+  var need = ['table', 'bossWaves', 'tuneRising', 'cast', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'plans', 'giraffeBlocked', 'shotStops', 'finds', 'kindsOk', 'bossBehaviour', 'floor1', 'spawns', 'liftOpens', 'rideStarts', 'rideDone', 'nextWave', 'bossFloor', 'bossEndsFloor', 'lastFloor', 'endFilm', 'endOffer', 'endVictory', 'rushDef', 'rushLocked', 'rushOpen', 'rushStart', 'rushLanes', 'rushFloor', 'rushHit', 'rushStars', 'rushCoat', 'rushTotals', 'vial', 'vialOnce', 'menuLocked', 'menuOpen', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runSaved', 'restored', 'togetherList', 'together', 'bestiary', 'victoryText'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);

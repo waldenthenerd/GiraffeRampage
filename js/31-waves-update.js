@@ -410,7 +410,7 @@ function updateWaves(dt){
     if (G.chapter === TOWER_CHAPTER && !isRunEnd(G.wave)){ if (G.waveTimer <= 0) towerLiftTick(dt); return; }      /* the Tower: the next floor is a ride in the lift away */
     if (G.waveTimer <= 0){
       marsClearAllies();
-      if (isRunEnd(G.wave)){ if (G.chapter === DOME_CHAPTER || G.chapter === TOWER_CHAPTER) startCutscene(function(){ marsRestoreHUD(); chapterComplete(); }, false, G.chapter === TOWER_CHAPTER ? 'towerout' : 'domeout'); else chapterComplete(); }       /* the last chapter's own film, then the report */
+      if (isRunEnd(G.wave)){ if (G.chapter === TOWER_CHAPTER){ towerFinishSave(); startCutscene(function(){ marsRestoreHUD(); if (!miniOffer(TOWER_CHAPTER, chapterComplete)) chapterComplete(); }, false, 'towerout'); } else if (G.chapter === DOME_CHAPTER) startCutscene(function(){ marsRestoreHUD(); chapterComplete(); }, false, 'domeout'); else chapterComplete(); }       /* the last chapter's own film, then the report */
       else if (isChapterFinaleWave(G.wave)) finishChapter();
       else if (G.chapter === 13 && chapterWaveOf(G.wave) === MARS_SWITCH_WAVE && !G.marsShipsSeen){      /* the Marine ships come down: a short film, then the war */
         G.marsShipsSeen = true; saveRunAtBoundary(true); startCutscene(function(){ marsRestoreHUD(); startWave(G.wave + 1); }, false, 'mships');

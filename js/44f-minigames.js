@@ -753,17 +753,17 @@ function miniOffer(ch, proceed){
   if (!def || G.attract) return false;
   G.miniThen = proceed; G.miniCh = ch; G.mini = null;
   G.state = 'miniask'; G.subScreen = '';
-  const next = BESTIARY_CHAPTERS[ch] || 'the next chapter', best = miniData().best[ch];
+  const next = ch === TOWER_CHAPTER ? 'the end of the run' : BESTIARY_CHAPTERS[ch] || 'the next chapter', best = miniData().best[ch];
   const ready = miniReadyIn() <= 0;
   setOverlay(
     '<div class="panel slab" style="max-width:500px">' +
-      '<h2 class="head">Chapter ' + ch + ' complete</h2>' +
+      '<h2 class="head">Chapter ' + chapterLabel(ch) + ' complete</h2>' +
       '<p class="sub">Before moving on: <b>' + def.name + '</b>. ' + def.blurb.replace(/\n/g, ' ') + '</p>' +
       '<p class="sub" style="margin-top:0">Finish it for a spin of the wheel: a hat, boots or, rarely, a very special hat for the giraffe. Win it, and earn up to three stars for better odds.' + (best ? ' Your best here: <b>' + best + '</b>.' : '') + '</p>' +
       (typeof tipOnce === 'function' ? tipOnce('offer', 'Stars: win the minigame for one star, and reach the two harder targets for the second and third. More stars give better odds at the rare hats, and three stars in a minigame unlocks its own coat colour.') : '') +
       '<div class="menucol" style="margin-top:6px;width:100%">' +
         '<button class="btn" data-a="mini-go" data-mini-play' + (ready ? '' : ' disabled') + '>Play the minigame<small data-mini-cd>' + miniCdText() + '</small></button>' +
-        '<button class="btn ghost" data-a="mini-skip">Start Chapter ' + chapterLabel(ch + 1) + '<small>' + next + '</small></button>' +
+        '<button class="btn ghost" data-a="mini-skip">' + (ch === TOWER_CHAPTER ? 'See the results' : 'Start Chapter ' + chapterLabel(ch + 1)) + '<small>' + next + '</small></button>' +
       '</div>' +
     '</div>');
   return true;
@@ -773,7 +773,7 @@ function miniOffer(ch, proceed){
 let _wheel = null;
 function showMiniResult(){
   const m = G.mini, def = m.def, md = miniData();
-  const nextLabel = m.then ? 'Start Chapter ' + chapterLabel(m.ch + 1) : G.townReturn ? 'Back to town' : 'Back to the menu';
+  const nextLabel = m.then ? (m.ch === TOWER_CHAPTER ? 'See the results' : 'Start Chapter ' + chapterLabel(m.ch + 1)) : G.townReturn ? 'Back to town' : 'Back to the menu';
   const starLine = (m.abandon || typeof miniStarsHTML !== 'function') ? '' : miniStarsHTML(m);
   setOverlay(
     '<div class="panel slab" style="max-width:480px">' +
@@ -866,14 +866,14 @@ function showMiniMenu(){
   for (let ch = 1; ch <= TOTAL_CHAPTERS; ch++){
     const d = MINI[ch]; if (!d) continue;
     const un = miniUnlocked(ch), b = md.best[ch] | 0;
-    rows += '<div class="minirow' + (un ? '' : ' locked') + '"><div class="mrn"><b>' + d.name + '</b><span>After Chapter ' + ch + ' \u00b7 ' + BESTIARY_CHAPTERS[ch - 1] + '</span>' +
-      '<span>' + (un ? (b ? 'Best: ' + b : 'Not played yet') + (md.stars[ch] ? ' · <b style="color:#FFD84D">' + '★'.repeat(md.stars[ch]) + '<span style="opacity:.3">' + '★'.repeat(3 - md.stars[ch]) + '</span></b>' : '') + (md.stars[ch] >= 3 && WARD[13 + ch] ? ' <span title="' + WARD[13 + ch].name + '" style="display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;background:' + WARD[13 + ch].c + ';border:1px solid #fff"></span>' : '') : 'Finish Chapter ' + ch + ' to unlock') + '</span></div>' +
+    rows += '<div class="minirow' + (un ? '' : ' locked') + '"><div class="mrn"><b>' + d.name + '</b><span>After Chapter ' + chapterLabel(ch) + ' \u00b7 ' + BESTIARY_CHAPTERS[ch - 1] + '</span>' +
+      '<span>' + (un ? (b ? 'Best: ' + b : 'Not played yet') + (md.stars[ch] ? ' · <b style="color:#FFD84D">' + '★'.repeat(md.stars[ch]) + '<span style="opacity:.3">' + '★'.repeat(3 - md.stars[ch]) + '</span></b>' : '') + (md.stars[ch] >= 3 && WARD[miniWardOf(ch)] ? ' <span title="' + WARD[miniWardOf(ch)].name + '" style="display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;background:' + WARD[miniWardOf(ch)].c + ';border:1px solid #fff"></span>' : '') : 'Finish Chapter ' + chapterLabel(ch) + ' to unlock') + '</span></div>' +
       '<button class="btn sm' + (un ? '' : ' ghost') + '" data-a="mini-start-' + ch + '" data-mini-play' + (un ? '' : ' data-mini-lock disabled') + '>' + (un ? 'Play' : 'Locked') + '</button></div>';
   }
   setOverlay(
     '<div class="panel slab wide" style="max-width:560px">' +
       '<h2 class="head">Minigames</h2>' +
-      '<p class="sub">One after each chapter. Every one you finish spins the wheel: 65% a hat, 30% boots, 5% a rare hat. Win it and earn stars for better odds at the rare hats. Stars: <b>' + miniStarTotal() + ' of ' + TOTAL_CHAPTERS * 3 + '</b>. One play every two minutes: <b data-mini-cd>' + miniCdText() + '</b></p>' +
+      '<p class="sub">One after each chapter. Every one you finish spins the wheel: 65% a hat, 30% boots, 5% a rare hat. Win it and earn stars for better odds at the rare hats. Stars: <b>' + miniStarTotal() + ' of ' + MINI_STAR_CHAPTERS.length * 3 + '</b>. One play every two minutes: <b data-mini-cd>' + miniCdText() + '</b></p>' +
       '<div class="minilist">' + rows + '</div>' +
       '<div class="row" style="margin-top:14px"><button class="btn sm ghost" data-a="mini-collection">Collection (' + accOwnedCount() + ' of ' + ACC_ITEMS.length + ')</button><button class="btn sm ghost" data-a="wardrobe">Wardrobe</button><button class="btn sm" data-a="mini-back">Back</button></div>' +
     '</div>');
