@@ -17,9 +17,10 @@ const ATMOS = {
   11: { cycle: true, base: [190, 120, 255, 0.08], accent: '#D8A8FF', fog: [200, 150, 255], fogA: 0.10, weather: 'glints' },
   12: { base: [10, 24, 50, 0.10], night: 0.3,     accent: '#7FE8FF', fog: [90, 120, 150],  fogA: 0.08, weather: 'dust' },
   13: { base: [255, 120, 60, 0.10],               accent: '#FF9A5A', fog: [220, 120, 70],  fogA: 0.12, weather: 'storm' },
-  14: { base: [150, 214, 255, 0.10],              accent: '#9FE8FF', fog: [200, 236, 255], fogA: 0.12, weather: 'snow' }           /* inside a dome: cold, still, a little snow that should not be there */
+  14: { base: [150, 214, 255, 0.10],              accent: '#9FE8FF', fog: [200, 236, 255], fogA: 0.12, weather: 'snow' },          /* inside a dome: cold, still, a little snow that should not be there */
+  15: { base: [255, 236, 190, 0.07],              accent: '#FFE49A', fog: [200, 200, 220], fogA: 0.05, weather: 'glints' }          /* an office tower at night: warm lamps, cool air, a few motes in the light */
 };
-const BIOME_CHAPTER = { savanna: 1, snow: 2, swamp: 3, ocean: 4, jungle: 5, city: 6, space: 7, moon: 8, venus: 9, area51: 12, mars: 13, dome: 14 };
+const BIOME_CHAPTER = { savanna: 1, snow: 2, swamp: 3, ocean: 4, jungle: 5, city: 6, space: 7, moon: 8, venus: 9, area51: 12, mars: 13, dome: 14, tower: 15 };
 /* type: streak (a line along its motion), dot, glow (soft additive point) */
 const WEATHER_KINDS = {
   dust:     { n: 34,  type: 'streak', vx: 90,   vy: 6,    len: [14, 34], col: '230,210,160', a: 0.20 },

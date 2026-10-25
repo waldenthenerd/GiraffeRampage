@@ -194,7 +194,7 @@ function drawHaze(ctx){
 
 /* ---------- 2. the ground remembers: footprints, flattened grass ---------- */
 const PRINT_COL = { snow: 'rgba(70,98,130,.55)', savanna: 'rgba(58,42,24,.45)', swamp: 'rgba(24,30,14,.55)', jungle: 'rgba(28,38,18,.45)',
-                    moon: 'rgba(118,122,140,.55)', venus: 'rgba(110,70,20,.45)', mars: 'rgba(84,32,16,.5)', area51: 'rgba(110,86,50,.4)', dome: 'rgba(70,98,130,.5)' };
+                    moon: 'rgba(118,122,140,.55)', venus: 'rgba(110,70,20,.45)', mars: 'rgba(84,32,16,.5)', area51: 'rgba(110,86,50,.4)', dome: 'rgba(70,98,130,.5)', tower: 'rgba(40,36,60,.5)' };
 const TRAMPLE_COL = { savanna: 'rgba(176,156,100,.55)', jungle: 'rgba(120,160,70,.45)', swamp: 'rgba(110,130,60,.4)' };
 const Memory = { acc: 0, accE: 0, side: 1 };
 (function(){
@@ -280,7 +280,7 @@ const ELITE = { chance: 0.06, minWave: 6, maxAlive: 4 };
 const EDGE_FX = {                                   /* biome: [r, g, b, a, how] ; how: 'glow' adds light, 'frost' is jagged white ice, 'murk' darkens */
   savanna: [255, 190, 90, 0.4, 'glow'], snow: [225, 244, 255, 0.55, 'frost'], swamp: [90, 130, 40, 0.45, 'murk'], ocean: [40, 150, 230, 0.45, 'glow'],
   jungle: [150, 255, 110, 0.4, 'glow'], city: [255, 90, 190, 0.35, 'glow'], space: [90, 140, 255, 0.35, 'glow'], moon: [210, 224, 255, 0.35, 'glow'],
-  venus: [255, 214, 70, 0.4, 'glow'], area51: [90, 255, 150, 0.35, 'glow'], mars: [255, 110, 60, 0.4, 'glow'], dome: [200, 240, 255, 0.5, 'frost']
+  venus: [255, 214, 70, 0.4, 'glow'], area51: [90, 255, 150, 0.35, 'glow'], mars: [255, 110, 60, 0.4, 'glow'], dome: [200, 240, 255, 0.5, 'frost'], tower: [255, 230, 170, 0.35, 'glow']
 };
 function drawIris(ctx, f){
   const W = G.W, H = G.H, k = f.t / f.dur, R = hyp(W, H) * 0.6;

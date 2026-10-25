@@ -7,7 +7,7 @@ function resetWorld(){
   G.shocks.length = 0; G.pickups.length = 0; G.swipes.length = 0;
   G.bolts.length = 0; _timers.length = 0;
   G.markers.length = 0; G.beams.length = 0; G.blasts.length = 0; G.hzones.length = 0; G.arcs.length = 0; G.pulses.length = 0;
-  G.ants = []; G.antTimers = null; G.buildings = []; G.rocket = null; G.allies = [];
+  G.ants = []; G.antTimers = null; G.buildings = []; G.rocket = null; G.allies = []; G.tower = false; if (typeof TW !== 'undefined') TW.ride = null;
   G.banner = null; G.flash = null; G.shake = 0; G.shakeBias = 0; G.hitstop = 0; G.fxDecals = []; G.bossIntro = null; G.fadeIn = null;
   if (typeof P !== 'undefined') P.magnetT = 0;
   G.transformFX = null; G.chapterFX = null; G.bossAlive = false; G.boss = null;
@@ -47,7 +47,7 @@ function startRun(startChapter, waveOverride, snap){
   grantStartCards();
   if (snap) restoreRun(snap); else Save.data.runSave = null;
   buildDecor();
-  G.buildings = []; G.rocket = null;
+  G.buildings = []; G.rocket = null; G.tower = false;
   if (G.biome === 'city') buildCityBuildings();
   else if (G.biome === 'space') buildSpaceCenter();
   else if (G.biome === 'moon') buildMoon();
@@ -55,6 +55,7 @@ function startRun(startChapter, waveOverride, snap){
     else if (G.biome === 'area51') buildArea51World();
     else if (G.biome === 'mars') buildMarsWorld();
     else if (G.biome === 'dome') buildDomeWorld();
+    else if (G.biome === 'tower') buildTowerWorld();
   buildScenery();
   G.state = 'playing';
   if (forcedWave && chapterOf(forcedWave) === 13 && chapterWaveOf(forcedWave) > MARS_SWITCH_WAVE) G.marsShipsSeen = true;
@@ -127,7 +128,7 @@ function chapterComplete(){
   d.gems = (d.gems | 0) + (G.runGems | 0);
   d.sulfur = (d.sulfur | 0) + (G.runSulfur | 0); d.basalt = (d.basalt | 0) + (G.runBasalt | 0); d.grubs = (d.grubs | 0) + (G.runGrubs | 0); d.iron = (d.iron | 0) + (G.runIron | 0); d.argon = (d.argon | 0) + (G.runArgon | 0);
   d.chaptersComplete = (d.chaptersComplete | 0) + 1;
-  const hadPart = !!d.enginePart; if (G.wave >= 175) d.chapter7Complete = true; if (G.wave >= 200) d.chapter8Complete = true; if (G.wave >= 225) d.chapter9Complete = true; if (G.wave >= 250){ d.chapter10Complete = true; d.enginePart = true; } if (G.wave >= 275) d.chapter11Complete = true; if (G.wave >= 300){ d.chapter12Complete = true; d.mutationVial = true; } if (G.wave >= WAVES_PER_CHAPTER * MAIN_CHAPTERS) d.chapter13Complete = true; if (G.wave >= CHAPTER_LAST_WAVE) d.chapter14Complete = true; G.vialNew = false; G.enginePartNew = !hadPart && G.wave === 250;     /* finishing a chapter completes it and every one before it */     /* the Inferno's reward: a spaceship engine part */   /* finishing the last chapter counts every chapter before it */
+  const hadPart = !!d.enginePart; if (G.wave >= 175) d.chapter7Complete = true; if (G.wave >= 200) d.chapter8Complete = true; if (G.wave >= 225) d.chapter9Complete = true; if (G.wave >= 250){ d.chapter10Complete = true; d.enginePart = true; } if (G.wave >= 275) d.chapter11Complete = true; if (G.wave >= 300){ d.chapter12Complete = true; d.mutationVial = true; } if (G.wave >= WAVES_PER_CHAPTER * MAIN_CHAPTERS) d.chapter13Complete = true; if (G.wave >= DOME_LAST_WAVE) d.chapter14Complete = true; if (G.wave >= CHAPTER_LAST_WAVE){ if (!d.chapter15Complete) d.vials = (d.vials | 0) + 1; d.chapter15Complete = true; } G.vialNew = false; G.enginePartNew = !hadPart && G.wave === 250;     /* finishing a chapter completes it and every one before it */     /* the Inferno's reward: a spaceship engine part */   /* finishing the last chapter counts every chapter before it */
   if (G.score > scoreInt(d.best)) d.best = G.score;
   if (G.wave > (d.bestWave | 0)) d.bestWave = G.wave;
   Save.write();
@@ -206,8 +207,8 @@ function updateHUD(){
   hudTxt('hpTxt', Math.max(0, Math.ceil(P.hp)) + ' / ' + Math.round(P.maxHp));
   hudTxt('xpTxt', 'Level ' + P.level + (G.pendingLevels > 0 && G.levelGate > 0 ? ' \u00b7 ' + G.pendingLevels + ' to pick in ' + Math.ceil(G.levelGate) + 's' : ''));
   hudTxt('hWave', String(G.wave));
-  hudTxt('hChapter', G.chapter === DOME_CHAPTER ? 'CH.13.5 THE DOMES' : G.chapter === 13 ? 'CH.13 MARS' : G.chapter === 12 ? 'CH.12 AREA 51' : G.chapter === 11 ? 'CH.11 GLIMMER' : G.chapter === 10 ? 'CH.10 INFERNO' : G.chapter === 9 ? 'CH.9 VENUS' : G.chapter === 8 ? 'CH.8 THE MOON' : G.chapter === 7 ? 'CH.7 SPACE CENTER' : G.chapter === 6 ? 'CH.6 HOUSTON' : G.chapter === 5 ? 'CH.5 THE CANOPY' : G.chapter === 4 ? 'CH.4 THE DEEP' : G.chapter === 3 ? 'CH.3 MURKFEN' : G.chapter === 2 ? 'CH.2 FROSTREACH' : '');
-  hudCls('hChapter', 'chaptag' + (G.chapter === DOME_CHAPTER ? ' dome' : G.chapter === 13 ? ' mars' : G.chapter === 12 ? ' a51' : G.chapter === 11 ? ' glim' : G.chapter === 10 ? ' inferno' : G.chapter === 9 ? ' venus' : G.chapter === 8 ? ' moon' : G.chapter === 7 ? ' space' : G.chapter === 6 ? ' city' : G.chapter === 5 ? ' jungle' : G.chapter === 4 ? ' ocean' : G.chapter === 3 ? ' swamp' : G.chapter === 2 ? ' snow' : ''));
+  hudTxt('hChapter', G.chapter === TOWER_CHAPTER ? 'CH.14 THE TOWER' : G.chapter === DOME_CHAPTER ? 'CH.13.5 THE DOMES' : G.chapter === 13 ? 'CH.13 MARS' : G.chapter === 12 ? 'CH.12 AREA 51' : G.chapter === 11 ? 'CH.11 GLIMMER' : G.chapter === 10 ? 'CH.10 INFERNO' : G.chapter === 9 ? 'CH.9 VENUS' : G.chapter === 8 ? 'CH.8 THE MOON' : G.chapter === 7 ? 'CH.7 SPACE CENTER' : G.chapter === 6 ? 'CH.6 HOUSTON' : G.chapter === 5 ? 'CH.5 THE CANOPY' : G.chapter === 4 ? 'CH.4 THE DEEP' : G.chapter === 3 ? 'CH.3 MURKFEN' : G.chapter === 2 ? 'CH.2 FROSTREACH' : '');
+  hudCls('hChapter', 'chaptag' + (G.chapter === TOWER_CHAPTER ? ' tower' : G.chapter === DOME_CHAPTER ? ' dome' : G.chapter === 13 ? ' mars' : G.chapter === 12 ? ' a51' : G.chapter === 11 ? ' glim' : G.chapter === 10 ? ' inferno' : G.chapter === 9 ? ' venus' : G.chapter === 8 ? ' moon' : G.chapter === 7 ? ' space' : G.chapter === 6 ? ' city' : G.chapter === 5 ? ' jungle' : G.chapter === 4 ? ' ocean' : G.chapter === 3 ? ' swamp' : G.chapter === 2 ? ' snow' : ''));
   hudTxt('hSpeed', G.runSpeed ? '\u00d7' + runSpeedMul() + (G.runSpeedLevel === 3 ? ' ULTRAFAST' : G.runSpeedLevel === 2 ? ' HYPERSPEED' : ' SPEED') : '');
   /* the score and kill counters roll up to their new value instead of jumping */
   const sc = G._dispScore === undefined || G.score < G._dispScore ? G.score : G._dispScore + (G.score - G._dispScore) * 0.25;

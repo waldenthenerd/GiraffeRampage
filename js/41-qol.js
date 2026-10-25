@@ -235,6 +235,8 @@ function filmList(){
   L.push({ kind: 'marshome', title: 'Home from Mars', sub: 'The long way back to the lab.', un: !!d.chapter13Complete });
   L.push({ kind: 'domeflight', title: 'The Mirrored Domes', sub: 'The town helicopter, and a ring of foil-covered domes.', un: !!d.chapter13Complete });
   L.push({ kind: 'domeout', title: 'The Long Flight to New York', sub: 'The domes light up, and the trail goes north.', un: !!d.chapter14Complete });
+  L.push({ kind: 'towerflight', title: 'The Tower', sub: 'The helicopter comes in over New York, and the glass tower.', un: !!d.chapter14Complete });
+  L.push({ kind: 'towerout', title: 'Out the Top', sub: 'The vial, the paraglider, and a second helicopter.', un: !!d.chapter15Complete });
   return L;
 }
 function galleryButtonHTML(){
@@ -703,6 +705,7 @@ function showDeath(){
 
 function victoryText(mins, secs){
   const tm = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's';
+  if (G.chapter >= TOWER_CHAPTER) return 'The Chief Executive folds into the chair behind the desk, and the whole top floor goes quiet except for the lift chiming somewhere far below. You climbed twenty-five floors in ' + tm + '. In the glass case on the wall, a vial of something green was still turning slowly in the light, and it is in your harness now. There is a window, a paraglider on a rack, and the lights of another building across the dark.';
   if (G.chapter >= DOME_CHAPTER) return 'The Ice Heart breaks apart in a rain of cold light, and the glowing root under the dome goes dark. You held the glass for ' + tm + ' while the mylar rang like a bell all round you. The helicopter is still turning on its pad. Among the wreckage was a shipping label, stamped with a city: New York.';
   if (G.chapter >= 13) return 'Fleet Marshal Dray’s flagship comes apart in the red sky, and the dust aliens melt back into the dunes. You held the Martian plain for ' + tm + ' between two armies. The vial hums in your harness, and there is a long way home.';
   if (G.chapter >= 12) return 'General Mercer goes down, and the klaxons wind to silence across Area 51. You held the base for ' + tm + ' of the Nevada night. Under the hatch in the middle of it, something in a glass case was still glowing green: the thing that changed the animals.';

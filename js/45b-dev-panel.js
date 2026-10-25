@@ -107,6 +107,9 @@ function showDebugPanel(){
           '<button class="btn ghost" data-a="debug-play12">Start Chapter 12 \u2014 Area 51</button>' +
           '<button class="btn ghost" data-a="debug-play13">Start Chapter 13 \u2014 Mars</button>' +
           '<button class="btn ghost" data-a="debug-play14">Start Chapter 13.5 \u2014 the Domes</button>' +
+          '<button class="btn ghost" data-a="debug-play15">Start Chapter 14 \u2014 the Tower</button>' +
+          '<button class="btn ghost" data-a="debug-cutscene-towerflight">Play the tower arrival film<small>The helicopter comes in over New York. Keys 1\u20134 jump between its scenes</small></button>' +
+          '<button class="btn ghost" data-a="debug-cutscene-towerout">Play the escape from the tower film<small>The end of Chapter 14: the vial, the paraglider, the helicopter. Keys 1\u20134 jump between its scenes</small></button>' +
           '<button class="btn ghost" data-a="debug-cutscene-domeflight">Play the dome flight film<small>The town helicopter over the mirrored domes. Keys 1\u20134 jump between its scenes</small></button>' +
           '<button class="btn ghost" data-a="debug-cutscene-domeout">Play the escape to New York film<small>The end of Chapter 13.5. Keys 1\u20134 jump between its scenes</small></button>' +
           '<button class="btn ghost" data-a="debug-cutscene">Play the ending cutscene<small>Chapter 7 film: the Moon landing. Keys 1\u20138 jump between its scenes; Esc leaves</small></button>' +
@@ -194,6 +197,9 @@ function handleDebugAction(a){
     case 'debug-cutscene-marshome': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'marshome'); break;
     case 'debug-play13': SFX.click(); startRun(13); break;
     case 'debug-play14': SFX.click(); startRun(DOME_CHAPTER); break;
+    case 'debug-play15': SFX.click(); startRun(TOWER_CHAPTER); break;
+    case 'debug-cutscene-towerflight': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'towerflight'); break;
+    case 'debug-cutscene-towerout': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'towerout'); break;
     case 'debug-cutscene-domeflight': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'domeflight'); break;
     case 'debug-cutscene-domeout': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'domeout'); break;
     case 'debug-lab': { const d = Save.data; d.chapter12Complete = true; d.mutationVial = true; d.chapter13Complete = true; d.antsUnlocked = true; d.chapter8Complete = true; d.vials = (d.vials | 0) + 3; if (!d.venusUp) d.venusUp = {}; ['hab1', 'hab2', 'hab3', 'col1', 'col2', 'col3'].forEach(k => { d.venusUp[k] = 1; }); d.iron = (d.iron | 0) + 3000; d.argon = (d.argon | 0) + 1500; d.sulfur = (d.sulfur | 0) + 1500; d.basalt = (d.basalt | 0) + 1500; Save.write(); SFX.buy(); showDebugPanel(); break; }
