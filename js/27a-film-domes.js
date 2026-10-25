@@ -7,7 +7,7 @@
 /* the town helicopter, side on, nose to the right: a dark green pod with a glass nose, a tail boom with a fin and a tail rotor, skids, and a main rotor on a mast.
    o = { x, y (the middle of the body), s, t, rot, spin (0 to 1: how fast the rotors turn), pilot (the giraffe in the cockpit), light } */
 function domeHeli(ctx, o){
-  const s = o.s || 1, t = o.t || 0, spin = o.spin === undefined ? 1 : o.spin, GREEN = '#35543A', GREEN_D = '#223A28', GREEN_L = '#4A7050', GLASS = '#BCE4F0', INK = '#1A2A1E';
+  const s = o.s || 1, t = o.t || 0, spin = o.spin === undefined ? 1 : o.spin, pal = o.pal || {}, GREEN = pal.g || '#35543A', GREEN_D = pal.gd || '#223A28', GREEN_L = pal.gl || '#4A7050', GLASS = '#BCE4F0', INK = pal.ink || '#1A2A1E', BAND = pal.band || '#E8C23A';
   const nose = () => { ctx.beginPath(); ctx.moveTo(10, -30); ctx.quadraticCurveTo(52, -34, 76, -6); ctx.quadraticCurveTo(74, 18, 40, 24); ctx.lineTo(10, 24); ctx.closePath(); };
   ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(o.rot || 0); ctx.scale(s, s);
   /* skids, behind the body: two struts bolted under the belly, a runner with an upturned toe, and a cross tube */
@@ -24,13 +24,13 @@ function domeHeli(ctx, o){
   ctx.fillStyle = GREEN_L; ctx.beginPath(); ctx.moveTo(-40, -16); ctx.lineTo(-196, -26); ctx.lineTo(-196, -23); ctx.lineTo(-40, -11); ctx.closePath(); ctx.fill();                  /* the sun on top of the boom */
   ctx.strokeStyle = '#162418'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(-40, -2); ctx.lineTo(-196, -19); ctx.stroke();                                              /* the strake */
   for (let k = 0; k < 9; k++){ const bx = -52 - k * 15; fillCircle(ctx, bx, -14 - (k * 15 + 12) * 0.064 + 3, 1.1, '#6E8A74'); }                                              /* rivets */
-  ctx.fillStyle = '#E8C23A'; ctx.beginPath(); ctx.moveTo(-120, -22); ctx.lineTo(-136, -23); ctx.lineTo(-136, -4); ctx.lineTo(-120, -2); ctx.closePath(); ctx.fill();      /* the town's yellow band */
+  ctx.fillStyle = BAND; ctx.beginPath(); ctx.moveTo(-120, -22); ctx.lineTo(-136, -23); ctx.lineTo(-136, -4); ctx.lineTo(-120, -2); ctx.closePath(); ctx.fill();      /* the town's yellow band */
   ctx.fillStyle = '#B8921E'; ctx.beginPath(); ctx.moveTo(-136, -23); ctx.lineTo(-139, -23.4); ctx.lineTo(-139, -4); ctx.lineTo(-136, -4); ctx.closePath(); ctx.fill();
   ctx.fillStyle = GREEN; ctx.beginPath(); ctx.moveTo(-178, -24); ctx.lineTo(-206, -70); ctx.lineTo(-190, -72); ctx.lineTo(-162, -26); ctx.closePath(); ctx.fill();
   ctx.fillStyle = GREEN_D; ctx.beginPath(); ctx.moveTo(-170, -24); ctx.lineTo(-198, -68); ctx.lineTo(-190, -72); ctx.lineTo(-162, -26); ctx.closePath(); ctx.fill();
   ctx.fillStyle = GREEN_L; ctx.beginPath(); ctx.moveTo(-178, -24); ctx.lineTo(-206, -70); ctx.lineTo(-203, -70); ctx.lineTo(-174, -25); ctx.closePath(); ctx.fill();
   ctx.fillStyle = GREEN_D; ctx.beginPath(); ctx.moveTo(-170, -12); ctx.lineTo(-190, 4); ctx.lineTo(-178, 6); ctx.lineTo(-156, -10); ctx.closePath(); ctx.fill();                  /* the stabiliser */
-  ctx.strokeStyle = '#E8C23A'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-197, -60); ctx.lineTo(-191, -68); ctx.stroke();                                              /* the fin tip */
+  ctx.strokeStyle = BAND; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-197, -60); ctx.lineTo(-191, -68); ctx.stroke();                                              /* the fin tip */
   /* tail rotor, on a gearbox at the top of the fin */
   const ta = t * 38 * spin;
   fillRoundBox(ctx, -203, -60, 10, 14, 3, '#121C14');
@@ -57,7 +57,7 @@ function domeHeli(ctx, o){
   ctx.strokeStyle = '#162418'; ctx.lineWidth = 2; ctx.stroke();
   ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.beginPath(); ctx.moveTo(-28, -13); ctx.lineTo(-20, -14); ctx.lineTo(-25, 1); ctx.lineTo(-28, 1); ctx.closePath(); ctx.fill();
   ctx.fillStyle = '#C8D0C0'; ctx.fillRect(-31, 9, 8, 3); ctx.fillStyle = '#6A7468'; ctx.fillRect(-31, 11.2, 8, 0.8);                                                    /* a door handle */
-  fillCircle(ctx, -19, 26, 6.4, '#E8C23A'); fillCircle(ctx, -19, 26, 4.6, GREEN_D); fillCircle(ctx, -19, 26, 1.8, '#E8C23A');                                              /* the town's badge */
+  fillCircle(ctx, -19, 26, 6.4, BAND); fillCircle(ctx, -19, 26, 4.6, GREEN_D); fillCircle(ctx, -19, 26, 1.8, BAND);                                              /* the town's badge */
   for (let k = 0; k < 6; k++) fillCircle(ctx, 8 + k * 8, 28 - k * 0.5 - (k > 3 ? (k - 3) * 2 : 0), 1, '#6E8A74');                                                            /* rivets */
   /* the glass nose and the cockpit */
   const gg = ctx.createLinearGradient(20, -34, 70, 22); gg.addColorStop(0, '#E4F8FF'); gg.addColorStop(0.5, GLASS); gg.addColorStop(1, '#6EA6BC');
@@ -85,7 +85,7 @@ function domeHeli(ctx, o){
   if (spin > 0.5){ ctx.strokeStyle = 'rgba(232,194,58,' + (0.3 * spin) + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(0, -62, 214, 8 + 3 * spin, 0, 0, TAU); ctx.stroke(); }
   const by = Math.sin(ra) * 4;
   ctx.lineCap = 'round'; ctx.strokeStyle = '#121C14'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(-bl, -62 + by); ctx.lineTo(bl, -62 - by); ctx.stroke();
-  ctx.strokeStyle = '#E8C23A'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(-bl, -62 + by); ctx.lineTo(-bl * 0.88, -62 + by * 0.88); ctx.moveTo(bl, -62 - by); ctx.lineTo(bl * 0.88, -62 - by * 0.88); ctx.stroke();
+  ctx.strokeStyle = BAND; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(-bl, -62 + by); ctx.lineTo(-bl * 0.88, -62 + by * 0.88); ctx.moveTo(bl, -62 - by); ctx.lineTo(bl * 0.88, -62 - by * 0.88); ctx.stroke();
   ctx.strokeStyle = '#2A3A2E'; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(-bl * 0.1, -62 + by * 0.1); ctx.lineTo(bl * 0.1, -62 - by * 0.1); ctx.stroke(); ctx.lineCap = 'butt';           /* the blade grips */
   fillCircle(ctx, 0, -62, 7, '#10181A'); fillCircle(ctx, 0, -62, 3, '#5A6A5E');
   ctx.restore();

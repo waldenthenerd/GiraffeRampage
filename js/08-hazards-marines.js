@@ -760,12 +760,12 @@ function spawnEnemy(type, x, y, wave, kind){
   if (G.enemies.length >= MAX_ENEMIES) return null;
   const w = wave || G.wave || 1;
   const cw3 = chapterOf(w);
-  const table = cw3 === DOME_CHAPTER ? ETYPES_DOME : cw3 >= 13 ? marsTableFor(w) : cw3 >= 12 ? ETYPES_A51 : cw3 >= 11 ? ETYPES_GLIM : cw3 >= 10 ? ETYPES_INFERNO : cw3 >= 9 ? ETYPES_VENUS : cw3 === 8 ? ETYPES_MARINE : cw3 === 7 ? ETYPES_SPACE : cw3 === 6 ? ETYPES_CITY : cw3 === 5 ? ETYPES_JUNGLE : cw3 === 4 ? ETYPES_OCEAN : cw3 === 3 ? ETYPES_SWAMP : cw3 === 2 ? ETYPES_FROST : ETYPES;
-  const t = cw3 === DOME_CHAPTER ? ETYPES_DOME[type] : cw3 >= 13 ? marsTableFor(w)[type] : cw3 >= 12 ? ETYPES_A51[type] : cw3 >= 11 ? ETYPES_GLIM[type] : cw3 >= 10 ? ETYPES_INFERNO[type] : cw3 >= 9 ? venusDefFor(type, Math.random(), kind) : table[type];     /* chapter 10: fire aliens only, no Marines */     /* chapter 9: aliens, with Marines among them */
+  const table = cw3 === TOWER_CHAPTER ? ETYPES_TOWER : cw3 === DOME_CHAPTER ? ETYPES_DOME : cw3 >= 13 ? marsTableFor(w) : cw3 >= 12 ? ETYPES_A51 : cw3 >= 11 ? ETYPES_GLIM : cw3 >= 10 ? ETYPES_INFERNO : cw3 >= 9 ? ETYPES_VENUS : cw3 === 8 ? ETYPES_MARINE : cw3 === 7 ? ETYPES_SPACE : cw3 === 6 ? ETYPES_CITY : cw3 === 5 ? ETYPES_JUNGLE : cw3 === 4 ? ETYPES_OCEAN : cw3 === 3 ? ETYPES_SWAMP : cw3 === 2 ? ETYPES_FROST : ETYPES;
+  const t = cw3 === TOWER_CHAPTER ? ETYPES_TOWER[type] : cw3 === DOME_CHAPTER ? ETYPES_DOME[type] : cw3 >= 13 ? marsTableFor(w)[type] : cw3 >= 12 ? ETYPES_A51[type] : cw3 >= 11 ? ETYPES_GLIM[type] : cw3 >= 10 ? ETYPES_INFERNO[type] : cw3 >= 9 ? venusDefFor(type, Math.random(), kind) : table[type];     /* chapter 10: fire aliens only, no Marines */     /* chapter 9: aliens, with Marines among them */
   if (!t) return null;
-  const sc = cw3 === DOME_CHAPTER ? domeScale(chapterWaveOf(w)) : enemyScale(chapterWaveOf(w));
+  const sc = cw3 === TOWER_CHAPTER ? towerScale(chapterWaveOf(w)) : cw3 === DOME_CHAPTER ? domeScale(chapterWaveOf(w)) : enemyScale(chapterWaveOf(w));
   const hpMul = t.big ? Math.pow(sc.hp, 0.82) : sc.hp;
-  const finalBossMul = (t.big && type === 'wildfire' && ((cw3 >= 8 && cw3 <= 10) || cw3 === 12 || cw3 === 13)) || type === 'iceheart' ? FINAL_BOSS_DMG : 1;
+  const finalBossMul = (t.big && type === 'wildfire' && ((cw3 >= 8 && cw3 <= 10) || cw3 === 12 || cw3 === 13 || cw3 === TOWER_CHAPTER)) || type === 'iceheart' ? FINAL_BOSS_DMG : 1;
   const easy = cw3 >= 8 && !t.big, hpEase = easy ? CH89_EASE_HP : 1, dmgEase = easy ? CH89_EASE_DMG : 1;     /* the gentler endgame: ordinary enemies only */
   const e = {
     type: type, def: t, x: x, y: y, vx: 0, vy: 0, kx: 0, ky: 0,

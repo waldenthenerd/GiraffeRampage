@@ -207,6 +207,8 @@ const UNI_SWATCH = {};
 (function(){
   [['Graduate Gown', '#2B2F4A', 'uni_grad'], ['Professor Tweed', '#8A7458', 'uni_prof'], ['Chancellor Crimson', '#8E1F3A', 'uni_chan']].forEach(function(w){ WARD_TOWN.push(w); WARD.push({ name: w[0], c: w[1] }); UNI_SWATCH[w[2]] = WARD.length - 1; });
 WARD.push({ name: 'Frost Mylar', c: '#CFE2EE' });                       /* 46: Chapter 13.5's colour (wardUnlocked in js/44e-wardrobe.js); it has to come after the three above, so it sits here */
+WARD.push({ name: 'Executive Navy', c: '#2F4376' });                     /* 47: Chapter 14's colour, the same way */
+WARD.push({ name: 'Brass Button', c: '#C8A24A' });                       /* 48: three stars in Rush Hour, Chapter 14's minigame (MINI_STAR_CHAPTERS in js/44k-minigame-rewards.js) */
 })();
 
 /* ---- the smart giraffe: an IQ chip over the bars in a run (the study cap and her rank), shown once she has studied anything ---- */

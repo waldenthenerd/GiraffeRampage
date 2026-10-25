@@ -2,6 +2,7 @@
 /* Enemy update and movement. */
 /* ========================= 19. ENEMY UPDATE ========================= */
 function updateEnemies(dt){
+  if (G.tower) towerFlow();                                    /* the Tower: how far every spot is from her, round the walls */
   const list = G.enemies, kdrag = Math.pow(0.0018, dt);        /* how much a shove has faded over this frame: the same for every creature */
   for (let i = list.length - 1; i >= 0; i--){
     const e = list[i];
@@ -36,7 +37,8 @@ function updateEnemies(dt){
     const tgx = antT ? antT.x : P.x, tgy = antT ? antT.y : P.y;
     const dx = tgx - e.x, dy = tgy - e.y;
     const d = hyp(dx, dy) || 1;
-    const ux = dx / d, uy = dy / d;
+    let ux = dx / d, uy = dy / d;
+    if (G.tower){ const sv = towerSteer(e, tgx, tgy, dt); if (sv){ ux = sv[0]; uy = sv[1]; } }       /* a wall in the way: head for the next doorway instead */
     const spd = e.spd * e.slowMul * (1 + 0.55 * (G.hunt || 0)) * (e.buffT > 0 ? 1.35 : 1);
     let mvx = 0, mvy = 0;
     /* A creature that is still far away (beyond every attack or aggro range in the game, 700) and has nothing in mind but coming closer
@@ -269,7 +271,7 @@ function updateEnemies(dt){
         }
 
         default: {                                                /* the Space Marines' behaviours live in MARINE_AI */
-          const f = MARINE_AI[e.ai] || DUST_AI[e.ai] || DOME_AI[e.ai];
+          const f = MARINE_AI[e.ai] || DUST_AI[e.ai] || DOME_AI[e.ai] || TOWER_AI[e.ai];
           if (f){ e.spdE = spd; const r = f(e, dt, ux, uy, d, dx, dy); mvx = r[0]; mvy = r[1]; }
         }
       }
@@ -308,7 +310,7 @@ function updateEnemies(dt){
     e.y += (mvy + e.ky) * dt;
     e.x = clamp(e.x, 12, ARENA_W - 12);
     e.y = clamp(e.y, 12, ARENA_H - 12);
-    if (G.buildings && G.buildings.length && !CITY_FLYERS[e.def.look]){
+    if (G.buildings && G.buildings.length && (G.tower || !CITY_FLYERS[e.def.look])){
       const hb = resolveBuildings(e, e.r * 0.85);
       if (hb){
         if (CITY_CRUSHERS[e.def.look] && e.state === 'dash') damageBuilding(hb, hb.maxHp * 0.5 * dt, 'crush');   /* a charging tank ploughs straight through */

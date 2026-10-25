@@ -31,7 +31,8 @@ function miniStarsOf(m){
   const v = miniStarVal(m);
   return 1 + (v >= d.t[0] ? 1 : 0) + (v >= d.t[1] ? 1 : 0);
 }
-function miniStarTotal(){ const s = miniData().stars; let n = 0; for (let ch = 1; ch <= MAIN_CHAPTERS; ch++) n += Math.min(3, s[ch] | 0); return n; }
+const MINI_STAR_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15];                  /* the chapters that have a minigame (13.5, the Domes, has none; Chapter 14, the Tower, has Rush Hour) */
+function miniStarTotal(){ const s = miniData().stars; let n = 0; for (let i = 0; i < MINI_STAR_CHAPTERS.length; i++) n += Math.min(3, s[MINI_STAR_CHAPTERS[i]] | 0); return n; }
 function miniStarText(n, big){ return '<span style="color:#FFD84D">' + '★'.repeat(n) + '</span><span style="opacity:.3">' + '★'.repeat(3 - n) + '</span>'; }
 
 /* the wheel's slices for a given number of stars: same items, the rare hats' share grows */
@@ -292,7 +293,7 @@ function showCollection(){
   setOverlay(
     '<div class="panel slab wide" style="max-width:640px">' +
       '<h2 class="head">Collection</h2>' +
-      '<p class="sub">' + accOwnedCount() + ' of ' + ACC_ITEMS.length + ' found. Stars earned: <b>' + miniStarTotal() + ' of ' + MAIN_CHAPTERS * 3 + '</b>. Click one you have to wear it.</p>' +
+      '<p class="sub">' + accOwnedCount() + ' of ' + ACC_ITEMS.length + ' found. Stars earned: <b>' + miniStarTotal() + ' of ' + MINI_STAR_CHAPTERS.length * 3 + '</b>. Click one you have to wear it.</p>' +
       (typeof tipOnce === 'function' ? tipOnce('coll', 'The dark shapes are items you have not found yet. Every minigame spin can give one, and rare hats are the gold-edged ones.') : '') +
       '<div class="collwrap">' + sect('Hats', ACC.hats.concat(ACC.rare)) + sect('Boots', ACC.boots) + (ACC.townHats ? sect('Only in Longneck Town', ACC.townHats.concat(ACC.townBoots)) : '') + '</div>' +
       '<div class="row" style="margin-top:12px"><button class="btn sm ghost" data-a="wardrobe">Wardrobe</button><button class="btn sm" data-a="mini-menu">Minigames</button></div>' +

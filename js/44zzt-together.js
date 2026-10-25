@@ -17,7 +17,7 @@
    Controls: giraffe 1 is WASD (the keys in Settings) with Space, or the mouse button, to kick; giraffe 2 is the arrow keys with Enter. Gamepads:
    with two, the first drives giraffe 1 and the second giraffe 2; with one, it drives giraffe 2. Auto-kick in Settings kicks for both. */
 const CO_SW = ['x', 'y', 'vx', 'vy', 'face', 'aim', 'walk', 'hp', 'maxHp', 'invuln', 'hurtT', 'kickCd', 'kickAnim', 'dead', 'rage', 'regenAcc'];
-const CO_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];       /* every chapter's backdrop and creatures, each opening once the one before it is finished in the real save */
+const CO_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];       /* every chapter's backdrop and creatures, each opening once the one before it is finished in the real save */
 const CO_ROUND_WAVES = [1, 2, 3, 4, 6, 7, 8, 9];     /* the waves of the chapter a round is built from (no boss waves) */
 /* without cards or experience the pair are weaker than a real run's giraffe: a third as many creatures, with a third of the health and a third of the damage */
 const CO_EASE = 3;
@@ -218,6 +218,7 @@ function coNextRound(){
   const k = (Co.round - 1) % CO_ROUND_WAVES.length, cyc = Math.floor((Co.round - 1) / CO_ROUND_WAVES.length);
   const w = chapterFirstWave(Co.chapter) - 1 + CO_ROUND_WAVES[k];
   G.wave = w; G.chapter = Co.chapter;
+  if (Co.chapter === TOWER_CHAPTER){ towerPrepareFloor(w); Co.pl[0].x = P.x - 60; Co.pl[1].x = P.x + 60; Co.pl[0].y = Co.pl[1].y = P.y; }       /* the Tower: a new floor each round, and both giraffes come out of its lift */
   /* the chapter's own mix of creatures, but only a few at first (a later chapter's wave is far bigger than two giraffes without cards can take): five and two more every round, then a third of that (CO_EASE) */
   let q = buildWave(w).filter(function(s){ return !s.boss && !s.ally; }).slice(0, Math.max(2, Math.round((5 + 2 * Co.round) / CO_EASE)));
   Co.cyc = cyc;
@@ -239,6 +240,7 @@ function coArenaStep(dt){
     Co.queue.shift();
     e.hp = e.hp / CO_EASE * (1 + 0.2 * (Co.cyc || 0)); e.maxHp = e.hp; e.dmg /= CO_EASE;
     if (G.chapter === DOME_CHAPTER){ const dk = domeScale(chapterWaveOf(G.wave)), bk = enemyScale(WAVES_PER_CHAPTER); e.hp /= dk.hp / bk.hp; e.maxHp = e.hp; e.dmg /= dk.dmg / bk.dmg; }          /* the Domes' extra strength is for the real run; here they are as strong as Chapter 13's */
+    if (G.chapter === TOWER_CHAPTER){ const tk = towerScale(chapterWaveOf(G.wave)), bk2 = enemyScale(WAVES_PER_CHAPTER); e.hp /= tk.hp / bk2.hp; e.maxHp = e.hp; e.dmg /= tk.dmg / bk2.dmg; }          /* and the Tower's, the same way */
     burstParticles(p.x, p.y, 5, '#6B5B45', 120, 3);
   }
   if (!Co.queue.length){

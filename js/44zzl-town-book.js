@@ -34,7 +34,7 @@
     c.push(['Errands', safe(function(){ return TOWN_ERRANDS.filter(function(e){ return townErrState(e.id) === 2; }).length; }, 0), TOWN_ERRANDS.length, 'finished for the herd']);
     c.push(['Friends', safe(function(){ return TOWN_NPC_LIST.filter(function(i){ return townBondLevel(i) >= 3; }).length; }, 0), TOWN_NPC_LIST.length, 'best friends (gifts raise it)']);
     c.push(['Creatures met', safe(function(){ const n = bestiaryCounts(); return n.creatures; }, 0), safe(function(){ return BESTIARY_TOTAL_CREATURES; }, 0), 'in the bestiary']);
-    c.push(['Minigame stars', safe(miniStarTotal, 0), 39, 'from the chapter minigames']);
+    c.push(['Minigame stars', safe(miniStarTotal, 0), typeof MINI_STAR_CHAPTERS !== 'undefined' ? MINI_STAR_CHAPTERS.length * 3 : 42, 'from the chapter minigames']);
     if (typeof GYM_SKILLS !== 'undefined') c.push(['The gym', safe(gymTotal, 0), GYM_SKILLS.length * GYM_MAX, 'levels trained · ' + safe(function(){ return GYM_RANKS[gymRankIndex()].n; }, '')]);
     if (typeof UNI_FAC !== 'undefined'){
       c.push(['The university', safe(uniTotal, 0), UNI_FAC.length * UNI_MAX, 'levels studied · ' + safe(function(){ return UNI_RANKS[uniRankIndex()].n; }, '')]);
