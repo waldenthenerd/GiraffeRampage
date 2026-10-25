@@ -40,16 +40,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 177 | 56,813 | 4.37 MiB (4,579,300 bytes) |
+| JavaScript (`js/`) | 177 | 56,800 | 4.37 MiB (4,577,321 bytes) |
 | Styles (`css/`) | 6 | 1,710 | 158 KiB (161,420 bytes) |
 | Page (`index.html`) | 1 | 225 | 9.7 KiB (9,950 bytes) |
-| **Whole game** | **184** | **58,748** | **4.53 MiB (4,750,670 bytes)** |
+| **Whole game** | **184** | **58,735** | **4.53 MiB (4,748,691 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **58,172 lines, 4.49 MiB (4,706,140 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 177 | 56,813 | 4.37 MiB (4,579,300 bytes) |
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **58,159 lines, 4.49 MiB (4,704,161 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 177 | 56,800 | 4.37 MiB (4,577,321 bytes) |
 | Styles (`css/`) | 6 | 1,710 | 158 KiB (161,420 bytes) |
 | Page (`index.html`) | 1 | 225 | 9.7 KiB (9,950 bytes) |
-| **Whole game** | **184** | **58,748** | **4.53 MiB (4,750,670 bytes)** |
+| **Whole game** | **184** | **58,735** | **4.53 MiB (4,748,691 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -101,7 +101,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/25-lab.js` | 89 | The Giraffe Lab (Mutation Vial). |
 | `js/26-dust-squad.js` | 135 | The dust squad (alliance after chapter 13). |
 | `js/27-film-mars.js` | 204 | The Mars films. |
-| `js/27a-film-domes.js` | 418 | **The Dome films** (Chapter 13.5). `MARS_FILMS.domeflight` (30 s: the dark green town helicopter, `domeHeli`, lifts off from Longneck Town, flies over the glittering savannah to a ring of mirror-skinned domes, `domeBuilding`, sees frost behind a lifted flap of mylar and lands) and `MARS_FILMS.domeout` (28 s: the dome glows and cracks, the helicopter takes off, a long flight and the skyline of New York). It plays after the Chapter 13 films, and when 13.5 is started from the menu. |
+| `js/27a-film-domes.js` | 405 | **The Dome films** (Chapter 13.5). `MARS_FILMS.domeflight` (30 s: the dark green town helicopter, `domeHeli`, lifts off from Longneck Town, flies over the glittering savannah to a ring of mirror-skinned domes, `domeBuilding`, sees frost behind a lifted flap of mylar and lands) and `MARS_FILMS.domeout` (28 s: the dome glows and cracks, the helicopter takes off, a long flight and the skyline of New York). It plays after the Chapter 13 films, and when 13.5 is started from the menu. |
 | `js/28-spaceplane.js` | 102 | The spaceplane. |
 | `js/29-city.js` | 123 | The Underground Giraffe City. |
 | `js/30-chapters-11-13.js` | 756 | Chapters 11, 12 and 13. |

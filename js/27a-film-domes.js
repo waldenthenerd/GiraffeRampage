@@ -363,18 +363,6 @@ function domeLady(ctx, lx, gy, t){
   ctx.fillStyle = VD; ctx.save(); ctx.translate(lx - 12, gy - 86); ctx.rotate(-0.2); ctx.fillRect(-6, -9, 12, 18); ctx.fillStyle = VL; ctx.fillRect(-5, -8, 10, 2); ctx.restore();                  /* the tablet on the other arm */
   ctx.strokeStyle = VD; ctx.lineWidth = 3.6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(lx - 8, gy - 96); ctx.lineTo(lx - 12, gy - 86); ctx.stroke(); ctx.lineCap = 'butt';
 }
-/* a guard in a dark uniform and a helmet, torch held out toward the helicopter, with its flame and a cone of light on the ground */
-function domeGuard(ctx, gx, gy, t, k){
-  const sw = Math.sin(t * 6 + k * 2) * 2;
-  ctx.fillStyle = 'rgba(255,248,200,.2)'; ctx.beginPath(); ctx.moveTo(gx - 24, gy - 54); ctx.lineTo(gx - 240, gy - 100 - k * 20); ctx.lineTo(gx - 240, gy - 20 - k * 20); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#14141C'; ctx.fillRect(gx - 6, gy - 22, 5, 22); ctx.fillRect(gx + 1, gy - 22, 5, 22); ctx.fillStyle = '#0A0A10'; ctx.fillRect(gx - 7, gy - 3, 7, 3); ctx.fillRect(gx + 1, gy - 3, 7, 3);   /* legs and boots */
-  ctx.fillStyle = '#20202C'; ctx.beginPath(); ctx.moveTo(gx - 9, gy - 24); ctx.lineTo(gx - 7, gy - 50); ctx.lineTo(gx + 7, gy - 50); ctx.lineTo(gx + 9, gy - 24); ctx.closePath(); ctx.fill();   /* the coat */
-  ctx.fillStyle = '#383848'; ctx.fillRect(gx - 9, gy - 33, 18, 3);
-  ctx.strokeStyle = '#20202C'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(gx - 6, gy - 47); ctx.lineTo(gx - 22, gy - 54 + sw); ctx.stroke(); ctx.beginPath(); ctx.moveTo(gx + 6, gy - 47); ctx.lineTo(gx + 8, gy - 30); ctx.stroke(); ctx.lineCap = 'butt';
-  ctx.fillStyle = '#C8A07A'; ctx.beginPath(); ctx.arc(gx, gy - 56, 5.4, 0, TAU); ctx.fill(); ctx.fillStyle = '#10101A'; ctx.beginPath(); ctx.arc(gx, gy - 58, 6.2, Math.PI, 0); ctx.fill(); ctx.fillRect(gx - 7, gy - 58, 14, 2.4);   /* the helmet */
-  ctx.strokeStyle = '#5A3A20'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(gx - 22, gy - 54 + sw); ctx.lineTo(gx - 26, gy - 70 + sw); ctx.stroke();
-  csGlow(ctx, gx - 26, gy - 75 + sw, 16, '#FFD070', 0.7); ctx.fillStyle = '#FFB040'; ctx.beginPath(); ctx.ellipse(gx - 26, gy - 75 + sw, 3.4, 6, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#FFF0B0'; ctx.beginPath(); ctx.ellipse(gx - 26, gy - 73 + sw, 1.6, 3.2, 0, 0, TAU); ctx.fill();
-}
 function domeOutScene(ctx, t){
   const T = DOME_OUT_T;
   if (t < T.B){                                                                      /* the dome glows and cracks; she runs to the helicopter, which takes off */
@@ -385,7 +373,6 @@ function domeOutScene(ctx, t){
     const py = gy - 74 - lift * 250, px = 420 + lift * 140;
     if (u < 4.4) csGiraffe(ctx, { x: csLerp(40, 360, csSm(0.8, 4.0, u)), y: gy + 14, s: 0.72, face: 1, walk: u * 9, moving: u < 4.1, neck: 0.4, head: 0.1, bare: true, boots: false });
     domeHeli(ctx, { x: px, y: py, s: 1.0, t: t, rot: -0.1 * lift, spin: 1, pilot: u > 4.2 });
-    for (let k = 0; k < 3; k++) domeGuard(ctx, 1120 + k * 60, gy, t, k);   /* guards with torches */
   } else if (t < T.C){                                                               /* away from the domes, the dome flaring behind */
     const u = t - T.B, sc = u * 260, gy = 580, p = csSm(0, 7, u);
     domeDay(ctx, t, gy, sc, true);
