@@ -450,11 +450,13 @@ const GRPack = (function(){
   /* Writing. Save.write() runs often, and the GR3 model takes a few hundred milliseconds, so a write is stored at once in GR2 (fast) and the same text is
      repacked as GR3 later: after a quiet moment (not in the middle of a run), or as soon as the page is hidden. If anything else was written in between,
      or the repack does not give the text back, the GR2 copy simply stays. */
-  const WRITE3 = true;                                                        /* false: still read GR3, but write only GR2 (for a careful roll-out) */
+  const WRITE3 = false;                                                       /* false: read GR3 but only write GR2 by itself (the first release, so every copy of the game can read GR3 before any writes it); flush() still repacks on demand */
   let pendingJson = null, lastFast = null, timer = 0;
   function wrote(raw){
-    if (!WRITE3 || !pendingJson) return;
-    lastFast = raw; clearTimeout(timer); timer = setTimeout(function(){ upgrade(false); }, 4000);
+    if (!pendingJson) return;
+    lastFast = raw;
+    if (!WRITE3) return;
+    clearTimeout(timer); timer = setTimeout(function(){ upgrade(false); }, 4000);
   }
   function upgrade(force){
     timer = 0;
@@ -470,8 +472,8 @@ const GRPack = (function(){
     } catch (e) { return false; }
   }
   if (typeof document !== 'undefined' && document.addEventListener){
-    document.addEventListener('visibilitychange', function(){ if (document.hidden && lastFast) upgrade(true); });
-    window.addEventListener('pagehide', function(){ if (lastFast) upgrade(true); });
+    document.addEventListener('visibilitychange', function(){ if (WRITE3 && document.hidden && lastFast) upgrade(true); });
+    window.addEventListener('pagehide', function(){ if (WRITE3 && lastFast) upgrade(true); });
   }
   function encodeFast(obj){ pendingJson = JSON.stringify(obj); return encode2(pendingJson); }
   function encode(obj){

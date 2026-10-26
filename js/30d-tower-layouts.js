@@ -13,7 +13,7 @@ const TW_U = 150, TW_COLS = 28, TW_ROWS = 21, TW_WALL = 64, TW_DOOR = 2.6, TW_IN
 function twRnd(seed){ let s = (seed * 9301 + 49297) % 233280; return function(){ s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
 /* ---- furniture patterns: each takes the free area of a room (r = { x0, y0, x1, y1 } in cells) and a seeded random, and returns boxes { x, y, w, h, k } in cells ---- */
 const TW_PAT = {
-  pillars(r){ const o = [], nx = Math.max(1, Math.floor((r.x1 - r.x0) / 4.4)), ny = Math.max(1, Math.floor((r.y1 - r.y0) / 4.4)); for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) o.push({ x: r.x0 + (i + 0.5) * (r.x1 - r.x0) / nx - 0.5, y: r.y0 + (j + 0.5) * (r.y1 - r.y0) / ny - 0.5, w: 1, h: 1, k: 'pillar' }); return o; },
+  pillars(r){ const o = [], nx = Math.max(1, Math.floor((r.x1 - r.x0) / 4.4)), ny = Math.max(1, Math.floor((r.y1 - r.y0) / 4.4)); for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) o.push({ x: r.x0 + (i + 0.5) * (r.x1 - r.x0) / nx - 0.5, y: r.y0 + (j + 0.5) * (r.y1 - r.y0) / ny - 0.5, w: 1, h: 1, k: (i + j) % 2 && nx * ny > 3 ? 'planter' : 'pillar' }); return o; },
   cubicles(r){ const o = [], nx = Math.floor((r.x1 - r.x0 + 1.8) / 5.0), ny = Math.floor((r.y1 - r.y0 + 2.3) / 3.6); if (nx < 1 || ny < 1) return o; const ox = r.x0 + ((r.x1 - r.x0) - (nx * 5.0 - 1.8)) / 2, oy = r.y0 + ((r.y1 - r.y0) - (ny * 3.6 - 2.3)) / 2;
     for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) o.push({ x: ox + i * 5.0, y: oy + j * 3.6, w: 3.2, h: 1.3, k: 'desk' }); return o; },
   tables(r){ const o = [], nx = Math.floor((r.x1 - r.x0 + 2.6) / 5.2), ny = Math.floor((r.y1 - r.y0 + 2.4) / 3.9); if (nx < 1 || ny < 1) return o; const ox = r.x0 + ((r.x1 - r.x0) - (nx * 5.2 - 2.6)) / 2, oy = r.y0 + ((r.y1 - r.y0) - (ny * 3.9 - 2.4)) / 2;
@@ -29,8 +29,8 @@ const TW_PAT = {
   counters(r){ const W = Math.min(r.x1 - r.x0, 11); return [{ x: r.x0, y: r.y0, w: W, h: 1.1, k: 'counter' }, { x: r.x1 - 1.1, y: r.y0 + 2.4, w: 1.1, h: Math.max(1, Math.min(4.5, r.y1 - r.y0 - 3)), k: 'counter' }]; },
   desks(r){ const o = [], nx = Math.max(1, Math.floor((r.x1 - r.x0 + 2) / 4.4)), ny = Math.max(1, Math.floor((r.y1 - r.y0 + 2) / 3.6)); for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) o.push({ x: r.x0 + (i + 0.5) * (r.x1 - r.x0) / nx - 1.2, y: r.y0 + (j + 0.5) * (r.y1 - r.y0) / ny - 0.6, w: 2.4, h: 1.2, k: 'desk' }); return o; },
   longtable(r){ const W = Math.min(r.x1 - r.x0 - 2, 13), H = Math.min(r.y1 - r.y0 - 2, 2.6), cx = (r.x0 + r.x1) / 2, cy = (r.y0 + r.y1) / 2; return [{ x: cx - W / 2, y: cy - H / 2, w: W, h: H, k: 'table' }]; },
-  tanks(r){ const o = [], nx = Math.max(1, Math.floor((r.x1 - r.x0) / 5.5)), ny = Math.max(1, Math.floor((r.y1 - r.y0) / 5.5)); for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) o.push({ x: r.x0 + (i + 0.5) * (r.x1 - r.x0) / nx - 0.9, y: r.y0 + (j + 0.5) * (r.y1 - r.y0) / ny - 0.9, w: 1.8, h: 1.8, k: 'tank' }); return o; },
-  safes(r){ const o = [], n = Math.floor((r.x1 - r.x0 + 2.4) / 4.6); if (n < 1) return o; const ox = r.x0 + ((r.x1 - r.x0) - (n * 4.6 - 2.4)) / 2, H = r.y1 - r.y0; for (let i = 0; i < n; i++) o.push({ x: ox + i * 4.6, y: r.y0 + (i % 2 ? H * 0.5 : 0), w: 2.2, h: H * 0.5 - 1.1, k: 'safe' }); return o; },
+  tanks(r){ const o = [], nx = Math.max(1, Math.floor((r.x1 - r.x0) / 5.5)), ny = Math.max(1, Math.floor((r.y1 - r.y0) / 5.5)); for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) o.push({ x: r.x0 + (i + 0.5) * (r.x1 - r.x0) / nx - ((i + j) % 2 ? 0.7 : 0.9), y: r.y0 + (j + 0.5) * (r.y1 - r.y0) / ny - ((i + j) % 2 ? 0.7 : 0.9), w: (i + j) % 2 ? 1.4 : 1.8, h: (i + j) % 2 ? 1.4 : 1.8, k: 'tank' }); return o; },
+  safes(r){ const o = [], n = Math.floor((r.x1 - r.x0 + 2.4) / 4.6); if (n < 1) return o; const ox = r.x0 + ((r.x1 - r.x0) - (n * 4.6 - 2.4)) / 2, H = r.y1 - r.y0; for (let i = 0; i < n; i++) o.push({ x: ox + i * 4.6, y: r.y0 + (i % 2 ? H * 0.5 : 0), w: i % 3 === 1 ? 1.5 : 2.2, h: H * (i % 3 === 2 ? 0.35 : 0.5) - 1.1, k: 'safe' }); return o; },
   throne(r){ const cx = (r.x0 + r.x1) / 2; return [{ x: cx - 3.5, y: r.y0, w: 7, h: 1.6, k: 'desk' }, { x: r.x0 + 1, y: r.y0 + 5, w: 1, h: 1, k: 'pillar' }, { x: r.x1 - 2, y: r.y0 + 5, w: 1, h: 1, k: 'pillar' }, { x: r.x0 + 1, y: r.y1 - 2, w: 1, h: 1, k: 'pillar' }, { x: r.x1 - 2, y: r.y1 - 2, w: 1, h: 1, k: 'pillar' }]; },
   none(){ return []; }
 };
@@ -149,8 +149,13 @@ function twBuildPlan(n){
   }
   function segWall(vert, line, a, b){ if (vert) wall(line * U - T / 2, a * U - T / 2, T, (b - a) * U + T); else wall(a * U - T / 2, line * U - T / 2, (b - a) * U + T, T); }
   /* furniture: laid out inside each room with a clear margin all round, so doorways and the room's rim stay open */
-  keys.forEach(k => { const r = P0.rooms[k], pat = (P0.pats || {})[k]; if (!pat || !TW_PAT[pat]) return;
-    const area = { x0: r[0] + TW_INSET, y0: r[1] + TW_INSET, x1: r[2] - TW_INSET, y1: r[3] - TW_INSET }; if (area.x1 - area.x0 < 2.2 || area.y1 - area.y0 < 2.2) return;
+  /* a big room with no furniture of its own gets the pattern that suits the floor (corridors, thin rooms and boss floors stay open) */
+  const FILL = { lobby: 'sofas', mail: 'shelves', steel: 'desks', carpet: 'desks', marble: 'sofas', tile: 'tables', server: 'racks', lab: 'tables', vault: 'safes', wood: 'longtable', penthouse: 'sofas' };
+  keys.forEach(k => { const r = P0.rooms[k], rw0 = r[2] - r[0], rh0 = r[3] - r[1]; let pat = (P0.pats || {})[k];
+    if (!pat && !P0.boss && Math.min(rw0, rh0) >= 6 && rw0 * rh0 >= 48 && Math.max(rw0, rh0) <= 2.6 * Math.min(rw0, rh0)) pat = FILL[r[4] || P0.kind];
+    if (!pat || !TW_PAT[pat]) return;
+    const ins = Math.min(TW_INSET, Math.max(1.5, (Math.min(rw0, rh0) - 2.4) / 2));                          /* a shallow room (6 cells deep) keeps a slightly smaller margin so it can hold a row of furniture */
+    const area = { x0: r[0] + ins, y0: r[1] + ins, x1: r[2] - ins, y1: r[3] - ins }; if (area.x1 - area.x0 < 2.2 || area.y1 - area.y0 < 2.2) return;
     TW_PAT[pat](area, rnd).forEach(b => { b.w = Math.min(b.w, area.x1 - area.x0); b.h = Math.min(b.h, area.y1 - area.y0); b.x = Math.max(area.x0, Math.min(area.x1 - b.w, b.x)); b.y = Math.max(area.y0, Math.min(area.y1 - b.h, b.y));          /* nothing may straddle a wall */
       if (b.w > 0.2 && b.h > 0.2) boxes.push({ x: b.x * U, y: b.y * U, w: b.w * U, h: b.h * U, k: b.k, room: k }); }); });
   /* the elevators come first, so the clutter can keep clear of them */

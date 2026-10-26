@@ -297,7 +297,7 @@ either way; the point is the cloud row and the localStorage are smaller, and pho
 
 ### The newer format: GR3
 
-`GR3:` replaces GR2 as what the save rests as. `Save.write()` still stores GR2 (fast, synchronous) and the **same text** is repacked as GR3 about four
+From the release that sets `WRITE3 = true`, `GR3:` replaces GR2 as what the save rests as. `Save.write()` always stores GR2 (fast, synchronous) and the **same text** is repacked as GR3 about four
 seconds later (not during a run), or at once when the page is hidden or closed. The repack is only stored if nothing else wrote in between and if decoding
 it gives the identical text; otherwise the GR2 copy stays. The value is still a JSON string literal, `"GR3:..."`.
 
@@ -317,8 +317,8 @@ integers only, so every browser produces identical predictions. **The model and 
 `tools/scenarios/save-gr3.js` holds a golden code that fails if either moves. The reference decoder is `cmDecode` in the same file.
 
 Cost: a few hundred milliseconds to pack or to read a large save (mostly reading the primer), about 20 MB of memory while it runs, none afterward. Saves over 1 MB use GR2.
-`WRITE3 = false` in that file makes the game read GR3 but write only GR2, for a careful roll-out (an older copy of the game cannot read `GR3:` and would treat it as an
-unreadable save, which it keeps aside under `giraffe_rampage_save_v1_unreadable` but does not load).
+**Roll-out:** `WRITE3` in that file is `false` in the first release: the game reads GR3 but never repacks by itself (only `GRSave.flush()` does), so every copy in the wild can read GR3 before any writes it. A later release sets it to `true`. Until then, an older copy of the game cannot read `GR3:` and would treat it as an
+unreadable save, which it keeps aside under `giraffe_rampage_save_v1_unreadable` but does not load.
 
 ### How the game reads it
 
@@ -527,7 +527,7 @@ panel. **The minigames themselves ARE part of the game and must be included.**
 3. `typeof window.GR === 'object'` and `GR.G.state` is a string (the `/play` page depends on it).
 4. `typeof window.GRSave === 'object'`; `GRSave.decode(GRSave.encode({a:1})).a === 1`.
 5. **Save round trip:** play a moment, reload: progress is still there. Look at localStorage `giraffe_rampage_save_v1`: it
-   must start with `"GR3:` (or `"GR2:` for the first few seconds after a change).
+   must start with `"GR2:` in the first release (`WRITE3 = false`), later `"GR3:` (or `"GR2:` for the first few seconds after a change).
 6. **Old-save test:** put `{"gold":777}` (plain JSON) into that key, reload: the game shows 777 gold, and after any action that
    saves, the key holds the packed form.
 7. **Bridge test:** sign in, play, reload on another browser: the cloud save arrives and loads.
