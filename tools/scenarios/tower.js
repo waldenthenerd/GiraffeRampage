@@ -5,8 +5,9 @@
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
   function freshSave(){ Save.reset(); }
-  function steps(n, dt){ for (var i = 0; i < n; i++) GR.step(dt || 1 / 30); }
-  function killAll(){ G.enemies.slice().forEach(function(e){ if (!e.dead) damageEnemy(e, 1e18, { noCrit: true, quiet: true }); }); }
+  function noLevels(){ G.pendingLevels = 0; G.levelGate = 0; if (G.state === 'levelup'){ G.state = 'playing'; G.offer = null; hideOverlay(); } }     /* kills now pay XP, so a level-up card can pause the game under a test */
+  function steps(n, dt){ for (var i = 0; i < n; i++){ GR.step(dt || 1 / 30); noLevels(); } }
+  function killAll(){ G.enemies.slice().forEach(function(e){ if (!e.dead) damageEnemy(e, 1e18, { noCrit: true, quiet: true }); }); noLevels(); }
   function godMode(){ P.invuln = 1e9; P.hp = P.maxHp = 1e12; G.rerolls = 0; }
   try {
     /* the chapter table: the old chapters, the Domes and the Tower are all as they should be */
@@ -140,11 +141,19 @@
     var rs = Save.data.runSave; out.runSaved = !!rs && rs.wave === 348 && validRunSave(rs);
     if (rs){ startRun(rs.chapter, rs.wave, rs); steps(5); out.restored = G.wave === 348 && TW.n === 13 && G.tower === true && TW.floor.name === 'Shredding Plant'; }
 
+    /* kills pay experience in the Domes and the Tower (the XP table once stopped at Chapter 13, so XP was NaN and the level never rose) */
+    out.xpPays = true; [326, 335, 336, 348, 360].forEach(function(w){
+      freshSave(); Save.data.chapter14Complete = true; startRun(w >= 336 ? 15 : 14, w); steps(10); godMode();
+      for (var q = 0; q < 300 && !G.enemies.length; q++) GR.step(1 / 30);
+      var en = G.enemies[0]; if (!en){ out.xpPays = false; return; }
+      var l0 = P.level, x0 = P.xp; killEnemy(en); var gain = (P.level - l0) * 1e6 + P.xp - x0;
+      if (!(P.xp === P.xp && isFinite(P.xp) && gain > 0)){ out.xpPays = false; out.xpBad = w + ':' + P.xp + ':' + P.level; }
+    });
     /* Play together: the Tower is on the list and a round builds on its floors */
     freshSave(); Save.data.chapter14Complete = true; out.togetherList = coChapters().indexOf(15) >= 0;
     coStart('arena', 15); steps(30, 1 / 30); out.together = Co.on && G.chapter === TOWER_CHAPTER && G.tower === true && !!TW.floor && G.buildings.length > 10 && Co.pl[0].x === Co.pl[0].x; coEnd(true);
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['table', 'bossWaves', 'tuneRising', 'cast', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'plans', 'giraffeBlocked', 'shotStops', 'finds', 'kindsOk', 'bossBehaviour', 'floor1', 'spawns', 'liftOpens', 'rideStarts', 'rideDone', 'nextWave', 'bossFloor', 'bossEndsFloor', 'lastFloor', 'endFilm', 'endOffer', 'endVictory', 'rushDef', 'rushLocked', 'rushOpen', 'rushStart', 'rushLanes', 'rushFloor', 'rushHit', 'rushStars', 'rushCoat', 'rushTotals', 'vial', 'vialOnce', 'menuLocked', 'menuOpen', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runSaved', 'restored', 'togetherList', 'together', 'bestiary', 'victoryText'];
+  var need = ['table', 'bossWaves', 'tuneRising', 'cast', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'plans', 'giraffeBlocked', 'shotStops', 'finds', 'kindsOk', 'bossBehaviour', 'floor1', 'spawns', 'liftOpens', 'rideStarts', 'rideDone', 'nextWave', 'bossFloor', 'bossEndsFloor', 'lastFloor', 'endFilm', 'endOffer', 'endVictory', 'rushDef', 'rushLocked', 'rushOpen', 'rushStart', 'rushLanes', 'rushFloor', 'rushHit', 'rushStars', 'rushCoat', 'rushTotals', 'vial', 'vialOnce', 'menuLocked', 'menuOpen', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runSaved', 'restored', 'xpPays', 'togetherList', 'together', 'bestiary', 'victoryText'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);

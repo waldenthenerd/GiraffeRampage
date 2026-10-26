@@ -151,12 +151,14 @@ function twBuildPlan(n){
   /* furniture: laid out inside each room with a clear margin all round, so doorways and the room's rim stay open */
   keys.forEach(k => { const r = P0.rooms[k], pat = (P0.pats || {})[k]; if (!pat || !TW_PAT[pat]) return;
     const area = { x0: r[0] + TW_INSET, y0: r[1] + TW_INSET, x1: r[2] - TW_INSET, y1: r[3] - TW_INSET }; if (area.x1 - area.x0 < 2.2 || area.y1 - area.y0 < 2.2) return;
-    TW_PAT[pat](area, rnd).forEach(b => { if (b.w > 0.2 && b.h > 0.2) boxes.push({ x: b.x * U, y: b.y * U, w: b.w * U, h: b.h * U, k: b.k, room: k }); }); });
+    TW_PAT[pat](area, rnd).forEach(b => { b.w = Math.min(b.w, area.x1 - area.x0); b.h = Math.min(b.h, area.y1 - area.y0); b.x = Math.max(area.x0, Math.min(area.x1 - b.w, b.x)); b.y = Math.max(area.y0, Math.min(area.y1 - b.h, b.y));          /* nothing may straddle a wall */
+      if (b.w > 0.2 && b.h > 0.2) boxes.push({ x: b.x * U, y: b.y * U, w: b.w * U, h: b.h * U, k: b.k, room: k }); }); });
   /* the lifts come first, so the clutter can keep clear of them */
   const liftSpot = (spec) => { const r = P0.rooms[spec[0]], side = spec[1], pos = spec[2]; let cx, cy;
     if (side === 's'){ cx = pos; cy = r[3] - 1; } else if (side === 'n'){ cx = pos; cy = r[1] + 1; } else if (side === 'w'){ cx = r[0] + 1; cy = pos; } else { cx = r[2] - 1; cy = pos; }
     return { x: (cx - 1) * U - U * 0.6, y: (cy - 1) * U - U * 0.6, w: 3.2 * U, h: 3.2 * U }; };
   const sp0 = liftSpot(P0.start), ep0 = liftSpot(P0.lift), start0 = { x: sp0.x + sp0.w / 2, y: sp0.y + sp0.h / 2 }, exit0 = { x: ep0.x + ep0.w / 2, y: ep0.y + ep0.h / 2 };
+  for (let i = boxes.length - 1; i >= 0; i--){ const q = boxes[i]; if ([sp0, ep0].some(z => q.x < z.x + z.w + 0.5 * U && q.x + q.w > z.x - 0.5 * U && q.y < z.y + z.h + 0.5 * U && q.y + q.h > z.y - 0.5 * U)) boxes.splice(i, 1); }     /* nothing from a room's furniture pattern stands on a lift */
   const base = twReach(walls.concat(boxes), start0.x, start0.y, exit0.x, exit0.y);
   const keep = [sp0, ep0];
   doors.forEach(d => keep.push(d.v ? { x: d.x - 1.5 * U, y: d.y - 0.6 * U, w: 3 * U, h: d.h + 1.2 * U } : { x: d.x - 0.6 * U, y: d.y - 1.5 * U, w: d.w + 1.2 * U, h: 3 * U }));
@@ -169,17 +171,18 @@ function twBuildPlan(n){
   }, SIZE = { cabinet: [0.62, 1.1], bookcase: [0.6, 1.6], plant: [0.8, 0.8], cooler: [0.6, 0.6], printer: [1.0, 0.8], vending: [0.9, 0.8], crate: [0.9, 0.9], bin: [0.5, 0.5], rack: [0.7, 1.4], safe: [0.9, 0.9], bench: [1.0, 2.0] };
   keys.forEach(k => {                                                                      /* things stood against the walls: never near a door or a lift */
     const r = P0.rooms[k], kind = r[4] || P0.kind, list = KINDS[kind] || KINDS.carpet, x0 = r[0] * U + 0.34 * U, y0 = r[1] * U + 0.34 * U, x1 = r[2] * U - 0.34 * U, y1 = r[3] * U - 0.34 * U;
+    const used = {}, ONE = { cooler: 1, vending: 1, printer: 1, safe: 1, plant: 3, bin: 2, bench: 1, rack: 3 };
     for (let side = 0; side < 4; side++){
-      const horiz = side < 2, len = horiz ? x1 - x0 : y1 - y0;
+      const horiz = side < 2, len = horiz ? x1 - x0 : y1 - y0; let prev = '';
       for (let at = 0.9 * U; at < len - 0.9 * U; at += (1.1 + rnd() * 1.6) * U){
         if (rnd() < 0.3) continue;
-        const kk = list[Math.floor(rnd() * list.length)], sz = SIZE[kk], along = (horiz ? sz[1] : sz[0]) * U, depth = (horiz ? sz[0] : sz[1]) * U;
+        const kk = list[Math.floor(rnd() * list.length)]; if (kk === prev || (ONE[kk] && (used[kk] | 0) >= ONE[kk])) continue; const sz = SIZE[kk], along = (horiz ? sz[1] : sz[0]) * U, depth = (horiz ? sz[0] : sz[1]) * U;
         const w = horiz ? along : depth, h = horiz ? depth : along;
         const bx = horiz ? x0 + at : side === 2 ? x0 : x1 - w, by = horiz ? (side === 0 ? y0 : y1 - h) : y0 + at;
         const b = { x: bx, y: by, w: w, h: h, k: kk, room: k, deco: true };
         if (keep.some(q => hits(b, q, 0)) || boxes.some(q => hits(b, q, 0.35 * U)) || bx + w > x1 + 1 || by + h > y1 + 1) continue;
-        boxes.push(b); const rc = twReach(walls.concat(boxes), start0.x, start0.y, exit0.x, exit0.y);
-        if (!rc.liftOk || rc.lost > base.lost) boxes.pop();                              /* it would shut something in: leave it out */
+        boxes.push(b); prev = kk; used[kk] = (used[kk] | 0) + 1; const rc = twReach(walls.concat(boxes), start0.x, start0.y, exit0.x, exit0.y);
+        if (!rc.liftOk || rc.lost > base.lost){ boxes.pop(); used[kk]--; prev = ''; }                              /* it would shut something in: leave it out */
       }
     }
     /* clutter on the floor: papers, cups, small boxes, cables, scuffs. Pictures only: nothing solid. */
