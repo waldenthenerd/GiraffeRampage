@@ -40,16 +40,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 183 | 58,401 | 4.55 MiB (4,775,712 bytes) |
+| JavaScript (`js/`) | 183 | 58,794 | 4.59 MiB (4,812,501 bytes) |
 | Styles (`css/`) | 6 | 1,711 | 158 KiB (161,450 bytes) |
 | Page (`index.html`) | 1 | 231 | 10.0 KiB (10,236 bytes) |
-| **Whole game** | **190** | **60,343** | **4.72 MiB (4,947,398 bytes)** |
+| **Whole game** | **190** | **60,736** | **4.75 MiB (4,984,187 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **59,750 lines, 4.67 MiB (4,901,201 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 183 | 58,401 | 4.55 MiB (4,775,712 bytes) |
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **60,143 lines, 4.71 MiB (4,937,990 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 183 | 58,794 | 4.59 MiB (4,812,501 bytes) |
 | Styles (`css/`) | 6 | 1,711 | 158 KiB (161,450 bytes) |
 | Page (`index.html`) | 1 | 231 | 10.0 KiB (10,236 bytes) |
-| **Whole game** | **190** | **60,343** | **4.72 MiB (4,947,398 bytes)** |
+| **Whole game** | **190** | **60,736** | **4.75 MiB (4,984,187 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -71,7 +71,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/00-icons.js` | 98 | The icon table (41 outlined icons drawn for this game) and the icon helpers. Runs outside strict mode, as it always did. |
 | `js/00b-icons-custom.js` | 153 | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
 | `js/01-core.js` | 361 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. Save fields `chapter14Complete` (13.5, the Domes) and `chapter15Complete` (14, the Tower). |
-| `js/01b-savepack.js` | 127 | Save compression: the save is stored as a JSON string holding `GR2:` + Base64 of an LZW-packed copy of its JSON (about 42 to 58 percent of the size). Old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `stats`). Format in the file header and in `lovable.md`. |
+| `js/01b-savepack.js` | 520 | Save compression: the save is stored as a JSON string holding `GR3:` + base 91 text of a context-mixing / arithmetic-coded copy of its JSON, primed with a frozen sample save (roughly a quarter of the GR2 size); each write is stored as `GR2:` (Base64 of LZW) at once and repacked as GR3 a few seconds later. GR2 and old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `flush`, `stats`). Format in the file header and in `lovable.md`. |
 | `js/02-music.js` | 347 | Procedural background music: themes, the 16-bar sequencer (A, A, B, A), key climb through a chapter, boss second phase, theme fade-in, stingers. |
 | `js/02b-ambience.js` | 132 | Extra sounds (card pick, wave clear, heartbeat, heavy thump), the per-chapter ambient bed that follows the weather, gamepad rumble. |
 | `js/02c-audio-mix.js` | 331 | Sound design on top of the synth: a reverb that follows the place (`MIX_ENV`), a hit sound per element, a death sound per kind of creature, an attack sound per kind of enemy (`Mix.variant`), boss roar, death and half-health growl, footsteps by ground, the music stingers, and the ambience extras (thunder with a delay, sweeping wind gusts, far-off calls). |
