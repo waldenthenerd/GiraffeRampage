@@ -1,6 +1,6 @@
-/* tower: Chapter 14, the Tower (internal chapter 15, waves 336 to 360): the chapter table, all twenty-five floor plans (unique, every room reachable, both lifts joined),
-   solid walls for the giraffe and for creatures, creatures finding their way through doorways, the lift between floors, the five bosses, the end of the run, the save,
-   the vial, the coat colour, the menu card and Play together. */
+/* tower: Chapter 14, the Tower (internal chapter 15, waves 336 to 360): the chapter table, all twenty-five floor plans (unique, every room reachable, both elevators joined),
+   solid walls for the giraffe and for creatures, creatures finding their way through doorways, the elevator between floors, the five bosses, the end of the run, the save,
+   the vial, the coat color, the menu card and Play together. */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
@@ -25,7 +25,7 @@
     freshSave(); out.wardLen = WARD.length === 49 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
     Save.data.chapter15Complete = true; out.wardOpen = wardUnlocked(47) === true;
 
-    /* the floor plans: twenty-five different ones, every room reachable, both lifts joined, vents everywhere, nothing outside the arena */
+    /* the floor plans: twenty-five different ones, every room reachable, both elevators joined, vents everywhere, nothing outside the arena */
     freshSave(); Save.data.chapter14Complete = true; startRun(15); steps(5); godMode();
     var sigs = {}, plansOk = true, why = [], unreach = [];
     for (var n = 1; n <= TOWER_WAVES; n++){
@@ -79,7 +79,7 @@
     out.bossBehaviour = bossOk && made['lion:memowind'] > 0 && made['matriarch:meeting'] > 0 && made['buffalo:coinwind'] > 0 && made['crocodile:flaskwind'] > 0 && made['wildfire:chartwind'] > 0;
     out.bossDetail = JSON.stringify(made).slice(0, 300);
 
-    /* the floors, one wave each: clear a floor, the lift opens, walking into it swaps the floor, and the next wave comes in */
+    /* the floors, one wave each: clear a floor, the elevator opens, walking into it swaps the floor, and the next wave comes in */
     freshSave(); Save.data.chapter14Complete = true; startRun(15); steps(10); G.introFX = null; G.banner = null; godMode(); G.rerolls = 0;
     out.floor1 = G.wave === 336 && TW.n === 1 && TW.floor.name === 'Lobby' && G.tower === true && G.biome === 'tower' && Math.abs(P.x - TW.floor.start.x) < 40;
     var seen = false; for (i = 0; i < 400 && G.spawnQueue.length; i++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; } seen = G.enemies.length > 0;
@@ -93,7 +93,7 @@
     out.rideDone = !TW.ride && G.wave === 337 && TW.n === 2 && TW.floor.name === 'Mailroom' && Math.abs(P.x - TW.floor.start.x) < 40 && Math.abs(P.y - TW.floor.start.y) < 40;
     steps(30); out.nextWave = (G.waveState === 'intro' || G.waveState === 'active') && G.wave === 337;
 
-    /* a boss floor: the Receptionist; killing the boss ends the floor at once, strays and all, and the lift opens */
+    /* a boss floor: the Receptionist; killing the boss ends the floor at once, strays and all, and the elevator opens */
     freshSave(); Save.data.chapter14Complete = true; startRun(15, 340); steps(10); G.introFX = null; G.banner = null; godMode();
     for (i = 0; i < 300 && G.spawnQueue.length; i++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; }
     out.bossFloor = !!G.boss && G.boss.def.title === 'The Receptionist' && TW.floor.boss === true && TW.floor.name === 'Reception Atrium';
@@ -101,7 +101,7 @@
     if (G.boss) damageEnemy(G.boss, 1e18, { noCrit: true, quiet: true }); steps(90);
     out.bossEndsFloor = strays >= 0 && G.waveState === 'clear' && TW.open === true && G.enemies.every(function(e){ return e.dead; }) && G.state === 'playing';
 
-    /* the end of the run: the last floor's boss falls, the film, then the report; the save, the coat colour, and the vial */
+    /* the end of the run: the last floor's boss falls, the film, then the report; the save, the coat color, and the vial */
     freshSave(); Save.data.chapter14Complete = true; Save.data.chapter13Complete = true; var v0 = Save.data.vials | 0;
     startRun(15, 360); steps(10); G.introFX = null; G.banner = null; godMode();
     out.lastFloor = G.wave === 360 && TW.n === 25 && isChapterFinaleWave(360) && TW.floor.name === 'The Executive Floor';
@@ -115,7 +115,7 @@
     var vials1 = Save.data.vials | 0; Save.data.chapter15Complete = true; var d = Save.data; steps(1); out.vialOnce = (Save.data.vials | 0) === vials1;
     G.chapter = TOWER_CHAPTER; out.victoryText = /Chief Executive/.test(victoryText(3, 4));
 
-    /* Rush Hour, the minigame after the Tower: the lanes, the lift, a hit, and the stars and the coat colour */
+    /* Rush Hour, the minigame after the Tower: the lanes, the elevator, a hit, and the stars and the coat color */
     freshSave(); out.rushDef = !!MINI[TOWER_CHAPTER] && MINI[TOWER_CHAPTER].name === 'Rush Hour' && typeof MINI[TOWER_CHAPTER].draw === 'function' && MINI_STAR[TOWER_CHAPTER].t[1] === 12 && MINI_STAR_CHAPTERS.length === 14;
     out.rushLocked = miniUnlocked(TOWER_CHAPTER) === false; Save.data.chapter15Complete = true; out.rushOpen = miniUnlocked(TOWER_CHAPTER) === true;
     Save.data.mini = { own: {}, best: {}, stars: {}, last: 0, plays: 0, hat: '', boot: '' };

@@ -8,7 +8,7 @@ const DM_MIXC = {};
 function dm_mix(a, c, t){ const k = a + c + t; return DM_MIXC[k] || (DM_MIXC[k] = blendHex(a, c, t)); }
 function dm_poly(ctx, pts, c){ ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(pts[0], pts[1]); for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]); ctx.closePath(); ctx.fill(); }
 function dm_eye(ctx, x, y, r){ fillCircle(ctx, x, y, r * 1.4, DM_EYE_DK); fillCircle(ctx, x, y, r, DM_CY); fillCircle(ctx, x + r * 0.2, y, r * 0.45, DM_CY_L); csGlow(ctx, x, y, r * 4, DM_CY, 0.5); }
-/* a faceted crystal: base centre (x,y), pointing along angle a, length L, half width w; one lit face and one shaded */
+/* a faceted crystal: base center (x,y), pointing along angle a, length L, half width w; one lit face and one shaded */
 function dm_crystal(ctx, x, y, a, L, w, c, lit){
   const ca = Math.cos(a), sa = Math.sin(a), px = -sa, py = ca;
   dm_poly(ctx, [x + px * w, y + py * w, x + ca * L, y + sa * L, x - px * w, y - py * w], c);

@@ -2,7 +2,7 @@
 /* Enemy art, Chapter 14: the Tower (TOWER_DRAW). */
 /* Twelve ordinary kinds and five bosses, all new: office machines and lab animals the glimmer has got into, drawn from above like every creature, facing +x. The
    ordinary ones read only def, type, r, anim and state of the creature, so the sprite cache (js/44t-enemy-sprites.js) can keep pictures of them. Shared look:
-   cold greys and cream plastic, with a hot accent (a red lens, a green glow, a yellow warning stripe) so each one stands out on the carpet. */
+   cold grays and cream plastic, with a hot accent (a red lens, a green glow, a yellow warning stripe) so each one stands out on the carpet. */
 const TW_RED = '#FF5A4A', TW_GLOW = '#9AF0C8', TW_GOLD = '#E8C84A', TW_EYE_DK = '#10141C';
 const TW_MIXC = {};
 function tw_mix(a, c, t){ const k = a + c + t; return TW_MIXC[k] || (TW_MIXC[k] = blendHex(a, c, t)); }

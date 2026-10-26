@@ -338,7 +338,7 @@ function startWave(n){
 
 function updateWaves(dt){
   if (G.attract){ attractSpawn(dt); return; }
-  if (TW.ride) towerRideTick(dt);                       /* the lift between two floors keeps running while the new floor's wave counts in */
+  if (TW.ride) towerRideTick(dt);                       /* the elevator between two floors keeps running while the new floor's wave counts in */
   if (G.waveState === 'intro'){
     G.waveTimer -= dt;
     if (G.waveTimer <= 0){ G.waveState = 'active'; G.spawnTimer = 0; }
@@ -407,7 +407,7 @@ function updateWaves(dt){
     }
   } else if (G.waveState === 'clear'){
     G.waveTimer -= dt;
-    if (G.chapter === TOWER_CHAPTER && !isRunEnd(G.wave)){ if (G.waveTimer <= 0) towerLiftTick(dt); return; }      /* the Tower: the next floor is a ride in the lift away */
+    if (G.chapter === TOWER_CHAPTER && !isRunEnd(G.wave)){ if (G.waveTimer <= 0) towerLiftTick(dt); return; }      /* the Tower: the next floor is a ride in the elevator away */
     if (G.waveTimer <= 0){
       marsClearAllies();
       if (isRunEnd(G.wave)){ if (G.chapter === TOWER_CHAPTER){ towerFinishSave(); startCutscene(function(){ marsRestoreHUD(); if (!miniOffer(TOWER_CHAPTER, chapterComplete)) chapterComplete(); }, false, 'towerout'); } else if (G.chapter === DOME_CHAPTER) startCutscene(function(){ marsRestoreHUD(); chapterComplete(); }, false, 'domeout'); else chapterComplete(); }       /* the last chapter's own film, then the report */

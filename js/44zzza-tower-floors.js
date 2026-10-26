@@ -3,7 +3,7 @@
 /* ========================= THE TOWER IN PLAY ========================= */
 /* The walls and the furniture are solid, unbreakable "buildings" (G.buildings): the giraffe, her ants and every creature, flyers too, have to go round them, and
    every shot dies on one. Creatures chase in a straight line when they can see her; when a wall is in the way they follow a flow field, a map of how many steps each
-   spot is from her (towerFlow), so they come through the doorways instead of pressing against the wall. A floor is cleared, the lift opens, she walks into it, and
+   spot is from her (towerFlow), so they come through the doorways instead of pressing against the wall. A floor is cleared, the elevator opens, she walks into it, and
    the ride up swaps the floor (towerRide). Everything the floor looks like is drawn from the plan in drawGroundTower. */
 const TW_NAV = 50, TW_NX = Math.ceil(ARENA_W / TW_NAV), TW_NY = Math.ceil(ARENA_H / TW_NAV), TW_RIDE = { out: 0.7, swap: 1.5, back: 2.3, end: 3.0 };
 const TW = { floor: null, n: 0, solid: null, blocked: null, dist: null, flowAt: -1, lift: null, ride: null, open: false, cache: {} };
@@ -29,7 +29,7 @@ function towerLoadFloor(n){
   return f;
 }
 function towerStartPoint(){ const s = TW.floor.start; return { x: s.x, y: s.y }; }
-/* startWave for a tower floor: load its plan the first time it is wanted, and put her in the lift she arrives by */
+/* startWave for a tower floor: load its plan the first time it is wanted, and put her in the elevator she arrives by */
 function towerPrepareFloor(w){
   const n = chapterWaveOf(w);
   if (!G.tower || TW.n !== n || !TW.floor) towerLoadFloor(n);
@@ -41,7 +41,7 @@ function buildTowerWorld(){ G.buildings = []; G.rocket = null; G.tower = true; T
 const towerBaseStartWave = startWave;
 startWave = function(n){ if (chapterOf(n) === TOWER_CHAPTER) towerPrepareFloor(n); return towerBaseStartWave.apply(this, arguments); };
 
-/* the last floor's boss has fallen: the vial and the coat colour are saved before the film, so quitting during it loses nothing */
+/* the last floor's boss has fallen: the vial and the coat color are saved before the film, so quitting during it loses nothing */
 function towerFinishSave(){
   const d = Save.data; if (!d) return;
   if (!d.chapter15Complete){ d.vials = (d.vials | 0) + 1; G.vialNew = true; }
@@ -134,12 +134,12 @@ function towerSpawnPoint(){
   return towerOpenNear(v.x + rand(-50, 50), v.y + rand(-50, 50));
 }
 
-/* ---- the lift ---- */
+/* ---- the elevator ---- */
 function towerInLift(){
   const l = TW.floor && TW.floor.lift; if (!l) return false;
   return P.x > l.zx && P.x < l.zx + 2 * TW_U && P.y > l.zy && P.y < l.zy + 2 * TW_U;
 }
-/* called every frame while a floor is cleared: the lift is open, and walking into it starts the ride */
+/* called every frame while a floor is cleared: the elevator is open, and walking into it starts the ride */
 function towerLiftTick(dt){
   if (!TW.open){ TW.open = true; addText(P.x, P.y - 70, 'The lift is open', '#9AE8FF', 18, true); banner('FLOOR CLEAR', 'The lift is open: walk into the glowing square', '#6AFFB0', 3.2); SFX.level(); }
   if (!TW.ride && towerInLift() && !P.dead){ TW.ride = { t: 0, from: chapterWaveOf(G.wave), swapped: false, px: P.x, py: P.y }; SFX.whoosh(); }
@@ -155,14 +155,14 @@ function towerRideTick(dt){
   } else if (r.swapped){ P.x = r.px; P.y = r.py; }
   if (r.t >= TW_RIDE.end) TW.ride = null;
 }
-/* the black-out, the floor counter and the lift's own sounds, over the whole screen */
-function towerLiftArrow(ctx){                                  /* a floor is clear and the lift is off the screen: an arrow at the edge of the screen points the way */
+/* the black-out, the floor counter and the elevator's own sounds, over the whole screen */
+function towerLiftArrow(ctx){                                  /* a floor is clear and the elevator is off the screen: an arrow at the edge of the screen points the way */
   if (!TW.open || TW.ride || !TW.floor) return;
   const l = TW.floor.lift, lx = l.zx + 150, ly = l.zy + 150, sx = (lx - G.camX) * G.zoom + G.W / 2, sy = (ly - G.camY) * G.zoom + G.H / 2, m = 46;
   if (sx > m && sx < G.W - m && sy > m + 60 && sy < G.H - m) return;
   const cx = G.W / 2, cy = G.H / 2, dx = sx - cx, dy = sy - cy, k = Math.min((G.W / 2 - m) / Math.max(1, Math.abs(dx)), (G.H / 2 - m - 40) / Math.max(1, Math.abs(dy))), ax = cx + dx * k, ay = cy + dy * k + 20, an = Math.atan2(dy, dx), pu = 0.7 + 0.3 * Math.sin(G.time * 6);
   ctx.save(); ctx.translate(ax, ay); ctx.rotate(an); ctx.globalAlpha = pu; ctx.fillStyle = '#6AFFB0'; ctx.strokeStyle = 'rgba(10,14,20,.85)'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(26, 0); ctx.lineTo(-12, -20); ctx.lineTo(-4, 0); ctx.lineTo(-12, 20); ctx.closePath(); ctx.stroke(); ctx.fill(); ctx.rotate(-an);
-  ctx.font = '900 15px "Arial Black", sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeText('LIFT', 0, -30); ctx.fillText('LIFT', 0, -30); ctx.restore();
+  ctx.font = '900 15px "Arial Black", sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeText('ELEVATOR', 0, -30); ctx.fillText('ELEVATOR', 0, -30); ctx.restore();
 }
 function towerRideDraw(ctx){
   towerLiftArrow(ctx);
@@ -189,7 +189,7 @@ const towerBaseDrawBuilding = drawBuilding;
 drawBuilding = function(ctx, b){ if (b.tower) return; return towerBaseDrawBuilding.apply(this, arguments); };
 
 /* ================== drawing the floor ================== */
-const TW_KINDS = {                                                   /* every floor is grey tile and grey wall, a little lighter or darker by kind; the colour is in the furniture */
+const TW_KINDS = {                                                   /* every floor is gray tile and gray wall, a little lighter or darker by kind; the color is in the furniture */
   lobby:     { floor: '#C4C7CD', alt: '#BBBEC5', line: '#9A9EA7', wall: '#848892', top: '#B4B8C2', trim: '#D8DBE2', glass: true,  rug: '#5A2A34' },
   mail:      { floor: '#A9ADB4', alt: '#A1A5AC', line: '#868A93', wall: '#757983', top: '#9A9EA9', trim: '#C8CCD4', band: true },
   steel:     { floor: '#989CA6', alt: '#9095A0', line: '#767A85', wall: '#6A6E79', top: '#8E929E', trim: '#C8CCD4', band: true },
@@ -310,7 +310,7 @@ function twDrawBox(ctx, b, f, t){
   if (k === 'bench'){ ctx.fillStyle = '#4A3E3A'; ctx.fillRect(x, y, w, h); ctx.fillStyle = '#7A6A5E'; ctx.fillRect(x + 4, y + 4, w - 8, h - 8); ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 2; const n = Math.max(2, Math.round(Math.max(w, h) / 50)); for (let i = 1; i < n; i++){ ctx.beginPath(); if (tall){ ctx.moveTo(x + 4, y + i * h / n); ctx.lineTo(x + w - 4, y + i * h / n); } else { ctx.moveTo(x + i * w / n, y + 4); ctx.lineTo(x + i * w / n, y + h - 4); } ctx.stroke(); } return; }
   ctx.fillStyle = '#6A6E78'; ctx.fillRect(x, y, w, h);
 }
-/* the two lifts: a steel frame set into the wall with two brushed doors and a seam, a number panel over them, chevrons and a brass threshold on the floor in front, and a green glow and a bobbing LIFT sign when this one is open */
+/* the two elevators: a steel frame set into the wall with two brushed doors and a seam, a number panel over them, chevrons and a brass threshold on the floor in front, and a green glow and a bobbing LIFT sign when this one is open */
 function towerDrawLifts(ctx, f, t, vx0, vy0, vx1, vy1){
   [[f.start, false], [f.lift, true]].forEach(pair => {
     const l = pair[0], isExit = pair[1]; if (l.zx > vx1 + 200 || l.zx + 300 < vx0 - 200 || l.zy > vy1 + 200 || l.zy + 300 < vy0 - 200) return;
@@ -343,6 +343,6 @@ function towerDrawLifts(ctx, f, t, vx0, vy0, vx1, vy1){
     ctx.fillStyle = live ? '#6AFFB0' : '#3A4050'; ctx.beginPath(); ctx.moveTo(34, -52); ctx.lineTo(44, -66); ctx.lineTo(54, -52); ctx.fill(); ctx.fillStyle = '#3A4050'; ctx.beginPath(); ctx.moveTo(-54, -50); ctx.lineTo(-44, -36); ctx.lineTo(-34, -50); ctx.fill();
     ctx.fillStyle = '#C8CCD6'; ctx.fillRect(-146, -96, 18, 40); ctx.fillStyle = live ? '#6AFFB0' : '#FFB84A'; ctx.beginPath(); ctx.arc(-137, -84, 5, 0, TAU); ctx.fill(); ctx.fillStyle = '#7A808E'; ctx.beginPath(); ctx.arc(-137, -68, 5, 0, TAU); ctx.fill();
     ctx.restore();
-    if (live){ const bob = Math.sin(t * 4) * 6; csGlow(ctx, l.zx + 150, l.zy + 150, 260, '#7AF0C8', 0.14 + 0.06 * pulse); ctx.save(); ctx.translate(l.zx + 150, l.zy + 150 + bob); ctx.font = '900 38px "Arial Black", sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 7; ctx.strokeStyle = 'rgba(10,14,20,.8)'; ctx.strokeText('LIFT', 0, 0); ctx.fillStyle = '#9AFFD0'; ctx.fillText('LIFT', 0, 0); ctx.restore(); }
+    if (live){ const bob = Math.sin(t * 4) * 6; csGlow(ctx, l.zx + 150, l.zy + 150, 260, '#7AF0C8', 0.14 + 0.06 * pulse); ctx.save(); ctx.translate(l.zx + 150, l.zy + 150 + bob); ctx.font = '900 38px "Arial Black", sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 7; ctx.strokeStyle = 'rgba(10,14,20,.8)'; ctx.strokeText('ELEVATOR', 0, 0); ctx.fillStyle = '#9AFFD0'; ctx.fillText('ELEVATOR', 0, 0); ctx.restore(); }
   });
 }

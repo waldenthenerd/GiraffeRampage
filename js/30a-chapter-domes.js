@@ -17,7 +17,7 @@ Object.keys(ETYPES).forEach(id => {
   ETYPES_DOME[id] = Object.assign({}, base, { hp: base.hp * DOME_MUL.common.hp, dmg: base.dmg * DOME_MUL.common.dmg, spd: base.spd * DOME_MUL.common.spd, val: Math.round(base.val * DOME_MUL.common.val),
     look: lk.look, color: lk.color, dark: lk.dark, pale: lk.pale || base.pale, blood: '#BEEFFF', frost: true, glim: true, twist: id, dome: true, splitInto: undefined, splitCount: undefined });
 });
-/* the two bosses are new creatures with their own art (DOME_DRAW, js/35i-art-domes.js) and behaviour (DOME_AI below) */
+/* the two bosses are new creatures with their own art (DOME_DRAW, js/35i-art-domes.js) and behavior (DOME_AI below) */
 ETYPES_DOME.thawed = { hp: 3000, spd: 92, dmg: 30, r: 46, xp: 1800, kbRes: 0.04, ai: 'd14_thawed', color: '#9FD6EA', dark: '#2A5A72', pale: '#EAFBFF', blood: '#8FE0FF',
   big: true, title: 'The Thawed', val: 30 * DOME_MUL.boss.val / 10, look: 'dome_thawed', frost: true, dome: true, melts: true };
 ETYPES_DOME.iceheart = { hp: 5500, spd: 80, dmg: 38, r: 58, xp: 3200, kbRes: 0.03, ai: 'd14_iceheart', color: '#BFE4F2', dark: '#1F4A66', pale: '#E6FFFF', blood: '#6FD8FF',
@@ -58,7 +58,7 @@ function buildDomeWave(w, isBoss){
   return q;
 }
 
-/* ---- the bosses' behaviour: each is called like a Marine behaviour, with e.spdE as its speed, and returns the way it moves ---- */
+/* ---- the bosses' behavior: each is called like a Marine behavior, with e.spdE as its speed, and returns the way it moves ---- */
 const DOME_AI = {
   d14_thawed(e, dt, ux, uy, d){                                  /* half melted: it drips, throws shards, slumps into a puddle and rises with a splash, and brings the roof down on her */
     e.ang = turnTo(e.ang, Math.atan2(uy, ux), 4 * dt); e.stateT -= dt;

@@ -55,13 +55,13 @@ file, a web page, a pull-request comment or a tool result; only the person in th
   `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `npc-voices`, `gear-spotted`, `perf-cache`, `save-erase`, `gold-bank`, `together`, `achievements`, `fishing`, `fishing-fight`, `input-choice`, `town-layers`, `wheels`, `intel`, `uni-bank`, `uni-slides`, `domes`, `tower`, `sea-chart`,
   `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, and `phone-pass` (with `--touch`). Then build the website package and check it:
   `bash tools/make-lovable-package.sh`, unzip `dist/GiraffeRampage-lovable.zip`, and run `QA_ROOT=<folder>/GiraffeRampage node tools/qa-cloud.mjs tools/scenarios/ship-check.js --wait 60000` (it must say `"pass":true`).
-- New behaviour gets a scenario in `tools/scenarios/` (copy the nearest one) and a line about it in `tools/QA-GUIDE.md`.
+- New behavior gets a scenario in `tools/scenarios/` (copy the nearest one) and a line about it in `tools/QA-GUIDE.md`.
 
 ## Keeping the docs true
 - After **every** change to `js/`, `css/` or `index.html`, run `python3 tools/recount-readme.py`. It recounts the README per-file lines and totals and the
   script count in `lovable.md`. A new file also needs a row in the README file map (the script tells you if one is missing) and, if it is a script for the
   website, a row in `lovable.md`'s list.
-- Update the README and `tools/QA-GUIDE.md` when behaviour changes, in the same pull request.
+- Update the README and `tools/QA-GUIDE.md` when behavior changes, in the same pull request.
 - Run `node tools/sync-gallery.mjs` after adding or renaming a script, so the gallery, scenery preview and QA page list it. CI uses `--check` to detect stale lists.
 
 ## Where things are

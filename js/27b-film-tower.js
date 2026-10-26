@@ -2,7 +2,7 @@
 /* The Tower films (Chapter 14). */
 /* ========================= THE TOWER FILMS ========================= */
 /* Two films in the same format as the Mars and Dome films (MARS_FILMS: end, starts, scene, over, cues), with nobody in them but the giraffe: the helicopter comes in over
-   New York at night and sets down by a glass tower, and she crosses the plaza to the lift (the start of Chapter 14); and, at the end, the vial, a paraglider off the top
+   New York at night and sets down by a glass tower, and she crosses the plaza to the elevator (the start of Chapter 14); and, at the end, the vial, a paraglider off the top
    floor, a rooftop across the city and a second helicopter (the end of Chapter 14). Every frame is a pure function of time. */
 const TW_FLIGHT_T = { B: 8, C: 16, D: 23, END: 31 };
 const TW_OUT_T = { B: 8, C: 15, D: 23, END: 32 };
@@ -13,7 +13,7 @@ const TW_FLIGHT_CAPS = [
   [12.2, 'THE DOMES CAME FROM HERE', 'Every dome was ordered from the top floor', 3.4],
   [16.6, 'THE FRONT DOOR', 'Glass, brass, and not locked', 3.2],
   [20.0, 'IT IS TWENTY-FIVE FLOORS UP', 'And every one of them has a door', 2.8],
-  [23.6, 'THE LOBBY', 'Marble, quiet, and a very large lift', 3.2],
+  [23.6, 'THE LOBBY', 'Marble, quiet, and a very large elevator', 3.2],
   [27.4, 'GOING UP', 'She presses the only button', 3.0]
 ];
 const TW_OUT_CAPS = [
@@ -61,7 +61,7 @@ function twRiver(ctx, t, gy, sc, tone){
 }
 function twNight(ctx, t, tone){ afSky(ctx, '#05071A', '#241B4A', '#6A3A62'); csStars(ctx, 1, t, 0, 0); csGlow(ctx, 1040, 120, 200, '#DCE4FF', 0.2); fillCircle(ctx, 1040, 120, 34, '#EEF2FF'); fillCircle(ctx, 1028, 112, 6, 'rgba(160,170,200,.5)'); fillCircle(ctx, 1052, 130, 4, 'rgba(160,170,200,.5)'); }
 
-/* ---- film 1 (31 s): in over the river, down on the plaza, across it, and up in the lift ---- */
+/* ---- film 1 (31 s): in over the river, down on the plaza, across it, and up in the elevator ---- */
 function towerFlightScene(ctx, t){
   const T = TW_FLIGHT_T;
   if (t < T.B){                                                                     /* over the river toward the tower */
@@ -86,7 +86,7 @@ function towerFlightScene(ctx, t){
     twFacade(ctx, t, gy, u);
     twPlaza(ctx, t, gy, true, sc);
     csGiraffe(ctx, { x: csLerp(100, 920, csSm(0.2, 6.4, u)), y: gy + 4, s: 0.78, face: 1, walk: u * 7, moving: u < 6.6, neck: 0.22, head: 0.08, bare: true, boots: false });
-  } else {                                                                          /* the lobby, and the lift */
+  } else {                                                                          /* the lobby, and the elevator */
     const u = t - T.D, gy = 560;
     twLobby(ctx, t, u);
     const open = csSm(2.6, 4, u) * (1 - csSm(5.4, 6.4, u));
@@ -118,7 +118,7 @@ function twFacade(ctx, t, gy, u){
   for (let k = 0; k < 4; k++){ const dx = x0 + 100 + k * 124, dw = 112, dt = ch + 30; ctx.fillStyle = '#6A8AA8'; ctx.fillRect(dx, dt, dw, gy - dt); ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.fillRect(dx + 10, dt + 10, 28, gy - dt - 40); ctx.fillStyle = '#C8A850'; ctx.fillRect(dx + dw / 2 - 4, dt, 8, gy - dt); ctx.fillRect(dx, dt, dw, 5); ctx.fillRect(dx, dt + (gy - dt) * 0.5, dw, 3); ctx.fillStyle = '#E8D890'; ctx.fillRect(dx + dw / 2 - 18, dt + (gy - dt) * 0.55, 6, 28); ctx.fillRect(dx + dw / 2 + 12, dt + (gy - dt) * 0.55, 6, 28); }
   const open = csSm(5.2, 7, u); if (open > 0){ ctx.fillStyle = 'rgba(255,230,170,' + (0.5 * open) + ')'; ctx.fillRect(x0 + 100 + 2 * 124, ch + 30, 112, gy - ch - 30); }
 }
-/* the lobby, looking straight in: a marble floor running back to a wall of brass lift doors, pillars either side, and a long empty desk */
+/* the lobby, looking straight in: a marble floor running back to a wall of brass elevator doors, pillars either side, and a long empty desk */
 function twLobby(ctx, t, u){
   const g = ctx.createLinearGradient(0, 0, 0, 720); g.addColorStop(0, '#1C1A2E'); g.addColorStop(0.555, '#2A2640'); g.addColorStop(0.556, '#D8D2C2'); g.addColorStop(1, '#8A8472'); ctx.fillStyle = g; ctx.fillRect(0, 0, CS_W, CS_H);
   ctx.fillStyle = '#242038'; ctx.fillRect(0, 0, CS_W, 400);
@@ -127,7 +127,7 @@ function twLobby(ctx, t, u){
   ctx.strokeStyle = 'rgba(120,110,90,.35)'; ctx.lineWidth = 2; for (let k = -8; k <= 8; k++){ ctx.beginPath(); ctx.moveTo(640 + k * 40, 400); ctx.lineTo(640 + k * 190, CS_H); ctx.stroke(); } for (let j = 0; j < 8; j++){ const y = 400 + Math.pow(j / 7, 1.8) * 320; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CS_W, y); ctx.stroke(); }
     ctx.fillStyle = '#5A1E2A'; ctx.beginPath(); ctx.moveTo(590, 400); ctx.lineTo(690, 400); ctx.lineTo(760, CS_H); ctx.lineTo(520, CS_H); ctx.closePath(); ctx.fill(); ctx.strokeStyle = '#C8A850'; ctx.lineWidth = 3; ctx.stroke();
   for (const px of [150, 1130]){ ctx.fillStyle = '#B8B2A2'; ctx.fillRect(px - 44, 0, 88, 560); ctx.fillStyle = '#D8D2C2'; ctx.fillRect(px - 44, 0, 20, 560); ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.fillRect(px + 24, 0, 20, 560); ctx.fillStyle = '#C8A850'; ctx.fillRect(px - 52, 540, 104, 22); ctx.fillRect(px - 52, 0, 104, 18); ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(px - 52, 562, 104, 10); }
-  ctx.fillStyle = '#C8A850'; ctx.fillRect(500, 96, 280, 52); ctx.fillStyle = '#7A6428'; ctx.fillRect(500, 144, 280, 4);                                  /* the name plate, brass on the wall above the lift */
+  ctx.fillStyle = '#C8A850'; ctx.fillRect(500, 96, 280, 52); ctx.fillStyle = '#7A6428'; ctx.fillRect(500, 144, 280, 4);                                  /* the name plate, brass on the wall above the elevator */
   ctx.fillStyle = '#1E1A2E'; ctx.fillRect(506, 102, 268, 40); ctx.font = '900 26px "Arial Black", sans-serif'; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 5; ctx.strokeStyle = '#05081A'; ctx.fillStyle = '#FFE066'; ctx.strokeText('GREYMERE', 640, 132); ctx.fillText('GREYMERE', 640, 132); ctx.textAlign = 'left';
   csGlow(ctx, 640, 310, 240, '#FFE49A', 0.12);
 }

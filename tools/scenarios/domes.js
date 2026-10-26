@@ -1,5 +1,5 @@
 /* domes: Chapter 13.5, the Domes (internal chapter 14, waves 326 to 335): the chapter table, the menu card, the two films, a whole run through all ten waves with both bosses,
-   the end of the run, the save, the Bestiary, Play together and the coat colour. */
+   the end of the run, the save, the Bestiary, Play together and the coat color. */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
@@ -54,7 +54,7 @@
     out.cast = ['hyena', 'cheetah', 'termite', 'rhino', 'vulture', 'jackal', 'warthog', 'baboon', 'honeybadger', 'mamba'].every(function(t){ return seen[t]; });
     out.domeLook = ETYPES_DOME.hyena.look === 'arcticwolf' && ETYPES_DOME.hyena.glim === true && ETYPES_DOME.hyena.twist === 'hyena' && ETYPES_DOME.thawed.big === true && ETYPES_DOME.iceheart.big === true;
 
-    /* the bosses' behaviour, state by state: each one runs, aims at her and makes its hazards without an error */
+    /* the bosses' behavior, state by state: each one runs, aims at her and makes its hazards without an error */
     G.waveState = 'intro'; G.waveTimer = 1e9; G.spawnQueue = [];
     var names = { thawed: ['idle', 'shardwind', 'slumpwind', 'slide', 'roofwind', 'meltdown'], iceheart: ['idle', 'novawind', 'volleywind', 'beamwind', 'spikewind', 'roar'] }, bossOk = true, made = {};
     Object.keys(names).forEach(function(b){
@@ -79,7 +79,7 @@
     damageEnemy(G.boss, 1e18, { noCrit: true, quiet: true }); for (var q = 0; q < 6; q++) { GR.step(1 / 30); noLevels(); };
     out.bossEnds = strays > 0 && G.waveState === 'clear' && G.enemies.every(function(e){ return e.dead; });
 
-    /* the end of the run: the last wave clears, the film, then the report; the save and the coat colour follow */
+    /* the end of the run: the last wave clears, the film, then the report; the save and the coat color follow */
     freshSave(); Save.data.chapter13Complete = true;
     startRun(14, 335); steps(5); G.introFX = null; G.banner = null; P.invuln = 1e9; P.hp = P.maxHp = 1e12;
     out.lastWave = G.wave === 335 && isChapterFinaleWave(G.wave) && isRunEnd(335) === true;
