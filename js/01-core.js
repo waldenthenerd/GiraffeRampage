@@ -274,8 +274,8 @@ const Save = {
     this.data.lastSpottedKeyAt = +this.data.lastSpottedKeyAt || 0;
     return this.data;
   },
-  write(){                                                                        /* a JSON string holding the packed save */
-    try { window.localStorage.setItem(SAVE_KEY, JSON.stringify(GRPack.encode(this.data))); this.writeFailed = false; return true; }
+  write(){                                                                        /* a JSON string holding the packed save (GR2 now, repacked as GR3 a moment later: js/01b-savepack.js) */
+    try { const raw = JSON.stringify(GRPack.encodeFast(this.data)); window.localStorage.setItem(SAVE_KEY, raw); GRPack.wrote(raw); this.writeFailed = false; return true; }
     catch (e) {                                                                   /* full or blocked storage: say so once, not on every write, and again if it fails after it had worked */
       if (!this.writeFailed){ this.writeFailed = true; gameToast('Your progress could not be saved: this browser is blocking or has run out of storage for the game. Free some space or allow site data, or what you do now will be lost when you close it.', 12000); }
       return false;

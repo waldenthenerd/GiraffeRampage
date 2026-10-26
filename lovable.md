@@ -73,7 +73,7 @@ game. This is the complete list for this version (183 scripts; the developer pan
 | 1 | `js/00-icons.js` | The icon table (41 outlined icons drawn for this game) and the icon helpers. Runs outside strict mode, as it always did. |
 | 2 | `js/00b-icons-custom.js` | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
 | 3 | `js/01-core.js` | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. |
-| 4 | `js/01b-savepack.js` | Save compression: LZW packing of the save, `window.GRSave`. Section 4 of this file describes the format. |
+| 4 | `js/01b-savepack.js` | Save compression: GR3 (context mixing) and GR2 (LZW) packing of the save, `window.GRSave`. Section 4 of this file describes the formats. |
 | 5 | `js/02-music.js` | Procedural background music: themes, the 16-bar sequencer (A, A, B, A), key climb through a chapter, boss second phase, theme fade-in, stingers. |
 | 6 | `js/02b-ambience.js` | Extra sounds (card pick, wave clear, heartbeat, heavy thump), the per-chapter ambient bed that follows the weather, gamepad rumble. |
 | 7 | `js/02c-audio-mix.js` | Sound design on top of the synth: a reverb that follows the place (`MIX_ENV`), a hit sound per element, a death sound per kind of creature, an attack sound per kind of enemy (`Mix.variant`), boss roar, death and half-health growl, footsteps by ground, the music stingers, and the ambience extras (thunder with a delay, sweeping wind gusts, far-off calls). |
@@ -295,9 +295,34 @@ clear code and no end code; the length in the header says when to stop. The refe
 **Measured:** a full late-game save is about 5 to 12 KB as JSON and about 42% to 58% of that once packed. (Saves are small
 either way; the point is the cloud row and the localStorage are smaller, and photo codes inside it are already dense.)
 
+### The newer format: GR3
+
+`GR3:` replaces GR2 as what the save rests as. `Save.write()` still stores GR2 (fast, synchronous) and the **same text** is repacked as GR3 about four
+seconds later (not during a run), or at once when the page is hidden or closed. The repack is only stored if nothing else wrote in between and if decoding
+it gives the identical text; otherwise the GR2 copy stays. The value is still a JSON string literal, `"GR3:..."`.
+
+After `GR3:` comes **base 91** text (the printable ASCII characters except `"` and `\`: `#` to `~` without `\`; four bytes become five characters, a last
+group of 1 to 3 bytes becomes 2 to 4) of these bytes:
+
+| bytes | meaning |
+|---|---|
+| 1 to 4 | length of the JSON text in bytes, little-endian 7-bit groups, high bit = more follow |
+| 2 | 16-bit check of the JSON text (FNV-1a over the bytes, then `(h >>> 16) ^ h` masked to 16 bits), big endian |
+| rest | the arithmetic-coded body (trailing zero bytes are dropped; the decoder reads zeros past the end) |
+
+The body is the JSON text coded one bit at a time by a context-mixing model (the idea behind PAQ and lpaq): hashed order-2/3/4 contexts, order 0 and 1, two
+JSON-aware contexts (the field name and how far into its value, the field name and the value so far) and one for the enclosing object's name, a match model,
+two mixers, two refiners, then a 32-bit binary arithmetic coder. The model first "reads" a frozen sample save (`PRIMER` in `js/01b-savepack.js`). It uses
+integers only, so every browser produces identical predictions. **The model and the primer must never change**: a new one would be a new magic (`GR4:`), and
+`tools/scenarios/save-gr3.js` holds a golden code that fails if either moves. The reference decoder is `cmDecode` in the same file.
+
+Cost: a few hundred milliseconds to pack or to read a large save (mostly reading the primer), about 20 MB of memory while it runs, none afterward. Saves over 1 MB use GR2.
+`WRITE3 = false` in that file makes the game read GR3 but write only GR2, for a careful roll-out (an older copy of the game cannot read `GR3:` and would treat it as an
+unreadable save, which it keeps aside under `giraffe_rampage_save_v1_unreadable` but does not load).
+
 ### How the game reads it
 
-- `Save.load()` accepts: the packed JSON-string literal above, a bare `GR2:...` string, **or an old plain JSON object**. An old
+- `Save.load()` accepts: the packed JSON-string literal (GR3 or GR2), a bare `GR3:`/`GR2:...` string, **or an old plain JSON object**. An old
   save is read as normal and is rewritten in the new form the next time the game saves. Damaged or foreign data is ignored, not
   half-used.
 - `Save.write()` always writes the new form.
@@ -502,7 +527,7 @@ panel. **The minigames themselves ARE part of the game and must be included.**
 3. `typeof window.GR === 'object'` and `GR.G.state` is a string (the `/play` page depends on it).
 4. `typeof window.GRSave === 'object'`; `GRSave.decode(GRSave.encode({a:1})).a === 1`.
 5. **Save round trip:** play a moment, reload: progress is still there. Look at localStorage `giraffe_rampage_save_v1`: it
-   must start with `"GR2:`.
+   must start with `"GR3:` (or `"GR2:` for the first few seconds after a change).
 6. **Old-save test:** put `{"gold":777}` (plain JSON) into that key, reload: the game shows 777 gold, and after any action that
    saves, the key holds the packed form.
 7. **Bridge test:** sign in, play, reload on another browser: the cloud save arrives and loads.

@@ -11,6 +11,7 @@
     /* save round trip: the stored value is a packed JSON string literal */
     Save.data.gold = 4321; Save.write();
     var raw = localStorage.getItem('giraffe_rampage_save_v1'); out.packed = /^"GR2:/.test(raw);
+    out.gr3 = GRSave.flush() === true && /^"GR3:/.test(localStorage.getItem('giraffe_rampage_save_v1'));     /* the repack to GR3 a few seconds after a write */
     Save.data.gold = 0; Save.load(); out.reload = Save.data.gold === 4321;
     /* an old plain-JSON save */
     localStorage.setItem('giraffe_rampage_save_v1', '{"gold":777}'); Save.load(); out.oldSave = Save.data.gold === 777;
@@ -26,7 +27,7 @@
     out.runs = bad.length === 0; if (bad.length) out.bad = bad;
     GR.showMenu(); GR.G.state = 'menu'; GR.showShop('gear'); out.gearPage = !!document.querySelector('.ttile') && !!document.getElementById('gearPreview');
     out.noPanelAction = (function(){ try { GR.handleAction('debug-addgold'); return true; } catch (e) { return false; } })() && !/Developer Panel/.test((document.getElementById('overlay') || {}).textContent || '');
-    out.pass = out.noDevPanel && out.grOk && out.grsave && out.menu && out.packed && out.reload && out.oldSave && out.repacked && out.guideClean && out.runs && out.gearPage && out.noPanelAction && out.errs.length === 0;
+    out.pass = out.noDevPanel && out.grOk && out.grsave && out.menu && out.packed && out.gr3 && out.reload && out.oldSave && out.repacked && out.guideClean && out.runs && out.gearPage && out.noPanelAction && out.errs.length === 0;
   } catch (e) { out.err = String(e && e.stack || e); }
   QA.done(out);
 })();
