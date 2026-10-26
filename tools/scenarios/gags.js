@@ -36,6 +36,9 @@
     /* a new run starts clean: new scenery, nothing counted, no timers */
     startRun(1, 1); calm();
     out.fresh = GAG.n === 0 && Object.keys(GAG.kinds).length === 0 && GAG.timers.length === 0 && SCEN.props.every(function(p){ return !p.gagged && !/_bare$/.test(p.def.id); });
+    /* the Domes and Tower have their own gags */
+    out.moreGags = !!(PROP_GAGS.dm_crystal && PROP_GAGS.dm_root && PROP_GAGS.dm_vent && TOWER_GAGS.pillar && TOWER_GAGS.tank && TOWER_GAGS.belt && IDLE_CHAPTER[14].length > 3 && IDLE_CHAPTER[15].length > 3 && ROBOT_LINES.length >= 14 && ROBOT_LINES.every(function(p){ return p.length === 2; }));
+
     /* idle lines, with nothing near */
     P.x = 2000; P.y = 2000; G.enemies.length = 0; SCEN.props.forEach(function(p){ p.gagged = true; });
     GAG.idleT = 99; var before = GAG.n; tick(); out.idle = GAG.n === before + 1 && GAG.kinds.idle === 1;
@@ -69,6 +72,6 @@
     Save.data.gagsDone = 0;
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
   Math.random = realRandom;
-  out.pass = !!(out.hasTree && out.bitten && out.said && out.counted && out.stubDraws && out.quiet && out.onlyOnce && out.notPaused && out.notBanner && out.fresh && out.idle && out.botLook && out.robotTold && out.robotAnswered && out.hasDesk && out.smashed && out.wreckDraws && out.sane && out.sane2 && out.dflt && out.reset && out.ach && !out.errs.length);
+  out.pass = !!(out.moreGags && out.hasTree && out.bitten && out.said && out.counted && out.stubDraws && out.quiet && out.onlyOnce && out.notPaused && out.notBanner && out.fresh && out.idle && out.botLook && out.robotTold && out.robotAnswered && out.hasDesk && out.smashed && out.wreckDraws && out.sane && out.sane2 && out.dflt && out.reset && out.ach && !out.errs.length);
   QA.done(out);
 })();

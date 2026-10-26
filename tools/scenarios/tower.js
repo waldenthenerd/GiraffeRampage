@@ -15,6 +15,7 @@
       chapterWaveOf(335) === 10 && CHAPTER_LAST_WAVE === 360 && TOTAL_CHAPTERS === 15 && chapterLabel(15) === '14' && chapterLabel(14) === '13.5' && chapterFirstWave(15) === 336 && chapterFirstWave(14) === 326 &&
       chapterLen(15) === 25 && isChapterFinaleWave(360) && !isChapterFinaleWave(355) && isRunEnd(335) === true && isRunEnd(360) === true && isRunEnd(340) === false;
     out.bossWaves = bossForWave(340) === 'lion' && bossForWave(345) === 'matriarch' && bossForWave(350) === 'buffalo' && bossForWave(355) === 'crocodile' && bossForWave(360) === 'wildfire';
+    out.harder = TOWER_TUNE.hard === 1.35 && Math.abs(towerScale(1).hp / enemyScale(25).hp / Math.sqrt(1.35) - TOWER_TUNE.hp0) < 1e-9;
     out.tuneRising = towerScale(25).hp > towerScale(1).hp && towerScale(25).dmg > towerScale(1).dmg && towerScale(1).hp > domeScale(DOME_WAVES).hp * 0.5;
     out.cast = Object.keys(ETYPES_TOWER).length === 17 && ETYPES_TOWER.wildfire.title === 'The Chief Executive' && ETYPES_TOWER.hyena.look === 'tw_rat' && !!ENEMY_LOOK_DRAW.tw_ceo && !!TOWER_AI.t_ceo;
     out.bestiary = BESTIARY_CHAPTERS.length === 15 && bestiaryTable(15) === ETYPES_TOWER && BESTIARY_ORDER.slice(0, 17).every(function(k){ return !!ETYPES_TOWER[k]; });

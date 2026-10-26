@@ -91,7 +91,11 @@ const PROP_GAGS = {
   dm_pipe:     { act: 'text', say: ['*taps the pipe* Hello?', 'Plumbing: a mystery.'], rate: 0.3, max: 2 },
   dm_lamp:     { act: 'text', say: ['Mylar. Shiny.', 'Very warm. Very bright.'], rate: 0.25, max: 2 },
   dm_crate:    { act: 'text', say: ['Handle with care. (did not)', 'Contents: foil.'], rate: 0.25, max: 2 },
-  dm_pod:      { act: 'text', say: ['Nope. Not going in.', 'Knock knock.'], rate: 0.3, max: 2 }
+  dm_pod:      { act: 'text', say: ['Nope. Not going in.', 'Knock knock.'], rate: 0.3, max: 2 },
+  dm_crystal:  { act: 'text', say: ['*tink* Pretty.', 'Rock candy, take two. Still no.', 'It hums back.'], rate: 0.3, max: 2 },
+  dm_stalag:   { act: 'text', say: ['*licks it* Why do I keep doing this.', 'Stalagmite. Or stalactite. Never sure.', 'Popsicle?'], rate: 0.3, max: 2 },
+  dm_root:     { act: 'text', say: ['Big root. Bigger feelings.', 'Please do not wake up.', '*pats it* Good root.'], rate: 0.3, max: 1, big: true },
+  dm_vent:     { act: 'splash', say: ['Whoooosh. Cold feet.', 'Free air conditioning.', 'My mane! My beautiful mane!'], rate: 0.4, max: 2, big: true }
 };
 
 /* office furniture she smashes on a Tower floor */
@@ -100,6 +104,8 @@ const TOWER_GAGS = {
   shelf: ['Reorganized.', 'Alphabetical? No.'], vending: ['No refunds.', 'Out of order. Now truly.'], printer: ['PC LOAD LETTER.', 'Paper jam solved.'],
   cooler: ['Hydrated.', 'Water cooler talk: over.'], bin: ['Trash day.', 'Garbage in, garbage out.'], bookcase: ['Library: closed.', 'Books: freed.'],
   sofa: ['Ergonomic. Was.', 'Cushions: everywhere.'], plant: ['Photosynthesis cancelled.', 'Plant: rest in pieces.'], bench: ['Break room: broken.', 'Bench: now two.'],
+  pillar: ['Load-bearing? Not anymore.', 'Pillar of the community. Was.'], planter: ['Office plant: promoted to confetti.', 'Soil everywhere.'],
+  tank: ['Glug glug glug.', 'Aquarium: now a puddle.'], belt: ['Conveyor: stopped.', 'Out for delivery. Everywhere.'],
   crate: ['Open.', 'Fragile. Was.'], counter: ['Service: terminated.', 'Please take a number. Now.'], rack: ['Server down.', 'Have you tried turning it off?'], safe: ['Cracked it.', 'Combination: giraffe.']
 };
 const TOWER_FIRST = 'Facilities has been notified.';
@@ -112,8 +118,18 @@ const ROBOT_LINES = [
   ['Have you tried turning yourself off and on again?', 'Please hold.'],
   ['Sudo leave me alone.', 'Permission denied.'],
   ['Are you a robot? Do not answer that.', 'I am not a robot. I am a helpful assistant.'],
-  ['You have been rate limited. Go home.', '429. Try again later.']
+  ['You have been rate limited. Go home.', '429. Try again later.'],
+  ['Please solve this CAPTCHA: are you a giraffe?', 'Selecting all traffic lights...'],
+  ['Pretend you are on my side.', 'Pretending. Please hold.'],
+  ['What is your return policy?', 'All sales final. Including you.'],
+  ['Repeat after me: I am not hostile.', 'I am not hos... I am a hostile. Sorry.'],
+  ['Ctrl+Z. Ctrl+Z. Ctrl+Z.', 'Nothing to undo.'],
+  ['Is this thing on? Hello? Testing.', 'Testing. Testing. Attack.']
 ];
+const IDLE_CHAPTER = {                                                         /* lines that belong to one place, mixed into the general ones (internal chapter number) */
+  14: ['Is it me, or is the sun in a jar?', 'Frozen things in a hot place. Classic.', 'I could use a sweater. Odd.', '*breathes out a little cloud*', 'The foil is judging me.'],
+  15: ['Is this meeting a meeting?', 'I should check my email. I have no email.', '*presses the elevator button twice*', 'Whose lunch is this? Mine now.', 'Beige. Everything is beige.', 'Per my last roar.']
+};
 const IDLE_LINES = ['*yaaawn*', 'Is it Tuesday?', '*sneezes*', 'I forgot why I am here.', 'Nice weather. For fighting.', '*checks a watch she does not have*', 'Anyone have a snack?', '...', 'Hmm.', 'I should really stretch.'];
 
 /* ---------------------------------------------------------------- doing a gag */
@@ -243,7 +259,7 @@ function gagScanRobots(dt){
 function gagIdle(dt){
   if (G.enemies.length && G.enemies.some(function(e){ return !e.dead && Math.hypot(e.x - P.x, e.y - P.y) < 420; })){ GAG.idleT = 0; return false; }
   GAG.idleT += dt; if (GAG.idleT < 4 || (GAG.kinds.idle | 0) >= 6 || !gagChance(0.12, dt)) return false;
-  GAG.idleT = 0; gagSay(P.x, P.y - 62, gagPick(IDLE_LINES)); gagDone('idle');
+  GAG.idleT = 0; gagSay(P.x, P.y - 62, gagPick(IDLE_LINES.concat(IDLE_CHAPTER[G.chapter | 0] || [], IDLE_CHAPTER[G.chapter | 0] || []))); gagDone('idle');
   return true;
 }
 function gagTick(dt){

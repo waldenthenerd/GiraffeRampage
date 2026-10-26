@@ -4,12 +4,13 @@
 /* Out in the savannah's heat the humans have built a ring of huge domes, their windows wrapped in mylar so the sun bounces off them. Inside it is cold:
    they keep Chapter 2's frozen creatures there, changed by the same glimmer that is spreading over the grass. The creatures are Chapter 2's cast
    (ARCTIC_LOOKS) with Chapter 11's twists (GLIM_TWIST, via def.twist) and the glimmer on top (def.glim). The numbers are tuned by hand and are the ones
-   to change if it is too hard or too easy: DOME_MUL is the Mars table's strength, domeScale then takes it from 1.33x to 2x of Chapter 13's last wave. */
+   to change if it is too hard or too easy: DOME_MUL is the Mars table's strength, domeScale then takes it from 1.33x to 2x of Chapter 13's last wave, times DOME_TUNE.hard (1.35: health and damage each by its square root, so a fight costs her 1.35 times as much). */
 const DOME_MUL = { common: { hp: 30, dmg: 7.0, spd: 1.65, val: 16 }, boss: { hp: 21, dmg: 5.8, spd: 1.45, val: 12 } };
-const DOME_TUNE = { hp0: 4 / 3, hp1: 2, dmg0: 1.6 * 2 / 3, dmg1: 2.2 * 2 / 3, count0: 90, countStep: 6 };
+const DOME_TUNE = { hp0: 4 / 3, hp1: 2, dmg0: 1.6 * 2 / 3, dmg1: 2.2 * 2 / 3, count0: 90, countStep: 6, hard: 1.35 };         /* hard: how much harder than it was, split evenly between health and damage */
+const DOME_HARD = Math.sqrt(DOME_TUNE.hard);
 function domeScale(cw){
   const k = clamp((cw - 1) / (DOME_WAVES - 1), 0, 1), b = enemyScale(WAVES_PER_CHAPTER);                    /* Chapter 13's last wave, then more */
-  return { hp: b.hp * (DOME_TUNE.hp0 + (DOME_TUNE.hp1 - DOME_TUNE.hp0) * k), dmg: b.dmg * (DOME_TUNE.dmg0 + (DOME_TUNE.dmg1 - DOME_TUNE.dmg0) * k), spd: b.spd };
+  return { hp: b.hp * DOME_HARD * (DOME_TUNE.hp0 + (DOME_TUNE.hp1 - DOME_TUNE.hp0) * k), dmg: b.dmg * DOME_HARD * (DOME_TUNE.dmg0 + (DOME_TUNE.dmg1 - DOME_TUNE.dmg0) * k), spd: b.spd };
 }
 const ETYPES_DOME = {};
 Object.keys(ETYPES).forEach(id => {

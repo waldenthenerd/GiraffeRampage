@@ -7,10 +7,11 @@
    hand and are the ones to change if it is too hard or too easy: TOWER_MUL is the strength of the table, towerScale takes it from TOWER_TUNE.hp0 to hp1 (and the same
    for damage) times Chapter 13's last wave. */
 const TOWER_MUL = { common: { hp: 30, dmg: 7.0, spd: 1.6, val: 18 }, boss: { hp: 22, dmg: 5.6, spd: 1.4, val: 14 } };
-const TOWER_TUNE = { hp0: 1.5, hp1: 3.0, dmg0: 1.1, dmg1: 1.9, count0: 66, countStep: 3.2 };
+const TOWER_TUNE = { hp0: 1.5, hp1: 3.0, dmg0: 1.1, dmg1: 1.9, count0: 66, countStep: 3.2, hard: 1.35 };           /* hard: how much harder than it was, split evenly between health and damage */
+const TOWER_HARD = Math.sqrt(TOWER_TUNE.hard);
 function towerScale(cw){
   const k = clamp((cw - 1) / (TOWER_WAVES - 1), 0, 1), b = enemyScale(WAVES_PER_CHAPTER);
-  return { hp: b.hp * (TOWER_TUNE.hp0 + (TOWER_TUNE.hp1 - TOWER_TUNE.hp0) * k), dmg: b.dmg * (TOWER_TUNE.dmg0 + (TOWER_TUNE.dmg1 - TOWER_TUNE.dmg0) * k), spd: b.spd };
+  return { hp: b.hp * TOWER_HARD * (TOWER_TUNE.hp0 + (TOWER_TUNE.hp1 - TOWER_TUNE.hp0) * k), dmg: b.dmg * TOWER_HARD * (TOWER_TUNE.dmg0 + (TOWER_TUNE.dmg1 - TOWER_TUNE.dmg0) * k), spd: b.spd };
 }
 const TOWER_KIT = {
   hyena:       { look: 'tw_rat',       ai: 't_rat',       color: '#8A7A72', dark: '#3A2E2A', pale: '#E8CFC0', blood: '#7A3A3A', rMul: 0.95, hpMul: 0.8,  spdMul: 1.1,  name: 'Scrap Rat' },

@@ -14,7 +14,8 @@
       DOME_LAST_WAVE === 335 && chapterFirstWave(14) === 326 && chapterFirstWave(13) === 301 && chapterFirstWave(2) === 26 && chapterLen(14) === 10 && chapterLabel(14) === '13.5' && chapterLabel(13) === '13' && TOTAL_CHAPTERS === 15;
     out.bossWaves = bossForWave(330) === 'thawed' && bossForWave(335) === 'iceheart' && bossForWave(25) === 'wildfire' && bossForWave(5) === 'lion';
     var s1 = enemyScale(25), d1 = domeScale(1), d10 = domeScale(10);
-    out.difficulty = Math.abs(d1.hp / s1.hp - 4 / 3) < 1e-9 && Math.abs(d10.hp / s1.hp - 2) < 1e-9 && d1.dmg / s1.dmg >= 1 && d10.dmg / s1.dmg <= 1.6 && d10.dmg > d1.dmg;
+    var hd = DOME_TUNE.hard;           /* the 1.35x harder setting: health and damage each by its square root */
+    out.difficulty = DOME_TUNE.hard === 1.35 && Math.abs(d1.hp / s1.hp / Math.sqrt(hd) - 4 / 3) < 1e-9 && Math.abs(d10.hp / s1.hp / Math.sqrt(hd) - 2) < 1e-9 && d1.dmg / s1.dmg >= 1 && d10.dmg / s1.dmg <= 1.6 * Math.sqrt(hd) && d10.dmg > d1.dmg;
 
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter14Complete === false;
