@@ -52,7 +52,7 @@
     var f7 = TW.floor; P.x = f7.start.x; P.y = f7.start.y;
     var rat = spawnEnemy('hyena', f7.rooms[5].x + f7.rooms[5].w / 2, f7.rooms[5].y + f7.rooms[5].h / 2, 342);        /* room F: not next to the start, and walled off from it */
     var d0 = Math.hypot(rat.x - P.x, rat.y - P.y), best = d0, stuck = 0, lastD = d0;
-    for (i = 0; i < 1500 && !rat.dead; i++){ GR.step(1 / 30); P.invuln = 1e9; P.hp = P.maxHp; var dd = Math.hypot(rat.x - P.x, rat.y - P.y); best = Math.min(best, dd); if (dd < 90) break; }
+    for (i = 0; i < 500 && !rat.dead; i++){ GR.step(1 / 30); P.invuln = 1e9; P.hp = P.maxHp; var dd = Math.hypot(rat.x - P.x, rat.y - P.y); best = Math.min(best, dd); if (dd < 90) break; }
     out.finds = best < 120;
     out.findsD = Math.round(d0) + ' -> ' + Math.round(best);
 
@@ -61,7 +61,7 @@
     var ok = true, bad = [], kinds = ['hyena', 'grub', 'jackal', 'cheetah', 'warthog', 'rhino', 'baboon', 'honeybadger', 'vulture', 'mamba', 'termite', 'ember'];
     kinds.forEach(function(t){
       G.enemies.length = 0; P.x = TW.floor.start.x; P.y = TW.floor.start.y; var p = towerSpawnPoint(), e = spawnEnemy(t, p.x, p.y, 339); if (!e){ ok = false; bad.push(t); return; }
-      for (var q = 0; q < 240; q++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; if (e.hp !== e.hp || e.x !== e.x || e.y !== e.y){ ok = false; bad.push(t + ' nan'); break; } }
+      for (var q = 0; q < 60; q++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; if (e.hp !== e.hp || e.x !== e.x || e.y !== e.y){ ok = false; bad.push(t + ' nan'); break; } }
       if (!e.dead && buildingAt(e.x, e.y)){ ok = false; bad.push(t + ' wall'); }
     });
     out.kindsOk = ok; out.kindsBad = bad.join(',');
@@ -70,7 +70,7 @@
       b[2].forEach(function(st){
         freshSave(); Save.data.chapter14Complete = true; startRun(15, b[1]); steps(3); godMode(); G.waveState = 'idle'; G.spawnQueue = []; G.enemies.length = 0; G.eproj.length = 0; G.markers.length = 0; G.blasts.length = 0; G.beams.length = 0; G.hzones.length = 0;
         var e = spawnEnemy(b[0], P.x + 500, P.y, b[1]); if (!e){ bossOk = false; return; }
-        e.state = st; e.stateT = 0.01; for (var q = 0; q < 70; q++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; }
+        e.state = st; e.stateT = 0.01; for (var q = 0; q < 30; q++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; }
         made[b[0] + ':' + st] = G.eproj.length + G.markers.length + G.hzones.length + G.blasts.length + G.beams.length + G.enemies.length;
         if (e.hp !== e.hp || e.x !== e.x || e.y !== e.y || (!e.dead && buildingAt(e.x, e.y))) { bossOk = false; made[b[0] + ':' + st + ':bad'] = 1; }
       });

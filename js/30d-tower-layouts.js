@@ -113,6 +113,17 @@ const TOWER_PLANS = [
     rooms: { A: [0, 0, 28, 15], B: [0, 15, 12, 21], C: [12, 15, 28, 21] },
     doors: ['A-B:0.5:3', 'A-C:0.5:3.4', 'B-C'], pats: { A: 'throne' }, start: ['B', 's', 3], lift: ['A', 'n', 14], boss: true }
 ];
+/* how much of the open floor can be reached from a point on a 50 px map padded by one cell (what the creatures and the giraffe's path-finding use): used to keep the furniture from shutting anything in */
+function twReach(rects, sx, sy, lx, ly){
+  const NX = 84, NY = 63, N = NX * NY, solid = new Uint8Array(N), blocked = new Uint8Array(N);
+  for (let k = 0; k < rects.length; k++){ const r = rects[k], i0 = Math.max(0, Math.floor(r.x / 50)), i1 = Math.min(NX - 1, Math.floor((r.x + r.w) / 50)), j0 = Math.max(0, Math.floor(r.y / 50)), j1 = Math.min(NY - 1, Math.floor((r.y + r.h) / 50));
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (i * 50 + 50 > r.x && i * 50 < r.x + r.w && j * 50 + 50 > r.y && j * 50 < r.y + r.h) solid[j * NX + i] = 1; }
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++){ let b = 0; for (let dj = -1; dj <= 1 && !b; dj++) for (let di = -1; di <= 1; di++){ const a = i + di, c = j + dj; if (a < 0 || c < 0 || a >= NX || c >= NY || solid[c * NX + a]){ b = 1; break; } } blocked[j * NX + i] = b; }
+  const seen = new Uint8Array(N), q = [Math.floor(sy / 50) * NX + Math.floor(sx / 50)]; seen[q[0]] = 1; let open = 0, reach = 0;
+  while (q.length){ const c = q.pop(), i = c % NX, j = (c / NX) | 0; for (let k = 0; k < 4; k++){ const a = i + (k === 0 ? 1 : k === 1 ? -1 : 0), b = j + (k === 2 ? 1 : k === 3 ? -1 : 0); if (a < 0 || b < 0 || a >= NX || b >= NY) continue; const m = b * NX + a; if (seen[m] || blocked[m]) continue; seen[m] = 1; q.push(m); } }
+  for (let k = 0; k < N; k++) if (!blocked[k]){ open++; if (seen[k]) reach++; }
+  return { lost: open - reach, liftOk: !!seen[Math.floor(ly / 50) * NX + Math.floor(lx / 50)] };
+}
 /* ---- turning a plan into walls, boxes, doors and the two lifts, in pixels ---- */
 function twBuildPlan(n){
   const P0 = TOWER_PLANS[Math.max(0, Math.min(TOWER_PLANS.length - 1, n - 1))], U = TW_U, rooms = [], walls = [], boxes = [], doors = [], keys = Object.keys(P0.rooms), rnd = twRnd(n * 977 + 13);
@@ -141,6 +152,41 @@ function twBuildPlan(n){
   keys.forEach(k => { const r = P0.rooms[k], pat = (P0.pats || {})[k]; if (!pat || !TW_PAT[pat]) return;
     const area = { x0: r[0] + TW_INSET, y0: r[1] + TW_INSET, x1: r[2] - TW_INSET, y1: r[3] - TW_INSET }; if (area.x1 - area.x0 < 2.2 || area.y1 - area.y0 < 2.2) return;
     TW_PAT[pat](area, rnd).forEach(b => { if (b.w > 0.2 && b.h > 0.2) boxes.push({ x: b.x * U, y: b.y * U, w: b.w * U, h: b.h * U, k: b.k, room: k }); }); });
+  /* the lifts come first, so the clutter can keep clear of them */
+  const liftSpot = (spec) => { const r = P0.rooms[spec[0]], side = spec[1], pos = spec[2]; let cx, cy;
+    if (side === 's'){ cx = pos; cy = r[3] - 1; } else if (side === 'n'){ cx = pos; cy = r[1] + 1; } else if (side === 'w'){ cx = r[0] + 1; cy = pos; } else { cx = r[2] - 1; cy = pos; }
+    return { x: (cx - 1) * U - U * 0.6, y: (cy - 1) * U - U * 0.6, w: 3.2 * U, h: 3.2 * U }; };
+  const sp0 = liftSpot(P0.start), ep0 = liftSpot(P0.lift), start0 = { x: sp0.x + sp0.w / 2, y: sp0.y + sp0.h / 2 }, exit0 = { x: ep0.x + ep0.w / 2, y: ep0.y + ep0.h / 2 };
+  const base = twReach(walls.concat(boxes), start0.x, start0.y, exit0.x, exit0.y);
+  const keep = [sp0, ep0];
+  doors.forEach(d => keep.push(d.v ? { x: d.x - 1.5 * U, y: d.y - 0.6 * U, w: 3 * U, h: d.h + 1.2 * U } : { x: d.x - 0.6 * U, y: d.y - 1.5 * U, w: d.w + 1.2 * U, h: 3 * U }));
+  const hits = (a, b, m) => a.x < b.x + b.w + m && a.x + a.w > b.x - m && a.y < b.y + b.h + m && a.y + a.h > b.y - m;
+  const props = [], KINDS = {
+    lobby: ['plant', 'plant', 'cabinet', 'cooler', 'bench'], mail: ['crate', 'crate', 'cabinet', 'printer', 'crate'], steel: ['cabinet', 'crate', 'cooler', 'vending', 'cabinet'],
+    carpet: ['cabinet', 'plant', 'printer', 'cooler', 'cabinet', 'bin'], marble: ['plant', 'plant', 'bench', 'cabinet'], tile: ['vending', 'cooler', 'plant', 'bin', 'cabinet'],
+    server: ['rack', 'rack', 'cabinet', 'cooler'], lab: ['cabinet', 'cooler', 'plant', 'crate', 'printer'], vault: ['crate', 'crate', 'cabinet', 'safe'], wood: ['bookcase', 'bookcase', 'plant', 'cabinet'],
+    penthouse: ['plant', 'bookcase', 'bench', 'cabinet']
+  }, SIZE = { cabinet: [0.62, 1.1], bookcase: [0.6, 1.6], plant: [0.8, 0.8], cooler: [0.6, 0.6], printer: [1.0, 0.8], vending: [0.9, 0.8], crate: [0.9, 0.9], bin: [0.5, 0.5], rack: [0.7, 1.4], safe: [0.9, 0.9], bench: [1.0, 2.0] };
+  keys.forEach(k => {                                                                      /* things stood against the walls: never near a door or a lift */
+    const r = P0.rooms[k], kind = r[4] || P0.kind, list = KINDS[kind] || KINDS.carpet, x0 = r[0] * U + 0.34 * U, y0 = r[1] * U + 0.34 * U, x1 = r[2] * U - 0.34 * U, y1 = r[3] * U - 0.34 * U;
+    for (let side = 0; side < 4; side++){
+      const horiz = side < 2, len = horiz ? x1 - x0 : y1 - y0;
+      for (let at = 0.9 * U; at < len - 0.9 * U; at += (1.1 + rnd() * 1.6) * U){
+        if (rnd() < 0.3) continue;
+        const kk = list[Math.floor(rnd() * list.length)], sz = SIZE[kk], along = (horiz ? sz[1] : sz[0]) * U, depth = (horiz ? sz[0] : sz[1]) * U;
+        const w = horiz ? along : depth, h = horiz ? depth : along;
+        const bx = horiz ? x0 + at : side === 2 ? x0 : x1 - w, by = horiz ? (side === 0 ? y0 : y1 - h) : y0 + at;
+        const b = { x: bx, y: by, w: w, h: h, k: kk, room: k, deco: true };
+        if (keep.some(q => hits(b, q, 0)) || boxes.some(q => hits(b, q, 0.35 * U)) || bx + w > x1 + 1 || by + h > y1 + 1) continue;
+        boxes.push(b); const rc = twReach(walls.concat(boxes), start0.x, start0.y, exit0.x, exit0.y);
+        if (!rc.liftOk || rc.lost > base.lost) boxes.pop();                              /* it would shut something in: leave it out */
+      }
+    }
+    /* clutter on the floor: papers, cups, small boxes, cables, scuffs. Pictures only: nothing solid. */
+    const n = Math.round((r[2] - r[0]) * (r[3] - r[1]) / 5), rx0 = r[0] * U + 0.5 * U, ry0 = r[1] * U + 0.5 * U, rw = (r[2] - r[0]) * U - U, rh = (r[3] - r[1]) * U - U;
+    for (let i = 0; i < n; i++){ const o = { k: ['papers', 'papers', 'cup', 'boxes', 'cable', 'scuff', 'scuff', 'folder'][Math.floor(rnd() * 8)], x: rx0 + rnd() * rw, y: ry0 + rnd() * rh, a: rnd() * 6.2832, s: 0.7 + rnd() * 0.7, room: k };
+      if (!boxes.some(q => o.x > q.x - 20 && o.x < q.x + q.w + 20 && o.y > q.y - 20 && o.y < q.y + q.h + 20)) props.push(o); }
+  });
   /* the lifts: a 2 x 2 cell space against the wall of a room (the doors are drawn on that wall) */
   const lift = (spec) => { const r = P0.rooms[spec[0]], side = spec[1], pos = spec[2]; let cx, cy;
     if (side === 's'){ cx = pos; cy = r[3] - 1; } else if (side === 'n'){ cx = pos; cy = r[1] + 1; } else if (side === 'w'){ cx = r[0] + 1; cy = pos; } else { cx = r[2] - 1; cy = pos; }
@@ -149,5 +195,5 @@ function twBuildPlan(n){
   /* spawn vents: two in the corners of every room, away from the lifts */
   const vents = []; rooms.forEach(r => { [[1.1, 1.1], [r.cx1 - r.cx0 - 1.1, r.cy1 - r.cy0 - 1.1]].forEach(o => { const vx = (r.cx0 + o[0]) * U, vy = (r.cy0 + o[1]) * U;
       if (Math.hypot(vx - start.x, vy - start.y) > 420 && Math.hypot(vx - exit.x, vy - exit.y) > 420) vents.push({ x: vx, y: vy, room: r.id }); }); });
-  return { n: n, name: P0.name, kind: P0.kind, boss: !!P0.boss, rooms: rooms, walls: walls, boxes: boxes, doors: doors, start: start, lift: exit, vents: vents };
+  return { n: n, name: P0.name, kind: P0.kind, boss: !!P0.boss, rooms: rooms, walls: walls, boxes: boxes, props: props, doors: doors, start: start, lift: exit, vents: vents };
 }

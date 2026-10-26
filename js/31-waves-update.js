@@ -377,7 +377,7 @@ function updateWaves(dt){
       }
       const domeBossDown = (G.chapter === DOME_CHAPTER ? finale : G.chapter === TOWER_CHAPTER && G.wave % 5 === 0) && !G.bossAlive;     /* the Domes end the moment the Ice Heart falls, and so does every boss floor of the Tower: whatever is left of the crowd goes with it */
       if (domeBossDown) G.enemies.forEach(e => { if (!e.dead){ burstParticles(e.x, e.y, 8, e.blood || '#9AE8FF', 160, 4); e.dead = true; } });
-      if (G.enemies.length === 0 || domeBossDown || (!finale && G.waveOver > WAVE_PATIENCE_S)){
+      if (G.enemies.length === 0 || domeBossDown || (!finale && G.chapter !== TOWER_CHAPTER && G.waveOver > WAVE_PATIENCE_S)){
         G.waveState = 'clear';
         G.waveTimer = WAVE_CLEAR_S;
         G.hunt = 0; G.huntWarned = false;
