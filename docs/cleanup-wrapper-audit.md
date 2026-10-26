@@ -2,7 +2,7 @@
 
 Baseline: main at 4f918b3. No game code is changed or deleted by this branch. The fresh AST scan found **143 global function names across 281 literal function/arrow assignment sites**, rather than the handoff's older count of 123. Of these, 139 names have a load-time site; six sites execute inside runtime functions. Four names occur only at runtime in this literal-assignment scan (the shadow cache's permanent assignment is a member reference, discussed below). All 281 sites appear in the inventory.
 
-Run `npm ci --prefix tools`, then `node tools/audit-wrappers.mjs`; add `--json` for the machine-readable records. The tool uses Babel already bundled with the pinned Playwright QA dependency. It does not write files. It reads scripts in index.html order, finds Program-level function declarations and global identifier assignments, resolves references to saved prior bindings through lexical scope, and recognises guarded captures such as `typeof fn === 'function' ? fn : null`. A yes means at least one branch calls the captured version; it does not mean every path does. A no means the new body does not call it, not that the old body is globally unreachable. Runtime substitutions and restorations must be considered before proposing deletions.
+Run `npm ci --prefix tools`, then `node tools/audit-wrappers.mjs`; add `--json` for the machine-readable records. The tool uses Babel already bundled with the pinned Playwright QA dependency. It does not write files. It reads scripts in index.html order, finds Program-level function declarations and global identifier assignments, resolves references to saved prior bindings through lexical scope, and recognizes guarded captures such as `typeof fn === 'function' ? fn : null`. A yes means at least one branch calls the captured version; it does not mean every path does. A no means the new body does not call it, not that the old body is globally unreachable. Runtime substitutions and restorations must be considered before proposing deletions.
 
 ## The 14 no-call sites
 
@@ -14,7 +14,7 @@ Run `npm ci --prefix tools`, then `node tools/audit-wrappers.mjs`; add `--json` 
 | upgradesTabHTML — 41e-upgrades-page:108 | Earlier simple upgrade list is bypassed by the grouped Upgrades UI; candidate dead body. |
 | miniLayer — 44l-minigame-polish:148 | Earlier direct backdrop copy is replaced with parallax/ambient drawing using miniBg; candidate dead body. |
 | softShadow — 44n-photo-studio:228 | Temporary no-op during creature drawing; restored from ss in finally. **No dead original body implied.** |
-| giraffeColours — 44p-photo-share:40 | Shared-photo colour substitution; restored from gc in finally. **No dead original body.** |
+| giraffeColours — 44p-photo-share:40 | Shared-photo color substitution; restored from gc in finally. **No dead original body.** |
 | giraffePattern — 44p-photo-share:41 | Shared-photo pattern substitution; restored from gp in finally. **No dead original body.** |
 | accEquipped — 44p-photo-share:42 | Shared-photo accessory substitution; restored from ae in finally. **No dead original body.** |
 | showHelp — 44r-guide:200 | Older How to Play UI is bypassed by the Guide; candidate dead UI body. Review older captures before removal. |

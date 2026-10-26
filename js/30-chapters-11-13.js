@@ -2,7 +2,7 @@
 /* Chapters 11, 12 and 13. */
 /* ========================= CHAPTER 11: THE CHANGED SAVANNAH ========================= */
 /* She comes home to the savannah, and the grass glitters. Chapter 1's creatures and its five bosses are back, the same animals in the same order, but
-   something has got into them: every one has a twist in how it fights (a hook that runs after its normal behaviour and bends it), a faint glimmer in its
+   something has got into them: every one has a twist in how it fights (a hook that runs after its normal behavior and bends it), a faint glimmer in its
    look, and a few animations of its own. The twists are in GLIM_TWIST; the look is glimOverlay. */
 const GLIM_MUL = { common: { hp: 30, dmg: 6.8, spd: 1.7, val: 12 }, boss: { hp: 21, dmg: 5.6, spd: 1.45, val: 9 } };
 const GLIM_TITLES = { lion: 'The Pride Caller', matriarch: 'The Herd Mother', buffalo: 'The Stampede King', crocodile: 'Old Nile, Risen', wildfire: 'Wildfire Reborn' };
@@ -21,7 +21,7 @@ const WAVE_FLAVOUR_GLIM = [
 ];
 const BOSS_INTRO_GLIM = { lion: 'The Pride Caller rises, crowned in crystal', matriarch: 'The Herd Mother calls for her kin', buffalo: 'The Stampede King lowers his horns', crocodile: 'Old Nile stirs the glowing mud', wildfire: 'Wildfire Reborn sets the savannah alight' };
 
-/* ---- the twists. Each is called after the creature's normal behaviour with (e, dt, ux, uy, d, mvx, mvy, spd, was): `was` is the state it was in last frame.
+/* ---- the twists. Each is called after the creature's normal behavior with (e, dt, ux, uy, d, mvx, mvy, spd, was): `was` is the state it was in last frame.
    Return nothing to leave its movement alone, or a new [mvx, mvy]. ---- */
 function glimHowl(e){
   burstParticles(e.x, e.y, 16, '#4AF0D8', 190, 3.2, { glow: true }); sfx('whoosh', 0.1);
@@ -151,7 +151,7 @@ const GLIM_DECOR = {
 };
 /* The shimmer, redrawn so it sits on the creature instead of over it: a faint stepped halo, a thin crystalline rim, a few faceted crystals growing out of
    the silhouette, twinkling glints, a slow sheen that sweeps along the body, and glowing eyes. GLIM_LK is per animal, in the art's own pixels (the art is
-   not scaled by radius): [body centre x, half length, half width, crystal count, eye x, eye y, flags (1 = no rim or sheen, 2 = the crystals ride the wings)]. */
+   not scaled by radius): [body center x, half length, half width, crystal count, eye x, eye y, flags (1 = no rim or sheen, 2 = the crystals ride the wings)]. */
 const GLIM_LK = {
   hyena: [-1, 17, 11, 3, 17.6, 3.1], cheetah: [0, 18, 8.6, 3, 18.6, 2.6], rhino: [-2, 27, 19, 5, 25, 7.4], termite: [-7, 13, 10, 3, 16.8, 3.6],
   grub: [0, 9, 5.5, 2, 10.4, 1.7], vulture: [-1, 13, 8, 2, 15.4, 2.4, 3], jackal: [-2, 15, 8, 3, 16.2, 2.6], warthog: [-3, 20, 13, 4, 19.2, 3.6],
@@ -232,7 +232,7 @@ function glimOverlay(ctx, e){
 
 /* ========================= CHAPTER 12: AREA 51 ========================= */
 /* She drops into the Nevada desert to find out what has been changing the animals. The base is full of soldiers: the same kinds of
-   unit as the Space Marines (so they reuse the Chapter 8 behaviours, slot for slot, through MARINE_AI), in desert camouflage with night-vision
+   unit as the Space Marines (so they reuse the Chapter 8 behaviors, slot for slot, through MARINE_AI), in desert camouflage with night-vision
    visors, harder than the Marines and in a mix of their own. Only the look, the numbers and the world are new. The look is A51_DRAW (below the
    Marine drawing code). The hidden lab hatch glows green in the middle of the base. */
 const A51_MUL = { common: { hp: 27.0, dmg: 6.2, spd: 1.55, val: 13.0 }, boss: { hp: 19.5, dmg: 5.2, spd: 1.4, val: 9.5 } };
@@ -464,7 +464,7 @@ const BOSS_INTRO_MARS = {
   wildfire: 'Fleet Marshal Dray brings the flagship down'
 };
 
-/* ---- the dust aliens' own behaviours. Called from the enemy update's default branch like MARINE_AI: (e, dt, ux, uy, d, dx, dy) -> [mvx, mvy]. e.spdE is the speed it should use.
+/* ---- the dust aliens' own behaviors. Called from the enemy update's default branch like MARINE_AI: (e, dt, ux, uy, d, dx, dy) -> [mvx, mvy]. e.spdE is the speed it should use.
    None of them shoots anything: they bite, slam, burst, burrow and swarm. ---- */
 const DUST_AI = {
   d_scuttle(e, dt, ux, uy, d){                          /* Dust Scuttler: weaves in as one of a swarm, then a snapping lunge */

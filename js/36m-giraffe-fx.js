@@ -49,7 +49,7 @@ function giraffeFxUpdate(dt){
     if (GF.trail.length > 6) GF.trail.shift();
   }
   for (let i = GF.trail.length - 1; i >= 0; i--){ GF.trail[i].age += dt; if (GF.trail[i].age > 0.26) GF.trail.splice(i, 1); }
-  /* the power glow follows the build: how many cards, how far they have come, and the colour of the strongest */
+  /* the power glow follows the build: how many cards, how far they have come, and the color of the strongest */
   GF.scanT -= dt;
   if (GF.scanT <= 0){
     GF.scanT = 0.5;
@@ -78,8 +78,8 @@ function giraffeFxUpdate(dt){
   if (GF.pulse > 0) GF.pulse = Math.max(0, GF.pulse - dt * 1.6);
 }
 
-/* a dark soft rim around her silhouette, strongest on the grounds she tends to blend into (grey snow, olive swamp, green
-   jungle, ochre Venus, and the orange Inferno and Mars); drawPlayer() sets it as a canvas shadow for the length of her drawing. Returns [colour, blur] or null. */
+/* a dark soft rim around her silhouette, strongest on the grounds she tends to blend into (gray snow, olive swamp, green
+   jungle, ochre Venus, and the orange Inferno and Mars); drawPlayer() sets it as a canvas shadow for the length of her drawing. Returns [color, blur] or null. */
 const GIRAFFE_RIM = { 1: 0.3, 2: 0.75, 3: 0.65, 4: 0.4, 5: 0.7, 6: 0.3, 7: 0.3, 8: 0.3, 9: 0.6, 10: 0.9, 11: 0.4, 12: 0.3, 13: 0.9, 14: 0.8, 15: 0.5 };
 function giraffeRim(){
   if (fxLevelNow() <= 0) return null;

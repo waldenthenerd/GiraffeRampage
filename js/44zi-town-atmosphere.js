@@ -7,7 +7,7 @@
       in the evening (18:00 to 21:00) and are away from 21:00 to 06:30. The others (the shopkeepers, Marina, Nova, Ossi, Dot) are where they are.
    3 WEATHER. Every four minutes the weather is drawn from a clock the same for everybody: clear, rain, a storm (rain, a darker sky, lightning
       and thunder) or fog. On clear nights the Rooftops and the Launchpad sometimes have an aurora.
-   4 NIGHT FLYING. At night the lighthouse in the Harbour throws a beam, the runway lights glow and a row of lights flashes toward it, four
+   4 NIGHT FLYING. At night the lighthouse in the Harbor throws a beam, the runway lights glow and a row of lights flashes toward it, four
       approach lights show whether she is high (white) or low (red), and a marshal waves his wands. */
 
 /* ---- 1 sound ---- */
@@ -222,7 +222,7 @@ function flyNightFX(ctx, cam, vw, t, dark){
   t.html = function(){
     return base().replace('</ul>', '<li><b>More to spend on:</b> four planes and four cars (each stalls, cruises and climbs differently; the Cargo Hauler pays most for rings), a bigger oven for the bakery, and <b>Her Home</b> at the far end of Willow Park with eight slots to furnish. Photos from the album can hang in the six frames in Herd Hall.</li>' +
       '<li><b>More to do:</b> work a shift at the caf\u00e9 bar, enter the weekly tournament on the arcade board, fish from the end of the pier, and check the post box in the square for the day\u2019s letter.</li>' +
-      '<li><b>Finding things:</b> the top of the screen says what is left in a street. Dewey in the library, or the Finds page of the journal, will give a hint when you are stuck, and the Gear page lists the town-only hats, boots and colours. On a touch screen, tap a person or a door and she walks there.</li>' +
+      '<li><b>Finding things:</b> the top of the screen says what is left in a street. Dewey in the library, or the Finds page of the journal, will give a hint when you are stuck, and the Gear page lists the town-only hats, boots and colors. On a touch screen, tap a person or a door and she walks there.</li>' +
       '<li><b>The town keeps hours:</b> some of the herd lunch at the caf\u00e9, gather by the fountain in the evening and go home at night. It also has rain, storms, fog and, some clear nights on the Rooftops and Launchpad, an aurora.</li></ul>');
   };
 })();

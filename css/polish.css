@@ -2,7 +2,7 @@
    Only appearance changes here; nothing in this file moves or resizes layout. Reduced-motion users get the static look
    (style.css already neutralises animation durations). */
 
-/* ---------- extra colour tokens ---------- */
+/* ---------- extra color tokens ---------- */
 :root{
   --rare:#8FB85A;
   --epic:#B07CFF;
@@ -179,12 +179,12 @@
 }
 #hint.on{opacity:1;transform:translate(-50%,0)}
 
-/* ---------- nearly dead: the health bar pulses (colour and glow only, its shape stays) ---------- */
+/* ---------- nearly dead: the health bar pulses (color and glow only, its shape stays) ---------- */
 #bars.lowhp .bar:first-child{animation:hppulse .9s ease-in-out infinite}
 @keyframes hppulse{0%,100%{box-shadow:0 0 0 0 rgba(207,68,51,0)}50%{box-shadow:0 0 12px 2px rgba(207,68,51,.8)}}
 #bars.lowhp #hpTxt{color:#FFD2C8;font-weight:700}
 
-/* ---------- rarity is never colour alone: each tier also has its own mark ---------- */
+/* ---------- rarity is never color alone: each tier also has its own mark ---------- */
 .ctag.rare::before{content:"\25C6\00a0"}
 .ctag.epic::before{content:"\2605\00a0"}
 .ctag.legendary::before{content:"\2726\00a0"}
@@ -216,7 +216,7 @@ body.ts2 #hint{font-size:18px}
 }
 /* ---------- touch layouts: the pause button no longer sits on the end of the health bar ---------- */
 body:has(#pausebtn.on) .hudtop{padding-right:56px}
-/* ---------- sliders in the game's colours; the settings Back button stays in reach; menu columns line up ---------- */
+/* ---------- sliders in the game's colors; the settings Back button stays in reach; menu columns line up ---------- */
 input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;height:26px;margin:0;accent-color:var(--hide)}
 input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(180deg,#2A2018,#4A372A)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-6px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#F5BE55,var(--hide));border:2px solid var(--bone);box-shadow:0 1px 4px rgba(0,0,0,.5)}
@@ -225,7 +225,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 .stickyback{position:sticky;bottom:-20px;z-index:2;padding:12px 0 2px;background:linear-gradient(180deg,rgba(30,23,18,0),rgba(30,23,18,.96) 40%)}
 @media (min-width:1000px) and (min-height:521px){ .menu2 .mside{align-self:start} }
-/* ---------- card art: a flat square tile behind each icon, with a faint slow light travelling round the rarer cards ---------- */
+/* ---------- card art: a flat square tile behind each icon, with a faint slow light traveling round the rarer cards ---------- */
 .cicon{position:relative;isolation:isolate;width:48px;height:48px;border-radius:10px;
   background:linear-gradient(180deg,rgba(255,236,200,.1),rgba(255,236,200,.03));
   border:1px solid rgba(255,236,200,.14);box-shadow:none}
@@ -239,7 +239,7 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 @keyframes cring{to{transform:rotate(360deg)}}
 @media (max-width:760px){.cicon{width:42px;height:42px}}
 @media (prefers-reduced-motion:reduce){.cicon::before{animation:none}}
-/* ---------- coat colours ---------- */
+/* ---------- coat colors ---------- */
 .swatches{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .swatch{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,236,200,.25);padding:0;cursor:pointer;position:relative;
   box-shadow:inset 0 -5px 8px rgba(0,0,0,.25),0 2px 5px rgba(0,0,0,.4);transition:transform .1s,border-color .1s}
@@ -286,7 +286,7 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 .coll .cell.locked{cursor:default;opacity:.75}
 .coll .cell.rare{border-color:rgba(255,216,77,.5);background:linear-gradient(180deg,rgba(255,216,77,.12),rgba(20,16,14,.55))}
 .coll .cell.on{outline:2px solid var(--sun,#FFD84D)}
-/* tips, the photo screen, hat colours, the slow-device notice */
+/* tips, the photo screen, hat colors, the slow-device notice */
 .tip{display:flex;gap:8px;align-items:flex-start;text-align:left;margin:6px 0;padding:8px 10px;border-radius:10px;font-size:13px;line-height:1.35;
   background:rgba(255,216,77,.1);border:1px solid rgba(255,216,77,.35);color:#F4EAD0}
 .tip .tipi{flex:none;font-size:16px;color:#FFD84D}

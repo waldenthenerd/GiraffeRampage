@@ -38,7 +38,7 @@ try {
   pages.gear(); Nav.on = true; gearPage.hover = null; gearPage.selected = null; var gp = $('.gp[data-gh]'); if (gp){ gp.focus(); out.gearFocus = gearPage.hover === gp.dataset.gh; var eq = $('#gearSide button, #gearSide .btn'); if (eq){ eq.focus(); out.gearKeep = gearPage.hover === gp.dataset.gh; } else out.gearKeep = true; var other = $('.gslot'); other.focus(); out.gearClear = gearPage.hover === null; } else { out.gearFocus = out.gearKeep = out.gearClear = false; }
   showShop('gear'); Nav.on = true; trinketPage.hover = null; trinketPage.sel = null; var tt = $('.ttile:not(.locked)'); tt.focus(); out.trinketFocus = trinketPage.hover === tt.dataset.th && /Tap to|Worn/.test($('#trinketSide').textContent);
   $('.gslot, .gview-b').focus(); out.trinketClear = trinketPage.hover === null;
-  /* 5. after the screen is drawn again the focus is not lost: the same button, or the nearest one when it has gone grey */
+  /* 5. after the screen is drawn again the focus is not lost: the same button, or the nearest one when it has gone gray */
   pages.upgrades(); Nav.on = true; Save.data.meta = {}; Save.data.gold = 150; showShop('upgrades'); var buy = $('[data-buy="hooves"]'); buy.focus(); out.focusStart = document.activeElement === buy;
   buy.click(); out.focusKept = !!document.activeElement && document.activeElement !== document.body && OV.contains(document.activeElement) && document.activeElement.tagName === 'BUTTON' && !document.activeElement.disabled;
   pages.wheel(); Nav.on = true; Save.data.wheelKeys = 1; Save.data.spottedKeys = 0; wheelPage.id = 'normal'; wheelResult = null; wheelSpinning = false; showShop('wheel'); $('#wheelSpinBtn').focus(); spinWheelUI();
@@ -49,7 +49,7 @@ try {
   pages.upgrades(); out.ariaUpg = $$('.upbtns .btn').length > 3 && $$('.upbtns .btn').every(function(b){ return /Buy .* (gold|levels)/.test(b.getAttribute('aria-label') || ''); }) && /Hooves/.test($('[data-buy="hooves"]').getAttribute('aria-label'));
   pages.ants(); out.ariaAnts = $$('.arbtns .btn').length >= 3 && $$('.arbtns .btn').every(function(b){ return /^Hire (\d+ .*Ant.* for [\d.]+ food|.+ for .+)$/.test(b.getAttribute('aria-label') || ''); });
   pages.wheel(); out.ariaWheel = $$('.wbtns .btn').length === 3 && $$('.wbtns .btn').every(function(b){ return /^Spin \d+ times?, using \d+ /.test(b.getAttribute('aria-label') || ''); });
-  /* 7. other screens' focus behaviour is untouched: a first arrow press focuses the first main button */
+  /* 7. other screens' focus behavior is untouched: a first arrow press focuses the first main button */
   showMenu(); Nav.on = true; document.activeElement && document.activeElement.blur(); Nav.move(0, 1); out.menuFirst = !!document.activeElement && OV.contains(document.activeElement);
   if (view !== 'none'){ G.state = 'shop'; Nav.on = true; (pages[view] || pages.upgrades)(); var f = $('.gp[data-gh], .ttile:not(.locked), [data-buy], #wheelSpinBtn, [data-a^="ant-hire"]'); if (f) f.focus(); }
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }

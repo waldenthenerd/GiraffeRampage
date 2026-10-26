@@ -242,7 +242,7 @@ function handleAction(a){
   if (a.indexOf('fuse-filter-') === 0){ G.cxFilter = a.slice(12); SFX.click(); showFusionMachine(); return; }
   if (a.indexOf('fuse-view-') === 0){ const p = a.slice(10).split('~'); if (p.length === 2 && FUSE_INFO[p[0]] && FUSE_INFO[p[1]]){ G.fuseSel = [p[0], p[1]]; G.fuseTab = 'machine'; } SFX.click(); showFusionMachine(); return; }
   if (a.indexOf('fuse-claim-') === 0){ if (claimMilestone(parseInt(a.slice(11), 10))){ SFX.buy(); SFX.level(); } else SFX.deny(); showFusionMachine(); return; }
-  if (a === 'wardrobe' || a.indexOf('ward-') === 0){ if (typeof handleWardAction === 'function') handleWardAction(a); return; }       /* coat colours (js/44e-wardrobe.js) */
+  if (a === 'wardrobe' || a.indexOf('ward-') === 0){ if (typeof handleWardAction === 'function') handleWardAction(a); return; }       /* coat colors (js/44e-wardrobe.js) */
   if (a.indexOf('mini-') === 0){ if (typeof handleMiniAction === 'function' && handleMiniAction(a)) return; }                        /* minigames (js/44f-minigames.js) */
   if (a.indexOf('town-') === 0){ if (typeof handleTownAction === 'function' && handleTownAction(a)) return; }                      /* Longneck Town (js/44x-town-ui.js) */
   /* actions that start with the testing prefix belong to a separate testing tool that is not part of the published game; without it they simply do nothing */

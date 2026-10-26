@@ -153,7 +153,7 @@ function showDebugPanel(){
         '<button class="btn ghost" data-a="debug-forage">Reset the foraging cooldown</button>' +
         '<button class="btn ghost" data-a="debug-mini-cd">Reset the minigame cooldown</button>' +
         '<button class="btn ghost" data-a="debug-mini-own">Own every hat and boot</button>' +
-        '<button class="btn ghost" data-a="debug-mini-colours">Unlock every minigame colour (three stars in all 13)</button>' +
+        '<button class="btn ghost" data-a="debug-mini-colours">Unlock every minigame color (three stars in all 13)</button>' +
         '<button class="btn ghost" data-a="debug-town-open">Longneck Town: open every place (marks chapters 4, 6 and 8 complete and flies her home)</button>' +
         '<button class="btn ghost" data-a="debug-town-find">Longneck Town: find every item (' + townFoundTotal() + ' of ' + TOWN_ITEMS.length + ' found)</button>' +
         '<button class="btn ghost" data-a="debug-town-friends">Longneck Town: make everyone a best friend</button>' +

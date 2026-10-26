@@ -2,10 +2,10 @@
 /* Longneck Town: the places, the herd, the errands and the things to find. */
 /* ========================= 44u. TOWN DATA ========================= */
 /* A side-on town she walks through between runs (menu button "Longneck Town"). It is made of districts laid out on one street:
-       Harbour | Market Street | Town Square | Willow Park | Rooftops | Launchpad          (+ the Burrows, down the manhole in the square)
+       Harbor | Market Street | Town Square | Willow Park | Rooftops | Launchpad          (+ the Burrows, down the manhole in the square)
    The square, market and park are open from the start; the others open with chapters (see `open` in TOWN_DIST). A building is the front
    door of a screen the game already has (wardrobe, trading post, minigames, photo studio, album, bestiary, guide, the outposts and the
-   lab), so each of them has a place to stand. Everything here is cosmetic or a small gift: gold, gems, hats, boots and five coat colours.
+   lab), so each of them has a place to stand. Everything here is cosmetic or a small gift: gold, gems, hats, boots and five coat colors.
 
    Save.data.town = {
      found:{id:1}          things she has picked up (TOWN_ITEMS ids)         bond:{npc:points}     how well she knows each of the herd
@@ -73,7 +73,7 @@ const TOWN_DIST = {
       { k: 'lamp', x: 1960 }, { k: 'tree', x: 2420, s: 1.1 }, { k: 'bench', x: 1900 }, { k: 'bush', x: 2400 }],
     L: [{ x: 840, y: 360, r: 110 }, { x: 1960, y: 360, r: 110 }, { x: 520, y: 400, r: 140 }, { x: 2160, y: 380, r: 120 }],
     npcs: ['gus', 'rio'], dig: [340, 1120, 2350] },
-  harbour: { id: 'harbour', name: 'Harbour', w: 2200, spawn: 1900, theme: 'harbour', left: null, right: 'market',
+  harbour: { id: 'harbour', name: 'Harbor', w: 2200, spawn: 1900, theme: 'harbour', left: null, right: 'market',
     open: function(){ return townDoneCh(4); }, need: 'Finish Chapter 4 (The Deep)',
     b: [
       { id: 'shack', kind: 'shack', x: 640, w: 280, h: 190, label: 'Bait & Tackle', act: 'shack' },
@@ -117,7 +117,7 @@ function townOpen(id){ const D = TOWN_DIST[id]; return !!(D && D.open()); }
 function townOpenCount(){ let n = 0; TOWN_IDS.forEach(function(id){ if (townOpen(id)) n++; }); return n; }
 
 /* ---- things to find ----
-   t: coin (gold), star (a bigger prize), gem, hat or boot (acc: an item from ACC), swatch (a coat colour, see WARD_TOWN), track (a creature's
+   t: coin (gold), star (a bigger prize), gem, hat or boot (acc: an item from ACC), swatch (a coat color, see WARD_TOWN), track (a creature's
    footprints: ch + type name a creature of the Bestiary). h: how high above the street it hangs. Under 60 it is picked up by walking over it;
    higher, she has to stretch her neck up to it (hold the up key). note: where it is, used by the hints. */
 const TOWN_ITEMS = [
@@ -185,7 +185,7 @@ function townFoundTotal(){ let n = 0; TOWN_ITEMS.forEach(function(it){ if (townD
 function townFoundType(t){ let n = 0; TOWN_ITEMS.forEach(function(it){ if (it.t === t && townData().found[it.id]) n++; }); return n; }
 
 /* ---- the herd ---- */
-/* look: coat, spot, pat (a WARD_PATTERNS number), hat, boot (ACC ids), hc/bc (tint colour numbers), s (size). habit: what she does when nobody is talking
+/* look: coat, spot, pat (a WARD_PATTERNS number), hat, boot (ACC ids), hc/bc (tint color numbers), s (size). habit: what she does when nobody is talking
    to her. fav: the gift she likes best. gift: what she gives at the best friend level. say/night/rain: things she says. */
 const TOWN_NPCS = {
   mayor: { id: 'mayor', name: 'Mayor Lofty', d: 'square', x: 1000, range: 150, habit: 'stroll', fav: 'flowers', look: { coat: '#E5B558', spot: '#8D5A22', pat: 1, hat: 'tophat', s: 1.12 },
@@ -197,7 +197,7 @@ const TOWN_NPCS = {
   tilly: { id: 'tilly', name: 'Tilly Stitch', d: 'square', x: 560, range: 70, habit: 'stand', fav: 'sweets', look: { coat: '#F29AC0', spot: '#B83B76', pat: 3, hat: 'beanie', hc: 0, s: 1.0 },
     gift: { gems: 60, coin: 8 },
     say: ["Stand still a moment. Mm. Yes. I have thoughts about your outfit.", "Hats and boots are half the look, darling.",
-      "Three colours on the coat, one on the hat, one on the boots. That's my rule. I break it constantly.", "Everything can be recoloured. Everything. Ask me nothing about the paper bag."],
+      "Three colors on the coat, one on the hat, one on the boots. That's my rule. I break it constantly.", "Everything can be recoloured. Everything. Ask me nothing about the paper bag."],
     night: ["Sewing by lamplight is the best kind."], rain: ["Wet fabric. Terrible. Come in if you like."] },
   barnaby: { id: 'barnaby', name: 'Barnaby Bartle', d: 'market', x: 800, range: 120, habit: 'stroll', fav: 'book', look: { coat: '#A9B86A', spot: '#5E6A2C', pat: 2, hat: 'straw', s: 1.05 },
     gift: { gems: 60, coin: 8 },
@@ -225,7 +225,7 @@ const TOWN_NPCS = {
     night: ["Night's when the big ones come up."], rain: ["Fish love the rain. I love the fish."] },
   skye: { id: 'skye', name: 'Skye Sprocket', d: 'roofs', x: 1020, range: 130, habit: 'tinker', fav: 'book', look: { coat: '#F2A85C', spot: '#9A4C12', pat: 12, hat: 'propeller', s: 1.0 },
     gift: { gems: 60, coin: 8 },
-    say: ["You can see all the way to the harbour from up here. Well. You can.", "Every antenna on this roof is mine. Don't touch the green one.",
+    say: ["You can see all the way to the harbor from up here. Well. You can.", "Every antenna on this roof is mine. Don't touch the green one.",
       "Reach for it! That's the only rule of the rooftops."],
     night: ["The signals are clearer at night."], rain: ["Wet cables. Fun times."] },
   nova: { id: 'nova', name: 'Nova Nib', d: 'launch', x: 1380, range: 40, habit: 'stargaze', fav: 'book', look: { coat: '#9AA6F2', spot: '#3B3F8F', pat: 7, hat: 'wizard', s: 1.0 },
@@ -255,8 +255,8 @@ const TOWN_ERRANDS = [
   { id: 'm2', npc: 'mayor', title: 'A finder’s fee', offer: "People keep dropping things around town. Bring the town's lost things back to the world: find ten of them, and I'll make it worth your while.", done: "Ten! The lost property office has never been so quiet.", need: { k: 'foundN', n: 10 }, r: { gems: 25 } },
   { id: 'm3', npc: 'mayor', title: 'Pride of the herd', offer: "Thirty things found, and the town would cheer. Shall we see if you can do it?", done: "Thirty! I'm going to need a bigger noticeboard.", need: { k: 'foundN', n: 30 }, r: { gems: 60 } },
   { id: 't1', npc: 'tilly', title: 'Something hat-ish', offer: "You're a vision, but your head is bare. Wear a hat. Any hat. Show me.", done: "Better. Much better. The head has a finish now.", need: { k: 'wear', what: 'hat' }, r: { coin: 2 } },
-  { id: 't2', npc: 'tilly', title: 'A splash of colour', offer: "Change your coat colour to something that isn't your own, and tint a hat or boots too. In the wardrobe at the tailor's.", done: "Now that is a statement.", need: { k: 'wear', what: 'colours' }, r: { gems: 20 } },
-  { id: 't3', npc: 'tilly', title: 'The full look', offer: "Hat, boots and a gear accent colour all at once. If you can do that I will weep.", done: "I'm weeping. Don't look.", need: { k: 'wear', what: 'outfit' }, r: { gems: 30 } },
+  { id: 't2', npc: 'tilly', title: 'A splash of color', offer: "Change your coat color to something that isn't your own, and tint a hat or boots too. In the wardrobe at the tailor's.", done: "Now that is a statement.", need: { k: 'wear', what: 'colours' }, r: { gems: 20 } },
+  { id: 't3', npc: 'tilly', title: 'The full look', offer: "Hat, boots and a gear accent color all at once. If you can do that I will weep.", done: "I'm weeping. Don't look.", need: { k: 'wear', what: 'outfit' }, r: { gems: 30 } },
   { id: 'b1', npc: 'barnaby', title: 'Shiny business', offer: "A star dropped off a cart on this street, somewhere high. Find it for me and I'll throw in a bonus. A gem went missing too, so bring both.", done: "Ha! Both of them. I'll keep the receipt.", need: { k: 'found', ids: ['mk_s1', 'mk_g1'] }, r: { coin: 4 } },
   { id: 'b2', npc: 'barnaby', title: 'Stock take', offer: "Bring me a purse of gold for the stock: twelve coins' worth. I'll pay you back in gems. I'm good for it.", done: "Honest dealing. I'll never forget it. Well. A week.", need: { k: 'give', cur: 'gold', coins: 12 }, r: { gems: 20 } },
   { id: 'b3', npc: 'barnaby', title: 'Rare wares', offer: "Collectors collect. Own six hats and boots and come and show me.", done: "A real collector. Here, for the shelf.", need: { k: 'own', n: 6 }, r: { gems: 25 } },
@@ -271,8 +271,8 @@ const TOWN_ERRANDS = [
   { id: 'g2', npc: 'gus', title: 'Star power', offer: "Collect three stars across the minigames. Any three.", done: "Three stars! You're basically a constellation.", need: { k: 'stars', n: 3 }, r: { gems: 20 } },
   { id: 'g3', npc: 'gus', title: 'High roller', offer: "Get all three stars in one minigame. The three of them. In one.", done: "Three! In one! Legend.", need: { k: 'mini3' }, r: { gems: 35 } },
   { id: 'h1', npc: 'marina', title: 'Lost at sea', offer: "I lost my dockside boots off the pier. Grey-blue, with a yellow cuff. Find them, please.", done: "My boots! Keep them. They never fit.", need: { k: 'found', ids: ['hb_b1'] }, r: { coin: 3 } },
-  { id: 'h2', npc: 'marina', title: 'Salty dog', offer: "Five things from the harbour. The sea gives, if you reach.", done: "The sea is generous when you're tall.", need: { k: 'dist', d: 'harbour', n: 5 }, r: { gems: 20 } },
-  { id: 'h3', npc: 'marina', title: 'Night fishing', offer: "Come to the harbour after dark. Just stand with me.", done: "Quiet company. The best kind.", need: { k: 'night', d: 'harbour' }, r: { gems: 20 } },
+  { id: 'h2', npc: 'marina', title: 'Salty dog', offer: "Five things from the harbor. The sea gives, if you reach.", done: "The sea is generous when you're tall.", need: { k: 'dist', d: 'harbour', n: 5 }, r: { gems: 20 } },
+  { id: 'h3', npc: 'marina', title: 'Night fishing', offer: "Come to the harbor after dark. Just stand with me.", done: "Quiet company. The best kind.", need: { k: 'night', d: 'harbour' }, r: { gems: 20 } },
   { id: 's1', npc: 'skye', title: 'Head in the clouds', offer: "There's a coin up near the top of the big antenna. Stretch for it. Neck all the way.", done: "All the way up. My hero.", need: { k: 'found', ids: ['rf_c3'] }, r: { coin: 3 } },
   { id: 's2', npc: 'skye', title: 'Signal boost', offer: "An aviator cap is spinning at the tip of that antenna. Fetch it before the wind does.", done: "Signal's perfect. And the hat's yours.", need: { k: 'found', ids: ['rf_h1'] }, r: { gems: 20 } },
   { id: 's3', npc: 'skye', title: 'View from above', offer: "Find everything on the rooftops. Everything.", done: "That's the whole roof. Nobody's ever done that.", need: { k: 'distAll', d: 'roofs' }, r: { gems: 40 } },

@@ -15,9 +15,9 @@ Object.assign(ENEMY_LOOK_DRAW, DUST_DRAW);
 ENEMY_LOOK_DRAW.mars_warden = ENEMY_LOOK_DRAW.warden; ENEMY_LOOK_DRAW.mars_admiral = ENEMY_LOOK_DRAW.admiral;
 
 /* ========================= CHAPTER 1 (SAVANNAH) CREATURE ART =========================
-   One drawing function per animal, called from the cases in drawEnemy below. All of them draw in the creature's local space (centre at 0,0, facing +x,
-   +y is its right side), take the body colour b and dark colour dk (both blended toward white briefly when hit) and build every shade from those two.
-   ch1_s / ch1_m memoise the shade() / blendHex() strings so that a crowd of enemies does not parse colours every frame. */
+   One drawing function per animal, called from the cases in drawEnemy below. All of them draw in the creature's local space (center at 0,0, facing +x,
+   +y is its right side), take the body color b and dark color dk (both blended toward white briefly when hit) and build every shade from those two.
+   ch1_s / ch1_m memoise the shade() / blendHex() strings so that a crowd of enemies does not parse colors every frame. */
 const CH1_MEMO = {}; let CH1_MEMO_N = 0;
 const CH1_DASH_FINE = [1.3, 2.7], CH1_DASH_RING = [1.1, 4.4], CH1_DASH_NONE = [];
 function ch1_s(hex, amt){
@@ -54,7 +54,7 @@ function ch1_leg4(ctx, xf, xr, yi, yo, sw, w, c, pr, pc){
     lkOV(ctx, xr - sw + pr * 0.3, -yo, pr * 1.35, pr * 0.9, pc); lkOV(ctx, xr + sw + pr * 0.3, yo, pr * 1.35, pr * 0.9, pc);
   }
 }
-/* a small eye: coloured iris, dark pupil, tiny highlight */
+/* a small eye: colored iris, dark pupil, tiny highlight */
 function ch1_eye(ctx, x, y, r, iris){
   fillCircle(ctx, x, y, r, iris);
   fillCircle(ctx, x + r * 0.18, y, r * 0.55, '#2B1D12');
@@ -782,7 +782,7 @@ function drawEnemy(ctx, e){
   }
 }
 
-/* The creature itself, drawn live in its own space (centre 0,0, facing +x). drawEnemy() calls this, or uses a cached picture of the same drawing. */
+/* The creature itself, drawn live in its own space (center 0,0, facing +x). drawEnemy() calls this, or uses a cached picture of the same drawing. */
 function drawEnemyBody(ctx, e, body, dk, bob, wind, d){
   const frost = d.frost, swamp = d.swamp, ocean = d.ocean;
   if (d.look && ENEMY_LOOK_DRAW[d.look]) ENEMY_LOOK_DRAW[d.look](ctx, e, body, dk, bob, wind, d);

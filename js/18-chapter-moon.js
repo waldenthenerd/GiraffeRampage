@@ -1,7 +1,7 @@
 'use strict';
 /* The Moon (chapter 8). */
 /* ========================= THE MOON (Chapter 8) ========================= */
-/* Grey regolith, craters, scattered boulders, and -- where the giraffe landed
+/* Gray regolith, craters, scattered boulders, and -- where the giraffe landed
    at the end of Chapter 7 -- the burned-out remains of the lander. It is all
    ground scenery (nothing blocks you): the Marines are the obstacle. */
 const MOON_WRECK = { x: 940, y: 690 };

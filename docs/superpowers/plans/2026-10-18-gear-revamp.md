@@ -14,12 +14,12 @@
 
 1. Scope: paper-doll layout (1), compare-before-equip (2), piece art (3, in detail), crate moment (6), gear upgrading (7), gear with a playstyle (8). Not in scope: loadouts (5), rebalancing the 16 sets, sets-view overhaul (4), linking university boosts to this page (9).
 2. The giraffe preview shows gear in the world with new art (capes, weapons, armor), at the same drawing used in play.
-3. Hats and boots are separate from gear: no hat or boot controls on the Gear page, `Save.data.equipped` keeps only `cape`, `weapon`, `armor`. The preview draws her current hat and boots as already chosen on the Coat colours screen (read-only), with one button to open that screen.
+3. Hats and boots are separate from gear: no hat or boot controls on the Gear page, `Save.data.equipped` keeps only `cape`, `weapon`, `armor`. The preview draws her current hat and boots as already chosen on the Coat colors screen (read-only), with one button to open that screen.
 4. Saves stay backward compatible: existing keys (`gear`, `equipped`, `equippedTrinkets`, `cratesOpened`) are not renamed or reshaped. New keys default when absent.
 5. `Settings.showGear` still hides gear art in play. Visual effects "off" turns the special-effect particles and the crate sparkle off.
 6. `js/45b-dev-panel.js` stays out of the website build; the Lovable `GR` export/save bridge is untouched.
 7. No shake-reduction setting. Cutscenes never announce the end of the game.
-8. Edits are exact-match replacements; new behaviour goes in new files that wrap old functions.
+8. Edits are exact-match replacements; new behavior goes in new files that wrap old functions.
 9. After every task: update `README.md` (new rows, recount per-file line counts and totals), the script count in `lovable.md`, and `tools/QA-GUIDE.md`; verify visual work with screenshots.
 10. Numbers pinned by this plan: gear levels 1 to 5 (stored as the number of upgrades, 0 to 4); each level adds 10% to a piece's own effect numbers (level 5 = +40%); pity: a Supply Crate guarantees rare or better on the 10th open without one, a Prime Crate guarantees epic or better on the 8th; 8 special-effect pieces.
 
@@ -94,7 +94,7 @@ Branch: `gear-revamp`, created from `polish-pack` (it holds the neck-stretch hoo
 - Produces: `CAPE_DESIGNS: {[setId]: function(ctx, o)}` where `o = {bx, by, tipA, len, spread, ppx, ppy, color, t, level, rarity}`; `capeDraw(ctx, setId, o): boolean` (false = use the generic cape). `P.capeSet` is set in `recalcStats` by wrapping `equippedCapeColor`'s caller (wrap `recalcStats`, read `gearEquipped('cape')`).
 
 **Design table (one line each; each design must read as different at the 2x close-up size, not only recoloured):**
-Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips; Stoneplate tabbed stone flaps; Frostbite fur-trimmed cloak with ice beads; Acacia Warden woven bark-and-leaf mantle with a seed pouch; Twinsoul two-tone split cloak with a drifting second tail; Glacier Guard crystal-edged cape; Sunforged gold-trimmed flame hem; Aurora ribbon cape with a slow colour shift; Starborn star-dusted night cloth with twinkles; Tideshell scalloped shell scales; Riptide ragged wave hem with foam flecks; Abyssal dark cloth with glowing seams; Canopy leaf-layered cape; Jaguarhide spotted pelt with a tail tip; Leviathan fin-like cape with a gilled edge.
+Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips; Stoneplate tabbed stone flaps; Frostbite fur-trimmed cloak with ice beads; Acacia Warden woven bark-and-leaf mantle with a seed pouch; Twinsoul two-tone split cloak with a drifting second tail; Glacier Guard crystal-edged cape; Sunforged gold-trimmed flame hem; Aurora ribbon cape with a slow color shift; Starborn star-dusted night cloth with twinkles; Tideshell scalloped shell scales; Riptide ragged wave hem with foam flecks; Abyssal dark cloth with glowing seams; Canopy leaf-layered cape; Jaguarhide spotted pelt with a tail tip; Leviathan fin-like cape with a gilled edge.
 
 - [ ] **Step 1: Write the failing check** in `gear-art.js`: for every set id in `GEAR_SETS`, `typeof CAPE_DESIGNS[id] === 'function'`, and `capeDraw(ctx, id, sample)` on a 120x120 canvas returns true and changes at least 40 pixels (`getImageData` non-transparent count).
 - [ ] **Step 2: Run, expect FAIL.**
@@ -116,11 +116,11 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 - Consumes: `P.weapon.id`, `P.kickAnim`, `GF.neck` (36n), `GF.land`.
 - Produces: `WEAPON_ART: {[weaponId]: {rest(ctx, o), swing(ctx, o)}}` with `o = {x, y, a, e, color, level, t}` (`e` = kick progress 0 to 1, same as `neckProfile`); `weaponArtDraw(ctx, weaponId, o): boolean`. Weapons are worn on the hooves or head, not held, so every design attaches to the front hoof pair (kicks) or the head (fangs, maul, lance).
 
-**Design table:** hooves (bare, with a faint hoof shine, no art at rest); spurs (thorny hoof spurs, small bleed drip on hit); stone (stone hoof caps, dust on swing); icefangs (ice fangs on the head); lance (acacia lance along the neck line); twin (two trailing tails that whip with the swing); glaciermaul (ice maul head on the neck tip); sunspear (spear with a flame tip); aurora (ribbon fang with a colour shift); starbreaker (star-shaped hoof guards); tideshellclub (shell club, water drops); riptide (trident, foam arc); abyssal (anglerfish lure light on the head); vinelash (vines trailing from the hooves); jaguarfang (claw hooks); leviathan (maw ring around the hooves, spinning with the strike).
+**Design table:** hooves (bare, with a faint hoof shine, no art at rest); spurs (thorny hoof spurs, small bleed drip on hit); stone (stone hoof caps, dust on swing); icefangs (ice fangs on the head); lance (acacia lance along the neck line); twin (two trailing tails that whip with the swing); glaciermaul (ice maul head on the neck tip); sunspear (spear with a flame tip); aurora (ribbon fang with a color shift); starbreaker (star-shaped hoof guards); tideshellclub (shell club, water drops); riptide (trident, foam arc); abyssal (anglerfish lure light on the head); vinelash (vines trailing from the hooves); jaguarfang (claw hooks); leviathan (maw ring around the hooves, spinning with the strike).
 
 - [ ] **Step 1: Extend the failing check:** each of the 15 non-default weapons in `WEAPONS` has `WEAPON_ART[id].rest` and `.swing`; `weaponArtDraw` returns true and paints at least 25 pixels for both poses.
 - [ ] **Step 2: Run, expect FAIL.**
-- [ ] **Step 3: Implement the designs.** `rest` draws the idle attachment; `swing(e)` uses the same `e` as the neck lunge so the swing and the headbutt line up; each design has one signature motion from the table. Level 4+ adds a glow in the weapon colour.
+- [ ] **Step 3: Implement the designs.** `rest` draws the idle attachment; `swing(e)` uses the same `e` as the neck lunge so the swing and the headbutt line up; each design has one signature motion from the table. Level 4+ adds a glow in the weapon color.
 - [ ] **Step 4: Screenshots:** two frames per weapon (rest, swing at `e = 0.3`) in a 4x8 contact sheet; confirm nothing covers the face or draws behind the body, and that the damage arc from the existing kick effect still reads over the art.
 - [ ] **Step 5: Run the check (PASS), `reg.js`, commit** `"Weapon art: 16 in-world designs"`.
 
@@ -153,14 +153,14 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 - Consumes: `CAPE_DESIGNS`, `WEAPON_ART`, `ARMOR_DESIGNS`, `ARMOR_REDRAW`, `GEAR_INDEX`.
 - Produces:
   - `gearIcon(id: string, size: number = 64, opts?: {locked?: boolean, level?: number}): string` — a data-URL PNG, cached per `id|size|locked|level`.
-  - `gearFrame(rarity: string): {border: string, glow: string, bg: string[]}` with the four rarity looks (common: dust grey, rare: acacia green, epic: jacaranda purple, legendary: gold with a slow shimmer class).
-  - `gearIconInvalidate(): void` — clears the cache (called when the accent colour changes on the Coat colours screen).
-- Rules: the icon is the piece alone, no giraffe: a cape drawn flat on a hanger-like crop, a weapon drawn on a plain hoof pair, an armor drawn as a chest plate. Locked pieces draw the same shape as a flat dark silhouette (colour `#1B1410`, 0.9 alpha) with no inner detail, so the shape shows but the design does not. The accent colour (`giraffeAccent()`) is applied to unlocked icons, as it is in play.
+  - `gearFrame(rarity: string): {border: string, glow: string, bg: string[]}` with the four rarity looks (common: dust gray, rare: acacia green, epic: jacaranda purple, legendary: gold with a slow shimmer class).
+  - `gearIconInvalidate(): void` — clears the cache (called when the accent color changes on the Coat colors screen).
+- Rules: the icon is the piece alone, no giraffe: a cape drawn flat on a hanger-like crop, a weapon drawn on a plain hoof pair, an armor drawn as a chest plate. Locked pieces draw the same shape as a flat dark silhouette (color `#1B1410`, 0.9 alpha) with no inner detail, so the shape shows but the design does not. The accent color (`giraffeAccent()`) is applied to unlocked icons, as it is in play.
 
 - [ ] **Step 1: Write the failing check:** `gearIcon(id, 64)` returns a string starting with `data:image/png` for all 48 ids; locked icons differ from unlocked ones; second call returns the identical string without redrawing (spy on a draw counter exposed as `gearIcon._draws`).
 - [ ] **Step 2: Run, expect FAIL.**
 - [ ] **Step 3: Implement** the three icon renderers, the locked silhouette (draw, then `source-in` fill), the frame table, and the cache. Sizes in use: 56 (set list), 72 (slot picker), 96 (compare panel), 128 (crate reveal).
-- [ ] **Step 4: Screenshots:** a sheet of all 48 icons unlocked and locked at 64 and 128; confirm the silhouettes are recognisable by shape and no icon is clipped.
+- [ ] **Step 4: Screenshots:** a sheet of all 48 icons unlocked and locked at 64 and 128; confirm the silhouettes are recognizable by shape and no icon is clipped.
 - [ ] **Step 5: Run the check (PASS) and commit** `"Gear icons: drawn, silhouettes, rarity frames"`.
 
 ---
@@ -173,15 +173,15 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 - Test: `tools/scenarios/gear-page.js`
 
 **Interfaces:**
-- Consumes: `gearIcon`, `gearFrame`, `gearLevel`, `gearDelta` (Task 7 fills the compare panel; this task leaves the panel empty), existing `equipGear(id)`, `unequipSlot(slot)`, `gearOwned`, `gearEquipped`, `toggleTrinket`, `trinketsHTML`, `showShop`, `showWardrobe` (the Coat colours entry; confirm the actual name in `44e-wardrobe.js`).
+- Consumes: `gearIcon`, `gearFrame`, `gearLevel`, `gearDelta` (Task 7 fills the compare panel; this task leaves the panel empty), existing `equipGear(id)`, `unequipSlot(slot)`, `gearOwned`, `gearEquipped`, `toggleTrinket`, `trinketsHTML`, `showShop`, `showWardrobe` (the Coat colors entry; confirm the actual name in `44e-wardrobe.js`).
 - Produces:
   - `gearTabHTML(): string` (override, same name and no arguments).
   - `gearPreviewMount(): void` — called after the tab is inserted; creates the preview `<canvas id="gearPreview">` loop and returns a stop function stored in `gearPreview.stop`.
   - `gearPage = {slot: 'cape'|'weapon'|'armor', selected: string|null, view: 'doll'|'sets'}`.
   - Actions (`data-a`): `gear-slot-cape|weapon|armor`, `gear-pick-<id>`, `gear-view-doll|sets`, `gear-demo-kick`, `gear-wardrobe`.
-- Layout (top to bottom): header with owned count; the doll row (left: three slot buttons with icons and level; centre: the preview canvas; right: trinkets stack); the slot picker grid for the chosen slot (owned pieces first, then silhouettes); the compare panel (Task 7); crates (Task 8); the existing set list kept as the second view `sets`, restyled with `gearIcon`s. Crate and trinket markup are reused, not rewritten.
-- Preview: `drawPlayer`-equivalent for a standing giraffe on a plain painted backdrop. The preview draws the player in an offscreen call of the real drawing code (set `P` to a clone: `{x, y, aim: 0, face: 1, cards: []}`, swap in, draw, swap back, so the page shows exactly what play shows). Idle breathing, cape flutter on a fake wind, a "Kick" button that plays the kick and the neck lunge. Her hat and boots draw as she wears them now; no controls for them. A single "Hats, boots and colours" button calls the wardrobe screen.
-- Hot paths: the preview loop runs only while the tab is open (`requestAnimationFrame`, cancelled when `shopTab !== 'gear'` or the overlay closes) and caps at 30 frames per second.
+- Layout (top to bottom): header with owned count; the doll row (left: three slot buttons with icons and level; center: the preview canvas; right: trinkets stack); the slot picker grid for the chosen slot (owned pieces first, then silhouettes); the compare panel (Task 7); crates (Task 8); the existing set list kept as the second view `sets`, restyled with `gearIcon`s. Crate and trinket markup are reused, not rewritten.
+- Preview: `drawPlayer`-equivalent for a standing giraffe on a plain painted backdrop. The preview draws the player in an offscreen call of the real drawing code (set `P` to a clone: `{x, y, aim: 0, face: 1, cards: []}`, swap in, draw, swap back, so the page shows exactly what play shows). Idle breathing, cape flutter on a fake wind, a "Kick" button that plays the kick and the neck lunge. Her hat and boots draw as she wears them now; no controls for them. A single "Hats, boots and colors" button calls the wardrobe screen.
+- Hot paths: the preview loop runs only while the tab is open (`requestAnimationFrame`, canceled when `shopTab !== 'gear'` or the overlay closes) and caps at 30 frames per second.
 
 - [ ] **Step 1: Failing scenario** `gear-page.js`: open `showShop('gear')`; assert `document.getElementById('gearPreview')` exists, three `[data-a^="gear-slot-"]` buttons exist, no element in the tab contains the text "Hat" or "Boots" as a control, the old `#gearSearch` is absent from the doll view. Equip a cape through the UI click and assert `P.capeSet` changed and the preview redrew (counter `gearPreview.frames` increased).
 - [ ] **Step 2: Run, expect FAIL.**
@@ -204,7 +204,7 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 
 - [ ] **Step 1: Failing check:** select `herdhide:armor` with armor empty; panel text contains "Damage taken" and "-4%" in green; select a weaker piece than the one worn; panel shows red for the lost stat; selecting a second piece of a set where two are worn shows "Completes Herdhide 3/3" with the set bonus line.
 - [ ] **Step 2: Run, expect FAIL.**
-- [ ] **Step 3: Implement** the panel (stat label table for `maxHpAdd`, `dr`, `speedMul`, `hasteMul`, `kickDmgMul`, `crit`, `regen`, `reflect`, etc. in `GEAR_STAT_LABELS`, with a format per key: percent, flat, or per second). Weapons show cooldown, damage, range, arc from the `WEAPONS` entry plus its blurb, with the same better/worse colouring (a lower `cd` is better).
+- [ ] **Step 3: Implement** the panel (stat label table for `maxHpAdd`, `dr`, `speedMul`, `hasteMul`, `kickDmgMul`, `crit`, `regen`, `reflect`, etc. in `GEAR_STAT_LABELS`, with a format per key: percent, flat, or per second). Weapons show cooldown, damage, range, arc from the `WEAPONS` entry plus its blurb, with the same better/worse coloring (a lower `cd` is better).
 - [ ] **Step 4: Check the try-on does not persist:** close and reopen the tab, equipped slot unchanged, no `recalcStats` called during try-on (spy count).
 - [ ] **Step 5: Screenshots** of green, red and set-completion states; commit `"Gear page: compare panel and try-on"`.
 
@@ -219,7 +219,7 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 
 **Interfaces:**
 - Consumes: `openCrate(kind)` (returns `{piece, dupe, refund, rarity}`), `rollRarity(weights)`, `buyCrate(kind)` in `43-input.js` (find the existing wrapper; the new reveal replaces its `showShop` redraw), `crateResult`, `cratePityCount/Bump`.
-- Produces: `openCrate` wrapper that forces the rarity floor when pity is reached (`normal` after 10 opens without rare+, `rare` after 8 without epic+), resets the counter on a qualifying drop, and sets `res.pity = true` when the floor was used; `crateReveal(res: object): void` — a full-panel overlay: crate shakes (0.6s), a light burst in the rarity colour, the piece icon (128px) rises, name and set, "New" or "Level up to +N" or "Maxed, refunded N gems", with a skip on click. The reveal sounds use `SFX.tone` with a rarity-dependent rise; Visual effects "off" shortens the reveal to 0.2s with no particles.
+- Produces: `openCrate` wrapper that forces the rarity floor when pity is reached (`normal` after 10 opens without rare+, `rare` after 8 without epic+), resets the counter on a qualifying drop, and sets `res.pity = true` when the floor was used; `crateReveal(res: object): void` — a full-panel overlay: crate shakes (0.6s), a light burst in the rarity color, the piece icon (128px) rises, name and set, "New" or "Level up to +N" or "Maxed, refunded N gems", with a skip on click. The reveal sounds use `SFX.tone` with a rarity-dependent rise; Visual effects "off" shortens the reveal to 0.2s with no particles.
 - Rule: gems are spent and the piece is granted before the animation starts (the animation is cosmetic); a second `openCrate` while `crateReveal.active` is ignored.
 
 - [ ] **Step 1: Failing scenario:** with `Save.data.cratePity.normal = 9` and every roll forced to common (stub `rollRarity`), the 10th `openCrate('normal')` returns rarity `rare` or better and `res.pity === true`; the counter resets to 0; a normal rare+ drop earlier also resets it; opening during `crateReveal.active` returns null and spends no gems.
@@ -238,7 +238,7 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 
 **Interfaces:**
 - Consumes: `gearLevelUp`, `DUPE_REFUND` (18 gems).
-- Produces: duplicate behaviour: a duplicate of an owned piece below level 5 calls `gearLevelUp` and refunds nothing; at level 5 it refunds `DUPE_REFUND` as now. `res.levelUp = newLevel` is set so the reveal can show "Level up to +N". Crates prefer unowned pieces first (unchanged), so levelling only starts once the rarity pool is owned. The page shows the level as pips on slot buttons and icons, and the compare panel lists "Level 3 -> 4: +10% of this piece".
+- Produces: duplicate behavior: a duplicate of an owned piece below level 5 calls `gearLevelUp` and refunds nothing; at level 5 it refunds `DUPE_REFUND` as now. `res.levelUp = newLevel` is set so the reveal can show "Level up to +N". Crates prefer unowned pieces first (unchanged), so levelling only starts once the rarity pool is owned. The page shows the level as pips on slot buttons and icons, and the compare panel lists "Level 3 -> 4: +10% of this piece".
 
 - [ ] **Step 1: Extend the failing check:** own `herdhide:cape`, force a duplicate roll: `gearLevel` goes 1 to 2, gems unchanged apart from the crate cost; at level 5 the next duplicate refunds 18 gems and the level stays 5.
 - [ ] **Step 2: Run, expect FAIL; implement; run, expect PASS.**
@@ -298,6 +298,6 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 
 ## Open points to confirm before building
 
-1. The name of the Coat colours screen function (Task 6 uses it for the wardrobe button).
+1. The name of the Coat colors screen function (Task 6 uses it for the wardrobe button).
 2. The name of the player's per-frame update (Task 10 tick hook).
 3. Whether the Lovable copy also needs the new files listed (the `lovable.md` rules say how; Task 11 covers the count).

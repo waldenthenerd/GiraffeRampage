@@ -32,7 +32,7 @@ function neckStretchUpdate(dt){
   if (anim > 0){
     const e = 1 - anim / 0.30, pr = neckProfile(e);
     G0.ext = pr.k * NS_REACH + NS.boost; G0.bend = pr.w * 30 * NS.side;
-    /* ghost frames while the head is travelling */
+    /* ghost frames while the head is traveling */
     NS.ghostT -= dt;
     if (e > 0.08 && e < 0.62 && NS.ghostT <= 0 && !P.dead){ NS.ghostT = 0.022; NS.ghosts.push({ ext: G0.ext, bend: G0.bend, x: P.x, y: P.y, a: P.aim, age: 0, face: P.face }); if (NS.ghosts.length > 6) NS.ghosts.shift(); }
     /* the head lands: squash, dust ring, a nudge of shake */

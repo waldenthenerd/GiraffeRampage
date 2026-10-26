@@ -16,7 +16,7 @@ function du_rock(ctx, x, y, n, r, sy, rot, seed, c){
   for (let k = 0; k < n; k++){ const an = rot + k / n * TAU, rr = r * DU_ROCK[(k + seed) % 12]; ctx.lineTo(x + Math.cos(an) * rr, y + Math.sin(an) * rr * sy); }
   ctx.closePath(); ctx.fill();
 }
-/* a long shard: base centre (x,y), pointing along (dx,dy) (unit), half width hw */
+/* a long shard: base center (x,y), pointing along (dx,dy) (unit), half width hw */
 function du_shard(ctx, x, y, dx, dy, len, hw, c){ lkTRI(ctx, x - dy * hw, y + dx * hw, x + dx * len, y + dy * len, x + dy * hw, y - dx * hw, c); }
 
 const DUST_DRAW = {
@@ -209,7 +209,7 @@ const DUST_DRAW = {
       ctx.globalAlpha = 0.8; for (let k = 0; k < 3; k++) lkOV(ctx, (-k * 7 - 1) * s, bob + Math.sin(a + k) * 2 * s - 1.2 * s, (5 - k) * s, 1.1 * s, '#F0D8A8');
       ctx.globalAlpha = 1; return;
     }
-    const bx = [];                                                                /* segment centres, for the bristles drawn after the body */
+    const bx = [];                                                                /* segment centers, for the bristles drawn after the body */
     for (let k = 6; k >= 1; k--){
       const x = -k * 6.4 * s, y = bob + Math.sin(a - k * 0.7) * 3.4 * s, rr = (8.4 - k * 0.8) * s, c = k % 2 ? b : d.pale;
       lkOV(ctx, x - 1.6 * s, y, 1.4 * s, rr * 0.7, dk, 0);
@@ -368,7 +368,7 @@ const DUST_DRAW = {
     }
     if (e.state === 'stomp') ringPath(ctx, 0, bob, 50 * s, 4, d.pale, 0.5);
   },
-  dust_titan(ctx, e, b, dk, bob, wind, d){                                          /* boss: a colossal armoured shell with cracks of light and heavy fists */
+  dust_titan(ctx, e, b, dk, bob, wind, d){                                          /* boss: a colossal armored shell with cracks of light and heavy fists */
     const s = e.r / 36, a = e.anim * 1.0, dash = e.state === 'dash' || e.state === 'wind', hi = du_li(b, 0.3), sh = du_sh(b, 0.35), pl = du_mix(b, d.pale, 0.2);
     /* three jointed pairs of legs */
     for (let i = 0; i < 3; i++) for (const sd of [-1, 1]){

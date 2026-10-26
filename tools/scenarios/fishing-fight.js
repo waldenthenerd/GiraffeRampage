@@ -149,7 +149,7 @@
     press(1, true); press(1, false); out.padSeaCloses = G.state === 'sail' && !Fg.sea; Sea.on = false; G.state = 'menu';
     navigator.getGamepads = realPads; Input.padUsed = false; Input.padOn = false;
 
-    /* the Guide has topics for fishing (once she has been to the Harbour), Trophies and Play together */
+    /* the Guide has topics for fishing (once she has been to the Harbor), Trophies and Play together */
     var keepFish = townData().fish; townData().fish = {}; delete townData().vis.harbour; var g0 = guideTopicsHTML(); townData().vis.harbour = 1; townData().fish = keepFish; var g1 = guideTopicsHTML();
     out.guideTopics = g0.indexOf('data-topic="fishing"') < 0 && g1.indexOf('data-topic="fishing"') >= 0 && g1.indexOf('data-topic="trophies"') >= 0 && g1.indexOf('data-topic="together"') >= 0 && /hot spot/.test(g1) && /gear bench/.test(g1) && /snaps/.test(g1);
     Input.padUsed = true; var gp = guideTopicsHTML(); Input.padUsed = false; out.guidePad = /hold<\/b> <b>A<\/b>/.test(gp);

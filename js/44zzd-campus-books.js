@@ -232,7 +232,7 @@ const UNI_BOOKS = [], UNI_BOOK_BY_ID = {};
     X.mc('space', 1, "Which planet has the brightest rings?", ["Saturn", "Mars", "Earth", "Mercury"]),
     X.mc('space', 1, "Who first walked on the Moon?", ["Neil Armstrong", "Yuri Gagarin", "Buzz Lightyear", "John Glenn"])
   ], "More than a thousand Earths would fit inside Jupiter.");
-  B('space', 2, "Neighbours in the Dark", "Orbit Starr", '#B58AE8', [
+  B('space', 2, "Neighbors in the Dark", "Orbit Starr", '#B58AE8', [
     "Mars has the tallest volcano in the solar system, Olympus Mons. It is about two and a half times as tall as Everest.",
     "Venus turns so slowly that a single day there lasts longer than its whole year.",
     "Uranus is tipped on its side, so it seems to roll around the Sun instead of spinning upright.",

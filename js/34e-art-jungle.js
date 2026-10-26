@@ -4,7 +4,7 @@
    Each is drawn top-down, facing +x, at the same scale as the chapter-1
    creature whose AI it borrows, so hitboxes still match what you see.
    Shared look: every animal is built from a base / shade / highlight of its
-   own body colour plus one vivid jungle accent (gold, lime, coral, ivory),
+   own body color plus one vivid jungle accent (gold, lime, coral, ivory),
    dark animals get a violet-or-warm rim light so they read on the deep green
    ground, and predators share lime/gold slit-pupil eyes. */
 function rosette(ctx, x, y, r, ring, fillc){
@@ -15,7 +15,7 @@ function rosette(ctx, x, y, r, ring, fillc){
 
 /* ---- small shared helpers (jg5_ prefix: Chapter 5 only) ---- */
 const JG5_CAC = {};
-/* cached shade()/blendHex() so a crowd of animals does not re-parse colour strings every frame */
+/* cached shade()/blendHex() so a crowd of animals does not re-parse color strings every frame */
 function jg5_c(c, a){ const k = c + a; return JG5_CAC[k] || (JG5_CAC[k] = shade(c, a)); }
 function jg5_m(c, t, a){ const k = c + t + a; return JG5_CAC[k] || (JG5_CAC[k] = blendHex(c, t, a)); }
 /* add one (rotated) ellipse to the current path, so many can share a single fill() */
@@ -33,7 +33,7 @@ function jg5_limb(ctx, x0, y0, x1, y1, w, c){
   ctx.strokeStyle = c; ctx.lineWidth = w; ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.lineCap = 'butt';
 }
-/* one consistent eye: dark socket, coloured iris, pupil, tiny glint */
+/* one consistent eye: dark socket, colored iris, pupil, tiny glint */
 function jg5_eye(ctx, x, y, r, iris, slit){
   fillCircle(ctx, x, y, r * 1.35, '#120C06');
   fillCircle(ctx, x, y, r, iris);
@@ -305,7 +305,7 @@ const JUNGLE_DRAW = {
     lkOV(ctx, -3, bob, 8, 5.2, jg5_c(pale, -0.12));
     lkOV(ctx, 6, bob, 3.2, 8.2, dk);                        /* dark chest band */
     lkOV(ctx, -6, bob - 6, 6, 3, hi); lkOV(ctx, -6, bob + 6, 6, 3, hi);   /* feathered thighs */
-    lkOV(ctx, 12, bob, 6.3, 5.8, jg5_m(b, '#E8E6E0', 0.4));  /* pale grey head */
+    lkOV(ctx, 12, bob, 6.3, 5.8, jg5_m(b, '#E8E6E0', 0.4));  /* pale gray head */
     lkOV(ctx, 13.4, bob, 4, 4.4, jg5_m(b, '#F4F0E4', 0.55));
     lkTRI(ctx, 9, bob - 3, 1, bob - 9.4, 7.6, bob - 0.8, dk);     /* the forked double crest */
     lkTRI(ctx, 9, bob + 3, 1, bob + 9.4, 7.6, bob + 0.8, dk);
@@ -693,7 +693,7 @@ const JUNGLE_DRAW = {
     lkOV(ctx, -36, bob, 13.6, 19.4, lo);                    /* pelvic shield */
     lkOV(ctx, -36, bob, 12.6, 18.4, lite);
     jg5_scutes(ctx, -36, bob, 11.4, 17, 5, 1.5, jg5_c(b, -0.3));
-    ctx.strokeStyle = dk; ctx.lineWidth = 2.2; ctx.beginPath();       /* the movable armour bands */
+    ctx.strokeStyle = dk; ctx.lineWidth = 2.2; ctx.beginPath();       /* the movable armor bands */
     for (let k = 0; k <= 8; k++){
       const x = -30 + k * 5.5, nx = (x + 6) / 44, h = 30 * Math.sqrt(Math.max(0.02, 1 - nx * nx)) - 1.4;
       ctx.moveTo(x, bob - h); ctx.quadraticCurveTo(x + 3.6, bob, x, bob + h);
@@ -711,7 +711,7 @@ const JUNGLE_DRAW = {
       for (let y = -h; y <= h; y += 6.4){ ctx.moveTo(x + 1.1, bob + y); ctx.arc(x, bob + y, 1.1, 0, TAU); }
     }
     ctx.fill();
-    ctx.fillStyle = jg5_c(skin, -0.12);                     /* narrow armoured head */
+    ctx.fillStyle = jg5_c(skin, -0.12);                     /* narrow armored head */
     ctx.beginPath(); ctx.moveTo(32, bob - 11.4); ctx.lineTo(52.4, bob - 3.4); ctx.lineTo(52.4, bob + 3.4); ctx.lineTo(32, bob + 11.4); ctx.closePath(); ctx.fill();
     ctx.fillStyle = jg5_m(skin, '#F0E4CC', 0.25);
     ctx.beginPath(); ctx.moveTo(33, bob - 9); ctx.lineTo(50, bob - 2.4); ctx.lineTo(50, bob + 2.4); ctx.lineTo(33, bob + 9); ctx.closePath(); ctx.fill();

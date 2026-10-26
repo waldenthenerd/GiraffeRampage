@@ -73,7 +73,7 @@ const CARDS = [
     const base = inst.tier ? c : '#D9A55C';
     /* Each blade starts a short distance clear of the player's own body so
        that two or three arms read as distinct limbs radiating outward,
-       rather than fusing through the centre into one lens-shaped blob. */
+       rather than fusing through the center into one lens-shaped blob. */
     const r0 = Math.max(20, s.thick * 0.5);
     const bow = -s.len * 0.15;
     for (let a = 0; a < s.arms; a++){
@@ -605,7 +605,7 @@ const CARDS = [
       desc:'Forty centimetres of prehensile tongue, now carrying a static charge that jumps between targets.' },
     { lv:5,  name:'Storm Tongue',       icon:'@t-cloud-storm', color:'#BFE9FF',
       desc:'Longer arcs, more jumps, and everything it touches seizes up.' },
-    { lv:10, name:'Savanna Judgement',  icon:'@t-x-judgement', color:'#FFFFFF',
+    { lv:10, name:'Savanna Judgment',  icon:'@t-x-judgement', color:'#FFFFFF',
       desc:'The sky picks its own targets. Bolts fall while the chain keeps running.' }
   ],
   stats(L){
@@ -663,7 +663,7 @@ const CARDS = [
       desc:'Drill the same strike a thousand times. Whatever you are holding hits harder and reaches further.' },
     { lv:5,  name:'Master of Arms', icon:'@t-sword', color:'#E0A24A',
       desc:'Your swing widens into a sweep and lands a second follow-up strike on every attack.' },
-    { lv:10, name:'Living Armoury', icon:'@t-shield-star', color:'#F2B33D',
+    { lv:10, name:'Living Armory', icon:'@t-shield-star', color:'#F2B33D',
       desc:'Every strike tears a shockwave forward, and the follow-up comes twice more.' }
   ],
   stats(L){
@@ -727,7 +727,7 @@ const CARDS = [
     { lv:1,  name:'Iron Hide',       icon:'@t-shield-chevron', color:'#A9B7C4',
       desc:'Thicker skin, more of it. Bigger health pool and less damage taken.' },
     { lv:5,  name:'Rhino Plate',     icon:'@t-x-rhino', color:'#C7D8E8',
-      desc:'Armour that answers back — a chunk of every hit is returned as a blast.' },
+      desc:'Armor that answers back — a chunk of every hit is returned as a blast.' },
     { lv:10, name:'Living Fortress', icon:'@t-x-castle', color:'#EFE6D4',
       desc:'Nothing gets through cleanly. Hits are paid back in full, and you mend as you walk.' }
   ],

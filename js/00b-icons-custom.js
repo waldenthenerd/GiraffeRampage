@@ -1,5 +1,5 @@
 /* Icons drawn for this game, for things the stock sets have no good picture of. They are 24x24, 2px outlines in the same style as
-   the icons in 00-icons.js (ICONS_T), so they are written '@t-x-name' and take their colour from the card as usual. Loaded right after
+   the icons in 00-icons.js (ICONS_T), so they are written '@t-x-name' and take their color from the card as usual. Loaded right after
    00-icons.js. To add one: put its path here and use it as icon:'@t-x-name'. */
 Object.assign(ICONS_T, {
   /* the prize wheels */
@@ -131,7 +131,7 @@ Object.assign(ICONS_T, {
 });
 
 /* The old Material names, and what replaced them. ico() and drawIcon() use this to find the new picture if some old name is still
-   written somewhere, and the old colour is kept for the new icon. */
+   written somewhere, and the old color is kept for the new icon. */
 const ICON_MIGRATE = {
   air:'t-wind', airport_shuttle:'t-x-rover', biotech:'t-x-cells', bloodtype:'t-x-blood', cabin:'t-x-tent', cable:'t-x-cable', campaign:'t-x-horn',
   castle:'t-x-castle', cloud:'t-x-cloud', construction:'t-x-drillbit', content_cut:'t-x-mandible', cottage:'t-x-cottage', home:'t-x-home', dark_mode:'t-x-moon',

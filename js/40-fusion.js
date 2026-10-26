@@ -30,7 +30,7 @@ function fuseElemOpts(el, dmg, col){
 function fuseProjOpts(el, dmg){ return el === 'burn' || el === 'bleed' ? { burn: dmg * 0.25 } : el === 'knock' ? { kb: 300 } : { pierce: 1 }; }
 
 /* ---- the three-level combo engine ----
-   Every combo is its own named ability built from a small kit of behaviours (CBH below), each with its own parameters.
+   Every combo is its own named ability built from a small kit of behaviors (CBH below), each with its own parameters.
    Levels 1 and 2 make it stronger; level 3 adds the combo's special upgrade (its capstone). */
 const CB_CAPS = {
   echo:   'Every use is repeated a moment later at 70% strength, and its constant effects hit 30% harder.',
@@ -49,7 +49,7 @@ const CB_ICON = { ring: 't-x-ring', nova: 't-x-spiral', volley: 't-sparkles', se
   retaliate: 't-x-gavel', tithe: 't-coin', boomerang: 't-tornado', comet: 't-meteor', sanctum: 't-x-flower', ram: 't-paw', march: 't-x-horn' };
 const CB_ALIAS = { nw: 'neck_whip', hq: 'hoof_quake', sp: 'spit', wp: 'weaponry', sd: 'speed', ih: 'iron_hide', th: 'thorn_halo', dm: 'dung_mine', fe: 'feast', fr: 'frenzy', sb: 'sun_beam', st: 'stampede',
   li: 'lightning', fl: 'fleece', tc: 'thorn_crown', sf: 'sunfire_flies', df: 'deflector', dd: 'dust_devils', ce: 'cavern_echo', ss: 'starfall' };
-/* name, behaviours [[kind, params]], what it does, the level-3 upgrade's name, the level-3 upgrade's kind */
+/* name, behaviors [[kind, params]], what it does, the level-3 upgrade's name, the level-3 upgrade's kind */
 const CB_RAW = {
   /* commons */
   'nw+hq': ['Whiplash Tremor', [['lash', { n: 4, pull: 1, el: 'stun', dm: 1.1 }]], 'Four lashes snare the nearest enemies, drag them to your hooves and slam them down, stunned.', 'Fault Line', 'echo'],
@@ -65,7 +65,7 @@ const CB_RAW = {
   'sp+sd': ['Slick Streak', [['trail', { iv: 0.14, r: 1.7, dur: 2.2, el: 'slow' }]], 'Run and you leave a slick of sticky spit that slows everything that follows.', 'Oil Slick', 'wide'],
   'sp+ih': ['Acid Plating', [['aura', { el: 'bleed', tick: 0.3, dm: 0.7 }]], 'Corrosive plates coat your hide: enemies that crowd you take bleeding damage.', 'Total Corrosion', 'swift'],
   'wp+sd': ['Blade Dance', [['ram', { el: 'plain', dm: 1.0 }]], 'While you run, anything you barrel through is cut and thrown aside.', 'Blur', 'swift'],
-  'wp+ih': ['Armoured Edge', [['blades', { n: 3, len: 0.8, sp: 2, el: 'knock' }]], 'Three short armoured blades patrol close to you and shove enemies back.', 'Fortress Spin', 'wide'],
+  'wp+ih': ['Armored Edge', [['blades', { n: 3, len: 0.8, sp: 2, el: 'knock' }]], 'Three short armored blades patrol close to you and shove enemies back.', 'Fortress Spin', 'wide'],
   'sd+ih': ['Decoy Plate', [['ghost', { delay: 1.4, el: 'knock', rm: 1.0 }]], 'You leave a steel afterimage that explodes shortly after, shoving enemies away.', 'Twin Decoys', 'echo'],
   /* rares */
   'th+dm': ['Thornmine', [['mines', { cluster: true, el: 'bleed' }]], 'You drop mines that burst into a ring of thorns when something steps on them.', 'Barbed Field', 'burst'],
@@ -117,7 +117,7 @@ const CB_RAW = {
   'ss+sp': ['Stardust Spit', [['pool', { where: 'near', n: 3, el: 'burn' }]], 'You spit three pools of burning stardust at the nearest enemies.', 'Nebula', 'wide'],
   'ss+wp': ['Starforged Edge', [['blades', { n: 3, len: 1.2, sp: 4, el: 'burn' }]], 'Three blades of starmetal whirl around you, setting everything alight.', 'Supernova Spin', 'swift'],
   'ss+sd': ['Shooting Star', [['trail', { el: 'burn', iv: 0.1, dm: 1.0, r: 1.2 }]], 'Running trails fire behind you like a comet tail.', 'Comet Tail', 'wide'],
-  'ss+ih': ['Meteoric Armour', [['retaliate', { kind: 'meteor', n: 3, el: 'burn' }]], 'When you are hit, stars fall on the enemies around you.', 'Impact Armour', 'heal'],
+  'ss+ih': ['Meteoric Armor', [['retaliate', { kind: 'meteor', n: 3, el: 'burn' }]], 'When you are hit, stars fall on the enemies around you.', 'Impact Armor', 'heal'],
   'ss+th': ['Constellation', [['ring', { twin: true, nm: 1.5, sp: 1.4, el: 'burn' }]], 'Two slow-turning rings of star-orbs, one inside the other.', 'Zodiac', 'wide'],
   'ss+dm': ['Star Mines', [['mines', { rm: 1.2, el: 'burn' }]], 'Mines made of fallen stars: large, hot and slow to forget.', 'Black Hole Mine', 'burst'],
   'ss+fe': ['Cosmic Feast', [['harvest', { chance: 0.6, heal: 0.02, every: 10, drop: 'nova' }]], 'Kills usually heal you, sometimes drop a nova pickup, and every tenth sets off a shockwave.', 'Stellar Appetite', 'heal'],
@@ -134,7 +134,7 @@ const CB_RAW = {
 };
 const CB_TABLE = {};
 Object.keys(CB_RAW).forEach(function(k){ const p = k.split('+'); CB_TABLE[comboKeyOf(CB_ALIAS[p[0]], CB_ALIAS[p[1]])] = CB_RAW[k]; });
-/* each combo's own level-3 upgrade: what it does to that combo's first behaviour (text, parameter changes) */
+/* each combo's own level-3 upgrade: what it does to that combo's first behavior (text, parameter changes) */
 const CB_CAP2_RAW = {
   'nw+hq': ['Eight lashes instead of four.', { n: 8 }],
   'nw+sp': ['Four wider acid lines instead of two.', { n: 4, w: 11 }],
@@ -556,7 +556,7 @@ function cbHeal2(inst, p, e){
   if (p.gold) G.bonusGold += p.gold * 0.5;
   if (p.drop) addPickup(e.x, e.y, p.drop);
 }
-/* the objects some behaviours leave on the ground */
+/* the objects some behaviors leave on the ground */
 const CBO = {
   mine: {
     upd(inst, o, dt){
@@ -637,7 +637,7 @@ function comboDefFor(idA, idB){
   const cfg = { col: col, colA: colA, colB: colB, el: (bs[0][1].el || fa.elem), shape: FUSE_SHAPE[fb.elem] || 'dot', cap: row[4], bs: bs, capName: row[3], ability: row[2], name: row[0] };
   const icon = '@' + CB_ICON[bs[0][0]] + ':' + col;
   const c2 = CB_CAP2[comboKeyOf(idA, idB)];
-  const bs3 = bs.map(function(b, i){ return i === 0 && c2 ? [b[0], Object.assign({}, b[1], c2[1])] : b; });     /* the behaviours as they are at level 3 */
+  const bs3 = bs.map(function(b, i){ return i === 0 && c2 ? [b[0], Object.assign({}, b[1], c2[1])] : b; });     /* the behaviors as they are at level 3 */
   cfg.bs3 = bs3; cfg.cap2 = c2 ? c2[0] : '';
   const def = {
     id: key, rarity: 'combo', type: 'combo', combo: true, parts: [idA, idB], cfg: cfg, maxLevel: 3, hideStats: ['rad', 'count'],

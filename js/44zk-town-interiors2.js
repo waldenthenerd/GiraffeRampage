@@ -6,7 +6,7 @@
    1 THE OBJECTS: the door, counter, oven, tables and chairs, the bar, turntable, tool bench, library shelves, mirror, mannequins, display
      cases, statue, arcade cabinets and score board, camera stand, sofa, fireplace/stove and bed are redrawn (townBuildingX wrapper).
    2 THE ROOMS: curtains and sill plants at every window, a baseboard, and each room's own wall furniture (townRoomProps wrapper):
-     shelves on brackets, signs on chains, a ladder on a rail, banners on a rod, tyres on hooks, and so on.
+     shelves on brackets, signs on chains, a ladder on a rail, banners on a rod, tires on hooks, and so on.
    3 THE STATUE in the square gets legs that reach its body. */
 function ivShadow(c, x, w){ tEll(c, 'rgba(0,0,0,.2)', x, TG + 3, w / 2, 6); }
 function ivLine(c, col, w, x1, y1, x2, y2){ c.strokeStyle = col; c.lineWidth = w; c.lineCap = 'round'; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); }
@@ -363,7 +363,7 @@ const IV_ROOMS = {
   },
   garage: function(c, D, K){
     tRect(c, '#F2C230', 0, TG - 102, D.w, 8); for (let x = 0; x < D.w; x += 40) tPoly(c, '#2A2A34', [x, TG - 102, x + 20, TG - 102, x + 10, TG - 94, x - 10, TG - 94]);
-    tRect(c, '#3A3A44', 210, 150, 880, 8); ivBracket(c, 220, 158, '#2A2A30', 1); ivBracket(c, 1070, 158, '#2A2A30', -1); ivBracket(c, 650, 158, '#2A2A30', 1);   /* a tyre rail on brackets */
+    tRect(c, '#3A3A44', 210, 150, 880, 8); ivBracket(c, 220, 158, '#2A2A30', 1); ivBracket(c, 1070, 158, '#2A2A30', -1); ivBracket(c, 650, 158, '#2A2A30', 1);   /* a tire rail on brackets */
     for (let i = 0; i < 5; i++){ const x = 280 + i * 190; ivLine(c, '#2A2A30', 3, x, 158, x, 168); tRect(c, '#2A2A30', x - 3, 158, 6, 12); tCircle(c, '#2A2A34', x, 200, 32); tCircle(c, '#44444C', x, 200, 22); tCircle(c, '#C9CDD9', x, 200, 14); for (let k = 0; k < 5; k++){ const a = k / 5 * TAU; tCircle(c, '#8A93A8', x + Math.cos(a) * 8, 200 + Math.sin(a) * 8, 2); } }
     ivChains(c, 780, 880, 36, 80); ivBoard(c, 760, 80, 140, 36, '#D5352B', '#3A4252'); ivText(c, 'OPEN', 830, 106, 22, '#F4F1E8');
     tRound(c, '#3A6AA0', 1100, TG - 70, 40, 70, 6); tRect(c, '#2A4A7A', 1100, TG - 50, 40, 4); tRect(c, '#2A4A7A', 1100, TG - 30, 40, 4); tRect(c, '#C9CDD9', 1112, TG - 78, 16, 8);   /* an oil drum */

@@ -3,7 +3,7 @@
 /* ========================= 44zh. QUALITY OF LIFE ========================= */
 /* 1 WHAT IS LEFT: the HUD says what is still to find in this street (or room): "(left: 2 coins, 1 gem)", or "(all found)".
    2 A HINT WHEN STUCK: Dewey in the library, and the Finds page of the journal, name one thing she has not found with exactly where.
-   3 THE GEAR PAGE: a journal page listing the town-only hats, boots and colours, found or not, and how each is earned.
+   3 THE GEAR PAGE: a journal page listing the town-only hats, boots and colors, found or not, and how each is earned.
    4 TOUCH: bigger buttons when a touch screen is in use, and a tap on a person or a door walks her there (and uses it on arrival). */
 const TOWN_TYPE_NAMES = { coin: ['coin', 'coins'], star: ['star', 'stars'], gem: ['gem', 'gems'], hat: ['hat', 'hats'], boot: ['boots', 'pairs of boots'], swatch: ['colour', 'colours'], track: ['track', 'tracks'] };
 function townLeftIn(D){
@@ -26,7 +26,7 @@ function townHintExact(){
     const id = order[k]; if (!townOpen(id)) continue;
     const it = TOWN_ITEMS.filter(function(x){ return x.d === id && !townFound(x.id); })[0];
     if (it){
-      const what = { coin: 'a coin', star: 'a little star', gem: 'a gem', hat: 'a hat', boot: 'a pair of boots', swatch: 'a coat colour', track: 'some tracks' }[it.t];
+      const what = { coin: 'a coin', star: 'a little star', gem: 'a gem', hat: 'a hat', boot: 'a pair of boots', swatch: 'a coat color', track: 'some tracks' }[it.t];
       const high = it.h >= 60 ? ' You will need to stretch your neck for it.' : '';
       const where = it.in && TOWN_DIST[it.in] ? 'inside ' + TOWN_DIST[it.in].name + ' (' + TOWN_DIST[it.d].name + ')' : 'in ' + TOWN_DIST[it.d].name;
       return 'There is ' + what + ' ' + where + ': ' + it.note + '.' + high;
@@ -42,7 +42,7 @@ function townShowGear(){
     const g = TOWN_NPC_LIST.filter(function(id){ return TOWN_GIFT_OF[id] && TOWN_GIFT_OF[id].acc === it.id; })[0];
     return g ? 'Best-friend gift from ' + TOWN_NPCS[g].name + '.' : (typeof TOWN_SPECIAL_SRC !== 'undefined' && TOWN_SPECIAL_SRC[it.id]) || '';
   };
-  let h = '<p class="jt">' + list.filter(function(i){ return accOwned(i.id); }).length + ' of ' + list.length + ' hats and boots, and ' + WARD_TOWN.filter(function(w){ return townFound(w[2]); }).length + ' of ' + WARD_TOWN.length + ' colours.</p><div class="gearlist">';
+  let h = '<p class="jt">' + list.filter(function(i){ return accOwned(i.id); }).length + ' of ' + list.length + ' hats and boots, and ' + WARD_TOWN.filter(function(w){ return townFound(w[2]); }).length + ' of ' + WARD_TOWN.length + ' colors.</p><div class="gearlist">';
   list.forEach(function(it){
     const own = accOwned(it.id);
     h += '<div class="gr' + (own ? ' on' : '') + '"><canvas width="56" height="56" data-gear="' + it.id + '"></canvas><div><b>' + (own ? it.name : '? ? ?') + '</b><span>' + src(it) + '</span></div></div>';

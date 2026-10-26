@@ -16,7 +16,7 @@ const VENUS_UP = [
   { id: 'col1', grp: 'Ant colony', icon: '@t-x-sulfur', name: 'Sulfur-Fed Colony', cost: { s: 60, b: 40 }, req: ['hab1'],
     desc: 'The whole anthill turns sulfur-yellow, crusted with crystals, and grows a second entrance. Each ant type can hold 2 more.' },
   { id: 'col2', grp: 'Ant colony', icon: '@t-x-burrow', name: 'Basalt Burrows', cost: { s: 150, b: 180 }, req: ['col1', 'hab2'],
-    desc: 'The whole anthill turns dark grey basalt, walled, with tunnels and a side chamber. Each ant type can hold 2 more, and every ant has 20% more health.' },
+    desc: 'The whole anthill turns dark gray basalt, walled, with tunnels and a side chamber. Each ant type can hold 2 more, and every ant has 20% more health.' },
   { id: 'col3', grp: 'Ant colony', icon: '@t-x-deepburrow', name: 'Deep Colony', cost: { s: 330, b: 400 }, req: ['col2', 'hab3'],
     desc: 'A tall stepped basalt tower with a turret on its side that turns to face enemies and spits sulfur at them. Each ant type can hold 4 more, and every ant hits 25% harder.' },
   /* trinkets forged from what you bring back */
@@ -637,7 +637,7 @@ function drawRubbleHeap(ctx, r, t){
   const stone = (px, py, rr, a, c1, c2) => { ctx.fillStyle = c1; ctx.beginPath(); ctx.ellipse(px, py, rr * 0.7, rr * 0.55, a, 0, TAU); ctx.fill(); ctx.fillStyle = c2; ctx.beginPath(); ctx.ellipse(px - 3, py - 3, rr * 0.35, rr * 0.22, a, 0, TAU); ctx.fill(); };
   if (T === 'column'){                                                                 /* a cluster of black hexagonal basalt columns */
     for (let k = 0; k < 5; k++){ const a = r.seed + k * 1.26, cx = x + Math.cos(a) * r.r * 0.45, cy = y + Math.sin(a) * r.r * 0.35; ctx.fillStyle = '#20232E'; ctx.beginPath(); for (let j = 0; j < 6; j++) ctx.lineTo(cx + Math.cos(j / 6 * TAU) * 11, cy + Math.sin(j / 6 * TAU) * 9); ctx.closePath(); ctx.fill(); ctx.fillStyle = 'rgba(150,170,255,.35)'; ctx.beginPath(); ctx.moveTo(cx - 6, cy - 3); ctx.lineTo(cx + 2, cy - 7); ctx.lineTo(cx - 1, cy); ctx.closePath(); ctx.fill(); }
-  } else if (T === 'vein'){                                                            /* a grey boulder laced with yellow sulfur */
+  } else if (T === 'vein'){                                                            /* a gray boulder laced with yellow sulfur */
     stone(x, y, r.r * 1.1, r.seed, '#6A5A50', '#A89888');
     ctx.strokeStyle = '#F2D43A'; ctx.lineWidth = 3; ctx.lineCap = 'round'; for (let k = 0; k < 3; k++){ ctx.beginPath(); ctx.moveTo(x - 14 + k * 12, y - 12); ctx.lineTo(x - 8 + k * 11, y); ctx.lineTo(x - 15 + k * 12, y + 11); ctx.stroke(); } ctx.lineCap = 'butt';
     csGlow(ctx, x, y, 26, '#FFE040', 0.22);

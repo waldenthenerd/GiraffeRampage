@@ -5,7 +5,7 @@
    In a run, a loaf heals 5% of her maximum health; there is a 15 second cooldown between loaves. The key (default B, rebindable) or the
    button eats one; with Settings.autoBread on (the default) one is eaten by itself whenever she is under 75% health and the cooldown
    is over. Nothing else about the run changes.
-   THE CAR. Bought at the garage (Save.data.town.car = { own:1, col:n }, col any unlocked colour number). In Longneck Town the C key (or
+   THE CAR. Bought at the garage (Save.data.town.car = { own:1, col:n }, col any unlocked color number). In Longneck Town the C key (or
    the Car button) gets in and out, and driving is 2.2 times as fast; the neck still stretches out of the open roof. It is left behind at
    the manhole: cars cannot go underground, so the Burrows and every indoor place put it away. In a run it is only in Chapter 6
    (Houston), where it is 45% faster and is drawn under her. Everywhere else it simply is not used. */
@@ -107,7 +107,7 @@ function townCarSide(ctx, x, gy, o){
   });
   ctx.restore();
 }
-/* from above, under her: only the car's own colours and lights, on the ground in Houston */
+/* from above, under her: only the car's own colors and lights, on the ground in Houston */
 function townCarTop(ctx, x, y, ang, moving){
   const col = townCarColour(), dk = wardShade(col, 0.7);
   ctx.save(); ctx.translate(x, y); ctx.rotate(ang);

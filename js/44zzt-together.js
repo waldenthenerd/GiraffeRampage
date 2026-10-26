@@ -5,7 +5,7 @@
      ARENA  the real creatures of a chapter's backdrop come in rounds; the two giraffes fight them side by side. A giraffe that is knocked down is
             helped up by standing next to her friend for two seconds. There is no wave 25 and no boss, and a round gets a little harder each time.
      YARD   a kick-about: a field, a ball and two goals, first to five.
-   Nothing is kept. The real save is put to one side for the length of the game (Save.data is a fresh, empty save, with only the coat colours and
+   Nothing is kept. The real save is put to one side for the length of the game (Save.data is a fresh, empty save, with only the coat colors and
    hats copied over so she looks like herself), Save.write does nothing, and the real save comes back untouched when the game ends: no points, no
    gold, no experience, no cards, no best wave, no bestiary entries, no achievements.
    HOW IT USES THE RUN. A normal run is started (so the backdrop, scenery, light, weather, creatures and effects are all the real ones) and these
@@ -47,7 +47,7 @@ function coMakeFresh(real){
   const f = freshSave();
   ['skinCol', 'spotCol', 'patCol', 'gearCol', 'mini', 'town', 'wardSeen'].forEach(function(k){ if (real && real[k] !== undefined) f[k] = JSON.parse(JSON.stringify(real[k])); });
   f.hintsSeen = {}; Object.keys(HINTS).forEach(function(k){ f.hintsSeen[k] = 1; });                  /* no first-time hints over the game */
-  for (let i = 1; i <= TOTAL_CHAPTERS; i++) if (real && real['chapter' + i + 'Complete']) f['chapter' + i + 'Complete'] = true;      /* the coat colours she has earned stay available */
+  for (let i = 1; i <= TOTAL_CHAPTERS; i++) if (real && real['chapter' + i + 'Complete']) f['chapter' + i + 'Complete'] = true;      /* the coat colors she has earned stay available */
   return f;
 }
 function coChapters(){ const real = coRealSave(), out = []; for (let i = 0; i < CO_CHAPTERS.length; i++){ const c = CO_CHAPTERS[i]; if (c <= 1 || (real && real['chapter' + (c - 1) + 'Complete'])) out.push(c); } return out; }

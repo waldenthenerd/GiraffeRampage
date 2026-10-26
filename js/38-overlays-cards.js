@@ -3,7 +3,7 @@
 /* ========================= 31. DOM HANDLES ========================= */
 const stage = document.getElementById('stage');
 /* an opaque canvas: the browser does not have to blend the game with the page behind it, which is a free saving on weak devices.
-   render() paints the page colour (STAGE_BG, the same as --night in the stylesheet) first, so nothing looks different */
+   render() paints the page color (STAGE_BG, the same as --night in the stylesheet) first, so nothing looks different */
 const STAGE_BG = '#14100E';
 const CTX = stage ? (stage.getContext('2d', { alpha: false }) || stage.getContext('2d')) : null;
 const OV = document.getElementById('overlay');

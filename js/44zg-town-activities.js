@@ -6,7 +6,7 @@
    2 THE WEEKLY TOURNAMENT: each week one of the unlocked minigames is the featured one. The herd's names have scores for it that are
       the same for everyone in that week; hers is the best she has scored in it this week (Save.data.town.tour = { w, ch, best, got }).
       Her rank pays gems, claimed once a week.
-   3 FISHING: from the end of the pier (Harbour). Cast, then press Reel when the marker is in the green. Twelve kinds, one only at night.
+   3 FISHING: from the end of the pier (Harbor). Cast, then press Reel when the marker is in the green. Twelve kinds, one only at night.
       Save.data.town.fish = { id: count }. A first catch of a kind pays gems; catching every kind pays a bonus once.
    4 THE POST BOX in the square: one letter a day from one of the herd (more likely from a friend), with a small gift
       (Save.data.town.mail = { d, from, text, gift, got, log:[] }). Reading it also warms the friendship by a point. */
@@ -180,7 +180,7 @@ function townMailToday(){
     const r = miniRng(townHash(today + 'mail')), pool = [];
     TOWN_NPC_LIST.forEach(function(id){ if (id === 'dot') return; const w = 1 + townBondLevel(id) * 2; for (let i = 0; i < w; i++) pool.push(id); });
     const from = pool[Math.floor(r() * pool.length)], def = TOWN_NPCS[from];
-    const opening = ['Dear friend,', 'Hello there,', 'Dear neighbour,', 'To the tall one,', 'Just a note,'][Math.floor(r() * 5)];
+    const opening = ['Dear friend,', 'Hello there,', 'Dear neighbor,', 'To the tall one,', 'Just a note,'][Math.floor(r() * 5)];
     const kind = r(), gift = kind < 0.4 ? { gold: Math.round(townCoin() * (2 + Math.floor(r() * 3))) } : kind < 0.7 ? { gems: 5 + Math.floor(r() * 8) } : kind < 0.92 ? { bread: 2 + Math.floor(r() * 3) } : { flower: 1 };
     m.d = today; m.from = from; m.gift = gift; m.got = false;
     m.text = opening + ' ' + (def.say[Math.floor(r() * def.say.length)] || 'Lovely day.') + ' ' + ['Come and see me.', 'Hope this finds you well.', 'Mind the neck.', 'Yours, with love.'][Math.floor(r() * 4)];

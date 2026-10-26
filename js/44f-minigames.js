@@ -374,7 +374,7 @@ function drawBootTop(ctx, id, t, moving){
   ctx.restore();
 }
 /* a small picture of any item, for the wheel, the prize card and the wardrobe */
-/* _accOv: the colours to tint the hat and boots with while a portrait of a saved outfit is drawn (otherwise the worn ones, see 44m) */
+/* _accOv: the colors to tint the hat and boots with while a portrait of a saved outfit is drawn (otherwise the worn ones, see 44m) */
 let _accOv = null;
 function drawAccIcon(ctx, it, cx, cy, sc, t){
   ctx.save(); ctx.translate(cx, cy); ctx.scale(sc, sc);
@@ -671,7 +671,7 @@ function miniIntro(ctx, m, g){
       const arr2 = toks.map(function(k){ return MINI_ARROW[k] && k !== 'Space' ? MINI_ARROW[k] : null; }).filter(Boolean);
       if (arr2.length) groups.push(arr2);
     }
-    /* measure the row so it can be centred */
+    /* measure the row so it can be centered */
     const gap = 5 * s, orW = 26 * s;
     let tw = 0; ctx.font = 'bold ' + Math.round(13 * s) + 'px system-ui, sans-serif';
     groups.forEach(function(gr, gi){ gr.forEach(function(c){ tw += miniCapW(ctx, c, s) + gap; }); if (gi < groups.length - 1) tw += orW; });
@@ -760,7 +760,7 @@ function miniOffer(ch, proceed){
       '<h2 class="head">Chapter ' + chapterLabel(ch) + ' complete</h2>' +
       '<p class="sub">Before moving on: <b>' + def.name + '</b>. ' + def.blurb.replace(/\n/g, ' ') + '</p>' +
       '<p class="sub" style="margin-top:0">Finish it for a spin of the wheel: a hat, boots or, rarely, a very special hat for the giraffe. Win it, and earn up to three stars for better odds.' + (best ? ' Your best here: <b>' + best + '</b>.' : '') + '</p>' +
-      (typeof tipOnce === 'function' ? tipOnce('offer', 'Stars: win the minigame for one star, and reach the two harder targets for the second and third. More stars give better odds at the rare hats, and three stars in a minigame unlocks its own coat colour.') : '') +
+      (typeof tipOnce === 'function' ? tipOnce('offer', 'Stars: win the minigame for one star, and reach the two harder targets for the second and third. More stars give better odds at the rare hats, and three stars in a minigame unlocks its own coat color.') : '') +
       '<div class="menucol" style="margin-top:6px;width:100%">' +
         '<button class="btn" data-a="mini-go" data-mini-play' + (ready ? '' : ' disabled') + '>Play the minigame<small data-mini-cd>' + miniCdText() + '</small></button>' +
         '<button class="btn ghost" data-a="mini-skip">' + (ch === TOWER_CHAPTER ? 'See the results' : 'Start Chapter ' + chapterLabel(ch + 1)) + '<small>' + next + '</small></button>' +
@@ -921,7 +921,7 @@ function paintAccIcons(){
   }
 }
 function handleAccAction(a){
-  if (typeof handleExtraAction === 'function' && handleExtraAction(a)) return true;       /* accessory colours and the photo screen (44m) */
+  if (typeof handleExtraAction === 'function' && handleExtraAction(a)) return true;       /* accessory colors and the photo screen (44m) */
   const m = /^ward-(hat|boot)-([a-z0-9]+)$/.exec(a);
   if (!m) return false;
   if (m[2] === 'none'){ accWear(m[1], ''); SFX.click(); }

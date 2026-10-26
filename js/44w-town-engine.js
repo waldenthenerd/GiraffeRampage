@@ -121,7 +121,7 @@ function townCollect(it){
     case 'track': r = { coin: 2 }; break;
     case 'swatch': break;
   }
-  if (it.t === 'swatch'){ msg = 'New colour: ' + WARD[it.n].name; Save.write(); townToast('New coat colour: ' + WARD[it.n].name + '. Find it in Coat colours.', '#FFE9A0'); SFX.transform(); }
+  if (it.t === 'swatch'){ msg = 'New color: ' + WARD[it.n].name; Save.write(); townToast('New coat color: ' + WARD[it.n].name + '. Find it in Coat colors.', '#FFE9A0'); SFX.transform(); }
   else {
     msg = townPay(r, cx, cy);
     if (it.t === 'track'){ const nm = TOWN_TRACK_NAME(it); townToast('Tracks: ' + nm + '. They are in your field journal.', '#E8D8B0'); }
@@ -403,7 +403,7 @@ function townNpcProp(ctx, n, hd, t){
      3 townDynamicBehind: moving things that live behind the props (sailboats)
      4 the street's front picture: every prop and building (cached)     5 lit windows, then townDynamic: everything else that moves
      6 the herd, then her     7 the glow of the lights and the evening tint     8 weather     9 the interface
-   A street gets tier 2 and 3 by setting D.behind = true (js/44zc-town-life.js does this for the harbour). */
+   A street gets tier 2 and 3 by setting D.behind = true (js/44zc-town-life.js does this for the harbor). */
 function townDynamicBehind(ctx, D, t, dark){}
 function townDynamic(ctx, D, t, dark){
   const h = townHour();

@@ -4,14 +4,14 @@
 /* A different family of fire aliens from Chapter 9's smooth, magma-cracked ones: these are built of overlapping plates of
    cooled rock with glowing seams between them, and every one has its own silhouette and its own weapon. Seen from above,
    facing +x.
-   Palette rules for this file: every body is body colour b over a darker same-hue dk, edged with an ASH-GREY rim (so dark
+   Palette rules for this file: every body is body color b over a darker same-hue dk, edged with an ASH-GREY rim (so dark
    rock still reads on the scorched ground), lit by one orange-yellow heat family (d.pale, then IN10_HOT, then IN10_CORE) and
    with bone-coloured (IN10_BONE) horns, teeth and claws. Eyes are always: dark socket, glowing iris, tiny white glint. */
 const IN10_BONE = '#E8D8B0', IN10_HOT = '#FFE9A8', IN10_CORE = '#FFF6D8', IN10_SOCK = '#1A0A06', IN10_ASH = '#CDBFB2';
 const IN10_PLATES = [[0, 0, 9.5, 12], [-4, -8, 6, 5.5], [-4, 8, 6, 5.5], [5, -7, 5, 4.5], [5, 7, 5, 4.5], [-9.5, 0, 4.4, 6.4]];
 const IN10_SHARDS = [[-16, -4, -9, -12, -3, -8, -6, -1], [-16, 4, -6, 1, -3, 8, -9, 12], [-2, -9, 4, -14, 10, -9, 6, -3], [-2, 9, 6, 3, 10, 9, 4, 14], [-8, -3, -2, -1, -8, 3, -13, 0], [4, -2, 11, -3, 11, 3, 4, 2]];
 const IN10_MC = {}; let in10_mn = 0;
-/* blendHex with a small cache (the same few colours are asked for every frame) */
+/* blendHex with a small cache (the same few colors are asked for every frame) */
 function in10_mix(a, c, t){
   const k = a + c + t; let v = IN10_MC[k];
   if (v === undefined){ if (++in10_mn > 500){ for (const q in IN10_MC) delete IN10_MC[q]; in10_mn = 0; } v = IN10_MC[k] = blendHex(a, c, t); }
@@ -28,7 +28,7 @@ function in10_crack(ctx, w, col, a){
   ctx.strokeStyle = IN10_HOT; ctx.lineWidth = Math.max(0.6, w * 0.38); ctx.stroke();
   ctx.globalAlpha = 1; ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
 }
-/* one armour plate: ash rim, dark edge, body face and a lit crescent */
+/* one armor plate: ash rim, dark edge, body face and a lit crescent */
 function in10_plate(ctx, x, y, rx, ry, b, dk, rim, rot, hi){
   lkOV(ctx, x, y, rx + 1.2, ry + 1.2, rim, rot);
   lkOV(ctx, x, y, rx, ry, dk, rot);

@@ -1,5 +1,5 @@
 'use strict';
-/* Drawing the giraffe and armour designs. */
+/* Drawing the giraffe and armor designs. */
 /* ========================= 27. THE GIRAFFE ========================= */
 const SPOTS = [];
 (function(){
@@ -9,7 +9,7 @@ const SPOTS = [];
 
 /* ========================= 27b. ARMOR DESIGNS ========================= */
 /* One visual per gear set, drawn on the giraffe's back in the body's own
-   local space (origin at the body's centre, already rotated to face the
+   local space (origin at the body's center, already rotated to face the
    direction of movement). Complexity rises with rarity: common pieces are
    a simple wrap, legendary is the most ornate. All of them sit under the
    mane and cape, which are drawn afterward in drawPlayer(). */
@@ -296,7 +296,7 @@ function drawPlayer(ctx){
   const rim = typeof giraffeRim === 'function' ? giraffeRim() : null;
   if (rim){ ctx.shadowColor = rim[0]; ctx.shadowBlur = rim[1]; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0; }      /* a dark edge, so she stands out from pale and green ground */
 
-  const cl = typeof giraffeColours === 'function' ? giraffeColours() : null;       /* the coat colours she has chosen (js/44e-wardrobe.js) */
+  const cl = typeof giraffeColours === 'function' ? giraffeColours() : null;       /* the coat colors she has chosen (js/44e-wardrobe.js) */
   const coat = hurt ? '#FFB9A8' : cl ? cl.coat : '#D6A44F';
   const spot = hurt ? '#E08878' : cl ? cl.spot : '#8A5A24';
   const dark = hurt ? '#C87A68' : cl ? cl.dark : '#A8762F';
@@ -341,7 +341,7 @@ function drawPlayer(ctx){
   ctx.shadowBlur = 0;                                     /* the rim is for her outline only, not her spots */
   ctx.fillStyle = spot;
   const spPat = typeof giraffePattern === 'function' ? giraffePattern() : 0;           /* the spot pattern she has chosen (js/44e-wardrobe.js) */
-  const gAcc = typeof giraffeAccent === 'function' ? giraffeAccent() : null;           /* and the accent colour for her cape and armour */
+  const gAcc = typeof giraffeAccent === 'function' ? giraffeAccent() : null;           /* and the accent color for her cape and armor */
   for (let i = 0; i < SPOTS.length; i++){
     const s = SPOTS[i];
     if (spPat) wardSpot(ctx, spPat, s.x, s.y, s.r, s.r * 0.82, i * 0.7);
@@ -432,7 +432,7 @@ function drawPlayer(ctx){
     ctx.quadraticCurveTo(tx, ty + 1, tx - ppx * spread, ty - ppy * spread);
     ctx.quadraticCurveTo(mx - ppx * spread * 0.8, my - ppy * spread * 0.8, bx - px * 7, by - py * 7);
     ctx.closePath(); ctx.fill();
-    /* fold shading down the centre so the cloth has some form */
+    /* fold shading down the center so the cloth has some form */
     ctx.globalAlpha = 0.22;
     ctx.fillStyle = '#1C1410';
     ctx.beginPath();

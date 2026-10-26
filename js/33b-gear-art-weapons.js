@@ -5,10 +5,10 @@
    twin tails and a spinning maw ring on the body. drawPlayer() (33-giraffe-art.js) calls weaponArtBody() while it is still in the body's
    rotated space and weaponArtHead() while it is in the head's, and the weapon's own look comes from WEAPON_ART[id]:
        hoof(ctx, o)  drawn at each front hoof (o.side -1 or 1), pointing forward (+x)
-       body(ctx, o)  drawn once, at the body's centre
+       body(ctx, o)  drawn once, at the body's center
        head(ctx, o)  drawn once, at the head, pointing forward (+x)
    o = { e (kick progress 0 to 1, or -1 when not kicking), swing (0 at rest, 1 at the strike), t, color, level, side }.
-   The swing is timed to the neck lunge in 36n-neck-stretch.js (the head lands at e = 0.3). Level 4 and up gives a glow in the weapon's colour.
+   The swing is timed to the neck lunge in 36n-neck-stretch.js (the head lands at e = 0.3). Level 4 and up gives a glow in the weapon's color.
    Nothing here changes damage, range or cooldown.
    ============================================================================================================================= */
 function weaponSwing(){
@@ -84,7 +84,7 @@ const WEAPON_ART = {
       ctx.fillStyle = 'rgba(255,240,170,.9)'; ctx.beginPath(); ctx.arc(8 + L + 9, 0, 1.6, 0, TAU); ctx.fill();
     }
   },
-  aurora: {                                                                    /* two fangs and a ribbon that shifts colour */
+  aurora: {                                                                    /* two fangs and a ribbon that shifts color */
     head(ctx, o){
       const h = 150 + Math.sin(o.t * 1.2) * 60, L = 11 + o.swing * 6;
       [-1, 1].forEach(function(s, i){

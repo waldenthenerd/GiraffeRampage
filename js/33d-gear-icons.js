@@ -3,7 +3,7 @@
    33d-gear-icons.js  --  A DRAWN ICON FOR EVERY PIECE OF GEAR. gearIcon(id, size, {locked, level}) returns a PNG data URL: the cape, the
    weapon on a hoof or a head, or the armor plate, drawn with the same code the game uses on her (33a, 33b, 33c) and fitted to the picture.
    A piece you have not found draws as a flat dark silhouette: the shape shows, the design does not. The icon is cached by id, size, locked,
-   level and the gear accent colour (so recolouring her on the Coat colours screen gives new icons by itself). gearFrame(rarity) gives the
+   level and the gear accent color (so recolouring her on the Coat colors screen gives new icons by itself). gearFrame(rarity) gives the
    four rarity looks the Gear page puts around an icon. Used by the Gear page (41a-gear-page.js).
    ============================================================================================================================= */
 const GEAR_FRAMES = {
@@ -18,7 +18,7 @@ function gearFrame(rarity){ return GEAR_FRAMES[rarity] || GEAR_FRAMES.common; }
 const GI_CACHE = {};
 function gearIconInvalidate(){ for (const k in GI_CACHE) delete GI_CACHE[k]; }
 
-/* the piece alone, at its own size, centred on (0, 0) of ctx */
+/* the piece alone, at its own size, centered on (0, 0) of ctx */
 function giDrawPiece(ctx, p, level, acc){
   const T = 1.3;
   if (p.slot === 'cape'){

@@ -3,10 +3,10 @@
 /* ======================== Chapter 6: Houston ======================== */
 /* The city is evacuated -- no people anywhere -- so the streets belong to
    the animals that live alongside people, while the military sends in
-   armour and aircraft to drive the giraffe out.
+   armor and aircraft to drive the giraffe out.
    Shared look: animals are warm fur tones with amber eyes; every machine has a
-   hard dark outline, lit panels and the same orange/red warning lights, so grey
-   hulls still read against the grey asphalt. */
+   hard dark outline, lit panels and the same orange/red warning lights, so gray
+   hulls still read against the gray asphalt. */
 
 /* ---- small local helpers (ct6_ prefix keeps them off the shared global scope) ---- */
 const CT6_PC = new Map();
@@ -339,7 +339,7 @@ const CITY_DRAW = {
     lkTRI(ctx, -6, bob - 2.8, -28, bob, -6, bob + 2.8, b);
     lkLN(ctx, [-8, bob, -26, bob], 0.8, p.lo);
     lkLN(ctx, [-25, bob - 1.6, -25, bob + 1.6], 2.2, CT6_ARM);          /* warning stripes */
-    lkOV(ctx, -27, bob, 2.4, 5.4, dk);                                   /* stabiliser */
+    lkOV(ctx, -27, bob, 2.4, 5.4, dk);                                   /* stabilizer */
     drawRotor(ctx, -28, bob + 5, 5, 2, G.time * 60, '#2A2A2A', CT6_ARM);   /* tail rotor */
     lkOV(ctx, 0, bob, 14, 7, p.deep);
     lkOV(ctx, 0, bob, 13, 6.2, b);
@@ -473,7 +473,7 @@ const CITY_DRAW = {
     ctx.fillStyle = CT6_ARM; ctx.fillRect(-60, bob - 3.2, 3, 6.4); ctx.fillRect(-54, bob - 3.6, 3, 7.2);   /* warning bands */
     lkTRI(ctx, -62, bob, -78, bob - 13, -72, bob, p.deep);              /* tail fin */
     lkTRI(ctx, -62, bob, -76.6, bob - 11.4, -71, bob, dk);
-    ct6_rect(ctx, -72, bob - 11, 7, 22, dk, p.deep, 1.2);                /* stabiliser */
+    ct6_rect(ctx, -72, bob - 11, 7, 22, dk, p.deep, 1.2);                /* stabilizer */
     lkLN(ctx, [-68.4, bob - 9, -68.4, bob + 9], 0.9, p.lo);
     drawRotor(ctx, -70, bob + 10, 10, 2, G.time * 60, '#2A2A2A', CT6_ARM);
     if (blink){ ct6_lamp(ctx, -70, bob - 11, 1.6, CT6_RED); ct6_lamp(ctx, -70, bob + 11, 1.6, CT6_RED); }
@@ -489,7 +489,7 @@ const CITY_DRAW = {
     lkOV(ctx, 0, bob, 41.4, 16.4, p.deep);                               /* fuselage */
     lkOV(ctx, 0, bob, 40, 15, b);
     ctx.globalAlpha = 0.45; lkOV(ctx, -2, bob - 6.6, 30, 3.4, p.hi2); ctx.globalAlpha = 1;
-    ctx.strokeStyle = p.deep; ctx.lineWidth = 1; ctx.beginPath();        /* armour plate seams */
+    ctx.strokeStyle = p.deep; ctx.lineWidth = 1; ctx.beginPath();        /* armor plate seams */
     for (const x of [-30, -18, -6, 6]){ ctx.moveTo(x, bob - 12); ctx.lineTo(x, bob + 12); }
     ctx.moveTo(-36, bob); ctx.lineTo(-6, bob);
     ctx.stroke();
@@ -586,7 +586,7 @@ const CITY_DRAW = {
     lkOV(ctx, -10, bob, 35.4, 19.4, p.deep);                             /* body */
     lkOV(ctx, -10, bob, 34, 18, b);
     ctx.globalAlpha = 0.5; lkOV(ctx, -10, bob - 15.4, 28, 2.6, belly); lkOV(ctx, -10, bob + 15.4, 28, 2.6, belly); ctx.globalAlpha = 1;   /* pale flank */
-    ctx.fillStyle = p.lo; ctx.beginPath();                               /* armoured scutes */
+    ctx.fillStyle = p.lo; ctx.beginPath();                               /* armored scutes */
     for (let r = -1; r <= 1; r++) for (let k = -4; k <= 3; k++){
       const sx = -12 + k * 7, sy = bob + r * 7;
       ctx.moveTo(sx + 3, sy); ctx.ellipse(sx, sy, 3, 2.4, 0, 0, TAU);
@@ -618,7 +618,7 @@ const CITY_DRAW = {
       ctx.moveTo(tx, bob + 7.4); ctx.lineTo(tx + 1.2, bob + 4.8); ctx.lineTo(tx + 2.4, bob + 7.4);
     }
     ctx.fill();
-    ctx.strokeStyle = '#141414'; ctx.lineWidth = 6.4;                    /* an old tyre stuck around its neck */
+    ctx.strokeStyle = '#141414'; ctx.lineWidth = 6.4;                    /* an old tire stuck around its neck */
     ctx.beginPath(); ctx.ellipse(12, bob, 5, 16, 0, 0, TAU); ctx.stroke();
     ctx.strokeStyle = '#5A5A5E'; ctx.lineWidth = 1; ctx.beginPath();
     for (let k = -3; k <= 3; k++){ ctx.moveTo(9, bob + k * 4.4); ctx.lineTo(15, bob + k * 4.4); } ctx.stroke();

@@ -3,10 +3,10 @@
    44zzp-photo-looks.js  --  THE PHOTO STUDIO'S LOOK AND LIGHT. A new "Look and light" tab (PHOTO.tab 'look') in the studio of 44n, and twelve
    stickers in the Effects tab. All of it is part of the picture: it is saved with it, in the album and in a shared photo code (44p, code version 5;
    a photo that uses none of these keeps its old version 4 code).
-     FILTERS   Sepia (warm brown, faded, with a vignette), Noir (black and white, hard contrast, grain, a heavy vignette), Glitch (the colours split
-               apart, slices of the picture slip sideways, scan lines) and Painterly (the picture broken into flat colours with brush strokes on top).
+     FILTERS   Sepia (warm brown, faded, with a vignette), Noir (black and white, hard contrast, grain, a heavy vignette), Glitch (the colors split
+               apart, slices of the picture slip sideways, scan lines) and Painterly (the picture broken into flat colors with brush strokes on top).
                They are made from a fixed seed, so the same photo always glitches and paints the same way.
-     FRAMES    Wooden, Polaroid, Film strip, Savanna leaves, Frost, Neon and Stars. The frame is drawn after the filter, so it stays in colour.
+     FRAMES    Wooden, Polaroid, Film strip, Savanna leaves, Frost, Neon and Stars. The frame is drawn after the filter, so it stays in color.
      TIME OF DAY  a slider for the hour (every half hour). It tints and darkens the backdrop and the figures, adds stars and a moon at night and a glow
                on the horizon at dawn and dusk, and moves the light the shadows come from. "The backdrop's own light" puts it back. The indoor Studio
                backdrop has no sky, so it has no hour.
@@ -36,7 +36,7 @@ const PHOTO_FRAMES = ['None', 'Wooden', 'Polaroid', 'Film strip', 'Savanna leave
   add('st_sparkstar', 'Gold star', function(c){ burst(c, 5, 56, 24); c.fillStyle = '#FFD84D'; c.fill(); c.lineWidth = 4; c.strokeStyle = '#E8A020'; c.lineJoin = 'round'; c.stroke(); c.fillStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.moveTo(-10, -30); c.lineTo(0, -48); c.lineTo(6, -28); c.closePath(); c.fill(); });
 
   /* ---------------------------------------------------- time of day ---------------------------------------------------- */
-  /* [hour, multiply colour, night strength]; the day runs round (the first row repeats at 24) */
+  /* [hour, multiply color, night strength]; the day runs round (the first row repeats at 24) */
   const TOD = [[0, [66, 78, 138], 1], [4.5, [78, 88, 150], 0.9], [5.5, [255, 176, 150], 0.35], [7, [255, 226, 204], 0.05], [9, [255, 252, 245], 0], [15.5, [255, 250, 238], 0], [17.5, [255, 214, 160], 0], [19, [255, 150, 120], 0.2], [20.5, [150, 110, 160], 0.65], [22, [80, 88, 150], 0.95], [24, [66, 78, 138], 1]];
   function todAt(h){
     for (let i = 0; i < TOD.length - 1; i++){

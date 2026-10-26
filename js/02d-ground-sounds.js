@@ -5,7 +5,7 @@
      mud      a wet squelch and suck, with a pop as the hoof comes up (the bogs, the jungle mud, and the whole of Murkfen)
      snow     a crunch: a squeak of the top crust, then the give underneath (Frostreach; a blizzard muffles it)
      ice      a hard tick and a short slide hiss
-     metal    a ringing clank with a low thud under it (the Moon and Mars, where she walks on plating, and the space centre)
+     metal    a ringing clank with a low thud under it (the Moon and Mars, where she walks on plating, and the space center)
      shallow  a splash with droplets, in a pond or an oil slick
      dust     a dry scuff (the savanna, the Changed Savannah, the desert); sand and ash have their own grain
      leaf     a rustle on the jungle floor; asphalt a harder knock in the city; hot rock in the Inferno; cinders on Venus

@@ -102,7 +102,7 @@ function drawHostileUnder(ctx){
     g.addColorStop(0, z.color); g.addColorStop(1, 'rgba(255,80,20,0)');
     ctx.globalAlpha = a * 0.75; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(z.x, z.y, z.r, 0, TAU); ctx.fill();
     ctx.globalAlpha = a; ctx.strokeStyle = z.color; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(z.x, z.y, z.r * 0.92, 0, TAU); ctx.stroke();
-    /* a dashed inner ring that turns, so a danger zone reads by its pattern and not only by its colour */
+    /* a dashed inner ring that turns, so a danger zone reads by its pattern and not only by its color */
     ctx.setLineDash([10, 8]); ctx.lineDashOffset = -G.time * 18; ctx.lineWidth = 2.4; ctx.strokeStyle = '#FFFFFF'; ctx.globalAlpha = a * 0.7;
     ctx.beginPath(); ctx.arc(z.x, z.y, z.r * 0.7, 0, TAU); ctx.stroke();
     ctx.setLineDash([]);
@@ -202,7 +202,7 @@ function drawMarineOverlays(ctx, cx, cy, vw, vh){
 }
 
 /* ========================= 18i. SPACE MARINE AI (Chapter 8) ========================= */
-/* Every behaviour here is new: none of it is a recolour of chase / dash / flank
+/* Every behavior here is new: none of it is a recolour of chase / dash / flank
    / charge / ranged / skirmish, and none of the bosses reuse an earlier boss's
    pattern. Each function is given the enemy, dt, the unit vector toward the
    giraffe (ux, uy), the distance d, the raw offset (dx, dy) and its speed, and
@@ -752,7 +752,7 @@ Object.keys(ETYPES).forEach(id => {
 });
 ETYPES_MARINE.turret = { hp: 18 * 19, spd: 0, dmg: 6 * 4.9, r: 14, xp: 4, kbRes: 0, ai: 'm_turret', color: '#8A8E98', dark: '#3A3E48', pale: '#FFE080', blood: '#5A5E68', val: 4, look: 'sentryturret', marine: true, turret: true, life: 14 };
 ETYPES_MARINE.sword = Object.assign({}, ETYPES_MARINE.hyena, { ai: 'm_swordsman', look: 'bladeguard', color: '#3E64A0', dark: '#18284A', pale: '#7FE8FF', kbRes: 0.8, hp: ETYPES_MARINE.hyena.hp * 1.3, spd: ETYPES_MARINE.hyena.spd * 1.1, melee: { type: 'cone', range: 125, arc: 0.7 } });
-/* the same behaviour functions, reached from the AI switch */
+/* the same behavior functions, reached from the AI switch */
 Object.assign(MARINE_AI, {});
 
 const FINAL_BOSS_DMG = 0.65;

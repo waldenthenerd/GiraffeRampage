@@ -1,5 +1,5 @@
 /* town-layers: the draw order of a street (the tiers are written above townDynamicBehind in js/44w-town-engine.js). A street with things that move behind its props (D.behind: the
-   harbour's sailboats) keeps a back picture (water and ground) and a front picture (every prop and building); the things behind are drawn between them. This proves it for every such
+   harbor's sailboats) keeps a back picture (water and ground) and a front picture (every prop and building); the things behind are drawn between them. This proves it for every such
    street: a loud marker is painted in the "behind" slot over the whole street, and wherever a prop or building is solid, none of it may show. It also checks that streets without such
    things pay for no second picture, and that nobody fakes depth with clip shapes again. */
 (function(){

@@ -2,7 +2,7 @@
 /* The ant colony. */
 /* ========================= ANT COLONY ========================= */
 /* Unlocked for good the first time a run reaches 100,000,000 points. An
-   anthill then sits at the centre of the arena in every run, and ants hired
+   anthill then sits at the center of the arena in every run, and ants hired
    at the trading post (paid for in food) pour out of it to fight alongside
    the giraffe. Each type has its own 15-second respawn timer that only runs
    while fewer of that type are on the field than the player owns. */
@@ -56,7 +56,7 @@ function hireAnt(type){
 function checkAntUnlock(){
   if (Save.data.antsUnlocked || G.attract || G.score < ANT_UNLOCK_SCORE) return;
   Save.data.antsUnlocked = true; Save.write();
-  banner('ANT COLONY UNLOCKED', 'An anthill has appeared at the centre of the arena. Hire ants at the trading post.', '#C98A3A', 3.6);
+  banner('ANT COLONY UNLOCKED', 'An anthill has appeared at the center of the arena. Hire ants at the trading post.', '#C98A3A', 3.6);
   SFX.level();
 }
 function spawnAnt(type){
@@ -104,7 +104,7 @@ function antAggroTarget(e){
 function distractorTarget(a, claims){
   /* Stick with the current target while it's alive and no other distractor
      shares it. Without this, a distractor circling its own enemy could drift
-     into range of a neighbouring one, swap to it for being nearer, and leave
+     into range of a neighboring one, swap to it for being nearer, and leave
      its original enemy undistracted. */
   const cur = a.tgt;
   if (cur && !cur.dead && hyp(cur.x - a.x, cur.y - a.y) < 900 && (claims.get(cur) || 0) <= 1) return cur;
@@ -268,7 +268,7 @@ function drawAnts(ctx){
 function antsTabHTML(){
   if (!Save.data.antsUnlocked){
     return '<p class="sub">The ant colony is still underground. Reach a score of <b>' + ANT_UNLOCK_SCORE.toLocaleString('en-US') +
-      '</b> in a single run to unlock it. An anthill will then appear at the centre of the arena.</p>';
+      '</b> in a single run to unlock it. An anthill will then appear at the center of the arena.</p>';
   }
   const canFood = Save.data.gold >= FOOD_GOLD && (Save.data.gems | 0) >= FOOD_GEMS;
   const afford = foodAffordable();

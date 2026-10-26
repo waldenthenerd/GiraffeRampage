@@ -96,7 +96,7 @@ function collapseBuilding(b){
   const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
   for (let i = 0; i < 6; i++) burstParticles(b.x + Math.random() * b.w, b.y + Math.random() * b.h, 8, '#A89E90', 220, 6);
   /* the collapse itself batters anything standing close by (but never
-     knocks down a neighbouring building, so there are no chain reactions) */
+     knocks down a neighboring building, so there are no chain reactions) */
   addShock(cx, cy, Math.max(b.w, b.h) * 0.7, 0.45, b.maxHp * 0.5, '#B8AE9E', { width: 20, kb: 240, filled: true });
   G.shocks[G.shocks.length - 1].noBuildings = true;
   addShake(12); sfx('boom', 0.1);
@@ -202,7 +202,7 @@ function drawGroundCity(ctx, cx, cy, vw, vh){
   const x0 = cx - vw / 2, y0 = cy - vh / 2;
   ctx.fillStyle = groundPatternCity || '#6A6862';
   ctx.fillRect(x0 - 40, y0 - 40, vw + 80, vh + 80);
-  /* streets run along the block edges, with a dashed yellow centre line */
+  /* streets run along the block edges, with a dashed yellow center line */
   const RW = 110;
   ctx.fillStyle = '#2E2E32';
   for (let gx = 0; gx <= ARENA_W; gx += CITY_BLOCK) if (gx + RW > x0 && gx - RW < x0 + vw) ctx.fillRect(gx - RW / 2, y0 - 40, RW, vh + 80);
@@ -301,7 +301,7 @@ Object.assign(BUILDING_ROOFS, {
   hangar:  { roof: '#D8D8D2', edge: '#8A8A84', detail: '#2F5AA8' },
   vab:     { roof: '#E8E8E4', edge: '#9A9A96', detail: '#1F4FA8' }
 });
-/* Geometry of the launch complex, all relative to the mount centre (rk.x, rk.y)
+/* Geometry of the launch complex, all relative to the mount center (rk.x, rk.y)
    and scaled by rk.s (1 in play, smaller in the menu preview). */
 function rocketGeom(rk){
   const s = rk.s || 1;
@@ -439,7 +439,7 @@ function drawGroundSpace(ctx, cx, cy, vw, vh){
   ctx.fillStyle = '#3A3C40';
   for (let gx = 0; gx <= ARENA_W; gx += SPACE_CELL) if (gx + RW > x0 && gx - RW < x0 + vw) ctx.fillRect(gx - RW / 2, y0 - 40, RW, vh + 80);
   for (let gy = 0; gy <= ARENA_H; gy += SPACE_CELL) if (gy + RW > y0 && gy - RW < y0 + vh) ctx.fillRect(x0 - 40, gy - RW / 2, vw + 80, RW);
-  /* dashed centre lines, started on a multiple of the dash period so the dashes
+  /* dashed center lines, started on a multiple of the dash period so the dashes
      stay put in the world instead of crawling along with the camera */
   const DASH = 20, GAP = 18, PERIOD = DASH + GAP;
   ctx.strokeStyle = '#F0F0E8'; ctx.lineWidth = 2.4; ctx.setLineDash && ctx.setLineDash([DASH, GAP]);

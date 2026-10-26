@@ -1,14 +1,14 @@
 'use strict';
 /* Longneck Town, sixteenth part: things worth going to the sea, the sky and the villages for. */
 /* ========================= 44zs. EXPLORER'S FINDS ========================= */
-/* Eight hats and boots and six coat colours, each found once and found only out there:
+/* Eight hats and boots and six coat colors, each found once and found only out there:
    THE AIR (3): a gift balloon drifting high over the Savannah (Cloud Crown), one low over the fields (Rocket Boots), one near the farm (Jet Stream).
    THE SEA (4): a chest on each of four islets (Pirate Tricorne, Flippers, Seafoam, Coral Reef): sail up to the beach. The sea chart marks the
      ones you have not opened with a gold star once you have charted that bit of sea.
    HAYFIELD VILLAGE (4): the Scarecrow Hat on the scarecrow, Wellington Boots in the barn, Cornfield in the farmhouse, Harvest Orange in the coop.
    DRIFTWOOD COVE (3): Beach Sandals under the palms, the Shell Crown in the lighthouse, Shell Pink on the crab tank.
    The village ones are ordinary town items (TOWN_ITEMS); the air and sea ones are listed in TOWN_SPECIAL_SRC so the Gear page can say where they are.
-   Colours are WARD 36 to 41 (WARD_TOWN in 44e-wardrobe.js); the save keeps each one as town.found[id]. */
+   Colors are WARD 36 to 41 (WARD_TOWN in 44e-wardrobe.js); the save keeps each one as town.found[id]. */
 const TOWN_SPECIAL_SRC = {
   cloudcrown: 'Found in the air: a gift balloon high over the Savannah.', rocketb: 'Found in the air: a gift balloon low over the fields.', fl_sw: 'Found in the air: a gift balloon near the farm.',
   tricorne: 'Found at sea: a chest on an islet to the south.', flippers: 'Found at sea: a chest on an islet to the south-east.', sea_sw1: 'Found at sea: a chest on an islet to the south-west.', sea_sw2: 'Found at sea: a chest on an islet to the east.'
@@ -88,7 +88,7 @@ const TOWN_SPECIAL_SRC = {
 function exploreGrant(sp){
   const t = townData(); if (t.found[sp.id]) return false;
   t.found[sp.id] = 1;
-  if (sp.kind === 'swatch'){ townToast('New coat colour: ' + WARD[sp.n].name + '. Find it in Coat colours.', '#FFE9A0'); SFX.transform(); }
+  if (sp.kind === 'swatch'){ townToast('New coat color: ' + WARD[sp.n].name + '. Find it in Coat colors.', '#FFE9A0'); SFX.transform(); }
   else { const msg = townPay({ acc: sp.acc }); townToast('Found: ' + ACC_BY_ID[sp.acc].name + ' (' + msg + ')', '#FFE9A0'); SFX.level(); }
   Save.write(); return true;
 }
@@ -172,5 +172,5 @@ const SEA_FINDS = [
 
 (function(){
   const t = GUIDE_TOPICS.find(function(x){ return x.id === 'town'; });
-  if (t){ const base = t.html; t.html = function(){ return base().replace('</ul>', '<li><b>Explorer’s finds:</b> hats, boots and coat colours are hidden further afield. Gift balloons drift over the Savannah (one is high, one is low over the fields, one near the farm); each of four islets in the sea has a treasure chest (sail up to the beach, and the sea chart shows a gold star once you have charted one); and Hayfield Village and Driftwood Cove each hide a few of their own. The Gear page in the journal says where each one is.</li></ul>'); }; }
+  if (t){ const base = t.html; t.html = function(){ return base().replace('</ul>', '<li><b>Explorer’s finds:</b> hats, boots and coat colors are hidden further afield. Gift balloons drift over the Savannah (one is high, one is low over the fields, one near the farm); each of four islets in the sea has a treasure chest (sail up to the beach, and the sea chart shows a gold star once you have charted one); and Hayfield Village and Driftwood Cove each hide a few of their own. The Gear page in the journal says where each one is.</li></ul>'); }; }
 })();

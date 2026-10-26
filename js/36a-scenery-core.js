@@ -6,7 +6,7 @@
    "over" layer of ambient life above the creatures (drawSceneryOver), and applies terrain effects each frame (sceneryUpdate).
 
    def = {
-     patches:   [{ fill: '#RRGGBB', alpha: 0.2, count: 12, rMin: 160, rMax: 380, squash: 0.65 }],            // big soft colour blotches under everything
+     patches:   [{ fill: '#RRGGBB', alpha: 0.2, count: 12, rMin: 160, rMax: 380, squash: 0.65 }],            // big soft color blotches under everything
      decals:    [{ id, count: 90, draw(ctx, d, t) }],                                                       // flat marks on the ground; ctx is translated to d.x, d.y and scaled/rotated by d.s / d.rot
      props:     [{ id, count: 60, r: 26, gap: 40, s: [0.8, 1.4], rot: false, draw(ctx, p, t) }],           // themed objects, y-sorted with the landmarks; r = footprint radius
      landmarks: [{ id, count: 3, r: 150, gap: 700, s: [1, 1.2], draw(ctx, p, t) }],                          // a few huge features that give orientation
@@ -49,7 +49,7 @@ function scenPlacer(){
     return null;
   };
 }
-/* the same colour at zero alpha (fading to transparent black would leave a dark ring around every patch) */
+/* the same color at zero alpha (fading to transparent black would leave a dark ring around every patch) */
 function scenFade(c){
   if (typeof c === 'string' && c.charAt(0) === '#' && c.length === 7) return 'rgba(' + parseInt(c.substr(1, 2), 16) + ',' + parseInt(c.substr(3, 2), 16) + ',' + parseInt(c.substr(5, 2), 16) + ',0)';
   const m = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(c || '');

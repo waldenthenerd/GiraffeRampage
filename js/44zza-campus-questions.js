@@ -164,7 +164,7 @@ function uqFactory(register, later){                             /* later: a lec
   Q.mc('chem', 1, "What is the chemical symbol for gold?", ["Au", "Ag", "Go", "Gd"], "Au comes from the Latin word aurum.");
   Q.mc('chem', 1, "Which gas do we need to breathe in to live?", ["Oxygen", "Carbon dioxide", "Helium", "Methane"], "Our cells use it to release energy.");
   Q.mc('chem', 1, "What state of matter is ice?", ["A solid", "A liquid", "A gas", "A plasma"], "Particles in ice are locked in place.");
-  Q.mc('chem', 1, "What is the chemical name of table salt?", ["Sodium chloride", "Calcium carbonate", "Potassium iodide", "Sodium sulphate"], "NaCl: one sodium and one chlorine.");
+  Q.mc('chem', 1, "What is the chemical name of table salt?", ["Sodium chloride", "Calcium carbonate", "Potassium iodide", "Sodium sulfate"], "NaCl: one sodium and one chlorine.");
   Q.tf('chem', 1, "At sea level, water boils at 100 degrees Celsius.", true, "It boils at a lower temperature on a mountain top.");
   Q.mc('chem', 1, "Which of these is a metal?", ["Iron", "Oxygen", "Sulfur", "Carbon"], "Metals conduct heat and electricity.");
   Q.mc('chem', 1, "Which is the lightest element?", ["Hydrogen", "Helium", "Oxygen", "Carbon"], "Hydrogen has just one proton.");

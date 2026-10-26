@@ -1,9 +1,9 @@
 'use strict';
-/* Hat and boot colours, the photo screen, and the one-time tips. */
-/* ========================= 44m. ACCESSORY COLOURS, PHOTO MODE, TIPS ========================= */
-/* Save.data.mini.hatCol and bootCol hold 0 (the item's own colours) or a colour number from the coat colours (1 to 26, whatever she has
+/* Hat and boot colors, the photo screen, and the one-time tips. */
+/* ========================= 44m. ACCESSORY COLORS, PHOTO MODE, TIPS ========================= */
+/* Save.data.mini.hatCol and bootCol hold 0 (the item's own colors) or a color number from the coat colors (1 to 26, whatever she has
    unlocked, see WARD in 44e-wardrobe.js). The hat and boots are drawn as usual, then tinted: 'color' blend keeps the item's light and
-   shade and takes the chosen hue, so even the black top hat and the white toque take a colour. Save.data.mini.tips remembers which
+   shade and takes the chosen hue, so even the black top hat and the white toque take a color. Save.data.mini.tips remembers which
    one-time tips have been shown. */
 
 /* ---- tinting the worn hat and boots ---- */
@@ -56,11 +56,11 @@ let _accDepth = 0;
   drawAccIcon = function(ctx, it, cx, cy, sc, t){ _accDepth++; try { ai(ctx, it, cx, cy, sc, t); } finally { _accDepth--; } };
 })();
 
-/* ---- the colour strip under the hat and boots rows of the wardrobe ---- */
+/* ---- the color strip under the hat and boots rows of the wardrobe ---- */
 function accColourRowHTML(kind){
   const md = miniData(), cur = (kind === 'boot' ? md.bootCol : md.hatCol) | 0;
-  let h = '<div class="sub" style="margin:4px 0 3px;font-size:12px">' + (kind === 'boot' ? 'Boot' : 'Hat') + ' colour: <b>' + (cur && WARD[cur] ? WARD[cur].name : 'its own') + '</b></div><div class="swatches dots">';
-  h += '<button class="swatch' + (cur ? '' : ' on') + '" data-a="ward-' + kind + 'col-0" title="Its own colours" aria-label="Its own colours" style="background:linear-gradient(135deg,#E9CB7C 50%,#D5352B 50%)"></button>';
+  let h = '<div class="sub" style="margin:4px 0 3px;font-size:12px">' + (kind === 'boot' ? 'Boot' : 'Hat') + ' color: <b>' + (cur && WARD[cur] ? WARD[cur].name : 'its own') + '</b></div><div class="swatches dots">';
+  h += '<button class="swatch' + (cur ? '' : ' on') + '" data-a="ward-' + kind + 'col-0" title="Its own colors" aria-label="Its own colors" style="background:linear-gradient(135deg,#E9CB7C 50%,#D5352B 50%)"></button>';
   for (let n = 1; n <= WARD_MAX; n++){
     if (!wardUnlocked(n)) continue;
     h += '<button class="swatch' + (cur === n ? ' on' : '') + '" data-a="ward-' + kind + 'col-' + n + '" title="' + WARD[n].name + '" aria-label="' + WARD[n].name + '" style="background:' + WARD[n].c + '"></button>';

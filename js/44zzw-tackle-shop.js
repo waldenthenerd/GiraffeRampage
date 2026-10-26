@@ -1,7 +1,7 @@
 'use strict';
 /* The Bait & Tackle shack, with an inside: three stations where she can see every rod, line and bait, and take the ones she has earned. */
 /* ========================= 44zzw. THE TACKLE SHOP ========================= */
-/* The shack on the Harbour street gets a door into a room (in_tackle, under the Harbour like the other rooms): a rod rack, a wall of line reels and a bait
+/* The shack on the Harbor street gets a door into a room (in_tackle, under the Harbor like the other rooms): a rod rack, a wall of line reels and a bait
    tank. Each station opens a page that lists every piece of that kind, what it does, and whether she can take it: "Take it" puts it on (the same save
    as the buttons in the fishing panel: town.tackle), "In use" marks the one she has, and a locked piece says how many more kinds of fish it needs.
    Nothing is bought: tackle is free and unlocked by the number of kinds caught (js/44zzv-fishing.js).

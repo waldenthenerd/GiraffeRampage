@@ -28,7 +28,7 @@ const HM_COATS = [{}, { coat: '#C98A3A', darkc: '#A8702A', spotc: '#6A3A18' }, {
    1 the frame, 2 skin, wings and heat tiles, 3 the engine, 4 the cockpit and lights ---- */
 /* The giraffe in the cockpit is the SAME sprite as the one that walked up to the plane, at the same size compared with the plane (she is drawn at
    0.41 of the plane's scale everywhere: 0.82 beside a plane drawn at 2.0). Her neck is pitched almost flat, head at the front, body low in the
-   fuselage, so the canopy only has to be big enough for her neck, her head and her helmet. Placed so the helmet is centred at (84, -37). */
+   fuselage, so the canopy only has to be big enough for her neck, her head and her helmet. Placed so the helmet is centered at (84, -37). */
 const HM_PILOT = { s: 0.41, neck: 1.3, head: 0.05, x: 31.67, y: 18.82 };
 function hmCanopyPath(ctx){                                                         /* a short, swept-back canopy with a raked windscreen */
   ctx.beginPath(); ctx.moveTo(12, -21); ctx.quadraticCurveTo(40, -50, 88, -55); ctx.quadraticCurveTo(108, -52, 114, -8); ctx.quadraticCurveTo(66, -24, 12, -21); ctx.closePath();

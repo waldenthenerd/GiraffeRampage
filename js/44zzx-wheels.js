@@ -13,7 +13,7 @@ const RIDES = [
   { id: 'skate',   kind: 'skate', name: 'Skateboard',   price: 3000,  mul: 1.6, fall: 0.05, col: '#D5352B', blurb: 'A plain deck. Quick, and a little wobbly.' },
   { id: 'cruiser', kind: 'skate', name: 'Cruiser board', price: 7000,  mul: 1.5, fall: 0.03, col: '#2DA79B', blurb: 'Long and steady, with big soft wheels.' },
   { id: 'bike',    kind: 'bike',  name: 'Bicycle',      price: 9000,  mul: 1.9, fall: 0.03, col: '#4DA0D8', blurb: 'Pedals, a bell and a basket-shaped gap in the frame.' },
-  { id: 'racer',   kind: 'bike',  name: 'Racing bike',  price: 20000, mul: 2.4, fall: 0.06, col: '#F2C230', blurb: 'Thin tyres, drop bars, no brakes worth mentioning.' }
+  { id: 'racer',   kind: 'bike',  name: 'Racing bike',  price: 20000, mul: 2.4, fall: 0.06, col: '#F2C230', blurb: 'Thin tires, drop bars, no brakes worth mentioning.' }
 ];
 const WHEELS_BY_ID = {}; RIDES.forEach(function(w){ WHEELS_BY_ID[w.id] = w; });
 function wheelsRaw(){ const t = Save.data && Save.data.town; return t && t.wheels && typeof t.wheels === 'object' && !Array.isArray(t.wheels) ? t.wheels : null; }
@@ -87,10 +87,10 @@ function wheelsSide(ctx, x, gy, o){
   ctx.restore();
 }
 /* a leg of two bones from the hip to a pedal, the knee bent forward */
-function wheelsLeg(ctx, hx, hy, fx, fy, dir, colour, boot){
+function wheelsLeg(ctx, hx, hy, fx, fy, dir, color, boot){
   const L = 25, dx = fx - hx, dy = fy - hy, d = Math.min(2 * L - 1, Math.max(8, Math.hypot(dx, dy))), h = Math.sqrt(Math.max(0, L * L - d * d / 4)), ux = dx / (Math.hypot(dx, dy) || 1), uy = dy / (Math.hypot(dx, dy) || 1);
   const kx = hx + ux * d / 2 + dir * Math.abs(uy) * h + (dir > 0 ? 0 : 0), ky = hy + uy * d / 2 - Math.abs(ux) * h * 0.6;
-  ctx.strokeStyle = colour; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(kx, ky); ctx.lineTo(fx, fy); ctx.stroke();
+  ctx.strokeStyle = color; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(kx, ky); ctx.lineTo(fx, fy); ctx.stroke();
   ctx.fillStyle = '#4A2E12'; ctx.beginPath(); ctx.ellipse(fx + dir * 2, fy + 1, 5, 3.2, 0, 0, TAU); ctx.fill();
 }
 

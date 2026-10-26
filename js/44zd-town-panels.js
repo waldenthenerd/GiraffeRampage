@@ -106,7 +106,7 @@ function townShowJournal(tab){
       const D = TOWN_DIST[id], open = D.open(), all = townItemsIn(id).length, got = townFoundIn(id);
       b += '<div class="je' + (open ? '' : ' locked') + '"><b>' + D.name + '</b> <span class="jw">' + (open ? got + ' of ' + all + (t.done[id] ? ' — all found' : '') : 'opens after: ' + D.need) + '</span>' + (open ? bar(got, all) : '') + '</div>';
     });
-    b += '<p class="jt">Colours: ';
+    b += '<p class="jt">Colors: ';
     WARD_TOWN.forEach(function(w){ const f = townFound(w[2]); b += '<span class="dotsw" title="' + (f ? w[0] : 'Not found yet') + '" style="background:' + (f ? w[1] : 'rgba(0,0,0,.12)') + '"></span>'; });
     b += '</p><p class="jt">Town hats and boots: ';
     ACC.townHats.concat(ACC.townBoots).forEach(function(it){ b += '<span class="dotsw" title="' + (accOwned(it.id) ? it.name : 'Not found yet') + '" style="background:' + (accOwned(it.id) ? it.c : 'rgba(0,0,0,.12)') + '"></span>'; });
@@ -213,15 +213,15 @@ const TOWN_REPLY = {
   accept: ['Wonderful. Off you go.', 'I knew I could count on you.', 'Take your time, no hurry.', 'Splendid. Come back and tell me how it goes.', 'You’re a star. Truly.', 'Good. I’ll be right here.'],
   later: ['No rush at all.', 'Whenever you’re ready.', 'Of course. It will keep.', 'Another day, then.'],
   gift: ['How thoughtful. Thank you.', 'Oh! For me? That is kind.', 'You shouldn’t have. I’m glad you did.', 'That’s very sweet of you.'],
-  fav: ['That is exactly what I wanted! How did you know?', 'My favourite! You really are something.', 'You remembered! I’m a bit teary.'],
+  fav: ['That is exactly what I wanted! How did you know?', 'My favorite! You really are something.', 'You remembered! I’m a bit teary.'],
   progress: ['How is it going?', 'Any luck?', 'Still at it?', 'Take your time.']
 };
 const TOWN_LINES = {
-  mayor: { day: ['Look at the sky. Not a cloud. Well, a few.', 'The fountain was cleaned this morning. You can tell.'], dusk: ['The lamps are coming on. My favourite moment.'], night: ['The square is empty at this hour. Just us and the owls.'],
+  mayor: { day: ['Look at the sky. Not a cloud. Well, a few.', 'The fountain was cleaned this morning. You can tell.'], dusk: ['The lamps are coming on. My favorite moment.'], night: ['The square is empty at this hour. Just us and the owls.'],
     new: ['I don’t believe we’ve properly met. I’m the mayor. It says so on the hat.'], friend: ['You’ve become part of the town. I mean that.', 'I’d re-elect you. Of what, I don’t know.'], best: ['I’ve put your name on a plaque. A small one. Humble.', 'If I could, I’d make you mayor. The hat doesn’t fit anyone else.'],
-    chap: [[3, 'Word has travelled from the swamps. People are talking about you.'], [6, 'Houston! I hear the buses are very large there.'], [8, 'The Moon. The Moon! And you came back with all your colours.'], [13, 'You’ve finished everything. The whole town is proud, and a bit nervous.']] },
-  tilly: { day: ['That coat, in this light. Mm.', 'I’m hemming a cape for no one in particular.'], dusk: ['Golden light is the best light for fabric.'], new: ['Hello. Don’t mind the pins. Or the measuring.'], friend: ['I’ve a bolt of cloth that is exactly your colour.', 'You’ve got a good eye. Don’t tell the others.'], best: ['I’ve a whole rail set aside for you. Everything on it is yours.', 'I’d dress you for free. Don’t tell the mayor.'],
-    chap: [[5, 'A jungle green coat would be so you.'], [10, 'Ember colours suit you. I wouldn’t say it to just anyone.']] },
+    chap: [[3, 'Word has traveled from the swamps. People are talking about you.'], [6, 'Houston! I hear the buses are very large there.'], [8, 'The Moon. The Moon! And you came back with all your colors.'], [13, 'You’ve finished everything. The whole town is proud, and a bit nervous.']] },
+  tilly: { day: ['That coat, in this light. Mm.', 'I’m hemming a cape for no one in particular.'], dusk: ['Golden light is the best light for fabric.'], new: ['Hello. Don’t mind the pins. Or the measuring.'], friend: ['I’ve a bolt of cloth that is exactly your color.', 'You’ve got a good eye. Don’t tell the others.'], best: ['I’ve a whole rail set aside for you. Everything on it is yours.', 'I’d dress you for free. Don’t tell the mayor.'],
+    chap: [[5, 'A jungle green coat would be so you.'], [10, 'Ember colors suit you. I wouldn’t say it to just anyone.']] },
   barnaby: { day: ['Slow day. Which is the best kind for a shopkeeper. Or the worst.', 'Everything’s for sale except the stall.'], dusk: ['Closing in a minute. Or never. Depends who wanders by.'], night: ['The night market is just me and a lantern.'],
     new: ['Browse! Browsing is free. Everything else, less so.'], friend: ['For you, I’d round down. A little.', 'I put aside something nice. I won’t say what.'], best: ['You’re the only one I’d give a discount. Don’t tell the herd.'], chap: [[2, 'Winter stock came in. You can imagine.'], [9, 'Venus! What’s the exchange rate on sulfur?']] },
   penny: { day: ['Fresh out of the oven, as always.', 'I’m trying a honey and sage loaf. Wish me luck.'], dusk: ['The evening rush. Everyone wants a bun.'], night: ['I bake best at night. Don’t ask why.'], new: ['Hello! You look hungry. Everyone does.'],
@@ -230,7 +230,7 @@ const TOWN_LINES = {
     friend: ['You’ve got an eye. Better than mine, some days.'], best: ['I’ve got a whole wall of your best ones. Come and see sometime.'], chap: [[1, 'I’d love a shot of the savanna at dawn.'], [7, 'Space! Can you take a camera next time?']] },
   gus: { day: ['Go on, hit a high score. I dare you.', 'The cabinets are warm. Somebody’s been on them.'], dusk: ['Arcade after dark is the best.'], new: ['Hey! Do you play? You look like you play.'], friend: ['Honestly, you’re the best I’ve seen. Don’t tell the others I said so.'], best: ['If you take my high score I’ll cry. Then I’ll cheer.'],
     chap: [[3, 'Three games in and you’re already doing better than me.'], [8, 'Is it true there’s a game on the Moon?']] },
-  marina: { day: ['The fish are shy today. Or smart.', 'The tide comes in, the tide goes out. I sit.'], dusk: ['The boats come home at this hour.'], night: ['I like the harbour after dark. The lighthouse is a friend.'], new: ['Hello. Don’t splash.'], friend: ['I caught a fish and let it go. It was a good one.'], best: ['There’s a boat in the harbour with your name on it. Not literally. Yet.'] },
+  marina: { day: ['The fish are shy today. Or smart.', 'The tide comes in, the tide goes out. I sit.'], dusk: ['The boats come home at this hour.'], night: ['I like the harbor after dark. The lighthouse is a friend.'], new: ['Hello. Don’t splash.'], friend: ['I caught a fish and let it go. It was a good one.'], best: ['There’s a boat in the harbor with your name on it. Not literally. Yet.'] },
   skye: { day: ['The wind is just right for antennas.', 'You can see everything from here. Even the arcade queue.'], dusk: ['Sunset. Everything turns orange. Even the washing.'], night: ['Stars from the roof. Not bad.'], new: ['Careful! Don’t step on the cables.'], friend: ['I built you a little aerial. For your hat. It’s a joke.'], best: ['I’d let you touch the green one. I wouldn’t tell anyone else that.'] },
   nova: { day: ['Daytime is boring. The stars are still up there, just hiding.'], dusk: ['First star in ten minutes. I can feel it.'], night: ['Right now, tonight, a star burst. Just then. You missed it.'], new: ['Shh. I’m counting.'], friend: ['I’ve named one after you. It’s a small one. Don’t be offended.'], best: ['I wrote your name on the map. In pencil, because stars move.'],
     chap: [[7, 'You’ve left the planet. I’m a little jealous.'], [9, 'Venus is the morning star, you know. Or the evening one.']] },

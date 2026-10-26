@@ -38,7 +38,7 @@ function shipCostHTML(i){
 function shipTabHTML(){
   const st = shipStage(), built = shipBuilt(), done = !!Save.data.homecoming;
   let out = '<p class="sub">' + (built
-    ? 'The spaceplane stands on its pad, fuelled and ready.'
+    ? 'The spaceplane stands on its pad, fueled and ready.'
     : 'The spaceship engine part is more than a trophy: with enough metal, sulfur, gems and gold it could carry a giraffe home. Build the spaceplane one stage at a time; each stage needs the one before it, and <b>every kind of material</b> listed.') + '</p>';
   out += '<div class="sub" style="margin:2px 0 6px">You have: ' + SHIP_CUR.map(c => '<span style="color:' + c[3] + '">' + fmt(shipHave(c[0])) + ' ' + c[2] + '</span>').join(' \u00B7 ') + '</div>';
   out += '<canvas id="shipPic" width="720" height="260" style="width:100%;border-radius:6px;border:1px solid var(--bark2);margin:2px 0 8px"></canvas><div class="shoplist">';
@@ -69,7 +69,7 @@ function drawShipPic(cv){
   const gg = ctx.createLinearGradient(0, 196, 0, H); gg.addColorStop(0, '#6A4A32'); gg.addColorStop(1, '#2A1C16'); ctx.fillStyle = gg; ctx.fillRect(0, 196, W, H - 196);
   ctx.fillStyle = '#4A4650'; ctx.fillRect(40, 196, W - 80, 14); ctx.fillStyle = '#6A6670'; ctx.fillRect(40, 196, W - 80, 4);
   ctx.fillStyle = '#F4C040'; for (let x = 70; x < W - 90; x += 70) ctx.fillRect(x, 202, 30, 3);
-  const px = 380, py = st >= 2 ? 196 - 44 * 1.3 : 150;           /* with the wheels down, the tyres rest on the pad */
+  const px = 380, py = st >= 2 ? 196 - 44 * 1.3 : 150;           /* with the wheels down, the tires rest on the pad */
   if (st < 4){                                                                        /* the scaffold round the plane, taller as the plane grows */
     ctx.strokeStyle = '#8A8E9A'; ctx.lineWidth = 3;
     for (const sx of [150, 610]){ ctx.beginPath(); ctx.moveTo(sx, 196); ctx.lineTo(sx, 66); ctx.moveTo(sx + 26, 196); ctx.lineTo(sx + 26, 66); ctx.stroke(); ctx.lineWidth = 1.6; for (let y = 196; y > 66; y -= 26){ ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx + 26, y - 26); ctx.moveTo(sx + 26, y); ctx.lineTo(sx, y - 26); ctx.stroke(); } ctx.lineWidth = 3; }

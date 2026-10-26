@@ -158,7 +158,7 @@ function renderForage(ctx){
     ctx.restore();
   }
   /* the giraffe: body at the bottom, a long spotted neck up to the head */
-  const cu = typeof giraffeCustom === 'function' ? giraffeCustom() : null, pt = typeof giraffePattern === 'function' ? giraffePattern() : 0;      /* her chosen colours (js/44e-wardrobe.js) */
+  const cu = typeof giraffeCustom === 'function' ? giraffeCustom() : null, pt = typeof giraffePattern === 'function' ? giraffePattern() : 0;      /* her chosen colors (js/44e-wardrobe.js) */
   const coat = cu ? cu.coat : '#D6A44F', spot = cu ? cu.spot : '#8A5A24';
   ctx.fillStyle = coat;
   ctx.beginPath(); ctx.ellipse(g.sx, g.sy + 70 * gs, 130 * gs, 70 * gs, 0, 0, TAU); ctx.fill();

@@ -15,7 +15,7 @@
    Save: Save.data.town.fish { id: count } (as before), .fishBook { id: biggest cm }, .tackle { rod, line, bait }, .fishOrder { w, id, done }.
    While the sea panel is open G.state is 'fishing' and the boat does not move. */
 (function(){
-  /* what the first 13 are like, and the 22 new kinds. h: where, c: colour, k: shape, len: [smallest, biggest] cm; r: how often; v: what it is worth */
+  /* what the first 13 are like, and the 22 new kinds. h: where, c: color, k: shape, len: [smallest, biggest] cm; r: how often; v: what it is worth */
   const OLD = {
     sardine: { h: 'pier', c: '#A9C6D8', k: 'slim', len: [12, 20] }, mackerel: { h: 'pier', c: '#4F8FA8', k: 'slim', s: '#1F3C4C', len: [25, 40] }, herring: { h: 'pier', c: '#B8C8D4', k: 'slim', len: [18, 30] },
     trout: { h: 'pier', c: '#9BBF7A', k: 'fish', s: '#C9604A', len: [30, 55] }, pike: { h: 'pier', c: '#6F8F4E', k: 'slim', s: '#3E5A2A', len: [50, 100] }, eel: { h: 'pier', c: '#5B6B4A', k: 'long', len: [60, 110] },

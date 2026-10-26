@@ -4,7 +4,7 @@
 /* Replaces townDrawRide (44zc). The picture is the inside of a carriage: a ceiling with lamps and the route map (the stops lit up as the
    tram passes them), a brass rail with swinging straps, a window with a frame and a sill, and a bench with buttoned upholstery where she
    sits between two other passengers. Through the window the world slides by in four layers (sky and sun or moon, far hills, a skyline of
-   houses with lit windows, and poles, trees and a fence flashing past) in the colours of the street she left, shifting to the colours of
+   houses with lit windows, and poles, trees and a fence flashing past) in the colors of the street she left, shifting to the colors of
    the one she is going to. Rain runs on the glass when it is raining. The ride lasts a little longer than it did (3.4 s). */
 (function(){
   const tr = townRide;

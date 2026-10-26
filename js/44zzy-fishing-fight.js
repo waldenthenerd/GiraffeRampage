@@ -5,7 +5,7 @@
                  button, Space or Enter to wind in; the fish pulls, and the line's tension (Fg.ten) climbs while she winds and while it pulls and falls when she lets go.
                  Over 1 for a third of a second and the line snaps; the fish (Fg.prog) comes in only while she winds. Rod and line give her room: a better rod
                  winds faster and a better line takes more strain. fishTick(dt) runs it (a test calls that by hand).
-   2 BEHAVIOUR   Each kind pulls in its own way (FISH_BEHAVE): steady, darting, long runs, deep dives, thrashing, or hardly at all (the boot).
+   2 BEHAVIOR   Each kind pulls in its own way (FISH_BEHAVE): steady, darting, long runs, deep dives, thrashing, or hardly at all (the boot).
    3 SOUND       Whoosh and splash on a cast, a thump on a bite, reel clicks that speed up, a warning when the line is near snapping, and a fanfare by rarity.
    5 CONDITIONS  Dawn and dusk, rain, storms, fog, midday and night change how fast they bite, how rare and how big (fishCond); the panel says so.
    6 SPOTS       Each day seven spots mark the sea (fishSpots, from the date): shoals, wrecks, reef edges and one hot spot. They shimmer on the water and show on the

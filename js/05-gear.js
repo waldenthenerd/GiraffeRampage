@@ -2,7 +2,7 @@
 /* Weapons, gear sets, ownership and equipping, trinkets, prize wheel, crates. */
 /* ========================= 30b. WEAPONS ========================= */
 /* Weapons replace the kick entirely. Each is a different rhythm rather than
-   just a bigger number: arc width, cadence, reach and on-hit behaviour all
+   just a bigger number: arc width, cadence, reach and on-hit behavior all
    change. `arcs` lets one swing land in several directions at once. */
 const DEFAULT_WEAPON = {
   id: 'hooves', name: 'Bare Hooves', color: '#FFE6A3',

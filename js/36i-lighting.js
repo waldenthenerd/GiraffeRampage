@@ -1,12 +1,12 @@
 'use strict';
-/* Lighting: per-chapter colour grade, the sun and soft shadows, light pools around bright things, sun shafts and caustics. */
+/* Lighting: per-chapter color grade, the sun and soft shadows, light pools around bright things, sun shafts and caustics. */
 /* ========================= LIGHTING ========================= */
 /* Everything here only reads game state. Settings.fxLevel: 0 turns it all off, 1 keeps the grade, soft shadows and light
    pools, 2 adds sun shafts, caustics and the extra glow passes.
    Light.update(dt, ch, S) runs from Atmos.update; Light.screen(...) runs from Atmos.draw; Light.pools(ctx) runs inside the
    world transform from render(); softShadow(...) replaces the flat black ellipses under creatures and scenery. */
 const GRADE = {
-  /* tint: soft-light colour laid over the whole frame; vig: tinted vignette; shadow: shadow colour; sun: where the light comes
+  /* tint: soft-light color laid over the whole frame; vig: tinted vignette; shadow: shadow color; sun: where the light comes
      from (radians, -PI/2 is straight up the screen); shafts / caustics: light bands; glow: how strongly bright things glow */
   1:  { tint: [255, 186, 104, 0.36], vig: [70, 30, 6, 0.22],   shadow: [34, 22, 10], sun: -2.35, shafts: [255, 238, 176, 0.075], glow: 0.7 },
   2:  { tint: [130, 190, 255, 0.36], vig: [8, 30, 62, 0.24],   shadow: [22, 40, 66], sun: -2.5,  shafts: [235, 246, 255, 0.05],  glow: 0.8 },
@@ -25,7 +25,7 @@ const GRADE = {
   15: { tint: [255, 224, 170, 0.20], vig: [10, 8, 24, 0.34],   shadow: [16, 12, 30], sun: -1.9,  glow: 1.0 }
 };
 
-/* things that give off light: colour, radius and where on the prop the light sits */
+/* things that give off light: color, radius and where on the prop the light sits */
 const PROP_LIGHT = {
   ct_lamp:      { r: 120, c: [255, 214, 140], a: 0.55, dy: -26 },
   sc_flood:     { r: 130, c: [220, 235, 255], a: 0.5,  dy: -16 },
@@ -39,7 +39,7 @@ const PROP_LIGHT = {
   a5_sign:      { r: 60,  c: [150, 255, 120], a: 0.4,  dy: -10 },
   mn_lander:    { r: 120, c: [255, 240, 200], a: 0.35, dy: -10 }
 };
-/* hurt zones glow in their own colour so they read from a distance */
+/* hurt zones glow in their own color so they read from a distance */
 const ZONE_LIGHT = { in_lavaseam: [255, 96, 28], vn_acid: [170, 235, 60] };
 
 const _colCache = {};
@@ -57,7 +57,7 @@ function colRGB(s){
   return (_colCache[s] = [r, g, b]);
 }
 
-/* a soft round light, white-hot in the middle, cached per (quantised) colour */
+/* a soft round light, white-hot in the middle, cached per (quantised) color */
 const _lightSprites = {};
 function lightSprite(rgb){
   const r = rgb[0] >> 4 << 4, g = rgb[1] >> 4 << 4, b = rgb[2] >> 4 << 4, k = (r >> 4 & 15) << 8 | (g >> 4 & 15) << 4 | (b >> 4 & 15);      /* a number, not text: this runs for every light on every frame */
@@ -125,7 +125,7 @@ const Light = {
   screen(ctx, cx, cy, ox, oy, S){
     if (!this.on) return;
     const W = G.W, H = G.H, g = this.g, fx = fxLevelNow(), t = G.time;
-    /* colour grade: soft-light keeps contrast and pushes the palette toward the chapter's mood */
+    /* color grade: soft-light keeps contrast and pushes the palette toward the chapter's mood */
     ctx.save();
     ctx.globalCompositeOperation = 'soft-light';
     ctx.fillStyle = 'rgba(' + g.tint[0] + ',' + g.tint[1] + ',' + g.tint[2] + ',' + (g.tint[3] * (g.k === undefined ? 0.82 : g.k)).toFixed(3) + ')';

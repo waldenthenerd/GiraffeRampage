@@ -1,6 +1,6 @@
 ﻿'use strict';
 /* Enemy art, Chapter 12: Area 51 camouflage and night-vision gear on top of the Marine drawing code (A51_ALIAS, a51Gear). */
-/* Chapter 12: Area 51's soldiers are drawn by the Marine drawing code, in the base's desert colours (they come from the creature's def), with a
+/* Chapter 12: Area 51's soldiers are drawn by the Marine drawing code, in the base's desert colors (they come from the creature's def), with a
    camouflage pattern and a green night-vision visor on the ones that wear a helmet. The Marine code calls a51Camo itself (when d.look starts with
    'a51_') so the camouflage sits under the arms, rifle and visor; a51Gear then adds the goggles on top. */
 const A51_ALIAS = { a51_guard: 'rifleman', a51_jumper: 'jumptrooper', a51_riot: 'riottrooper', a51_pod: 'droppod', a51_drone: 'attackdrone', a51_lancer: 'lancer',
@@ -9,7 +9,7 @@ const A51_ALIAS = { a51_guard: 'rifleman', a51_jumper: 'jumptrooper', a51_riot: 
 const A51_HELMETED = { rifleman: 1, jumptrooper: 1, riottrooper: 1, bladeguard: 1, lancer: 1, shocktrooper: 1, engineer: 1, medic: 1, siegebreaker: 1, shadowop: 1, breacher: 1, sergeant: 1, spotter: 1 };
 /* the marine drawing code scales each kit differently (s = e.r / this) */
 const A51_SCALE = { siegebreaker: 11, sergeant: 11, spotter: 12, shadowop: 8, breacher: 8 };
-/* camouflage blotches: [x, y, radius] in units of the patch ellipse, colour slot 0 mid / 1 dark / 2 sand, and their jagged outlines */
+/* camouflage blotches: [x, y, radius] in units of the patch ellipse, color slot 0 mid / 1 dark / 2 sand, and their jagged outlines */
 const A51_BLOTCH = [[-0.5, -0.46, 0.62, 0], [0.46, -0.52, 0.5, 1], [-0.08, 0.06, 0.46, 2], [0.62, 0.36, 0.5, 0], [-0.62, 0.46, 0.5, 1], [0.04, 0.74, 0.42, 2], [0.1, -0.88, 0.36, 1]];
 const A51_JIT = [1, 0.58, 0.9, 0.5, 1.1, 0.68];
 const A51_VERT = A51_BLOTCH.map((c, i) => A51_JIT.map((j, k) => { const a = k / 6 * TAU + i * 0.9, r = j * (0.8 + 0.3 * ((i * 5 + k * 3) % 4) / 3); return [Math.cos(a) * r * 1.25, Math.sin(a) * r]; }));

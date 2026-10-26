@@ -2,9 +2,9 @@
 /* =============================================================================================================================
    44zzm-home-trophies.js  --  HER HOME SHOWS WHAT SHE HAS DONE. Three new displays on the walls of her home, each painted into the cached
    room (homePaintBase wrapper) and refreshed when what they show changes (the room's signature wrapper):
-     DIPLOMAS    a framed one for every degree from the university (Bachelor, Master, Doctorate per faculty, in the faculty's colour; a
+     DIPLOMAS    a framed one for every degree from the university (Bachelor, Master, Doctorate per faculty, in the faculty's color; a
                  Doctorate has a gold seal), up to eight frames in two rows over the sofa side of the room
-     BOOKSHELF   a shelf of spines, one for each book she has read in the library (in the book's own colour), up to 24, with a stack of
+     BOOKSHELF   a shelf of spines, one for each book she has read in the library (in the book's own color), up to 24, with a stack of
                  notebooks once she has written facts down
      TROPHIES    a cabinet with a cup for every gym rank she has reached (bronze up to gold), and a mounted fish, a crab and a shell for what
                  she has caught at sea

@@ -23,7 +23,7 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   const metaTotal = function(){ let n = 0; keys(D().meta).forEach(function(k){ n += D().meta[k] | 0; }); return n; };
   const stars = function(){ let n = 0; const s = mini('stars'); keys(s).forEach(function(k){ n += s[k] | 0; }); return n; };
   const hats = function(){ const o = mini('own'); return ACC_ITEMS.filter(function(it){ return o && o[it.id]; }).length; };
-  const colours = function(){ let n = 0; for (let i = 1; i <= WARD_MAX; i++) if (wardUnlocked(i)) n++; return n; };
+  const colors = function(){ let n = 0; for (let i = 1; i <= WARD_MAX; i++) if (wardUnlocked(i)) n++; return n; };
   const films = function(){ return filmList().filter(function(f){ return f.un; }).length; };
   const friends = function(){ const b = tw('bond'); return keys(b).filter(function(k){ return (b[k] | 0) > 0; }).length; };
   const errands = function(){ const e = tw('err'); return keys(e).filter(function(k){ return (e[k] | 0) >= 2; }).length; };
@@ -85,8 +85,8 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   add('hats10', C, 'Hat Rack', 'Win 10 hats and boots', 10, 5, hats);
   add('hats40', C, 'Shoe Closet', 'Win 40 hats and boots', 40, 15, hats);
   add('stars20', C, 'Star Player', 'Earn 20 minigame stars', 20, 8, stars);
-  add('colours10', C, 'Colourful', 'Unlock 10 coat colours', 10, 5, colours);
-  add('colours30', C, 'Rainbow Coat', 'Unlock 30 coat colours', 30, 15, colours);
+  add('colours10', C, 'Colorful', 'Unlock 10 coat colors', 10, 5, colors);
+  add('colours30', C, 'Rainbow Coat', 'Unlock 30 coat colors', 30, 15, colors);
   add('photo1', C, 'Say Cheese', 'Keep a photo in the album', 1, 2, function(){ return keys(D().album).length; });
   add('photo24', C, 'Photographer', 'Keep 24 photos in the album', 24, 8, function(){ return keys(D().album).length; });
   add('photo48', C, 'Full Album', 'Fill the album with 48 photos', 48, 15, function(){ return keys(D().album).length; });
@@ -106,7 +106,7 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   add('oven3', W, 'Master Baker', 'Upgrade the oven all the way', 3, 6, function(){ return Math.min(3, tn('oven')); });
   add('sail1', W, 'All Aboard', 'Set sail', 1, 3, function(){ return tn('sails'); });
   add('sail25', W, 'Old Sea Dog', 'Set sail 25 times', 25, 10, function(){ return tn('sails'); });
-  add('boats4', W, 'Harbour Master', 'Own all four boats', 4, 12, function(){ return keys(tw('sea', 'own')).length; });
+  add('boats4', W, 'Harbor Master', 'Own all four boats', 4, 12, function(){ return keys(tw('sea', 'own')).length; });
   add('fish5', W, 'Angler', 'Catch 5 kinds of fish', 5, 6, function(){ return keys(tw('fish')).length; });
   add('fishAll', W, 'Master Angler', 'Catch every kind of fish', FISH.length, 15, function(){ return keys(tw('fish')).length; });
   add('rings20', W, 'Ring Master', 'Fly through 20 rings', 20, 6, function(){ return tn('rings'); });

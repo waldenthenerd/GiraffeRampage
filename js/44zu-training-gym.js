@@ -16,7 +16,7 @@
    Strength (attack), Stride (speed), Heavy Press (crit damage), Sharp Jab (crit chance), Stamina (health), Flexibility (kick reach),
    Grit (damage taken), Haste (attack speed), Mastery (all damage), Recovery (regeneration).
    RANK. The sum of all levels is the gym rank: Newcomer, Regular (Sweatband), Athlete (Trainers), Bruiser (Boxing Boots), Champion (Champion's
-   Laurel), Longneck Legend (the Gold Medal coat colour).
+   Laurel), Longneck Legend (the Gold Medal coat color).
    Saved in Save.data.town.gym = { pass, day, sk: { id: { l, xp } }, reps, spent, rk: { n: 1 } } (all optional, older saves load fine).
    Hooks: updateTown, townDrawPlayer, townDynamic, townDrawHud, townUse, townNearest, handleTownAction, townEnter, applyCityStats.
    ============================================================================================================================= */
@@ -97,7 +97,7 @@ function gymCheckRank(){
     if (!i || n < r.at || d.rk[i]) return; d.rk[i] = 1;
     let txt = 'Gym rank: ' + r.n + '!';
     if (r.acc) txt += '  ' + townPay({ acc: r.acc });
-    if (r.swatch){ townData().found[r.swatch] = 1; txt += '  New coat colour: Gold Medal'; Save.write(); }
+    if (r.swatch){ townData().found[r.swatch] = 1; txt += '  New coat color: Gold Medal'; Save.write(); }
     townToast(txt, '#FFE9A0'); SFX.transform();
   });
 }
@@ -456,7 +456,7 @@ function gymHud(ctx){
 function gymRankBar(){
   const r = gymRankIndex(), n = gymTotal(), cur = GYM_RANKS[r], nxt = GYM_RANKS[r + 1];
   const pct = nxt ? clamp((n - cur.at) / (nxt.at - cur.at), 0, 1) : 1;
-  return '<div class="gymrank"><div><span>GYM RANK</span><b>' + cur.n + '</b></div><div class="gr-bar"><i style="width:' + Math.round(pct * 100) + '%"></i></div><div class="gr-sub">' + n + ' levels trained' + (nxt ? '  ·  next: <em>' + nxt.n + '</em> at ' + nxt.at + (nxt.acc ? ' (' + ACC_BY_ID[nxt.acc].name + ')' : nxt.swatch ? ' (Gold Medal coat colour)' : '') : '  ·  the top') + '</div></div>';
+  return '<div class="gymrank"><div><span>GYM RANK</span><b>' + cur.n + '</b></div><div class="gr-bar"><i style="width:' + Math.round(pct * 100) + '%"></i></div><div class="gr-sub">' + n + ' levels trained' + (nxt ? '  ·  next: <em>' + nxt.n + '</em> at ' + nxt.at + (nxt.acc ? ' (' + ACC_BY_ID[nxt.acc].name + ')' : nxt.swatch ? ' (Gold Medal coat color)' : '') : '  ·  the top') + '</div></div>';
 }
 function townShowGymDesk(){
   const gold = goldInt(Save.data.gold), cur = gymTier();
@@ -491,6 +491,6 @@ function townShowGymBoard(){
 /* ---- the guide ---- */
 (function(){
   const t = GUIDE_TOPICS.find(function(x){ return x.id === 'town'; });
-  if (t){ const base = t.html; t.html = function(){ return base().replace('</ul>', '<li><b>Longneck Fitness</b>, the big building at the end of Market Street. Buy a <b>day pass</b> at the desk (it lasts until midnight; there are five tiers, each opening after a chapter) and use the machines: ten of them, each trains one skill. A set is eight reps, and every rep is a timing game. Skill levels give permanent bonuses in a run (attack, speed, crits, health, reach and more), with bigger ones at levels 5, 10 and 15. Your total levels make your <b>gym rank</b>, which pays out hats, boots and a coat colour.</li></ul>'); }; }
+  if (t){ const base = t.html; t.html = function(){ return base().replace('</ul>', '<li><b>Longneck Fitness</b>, the big building at the end of Market Street. Buy a <b>day pass</b> at the desk (it lasts until midnight; there are five tiers, each opening after a chapter) and use the machines: ten of them, each trains one skill. A set is eight reps, and every rep is a timing game. Skill levels give permanent bonuses in a run (attack, speed, crits, health, reach and more), with bigger ones at levels 5, 10 and 15. Your total levels make your <b>gym rank</b>, which pays out hats, boots and a coat color.</li></ul>'); }; }
   Object.assign(TOWN_SPECIAL_SRC, { sweatband: 'Earned at the gym: reach the Regular rank.', trainers: 'Earned at the gym: reach the Athlete rank.', boxboots: 'Earned at the gym: reach the Bruiser rank.', laurel: 'Earned at the gym: reach the Champion rank.', gym_gold: 'Earned at the gym: reach the Longneck Legend rank.' });
 })();

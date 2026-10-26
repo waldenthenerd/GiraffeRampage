@@ -1,7 +1,7 @@
 'use strict';
 /* =============================================================================================================================
    41b-trinket-page.js  --  THE TRINKETS, ON THE GEAR PAGE. They used to be a column of plain text cards with a ten-pixel icon. Now each trinket
-   is a framed tile with a big icon in its own colour (unfound ones are dark silhouettes), a tap wears or removes it on the spot (no page redraw,
+   is a framed tile with a big icon in its own color (unfound ones are dark silhouettes), a tap wears or removes it on the spot (no page redraw,
    a small pop and a sound), and a panel beside the tiles (a window of fixed size, like the gear one) says what the trinket does in numbers.
    The numbers are not typed in: they come from running recalcStats() with and without the trinket (trinketStats), so they are always what the game
    really does, including Red Rampage's boost to whatever gear she wears and the Lime Helmet's cut to damage taken. Pointing at a tile (or tapping it)

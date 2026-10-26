@@ -26,15 +26,15 @@ const MARS_UP = [
     desc: 'A field of solar panels, wired to the habitat. While it is connected every machine works 50% faster.' },
   { id: 'condenser', grp: 'Machines', icon: '@t-flask-2', name: 'Argon Condenser', cost: { i: 120, s: 80, b: 80, a: 40 }, req: ['collector', 'gen'],
     desc: 'A tall condenser that makes argon on its own while you scout, on a wire of its own.' },
-  { id: 'shield', grp: 'Machines', icon: '@t-x-cable', name: 'Armoured Cabling', cost: { i: 60, s: 40, b: 40 }, req: ['drill'],
-    desc: 'Every wire is armoured: mice take twice as long to chew through it and Marines twice as long to cut it.' },
+  { id: 'shield', grp: 'Machines', icon: '@t-x-cable', name: 'Armored Cabling', cost: { i: 60, s: 40, b: 40 }, req: ['drill'],
+    desc: 'Every wire is armored: mice take twice as long to chew through it and Marines twice as long to cut it.' },
   { id: 'mforge', grp: 'Trinkets', icon: '@t-x-anvil', name: 'Mars Forge', cost: { i: 60, s: 40, b: 40 }, req: ['mh1'],
     desc: 'A forge beside the base, running on Martian iron. Unlocks the trinkets below.' },
   { id: 't_gauntlet', grp: 'Trinkets', trinket: 'irongauntlet', cost: { i: 80, s: 20, b: 40 }, req: ['mforge'] },
   { id: 't_lamp', grp: 'Trinkets', trinket: 'argonlamp', cost: { i: 60, s: 30, b: 30, a: 40 }, req: ['mforge', 'collector'] },
   { id: 't_veil', grp: 'Trinkets', trinket: 'dustveil', cost: { i: 120, s: 60, b: 60, a: 60 }, req: ['t_gauntlet', 't_lamp', 'mh2'] },
   { id: 'rover2', grp: 'Vehicle', icon: '@t-x-rover', name: 'Rover Mk II', cost: { i: 200, s: 100, b: 120, a: 50 }, req: ['mh2'], venus: 'rover',
-    desc: 'An upgrade for the Makeshift Rover, built on Mars: about 25% faster, a much longer battery that recharges quicker, 70% more armour in every chapter, and it pulls pickups in from further away.' },
+    desc: 'An upgrade for the Makeshift Rover, built on Mars: about 25% faster, a much longer battery that recharges quicker, 70% more armor in every chapter, and it pulls pickups in from further away.' },
   { id: 'm_card', grp: 'Gear', icon: '@t-wind', name: 'Dust Devils (card)', cost: { i: 150, s: 80, b: 80, a: 40 }, req: ['mforge'],
     desc: 'Adds the epic card Dust Devils to the cards you can be offered in a run: whirlwinds of red sand that hunt the nearest enemy, grinding it down and slowing it.' }
 ];

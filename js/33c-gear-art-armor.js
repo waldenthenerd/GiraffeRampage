@@ -3,7 +3,7 @@
    33c-gear-art-armor.js  --  THE ARMOR PASS. The sixteen armors in ARMOR_DESIGNS (33-giraffe-art.js) were checked at three times their size;
    four were weak (the Herdhide Vest was a smudge, the Tideshell and Riptide plates thin, the Twinsoul harness a plain cross) and are redrawn
    here (ARMOR_REDRAW). Every armor also gets what its piece is worth: a glint by rarity (rare: a faint rim, epic: pulsing sparkles,
-   legendary: motes circling it, mythical: a ring of shifting colours) and one gold pip per level above the first. The original functions stay in place and are wrapped, so
+   legendary: motes circling it, mythical: a ring of shifting colors) and one gold pip per level above the first. The original functions stay in place and are wrapped, so
    drawPlayer() is untouched; armorDraw() is the single entry point (the Gear page icons and the preview use it too).
    P.armorLevel is kept up to date by 33a-gear-art-capes.js.
    ============================================================================================================================= */

@@ -3,12 +3,12 @@
 /* ======================== Chapter 4: the open ocean ======================== */
 /* One shared sea palette keeps the whole chapter in one world: a cool white highlight (OC4_FOAM),
    a deep navy shadow (OC4_ABYSS), a single teal accent for the few glowing things (OC4_TEAL) and an
-   amber eye iris. Every body is built from the definition colours b / dk (so hit-flashes still work)
+   amber eye iris. Every body is built from the definition colors b / dk (so hit-flashes still work)
    as: base, shade, highlight, plus a light rim wherever the creature is dark against the deep ground. */
 const OC4_ABYSS = '#06141F', OC4_FOAM = '#D6F0FF', OC4_TEAL = '#7FF0DC', OC4_AMBER = '#E8B64A';
 function oc4_dk(c, a){ return blendHex(c, OC4_ABYSS, a); }
 function oc4_lt(c, a){ return blendHex(c, OC4_FOAM, a); }
-/* a round eye: dark socket, coloured iris, pupil, one tiny glint */
+/* a round eye: dark socket, colored iris, pupil, one tiny glint */
 function oc4_eye(ctx, x, y, r, iris){
   fillCircle(ctx, x, y, r, '#060B10');
   fillCircle(ctx, x + r * 0.12, y, r * 0.68, iris || OC4_AMBER);
@@ -117,7 +117,7 @@ const OCEAN_DRAW = {
       lkTRI(ctx, -2, bob + s * 14.5, -9, bob + s * (22 + fl), -6, bob + s * 14.5, tip);
       lkLN(ctx, [4, bob + s * 8, -6, bob + s * 18], 0.7, back);
     }
-    /* body: pale rim, grey flank, dark back */
+    /* body: pale rim, gray flank, dark back */
     lkOV(ctx, -2, bob, 28.5, 10.4, lit);
     lkOV(ctx, -2, bob, 28, 9.2, b);
     lkOV(ctx, -3, bob, 24, 5.2, back);
@@ -244,7 +244,7 @@ const OCEAN_DRAW = {
       lkTRI(ctx, 7, bob + s * 5, -3, bob + s * (13 + fl), 1, bob + s * 4.6, b);
       lkTRI(ctx, -1.4, bob + s * 9.6, -3, bob + s * (13 + fl), 0.2, bob + s * 8, tip);
     }
-    /* body: pale belly rim, grey flank, dark cape */
+    /* body: pale belly rim, gray flank, dark cape */
     lkOV(ctx, -1, bob + sw * 0.2, 17.4, 6.7, belly);
     lkOV(ctx, -1, bob + sw * 0.2, 17, 5.9, mid);
     lkOV(ctx, -2, bob + sw * 0.1, 14.5, 3.7, back);
@@ -361,7 +361,7 @@ const OCEAN_DRAW = {
       ctx.moveTo(x - 7 + st + 0.8, bob + s * 20); ctx.arc(x - 7 + st, bob + s * 20, 0.8, 0, TAU);
     }
     ctx.fill();
-    /* the big claws: jointed arm, armoured palm, open serrated pincers that snap */
+    /* the big claws: jointed arm, armored palm, open serrated pincers that snap */
     for (let s = -1; s <= 1; s += 2){
       const sn = snap * 1.4 * s;
       ctx.strokeStyle = leg; ctx.lineWidth = 3.6;
@@ -484,7 +484,7 @@ const OCEAN_DRAW = {
       lkTRI(ctx, 1, bob + s * 12.6, -10, bob + s * (36 + fl), -4, bob + s * 21, mid);
       lkLN(ctx, [9, bob + s * 13, -6, bob + s * 30, 2, bob + s * 14, -3, bob + s * 24], 0.8, back);
     }
-    /* body: pale belly edge, grey flank, dark back, centre ridge */
+    /* body: pale belly edge, gray flank, dark back, center ridge */
     lkOV(ctx, -4, bob + sw * 0.15, 44.6, 16.6, belly);
     lkOV(ctx, -4, bob + sw * 0.15, 44, 15, b);
     lkOV(ctx, -6, bob + sw * 0.1, 36, 8.6, back);
@@ -587,7 +587,7 @@ const OCEAN_DRAW = {
     lkOV(ctx, -3.6, bob + sw * 0.15, 43.2, 15.9, b);
     oc4_rim(ctx, -4, bob + sw * 0.15, 44.4, 18.4, gloss, 0.35, 1.2);
     ctx.globalAlpha = 0.5; lkOV(ctx, -4, bob, 38, 11, sheen); ctx.globalAlpha = 0.5; lkOV(ctx, -6, bob, 32, 5.6, gloss); ctx.globalAlpha = 1;
-    /* grey saddle patch and the towering dorsal fin, edge-on */
+    /* gray saddle patch and the towering dorsal fin, edge-on */
     lkOV(ctx, -10, bob, 12, 11, saddle);
     ctx.globalAlpha = 0.5; lkOV(ctx, -12, bob, 8, 7, oc4_lt(saddle, 0.3)); ctx.globalAlpha = 1;
     lkTRI(ctx, -14, bob - 4.2, 15, bob, -14, bob + 4.2, '#0A0C0E');

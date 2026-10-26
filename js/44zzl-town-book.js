@@ -3,15 +3,15 @@
    44zzl-town-book.js  --  THE COLLECTION BOOK and the BETTER TRAM MAP.
 
    THE COLLECTION BOOK (townShowBook; a "Book" tab in the journal, and a button on the town menu): one page for everything she can collect or
-   finish. A table with a row for every district that has things to find (coins, stars, gems, hats, boots, colours, tracks, each "found of
-   all"), then a card with a bar for each of: hats and boots, coat colours, photos in the album, errands, friends, creatures met, minigame
+   finish. A table with a row for every district that has things to find (coins, stars, gems, hats, boots, colors, tracks, each "found of
+   all"), then a card with a bar for each of: hats and boots, coat colors, photos in the album, errands, friends, creatures met, minigame
    stars, the gym (levels trained), and the university (levels, degrees and notebook entries). A district whose row is complete is marked.
    THE MAP (townShowMap wrapper): each stop on the tram line shows who is there right now (townNpcNow, from 44zzk), which of them has an errand
    waiting, and how many things are still to find; below it is "Who is where" for every giraffe with what each is doing, and the places
    off the tram line (the Runway, the farm, the isle, the university) with their finds.
    ============================================================================================================================= */
 (function(){
-  const TYPES = [['coin', 'Coins'], ['star', 'Stars'], ['gem', 'Gems'], ['hat', 'Hats'], ['boot', 'Boots'], ['swatch', 'Colours'], ['track', 'Tracks']];
+  const TYPES = [['coin', 'Coins'], ['star', 'Stars'], ['gem', 'Gems'], ['hat', 'Hats'], ['boot', 'Boots'], ['swatch', 'Colors'], ['track', 'Tracks']];
   const OFF_TRAM = ['runway', 'farm', 'isle', 'campus'];
   const safe = function(f, d){ try { return f(); } catch (e) { return d; } };
   const bar = function(a, m){ return '<span class="cb-bar"><i style="width:' + Math.round(100 * Math.min(1, a / Math.max(1, m))) + '%"></i></span>'; };
@@ -29,7 +29,7 @@
   function cards(){
     const c = [], md = safe(function(){ return miniData(); }, null);
     c.push(['Hats and boots', safe(accOwnedCount, 0), safe(function(){ return ACC_ITEMS.length; }, 0), 'worn on her head and feet']);
-    c.push(['Coat colours', safe(function(){ return WARD_TOWN.filter(function(w){ return townFound(w[2]); }).length; }, 0), safe(function(){ return WARD_TOWN.length; }, 0), 'found around town and earned']);
+    c.push(['Coat colors', safe(function(){ return WARD_TOWN.filter(function(w){ return townFound(w[2]); }).length; }, 0), safe(function(){ return WARD_TOWN.length; }, 0), 'found around town and earned']);
     c.push(['Photos', safe(function(){ return photoAlbum().length; }, 0), safe(function(){ return PHOTO_ALBUM_MAX; }, 0), 'in the album']);
     c.push(['Errands', safe(function(){ return TOWN_ERRANDS.filter(function(e){ return townErrState(e.id) === 2; }).length; }, 0), TOWN_ERRANDS.length, 'finished for the herd']);
     c.push(['Friends', safe(function(){ return TOWN_NPC_LIST.filter(function(i){ return townBondLevel(i) >= 3; }).length; }, 0), TOWN_NPC_LIST.length, 'best friends (gifts raise it)']);
@@ -111,7 +111,7 @@
         h += '<div class="who"><b>' + D.name + '</b><span>' + (open ? got + ' of ' + all + ' found' : 'opens after: ' + D.need) + '</span></div>'; });
       h += '</div>';
     }
-    h += '<p class="tnote">The coloured dots are giraffes; a ringed one has an errand for you.</p></div>';
+    h += '<p class="tnote">The colored dots are giraffes; a ringed one has an errand for you.</p></div>';
     const foot = panel.querySelector('.tp-foot'); const div = document.createElement('div'); div.innerHTML = h; panel.insertBefore(div.firstChild, foot);
   };
 })();

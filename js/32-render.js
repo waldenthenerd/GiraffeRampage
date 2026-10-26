@@ -427,7 +427,7 @@ function drawGroundJungle(ctx, cx, cy, vw, vh){
         fillCircle(ctx, d.x - 10 * d.s, d.y + 6 * d.s, 2.2 * d.s, '#F26A3A');
       }
     } else {
-      /* a fern: fronds radiating from the centre, each with little leaflets */
+      /* a fern: fronds radiating from the center, each with little leaflets */
       const sway = Math.sin(G.time * 1.1 + d.rot) * 0.08;
       ctx.strokeStyle = '#4E9A32'; ctx.lineWidth = 1.3;
       for (let k = 0; k < 5; k++){

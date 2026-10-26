@@ -13,7 +13,7 @@
        so the pictures (16 per turn) repeat without a jump;
      - it must look the same at another G.time, so it does not depend on the clock.
    Anything that fails any of those is left on the live path for good (and EnemySprite.report() says why). Also never cached:
-   bosses (e.big), a creature that is flashing from a hit (the white flash is blended into its colours), and portraits.
+   bosses (e.big), a creature that is flashing from a hit (the white flash is blended into its colors), and portraits.
    The key is: chapter, effects level, state, size (to 0.5) and the screen scale, so nothing stale is ever drawn after a change.
    The picture is cropped to what was actually drawn. If a drawing touches the edge of its box it is not cached. The total is
    capped (SPRITE_BUDGET pixels); when it is reached the cache is emptied and refills as needed. */
@@ -47,7 +47,7 @@ const EnemySprite = (function(){
     const cv = document.createElement('canvas'); cv.width = cv.height = size;
     return guarded(cv);
   }
-  /* run the drawing once into context c (size x size px, the creature at its centre) at animation phase anim; returns what happened */
+  /* run the drawing once into context c (size x size px, the creature at its center) at animation phase anim; returns what happened */
   function paint(c, def, type, state, r, anim, sc, size, spy, cols){
     c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, size, size);
     c.setTransform(sc, 0, 0, sc, size / 2, size / 2);
@@ -139,7 +139,7 @@ const EnemySprite = (function(){
       sk.gen = gen; sk.ch = chn; sk.fx = fxv; sk.ty = e.type; sk.st = e.state; sk.rq = rq; sk.sc = sc; sk.ent = ent;
     }
     if (!ent.ok){ stats.live++; stats.liveBy.kind++; return false; }
-    /* a creature that is flashing from a hit has its colours blended toward white (the player's Hit flash setting); that is a second,
+    /* a creature that is flashing from a hit has its colors blended toward white (the player's Hit flash setting); that is a second,
        coarser set of pictures (8 per loop; the flash is over in a fraction of a second) */
     const hf = e.flash > 0 ? Settings.hitFlash : 0;
     const span = TAU * ent.k, ph = ((e.anim % span) + span) % span;

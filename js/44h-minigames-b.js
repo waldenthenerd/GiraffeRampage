@@ -302,13 +302,13 @@ function hgGeom(m, g){ const ts = Math.min((g.W - 150 * g.s) / m.cols, (g.H - 13
 
 /* ---- 13. Sandworm escape (Mars) ---- */
 registerMini({
-  ch: 13, id: 'worm', name: 'Sandworm Escape', unit: 'metres', dur: 40, goal: 0,
+  ch: 13, id: 'worm', name: 'Sandworm Escape', unit: 'meters', dur: 40, goal: 0,
   blurb: 'Something huge is following the vibrations across the dunes.\nKeep running. Rocks slow her down, and water flasks give her a burst of speed.',
   hint: 'Steer with WASD or the arrow keys, or hold the mouse button toward the pointer.\nKeep the worm\u2019s distance bar from running out.',
   touchHint: 'Drag your finger: she runs toward it.\nKeep the worm\u2019s distance bar from running out.',
   goalText: 'Goal: stay ahead of the worm for 40 seconds',
   win: function(m){ return !m.dead; },
-  hudText: function(m){ return Math.floor(m.dist / 10) + ' metres'; },
+  hudText: function(m){ return Math.floor(m.dist / 10) + ' meters'; },
   init: function(m, g){
     m.p = { x: g.W / 2, y: g.H * 0.64, ph: 0 }; m.rocks = []; m.fl = []; m.gap = 70; m.dist = 0; m.boost = 0; m.slow = 0; m.inv = 0; m.nr = 0.2; m.nf = 2.5; m.dead = false; m.rip = [];
   },

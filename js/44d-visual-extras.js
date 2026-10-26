@@ -1,5 +1,5 @@
 'use strict';
-/* A second visual pass: more scenery for Chapters 1 and 2, ground that remembers, elite and varied creatures, time-of-day colour,
+/* A second visual pass: more scenery for Chapters 1 and 2, ground that remembers, elite and varied creatures, time-of-day color,
    heat haze, biome screen edges and an iris at chapter changes, a map of the run on the death screen, and animated bestiary portraits. */
 /* ========================= 44d. VISUAL EXTRAS ========================= */
 /* Loaded after the files it extends (it wraps functions that live in 03, 08, 35h, 36i, 36l, 42 and 44), so everything here is
@@ -10,7 +10,7 @@
   const S1 = SCEN_DEFS[1], S2 = SCEN_DEFS[2];
   if (S1){
     S1.props.push(
-      { id: 'sv_flowers', count: 38, r: 14, gap: 36, s: [0.8, 1.3], draw: function(ctx, p, t){      /* wildflowers: small spots of colour */
+      { id: 'sv_flowers', count: 38, r: 14, gap: 36, s: [0.8, 1.3], draw: function(ctx, p, t){      /* wildflowers: small spots of color */
           const cols = ['#E8A33C', '#D9534A', '#B98AE0', '#F2E27A'], c1 = cols[(p.seed * 4) | 0], c2 = cols[((p.seed * 4) | 0) + 1 & 3], sw = scSway(t, p, 1.6);
           ctx.lineCap = 'round'; ctx.lineWidth = 1.2; ctx.strokeStyle = '#6F7F3A';
           for (let i = 0; i < 5; i++){ const x = -9 + i * 4.4, h = 7 + scRnd(p.seed, i) * 8;
@@ -145,7 +145,7 @@
   }
 })();
 
-/* ---------- 5. time of day in more chapters, and a colour for each part of it ---------- */
+/* ---------- 5. time of day in more chapters, and a color for each part of it ---------- */
 ATMOS[5].cycle = true; ATMOS[7].cycle = true; ATMOS[13].cycle = true;       /* the canopy, the space center and Mars now run dawn to night too */
 WX_TOD[5] = ['fireflies', 0.55]; WX_TOD[7] = ['stars', 0.55]; WX_TOD[13] = ['stars', 0.6];
 /* [fraction of the chapter, r, g, b, strength]: dawn is rose, midday is clear, the afternoon is gold, dusk is violet, night is deep blue */

@@ -8,7 +8,7 @@
   const pad = function(){ return !!Input.padUsed; };
   const reelKey = function(){ return Input.hasTouch ? 'the <b>Reel</b> button' : pad() ? '<b>A</b>' : 'the <b>Reel</b> button, <b>Space</b> or <b>Enter</b>'; };
   place({ id: 'fishing', title: 'Fishing', show: function(){ const t = Save.data && Save.data.town; return !!(t && ((t.vis && t.vis.harbour) || (t.fish && Object.keys(t.fish).length))); }, html: function(){
-    return '<p>Fish from the end of the pier in the Harbour, or from your own boat at sea. There are <b>' + FISH.length + ' kinds</b>, kept in the <b>Fish book</b> with the biggest you have landed.</p><ul class="helplist">' +
+    return '<p>Fish from the end of the pier in the Harbor, or from your own boat at sea. There are <b>' + FISH.length + ' kinds</b>, kept in the <b>Fish book</b> with the biggest you have landed.</p><ul class="helplist">' +
       '<li><b>Cast</b> and wait for the float to dip. At sea, slow the boat to a stop and press <b>' + (Input.hasTouch ? 'the Cast button' : pad() ? 'A' : keyName(keyOf('cast'))) + '</b>.</li>' +
       '<li><b>Hook it:</b> when the marker is in the green, press Reel. Then it is a fight: <b>hold</b> ' + reelKey() + ' to wind in. The Line bar fills while you wind and while the fish pulls, and empties when you let go. <b>Let go before it reaches the red end</b> or the line snaps. Keep it out of the red and the catch pays a quarter more and leaves an extra scale.</li>' +
       '<li>Every kind fights in its own way: some dart, some make long runs, some dive, and the boot hardly fights at all.</li>' +

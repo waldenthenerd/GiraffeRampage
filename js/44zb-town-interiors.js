@@ -96,7 +96,7 @@ const TOWN_ROOM_PARENT = { in_tailor: 'square', in_hall: 'square', in_house1: 's
   { id: 'ba_c1', d: 'market', in: 'in_bakery', t: 'coin', x: 330, h: 90, note: 'in a flour sack in the bakery' },
   { id: 'li_c1', d: 'market', in: 'in_library', t: 'coin', x: 700, h: 170, note: 'on a high shelf in the library' },
   { id: 'li_g1', d: 'market', in: 'in_library', t: 'gem', x: 1000, h: 275, note: 'on the very top shelf of the library' },
-  { id: 'ga_c1', d: 'market', in: 'in_garage', t: 'coin', x: 1120, h: 60, note: 'in a stack of tyres in the garage' },
+  { id: 'ga_c1', d: 'market', in: 'in_garage', t: 'coin', x: 1120, h: 60, note: 'in a stack of tires in the garage' },
   { id: 'pk_c4', d: 'park', t: 'coin', x: 2480, h: 150, note: 'on the roof of the bandstand' },
   { id: 'pk_c5', d: 'park', t: 'coin', x: 2830, h: 262, note: 'at the top of the big wheel' },
   { id: 'pk_s2', d: 'park', t: 'star', x: 2960, h: 190, note: 'over the flowerbed by the cottage' },
@@ -134,12 +134,12 @@ Object.assign(TOWN_DIST.in_bakery, {}); /* the rooms already list their people *
 TOWN_ERRANDS.push(
   { id: 'cr1', npc: 'crumb', title: 'Daily bread', offer: "Buy three loaves from me. It's good for you and it's good for the bakery.", done: "Three loaves in your pockets. You'll thank me in a run.", need: { k: 'stat', key: 'bought', n: 3 }, r: { coin: 2 } },
   { id: 'cr2', npc: 'crumb', title: 'Breadwinner', offer: "Eat five loaves in your runs. It's what they're for.", done: "Five! They did their job.", need: { k: 'stat', key: 'eaten', n: 5 }, r: { gems: 25 } },
-  { id: 'tq1', npc: 'torque', title: 'Kick the tyres', offer: "Come in and see the showroom car. Just look.", done: "Every customer kicks the tyres. Respect.", need: { k: 'visit', ids: ['in_garage'] }, r: { coin: 2 } },
+  { id: 'tq1', npc: 'torque', title: 'Kick the tires', offer: "Come in and see the showroom car. Just look.", done: "Every customer kicks the tires. Respect.", need: { k: 'visit', ids: ['in_garage'] }, r: { coin: 2 } },
   { id: 'tq2', npc: 'torque', title: 'Test drive', offer: "Own a car. Then drive it around town. Houston, too.", done: "She drives like she was built for it.", need: { k: 'car' }, r: { gems: 30 } },
   { id: 'dw1', npc: 'dewey', title: 'Quiet please', offer: "Come and sit in the library, and just be quiet for a while.", done: "Ah. Perfect.", need: { k: 'visit', ids: ['in_library'] }, r: { coin: 2 } },
   { id: 'dw2', npc: 'dewey', title: 'Bookworm', offer: "Discover twenty creatures in the Bestiary. Then you'll have read the best book there is.", done: "Twenty entries. A scholar.", need: { k: 'bestiary', n: 20 }, r: { gems: 30 } },
   { id: 'gh1', npc: 'granny', title: 'Tea and biscuits', offer: "Say hello to Penny and Crumb for me. They never visit.", done: "They're good children. Here, take this.", need: { k: 'talk', ids: ['penny', 'crumb'] }, r: { coin: 3 } },
-  { id: 'mm1', npc: 'mim', title: 'Nightlight', offer: "Come to the cottage after dark. It's cosy at night.", done: "See? Cosy.", need: { k: 'night', d: 'in_house2' }, r: { gems: 20 } }
+  { id: 'mm1', npc: 'mim', title: 'Nightlight', offer: "Come to the cottage after dark. It's cozy at night.", done: "See? Cozy.", need: { k: 'night', d: 'in_house2' }, r: { gems: 20 } }
 );
 TOWN_ERRANDS.forEach(function(e){ TOWN_ERR_BY_ID[e.id] = e; });
 (function(){
@@ -460,7 +460,7 @@ function townBuildingX(c, D, b, P, r){
 }
 
 /* ---- one best-friend gift each ---- */
-/* Sixteen people, sixteen different things: a hat, boots or a colour that nobody else gives and that is not on the wheel. */
+/* Sixteen people, sixteen different things: a hat, boots or a color that nobody else gives and that is not on the wheel. */
 const TOWN_GIFT_OF = {
   mayor: { acc: 'bicorne' }, tilly: { acc: 'bow' }, rio: { acc: 'visor' }, nova: { acc: 'nightcap' }, granny: { acc: 'bonnet' }, dewey: { acc: 'mortarboard' }, torque: { acc: 'welder' }, skye: { acc: 'antennahat' },
   gus: { acc: 'hightops' }, marina: { acc: 'waders' }, crumb: { acc: 'clogs' }, ossi: { acc: 'felt' },
@@ -469,9 +469,9 @@ const TOWN_GIFT_OF = {
 Object.keys(TOWN_GIFT_OF).forEach(function(id){ if (TOWN_NPCS[id]) TOWN_NPCS[id].gift = TOWN_GIFT_OF[id]; });
 function townGiftName(id){
   const g = TOWN_GIFT_OF[id]; if (!g) return 'a surprise';
-  return g.acc ? ACC_BY_ID[g.acc].name : 'the colour ' + WARD[g.colour].name;
+  return g.acc ? ACC_BY_ID[g.acc].name : 'the color ' + WARD[g.colour].name;
 }
-/* hand it over (only once: a colour is a flag, a hat or boots go to her wardrobe); returns what to say */
+/* hand it over (only once: a color is a flag, a hat or boots go to her wardrobe); returns what to say */
 function townGrantGift(id){
   const g = TOWN_GIFT_OF[id], t = townData(); if (!g) return '';
   if (g.acc){ if (!accOwned(g.acc)){ const pz = { item: ACC_BY_ID[g.acc] }; miniAward(pz); } }

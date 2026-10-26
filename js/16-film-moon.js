@@ -349,7 +349,7 @@ function csLimb(ctx, x0, y0, x1, y1, kx, ky, w0, w1, col){
 }
 function csGiraffe(ctx, g){
   const s = g.s || 1, face = g.face || 1, walk = g.walk || 0, crouch = g.crouch || 0, tuck = g.tuck || 0;
-  const cu = typeof giraffeCustom === 'function' ? giraffeCustom() : null, pt = typeof giraffePattern === 'function' ? giraffePattern() : 0;      /* her chosen colours and spots (js/44e-wardrobe.js) */
+  const cu = typeof giraffeCustom === 'function' ? giraffeCustom() : null, pt = typeof giraffePattern === 'function' ? giraffePattern() : 0;      /* her chosen colors and spots (js/44e-wardrobe.js) */
   const coat = g.coat || (cu ? cu.coat : '#D6A44F'), dark = g.darkc || (cu ? cu.dark : '#B98A3C'), spot = g.spotc || (cu ? cu.spot : '#8A5A24');
   ctx.save(); ctx.translate(g.x, g.y); ctx.scale(face * s, s);
   const geo = csGiraffeGeom(g);
@@ -421,7 +421,7 @@ function csGiraffe(ctx, g){
 /* where the head is, on screen, so a window can be framed around it */
 function csGiraffeHead(g){
   const geo = csGiraffeGeom(g), s = g.s || 1, face = g.face || 1;
-  return { x: g.x + face * (geo.tx + geo.dx * 9) * s, y: g.y + (geo.ty + geo.dy * 9) * s };   /* the helmet's centre, exactly as csGiraffe draws it */
+  return { x: g.x + face * (geo.tx + geo.dx * 9) * s, y: g.y + (geo.ty + geo.dy * 9) * s };   /* the helmet's center, exactly as csGiraffe draws it */
 }
 
 /* ---------- shared overlays ---------- */
@@ -602,7 +602,7 @@ function csSceneAscent(ctx, u, t){
     ctx.save(); ctx.translate(o.x, -st[0] - h / 2 + o.y); ctx.rotate(o.r); ctx.translate(0, h / 2);
     csFlame(ctx, 0, -26, 96 * csBump(u, CB.les, CB.les + 2.2, 0.15), 11, 'kero', t, false); ctx.restore();
   }
-  const mq = csBump(u, 6.0, 9.4, 0.9);                                              /* the vapour cone at maximum dynamic pressure */
+  const mq = csBump(u, 6.0, 9.4, 0.9);                                              /* the vapor cone at maximum dynamic pressure */
   if (mq > 0.01){
     ctx.globalAlpha = 0.6 * mq; ctx.fillStyle = '#FFFFFF';
     ctx.beginPath(); ctx.moveTo(-6, -352); ctx.lineTo(-52, -270); ctx.lineTo(52, -270); ctx.lineTo(6, -352); ctx.closePath(); ctx.fill();
@@ -679,7 +679,7 @@ function csSurfaceSky(ctx, t){
   csStars(ctx, 0.9, t, 0, 0);
   csEarth(ctx, 1010, 150, 58, t * 0.02, t);
 }
-/* Hc: the camera's height above the ground in metres, camx: its sideways position */
+/* Hc: the camera's height above the ground in meters, camx: its sideways position */
 function csMoonGround(ctx, Hc, camx){
   const g = ctx.createLinearGradient(0, CS_HZ, 0, CS_H); g.addColorStop(0, '#5C5A56'); g.addColorStop(0.3, '#8C8A84'); g.addColorStop(1, '#B6B4AD');
   ctx.fillStyle = g; ctx.fillRect(-2600, CS_HZ, CS_W + 5200, 2600);

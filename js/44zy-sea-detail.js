@@ -1,8 +1,8 @@
 /* ==========================================================================================================================
    44zy-sea-detail.js  --  The open sea, seen from above: the small parts.
-   Pure drawing. 44zq-sea.js paints the terrain as a colour field with a few vector shapes on top, and the boats, docks, village and
+   Pure drawing. 44zq-sea.js paints the terrain as a color field with a few vector shapes on top, and the boats, docks, village and
    lighthouse as plain blocks. This file wraps seaDrawTerrain, seaDrawFeatures and seaDrawBoat and adds: sparkle and swell on the water,
-   starfish and shells on the shallows and sand, driftwood, crabs, bushes and flowers on the grass, trees in several colours with palms
+   starfish and shells on the shallows and sand, driftwood, crabs, bushes and flowers on the grass, trees in several colors with palms
    near the beach, faceted rocks, coral and fish on the reefs; plank nails, piles, bollards, crates and lanterns on the docks; tiles,
    chimneys and gardens on the village roofs; a sweeping beam on the lighthouse; staves and glints on the loot; and for each boat its
    planking, rails, windows, lights and a bow wave.

@@ -3,7 +3,7 @@
    33e-gear-art-more.js  --  THE ART FOR SIX MORE SETS. Cinderhide and Rooftop Runner (common), Moondust and Rustwalker (rare), Site Zero
    (epic) and Worldspire (mythical): a cape, a weapon and an armor each, added to the same registries the first sixteen sets use
    (CAPE_DESIGNS in 33a, WEAPON_ART in 33b, ARMOR_REDRAW and ARMOR_DESIGNS in 33c). Worldspire is the showpiece: a cape of shifting dawn
-   colours with rays and stars, a spire of light that reaches far ahead of her, and a plate ringed by a turning constellation.
+   colors with rays and stars, a spire of light that reaches far ahead of her, and a plate ringed by a turning constellation.
    ============================================================================================================================= */
 
 /* ---------- capes ---------- */
@@ -56,7 +56,7 @@ CAPE_DESIGNS.sitezero = function(ctx, o){                                      /
   ctx.save(); gaGlow(ctx, c, 5); ctx.strokeStyle = c; ctx.lineWidth = 1.1; ctx.globalAlpha = 0.6 + 0.4 * Math.sin(o.t * 2.6); capeLine(ctx, F, 0.04, 0.9, 0.97, 0.9, 4); ctx.stroke(); ctx.restore();
   return hem;
 };
-CAPE_DESIGNS.worldspire = function(ctx, o){                                    /* mythical: dawn colours that turn, rays from the collar, stars, a hem of light */
+CAPE_DESIGNS.worldspire = function(ctx, o){                                    /* mythical: dawn colors that turn, rays from the collar, stars, a hem of light */
   const F = capeFrame(o), hem = function(v, j){ return 0.06 + 0.06 * Math.sin(v * 5 + o.t * 3) + (j % 2 ? 0.05 : 0); };
   const h0 = (o.t * 28) % 360;
   ctx.globalAlpha = 0.96;

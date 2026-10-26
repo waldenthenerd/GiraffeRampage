@@ -63,7 +63,7 @@ const GUIDE_TOPICS = [
       '<li>The <b>' + CRATES.normal.name + '</b> costs ' + CRATES.normal.cost + ' gems (' + pity('normal') + '; mythical ' + myth('normal') + '). The <b>' + CRATES.rare.name + '</b> costs ' + CRATES.rare.cost + ' gems (' + pity('rare') + '; mythical ' + myth('rare') + ').</li>' +
       '<li>The <b>' + CRATES.spotted.name + '</b> costs ' + CRATES.spotted.cost + ' gems <i>and</i> ' + CRATES.spotted.food + ' food, and ' + pity('spotted') + ' (mythical ' + myth('spotted') + '). Food comes from foraging.</li>' +
       '<li><b>Duplicates level a piece up.</b> Opening a piece you already own raises it one level, up to level ' + GEAR_LV_MAX + '. Each level makes the piece\u2019s own bonuses ' + Math.round(GEAR_LV_MUL * 100) + '% stronger (a weapon\u2019s damage ' + Math.round(GEAR_WEAPON_LV_DMG * 100) + '%). A duplicate of a piece already at the top level gives some gems back.</li>' +
-      '<li>Wear all three pieces of one set (cape, weapon, armour) for the set bonus. <b>Trinkets</b> are separate, and all of them can be worn at once.</li>' +
+      '<li>Wear all three pieces of one set (cape, weapon, armor) for the set bonus. <b>Trinkets</b> are separate, and all of them can be worn at once.</li>' +
       '<li>Some pieces also have a <b>playstyle effect</b> (' + fx.length + ' in all: ' + fx.join(', ') + ') that changes how you play, not just the numbers. It is shown on the piece, marked with a star.</li></ul>';
   } },
   { id: 'speed', title: 'Speed mode', show: function(){ return true; }, html: function(){
@@ -181,7 +181,7 @@ const GUIDE_TOPICS = [
     return '<p>With the dust aliens as allies, up to five can join her squad.</p><ul class="helplist">' +
       '<li>Hire them at the trading post (in the Ants tab) with iron, argon, sulfur and basalt. They live in rooms built into the anthill.</li>' +
       '<li>In a run, press keys ' + guideKey('squad1') + ' to ' + guideKey('squad5') + ' (or click the right-hand panel) to call one in. It fights the nearest enemy until it falls.</li>' +
-      '<li>A fallen squad member needs 40 seconds before it can be called again. Each one has ten times her health, and her armour does not help it.</li></ul>';
+      '<li>A fallen squad member needs 40 seconds before it can be called again. Each one has ten times her health, and her armor does not help it.</li></ul>';
   } }
 ];
 

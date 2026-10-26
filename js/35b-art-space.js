@@ -5,7 +5,7 @@
    hover tanks, drones, a stealth bomber and a flying fortress. Nothing here is
    piloted in view -- these are machines. Same scheme as every chapter: each
    unit keeps the AI and hitbox of the creature it stands in for.
-   One tech faction: every unit shares the same near-black rim colour for seams
+   One tech faction: every unit shares the same near-black rim color for seams
    and outlines, a steel-blue lift mixed into its panels so green hulls never
    melt into the lawn, lit top edges, bolts, and a lens with a dark ring and a
    tiny glint (cyan unless the unit's own definition says otherwise). */
@@ -23,7 +23,7 @@ const SP7_SW_HULL = [-38, -20, 30, -26, 46, -8, 46, 8, 30, 26, -38, 20];
 const SP7_SW_LEGS = [[22, -24, 0], [22, 24, Math.PI], [-24, -24, Math.PI], [-24, 24, 0]];
 
 function sp7_mix(c, t){ return blendHex(c, SP7_STEEL, t); }
-/* a sensor lens: dark ring, lit colour, white glint */
+/* a sensor lens: dark ring, lit color, white glint */
 function sp7_lens(ctx, x, y, r, c){
   fillCircle(ctx, x, y, r + 0.9, SP7_RIM); fillCircle(ctx, x, y, r, c);
   fillCircle(ctx, x - r * 0.32, y - r * 0.32, Math.max(0.45, r * 0.36), '#FFFFFF');
@@ -36,7 +36,7 @@ function sp7_poly(ctx, pts, ox, oy, fill, edge, lw){
   if (fill){ ctx.fillStyle = fill; ctx.fill(); }
   if (edge){ ctx.strokeStyle = edge; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.stroke(); ctx.lineJoin = 'miter'; }
 }
-/* a riveted plate: edge colour, fill, lit top strip */
+/* a riveted plate: edge color, fill, lit top strip */
 function sp7_plate(ctx, x, y, w, h, fill, edge, hl){
   ctx.fillStyle = edge; ctx.fillRect(x, y, w, h);
   ctx.fillStyle = fill; ctx.fillRect(x + 0.8, y + 0.8, w - 1.6, h - 1.6);
@@ -143,7 +143,7 @@ const SPACE_DRAW = {
     for (let s = -1; s <= 1; s += 2){
       for (let k = 0; k < 4; k++){ const x = -9 + k * 6; fillCircle(ctx, x, bob + s * 8.3, 2.1, jt); fillCircle(ctx, x, bob + s * 8.3, 0.9, dk); }
     }
-    lkTRI(ctx, 11, bob - 6.6, 20.4, bob - 9, 15, bob - 3, d.pale); lkTRI(ctx, 11, bob + 6.6, 20.4, bob + 9, 15, bob + 3, d.pale);   /* plough tusks */
+    lkTRI(ctx, 11, bob - 6.6, 20.4, bob - 9, 15, bob - 3, d.pale); lkTRI(ctx, 11, bob + 6.6, 20.4, bob + 9, 15, bob + 3, d.pale);   /* plow tusks */
     ctx.fillStyle = SP7_RIM; ctx.fillRect(-11.4, bob - 8.4, 22.8, 16.8);
     ctx.fillStyle = pl; ctx.fillRect(-10, bob - 7, 20, 14);
     ctx.fillStyle = lt; ctx.fillRect(-10, bob - 7, 20, 1.8);
@@ -171,7 +171,7 @@ const SPACE_DRAW = {
     sp7_poly(ctx, SP7_HOVER, 0, bob, pl, SP7_RIM, 1.6);       /* hull */
     sp7_poly(ctx, SP7_HOVER_IN, 0, bob, lt, null, 0);
     sp7_poly(ctx, [-19, 1, 24, 0, 18, 7.6, -19, 11.4], 0, bob, pl, null, 0);   /* lower half stays mid tone */
-    ctx.strokeStyle = SP7_RIM; ctx.lineWidth = 1; ctx.beginPath();           /* armour seams */
+    ctx.strokeStyle = SP7_RIM; ctx.lineWidth = 1; ctx.beginPath();           /* armor seams */
     ctx.moveTo(-8, bob - 12); ctx.lineTo(-8, bob + 12); ctx.moveTo(15, bob - 8); ctx.lineTo(19, bob); ctx.lineTo(15, bob + 8);
     ctx.moveTo(-19, bob - 6); ctx.lineTo(-8, bob - 6); ctx.moveTo(-19, bob + 6); ctx.lineTo(-8, bob + 6); ctx.stroke();
     ctx.fillStyle = dk; for (let k = 0; k < 3; k++) ctx.fillRect(-21, bob - 3.6 + k * 2.8, 5.6, 1.4);   /* exhaust vents */
@@ -410,7 +410,7 @@ const SPACE_DRAW = {
     };
     ctx.fillStyle = b; ctx.beginPath(); outline(); ctx.fill();
     ctx.strokeStyle = SP7_RIM; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke(); ctx.lineJoin = 'miter';
-    ctx.fillStyle = pl; ctx.beginPath();                                       /* raised centre section */
+    ctx.fillStyle = pl; ctx.beginPath();                                       /* raised center section */
     ctx.moveTo(32, bob); ctx.lineTo(-4, bob - 34); ctx.lineTo(-14, bob - 22); ctx.lineTo(-22, bob - 6); ctx.lineTo(-24, bob);
     ctx.lineTo(-22, bob + 6); ctx.lineTo(-14, bob + 22); ctx.lineTo(-4, bob + 34); ctx.closePath(); ctx.fill();
     ctx.fillStyle = lt; ctx.beginPath();                                       /* sunlit upper half */
@@ -554,7 +554,7 @@ const SPACE_DRAW = {
       fillCircle(ctx, px, bob + py, 3.2, '#FFFFFF'); fillCircle(ctx, px, bob + py, 1.6, d.pale);
     }
     fillCircle(ctx, 0, bob, 51.4, SP7_RIM); fillCircle(ctx, 0, bob, 50, dk); fillCircle(ctx, 0, bob, 46, b);
-    for (let k = 0; k < 8; k++){                                                          /* alternating armour sectors */
+    for (let k = 0; k < 8; k++){                                                          /* alternating armor sectors */
       const a0 = k / 8 * TAU, a1 = (k + 1) / 8 * TAU;
       ctx.fillStyle = k & 1 ? pl : lt; ctx.beginPath(); ctx.moveTo(Math.cos(a0 + 0.02) * 22, bob + Math.sin(a0 + 0.02) * 22);
       ctx.arc(0, bob, 44.4, a0 + 0.02, a1 - 0.02); ctx.arc(0, bob, 22, a1 - 0.02, a0 + 0.02, true); ctx.closePath(); ctx.fill();

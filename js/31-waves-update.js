@@ -56,7 +56,7 @@ const WAVE_FLAVOUR_JUNGLE = [
   'A herd of peccaries is on the move', '', 'The air is thick and humming',
   'Spotted shapes pace between the trunks', 'Leafcutters march in endless lines', 'Nothing here is harmless',
   '', 'A howl rolls through the treetops', 'The ground shakes under something heavy',
-  'Bright colours mean poison here', 'Eyes glint from every shadow', '',
+  'Bright colors mean poison here', 'Eyes glint from every shadow', '',
   'The forest hunts in shifts', 'A great wingbeat passes overhead', '',
   'Even the leaves feel hostile', '', 'The river runs black and still',
   'The whole forest is against you', 'Something vast is coiling in the dark', 'The canopy holds its breath',
@@ -70,7 +70,7 @@ const WAVE_FLAVOUR_CITY = [
   'Something heavy is rolling up Main Street', 'The grackles will not stop shrieking', '',
   'They are herding you toward the bayou', 'A searchlight sweeps the plaza', '',
   'The whole city holds its breath', '', 'Every window is watching',
-  'The ground shakes under a column of armour', 'Something big is circling overhead', 'The air smells of jet fuel',
+  'The ground shakes under a column of armor', 'Something big is circling overhead', 'The air smells of jet fuel',
   ''
 ];
 const BOSS_SEQUENCE = ['lion', 'matriarch', 'buffalo', 'crocodile', 'wildfire'];
@@ -98,7 +98,7 @@ const BOSS_INTRO_SWAMP = {
 const BOSS_INTRO_JUNGLE = {
   lion: 'Two green eyes open in the darkness',
   matriarch: 'A shadow with a seven-foot wingspan blots out the sun',
-  buffalo: 'Something armoured is tearing through the roots',
+  buffalo: 'Something armored is tearing through the roots',
   crocodile: 'The black river ripples, then rises',
   wildfire: 'The air turns sickly gold and bitter'
 };
@@ -155,7 +155,7 @@ const WAVE_FLAVOUR_SPACE = [
   'Hover bikes streak between the buildings', 'The rocket stands untouched on its pad', 'Reinforcements arrive by convoy',
   '', 'Sentry walkers take up positions', 'Something slithers out of a vent',
   'The force keeps growing', 'Swarm carriers roll in from the highway', '',
-  'Hover tanks crest the hill', 'Every hangar is emptying', 'The whole base is mobilised',
+  'Hover tanks crest the hill', 'Every hangar is emptying', 'The whole base is mobilized',
   'Nothing is getting near that rocket', '', 'Reaper drones circle overhead',
   'The perimeter has collapsed. They keep coming', 'Plasma drones light up the dusk', 'Something enormous is powering up',
   ''
@@ -170,7 +170,7 @@ const BOSS_INTRO_SPACE = {
 const BOSS_INTRO_CITY = {
   lion: 'A spiked collar glints in the mouth of an alley',
   matriarch: 'The rooftops shake to the thump of heavy rotors',
-  buffalo: 'Seventy tons of armour turns onto your street',
+  buffalo: 'Seventy tons of armor turns onto your street',
   crocodile: 'Something ancient climbs out of Buffalo Bayou',
   wildfire: 'A low, rising roar -- the Warthog is making its run'
 };

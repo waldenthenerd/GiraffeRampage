@@ -9,7 +9,7 @@ const Nav = {
     for (let i = 0; i < el.attributes.length; i++){ const a = el.attributes[i]; if (a.name.indexOf('data-') === 0) return '[' + a.name + '="' + String(a.value).replace(/"/g, '\\"') + '"]'; }
     return el.id ? '#' + el.id : null;
   },
-  /* put focus back after the screen is drawn again; if that button is gone or has just gone grey (bought the last one, spun the last key), focus the nearest one to where it was */
+  /* put focus back after the screen is drawn again; if that button is gone or has just gone gray (bought the last one, spun the last key), focus the nearest one to where it was */
   restore(sig, rect){
     try { const el = OV.querySelector(sig); if (el && !el.disabled){ el.focus({ preventScroll: true }); return; } } catch (e) {}
     if (!rect) return;
@@ -330,7 +330,7 @@ function showMenu(){
   setOverlay(
     '<div class="panel menu2">' +
       '<h1 class="marquee display">GIRAFF<span data-a="debug-e" style="cursor:default">E</span><br>RAMPAGE</h1>' +
-      '<p class="tagline">Six metres of neck against everything the wild can send. Kick, collect cards, and see how far the journey goes.</p>' +
+      '<p class="tagline">Six meters of neck against everything the wild can send. Kick, collect cards, and see how far the journey goes.</p>' +
       continueButtonHTML() +
       '<div class="chwrap">' + chapterSelectorHTML() + '</div>' +
       '<div class="menurow">' +

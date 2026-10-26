@@ -281,7 +281,7 @@ function farmOnStrip(x){ const R = farmRegion(); return !!R && x >= R.x0 + FARM_
   };
   townPaintMid = function(c, D, W, H, R){
     if (D.theme !== 'farm') return pmid(c, D, W, H, R);
-    for (let k = 0; k < 14; k++){                                                  /* ploughed strips in two greens and a gold */
+    for (let k = 0; k < 14; k++){                                                  /* plowed strips in two greens and a gold */
       const x = k * (W / 13), w = W / 13 + 4;
       c.fillStyle = ['#8DAA52', '#B8A850', '#7A9A48'][k % 3]; c.fillRect(x, TG - 56, w, 60);
       c.strokeStyle = 'rgba(40,60,20,.25)'; c.lineWidth = 1.4; for (let i = 0; i < 6; i++){ c.beginPath(); c.moveTo(x + i * w / 6, TG - 56); c.lineTo(x + i * w / 6 - 10, TG + 4); c.stroke(); }

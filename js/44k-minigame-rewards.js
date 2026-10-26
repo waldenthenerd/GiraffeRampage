@@ -258,10 +258,10 @@ function miniStarsHTML(m){
   const odds = Math.round(MINI_RARE_ODDS[m.stars] * 100);
   h += '<p class="sub" style="margin:0 0 2px;font-size:13px">Rare hat chance this spin: <b>' + odds + '%</b>' + (m.stars >= 2 ? ' · duplicates rolled again' : '') +
     (m.starGems ? ' · <b style="color:#9AE8FF">+' + m.starGems + ' gems for new stars</b>' : '') + '</p>';
-  if (m.stars >= 3 && m.prevStars < 3 && WARD[13 + m.ch]){                          /* the first time all three stars are won: this minigame's colour */
+  if (m.stars >= 3 && m.prevStars < 3 && WARD[13 + m.ch]){                          /* the first time all three stars are won: this minigame's color */
     const w = WARD[13 + m.ch];
     h += '<p class="sub" style="margin:4px 0 2px;font-size:14px"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:6px;background:' + w.c + ';border:1px solid #fff"></span>' +
-      '<b style="color:#FFE9A0">New coat colour: ' + w.name + '.</b> Find it under Coat colours.</p>';
+      '<b style="color:#FFE9A0">New coat color: ' + w.name + '.</b> Find it under Coat colors.</p>';
   }
   return h;
 }

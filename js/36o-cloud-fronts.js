@@ -2,13 +2,13 @@
 /* =============================================================================================================================
    36o-cloud-fronts.js  --  WEATHER THAT ARRIVES. 36j chooses the next weather event 16 seconds ahead (WxE.pend) and eases it in over 14
    seconds; this file gives that wait a sky. A bank of clouds drifts across the screen, thickening as the front nears (WxE.front, 0 to 1),
-   dimming the ground under their shadows and tinting it in the colour of what is coming (grey for rain, tan for a sandstorm, white for a
+   dimming the ground under their shadows and tinting it in the color of what is coming (gray for rain, tan for a sandstorm, white for a
    blizzard, green for acid). Rain, snow and the rest then build from a few drops to a full fall, and ease off again while the clouds linger.
    In the calm between events a few thin, pale clouds still drift (the chapters with an open sky only), so the sky is never quite still.
    Drawn as soft shadows over the ground, at the Visual effects setting "medium" and "high" (off = nothing). Purely visual.
    ============================================================================================================================= */
 (function(){
-  const SKYLESS = { 7: 1, 8: 1 };                                       /* the space centre and the moon have no clouds */
+  const SKYLESS = { 7: 1, 8: 1 };                                       /* the space center and the moon have no clouds */
   const AMBIENT = { 1: 1, 2: 1, 3: 1, 5: 1, 6: 1, 11: 1, 12: 1 };        /* the chapters with an open sky, for the thin calm-weather clouds */
   const CL = { list: [], sprites: [], t: 0, ch: 0, wind: 1, rgb: [70, 80, 100], want: 0, amb: 0 };
   function sprite(seed){
@@ -20,7 +20,7 @@
     }
     return cv;
   }
-  function tinted(sp, rgb, key){                                          /* the sprite in the front's colour, kept for reuse */
+  function tinted(sp, rgb, key){                                          /* the sprite in the front's color, kept for reuse */
     sp._t = sp._t || {}; if (sp._t[key]) return sp._t[key];
     const c = document.createElement('canvas'); c.width = sp.width; c.height = sp.height; const g = c.getContext('2d');
     g.drawImage(sp, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; g.fillRect(0, 0, c.width, c.height);

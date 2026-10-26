@@ -1,7 +1,7 @@
 'use strict';
 /* Longneck Town, fourteenth part: boats, the open sea, and Driftwood Cove, a small island town. */
 /* ========================= 44zq. THE SEA ========================= */
-/* 1 THE DEALERSHIP: Saltwind Boats at the Harbour sells four boats (skiff, launch, trawler, speedboat) and a mooring beside it launches them.
+/* 1 THE DEALERSHIP: Saltwind Boats at the Harbor sells four boats (skiff, launch, trawler, speedboat) and a mooring beside it launches them.
    2 SAILING (G.state 'sail'): a top-down sea of 6000 x 6000 units. A and D turn, W and S are the throttle (S goes below zero to reverse).
      Depth is a noise field with islands blended in: deep water, open water, shallows (slow the boat), sand, grass, forest, rocks and reefs
      (both bump and stop it). Foam, waves, seaweed, coral, palms and a lighthouse are drawn on top; floating barrels pay gold or gems, glinting
@@ -91,8 +91,8 @@ function seaTypeAt(x, y){ return seaCell(Math.floor(x / SEA_C), Math.floor(y / S
 function seaBlocked(x, y){ const t = seaTypeAt(x, y); return t >= SEA_SAND; }
 function seaFindDocks(){
   const o = {};
-  let x = 1400; while (x > 0 && seaLevel(x, 3000) < 0.0) x -= 10;                                             /* the harbour: the mainland's east coast */
-  o.harbour = { px: x, py: 3000, wx: x + 150, wy: 3000, ang: 0, name: 'Harbour' };
+  let x = 1400; while (x > 0 && seaLevel(x, 3000) < 0.0) x -= 10;                                             /* the harbor: the mainland's east coast */
+  o.harbour = { px: x, py: 3000, wx: x + 150, wy: 3000, ang: 0, name: 'Harbor' };
   let y = 2500; while (y < SEA_W && seaLevel(3700, y) > 0.0) y += 10;                                           /* the island: its south shore */
   o.isle = { px: 3700, py: y, wx: 3700, wy: y + 150, ang: Math.PI / 2, name: 'Driftwood Cove' };
   return o;
@@ -148,7 +148,7 @@ function seaMapSave(){
 }
 
 /* ---- drawing the sea ---- */
-/* The sea is painted smooth: the depth/height field is sampled bilinearly into a small picture (one sample every few screen pixels), coloured
+/* The sea is painted smooth: the depth/height field is sampled bilinearly into a small picture (one sample every few screen pixels), colored
    through a gradient table in the palette of the ocean chapter, with soft wave ridges, caustics in the shallows and foam along the shore,
    then scaled up with smoothing. Trees, coral, rocks and shells are vector shapes drawn over it. */
 const SEA_LUT = (function(){
@@ -248,7 +248,7 @@ function seaDrawBoat(ctx, x, y, ang, kind, t, scale, wob){
   ctx.restore();
 }
 /* her, from above (drawn by the caller after the boat's fittings, in the boat's own space, so no rail or seat crosses her), in the same style as the giraffe on land
-   (js/33-giraffe-art.js): her chosen coat, spot colour and pattern, no outline, the same head (a coat head, a dark muzzle, ossicones with knobs, ears) and small dark eyes.
+   (js/33-giraffe-art.js): her chosen coat, spot color and pattern, no outline, the same head (a coat head, a dark muzzle, ossicones with knobs, ears) and small dark eyes.
    Her neck is a bent line from the shoulder to the head and it moves by itself: she sways her head and now and then looks about, so she is not stuck to the boat.
    seaRiderPose(t) says where the head is (a: the neck's angle, 0 is straight ahead and positive is to the boat's right; L: its length) and, when she holds a rod
    (js/44zzv-fishing.js), { len, da (the rod's angle from the head's), bend, s (the side) }. The end of the rod is kept in seaRiderTip, in screen pixels, for the line. */
@@ -385,7 +385,7 @@ function renderSea(ctx){
   ctx.save(); ctx.translate(W - 44 * s, 62 * s); ctx.fillStyle = 'rgba(14,10,8,.6)'; ctx.beginPath(); ctx.arc(0, 0, 26 * s, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(242,179,61,.5)'; ctx.stroke();
   ctx.fillStyle = '#E8D8B0'; ctx.font = '700 10px system-ui'; ctx.textAlign = 'center'; ctx.fillText('N', 0, -14 * s); ctx.rotate(Sea.h + Math.PI / 2); ctx.fillStyle = '#FF6A5A'; ctx.beginPath(); ctx.moveTo(0, -18 * s); ctx.lineTo(-5 * s, 4 * s); ctx.lineTo(5 * s, 4 * s); ctx.fill(); ctx.restore();
   seaDrawMap(ctx, W, H, s);
-  if (Sea.t < 9) miniText(ctx, Input.hasTouch ? 'Hold a finger where you want to sail.' : 'W / S: throttle  ·  A / D: turn  ·  Slow down by a dock to land  ·  Esc: back to the harbour', W / 2, H - 16 * s, 13 * s, '#FFF6E0', 'center', false);
+  if (Sea.t < 9) miniText(ctx, Input.hasTouch ? 'Hold a finger where you want to sail.' : 'W / S: throttle  ·  A / D: turn  ·  Slow down by a dock to land  ·  Esc: back to the harbor', W / 2, H - 16 * s, 13 * s, '#FFF6E0', 'center', false);
   drawFade(ctx);
 }
 
@@ -546,7 +546,7 @@ function updateSea(dt){
   startRun = function(){ Fish.cd = Fish.on = Crab.cd = Crab.on = 0; return sr.apply(this, arguments); };
 })();
 
-/* ---- the harbour: the dealership and the mooring ---- */
+/* ---- the harbor: the dealership and the mooring ---- */
 (function(){
   const H = TOWN_DIST.harbour;
   H.p = H.p.filter(function(p){ return !(p.k === 'lamp' && p.x === 1400); });
@@ -568,16 +568,16 @@ function updateSea(dt){
     say: ['Caught this morning. Ask the fish; they’ll tell you.', 'A fish a day keeps you in one piece. Eat it in a run and you’ll mend.', 'Tides come in, tides go out. Prices stay put.', 'You sail a straight line, for a giraffe.'],
     night: ['The lighthouse keeps me company.'], rain: ['Best fish come after rain.'] };
   TOWN_NPCS.pearl = { id: 'pearl', name: 'Pearl', d: 'isle', x: 1560, range: 50, habit: 'stand', fav: 'flowers', look: { coat: '#F2B8A0', spot: '#B04A32', pat: 1, hat: 'flowers', s: 1.02 }, gift: { acc: 'pearlhat' },
-    say: ['Crab is armour you can eat. Don’t ask me how that works.', 'Mind the claws. Mine, and theirs.', 'A shell’s a shell. Wear it well.', 'The reefs are pretty. Don’t stare at them from a boat.'],
+    say: ['Crab is armor you can eat. Don’t ask me how that works.', 'Mind the claws. Mine, and theirs.', 'A shell’s a shell. Wear it well.', 'The reefs are pretty. Don’t stare at them from a boat.'],
     night: ['Lantern’s lit. Come in.'], rain: ['Crabs love a drizzle.'] };
   TOWN_NPC_LIST.push('brine', 'pearl');
   TOWN_GIFT_OF.brine = { acc: 'captain' }; TOWN_GIFT_OF.pearl = { acc: 'pearlhat' };
   TOWN_LINES.brine = { day: ['Fresh from the cove.'], dusk: ['Last catch of the day.'], night: ['Closed. Mostly.'], new: ['New face! Fish?'], friend: ['You’re a good customer. And a very tall one.'], best: ['Take the cap. It was my father’s. It deserves a good head.'], chap: [[4, 'The Deep? I’ve fished the edge of it. Never looked in.']] };
   TOWN_LINES.pearl = { day: ['Crab’s fresh.'], dusk: ['Sunset’s the best time for crab.'], night: ['Moonlight and claws.'], new: ['Welcome, sailor!'], friend: ['You always bring good weather.'], best: ['It’s a pearl. A hat pearl. Wear it.'], chap: [[4, 'I hear there are crabs the size of cars down there.']] };
   TOWN_ERRANDS.push(
-    { id: 'sea1', npc: 'brine', title: 'Land ho', offer: 'Sail a boat out from the harbour and dock at the cove.', done: 'The sea took to you. Good.', need: { k: 'stat', key: 'seaDock', n: 1 }, r: { coin: 3 } },
+    { id: 'sea1', npc: 'brine', title: 'Land ho', offer: 'Sail a boat out from the harbor and dock at the cove.', done: 'The sea took to you. Good.', need: { k: 'stat', key: 'seaDock', n: 1 }, r: { coin: 3 } },
     { id: 'sea2', npc: 'brine', title: 'Fish for supper', offer: 'Buy a fish and eat it in a run. Just once.', done: 'Better, isn’t it?', need: { k: 'stat', key: 'fishEaten', n: 1 }, r: { gems: 20 } },
-    { id: 'sea3', npc: 'pearl', title: 'Shell shock', offer: 'Eat a crab in a run. You’ll feel it.', done: 'Armoured and smug.', need: { k: 'stat', key: 'crabEaten', n: 1 }, r: { gems: 20 } },
+    { id: 'sea3', npc: 'pearl', title: 'Shell shock', offer: 'Eat a crab in a run. You’ll feel it.', done: 'Armored and smug.', need: { k: 'stat', key: 'crabEaten', n: 1 }, r: { gems: 20 } },
     { id: 'sea4', npc: 'pearl', title: 'Treasure hunter', offer: 'Fish ten barrels and gems out of the sea.', done: 'The sea gives, you took.', need: { k: 'stat', key: 'seaLoot', n: 10 }, r: { gems: 40 } });
   TOWN_ERRANDS.forEach(function(e){ TOWN_ERR_BY_ID[e.id] = e; });
   [{ id: 'captain', name: 'Captain’s Cap', c: '#2F4F8A' }, { id: 'pearlhat', name: 'Pearl Cloche', c: '#F4F1E8' }].forEach(function(o){
@@ -688,7 +688,7 @@ function updateSea(dt){
       if (b.act === 'fishshop'){ townShowFishShop(); return; }
       if (b.act === 'crabshop'){ townShowCrabShop(); return; }
       if (b.act === 'isle-house'){ townSay({ name: 'A cottage', text: 'Shells on the windowsill, a hammock on the porch and a smell of salt. Nobody is in, but the door is open.' }, []); return; }
-      if (b.act === 'isle-light'){ townSay({ name: 'The cove lighthouse', text: 'It turns slowly all night, for the boats. You can see the harbour on the far shore from the top. Probably.' }, []); return; }
+      if (b.act === 'isle-light'){ townSay({ name: 'The cove lighthouse', text: 'It turns slowly all night, for the boats. You can see the harbor on the far shore from the top. Probably.' }, []); return; }
     }
     tu(o);
   };
@@ -744,5 +744,5 @@ function townShowCrabShop(){ seaShop('crab', 'CLAW & ORDER CRAB SHACK', 'Crab yo
 
 (function(){
   const t = GUIDE_TOPICS.find(function(x){ return x.id === 'town'; });
-  if (t){ const base = t.html; t.html = function(){ return base().replace('</ul>', '<li><b>Saltwind Boats</b> at the Harbour sells four boats. Sail from the mooring beside it: <b>W and S</b> are the throttle (S below zero reverses), <b>A and D</b> turn. Shallows slow the boat, rocks and reefs stop it. Barrels and gems float about, glinting shoals give a fish, and the sea chart in the corner remembers everything you have sailed past. Dock beside the pier at <b>Driftwood Cove</b> (slow right down): Brine sells <b>fish</b> (<b>' + keyName(keyOf('fish')) + '</b> in a run heals over time) and Pearl sells <b>crab</b> (<b>' + keyName(keyOf('crab')) + '</b> cuts damage taken for 30 seconds).</li></ul>'); }; }
+  if (t){ const base = t.html; t.html = function(){ return base().replace('</ul>', '<li><b>Saltwind Boats</b> at the Harbor sells four boats. Sail from the mooring beside it: <b>W and S</b> are the throttle (S below zero reverses), <b>A and D</b> turn. Shallows slow the boat, rocks and reefs stop it. Barrels and gems float about, glinting shoals give a fish, and the sea chart in the corner remembers everything you have sailed past. Dock beside the pier at <b>Driftwood Cove</b> (slow right down): Brine sells <b>fish</b> (<b>' + keyName(keyOf('fish')) + '</b> in a run heals over time) and Pearl sells <b>crab</b> (<b>' + keyName(keyOf('crab')) + '</b> cuts damage taken for 30 seconds).</li></ul>'); }; }
 })();

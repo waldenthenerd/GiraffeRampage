@@ -232,7 +232,7 @@ function timeScale(raw){
 function drawDeathFX(ctx){
   const d = G.deathFX; if (!d) return;
   const k = clamp(d.t / d.dur, 0, 1), e = 1 - Math.pow(1 - k, 2);
-  /* colour drains away and the edges go dark red */
+  /* color drains away and the edges go dark red */
   ctx.save();
   ctx.globalCompositeOperation = 'saturation'; ctx.globalAlpha = 0.85 * e; ctx.fillStyle = '#808080'; ctx.fillRect(0, 0, G.W, G.H);
   ctx.restore();

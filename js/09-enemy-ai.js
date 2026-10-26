@@ -42,7 +42,7 @@ function updateEnemies(dt){
     const spd = e.spd * e.slowMul * (1 + 0.55 * (G.hunt || 0)) * (e.buffT > 0 ? 1.35 : 1);
     let mvx = 0, mvy = 0;
     /* A creature that is still far away (beyond every attack or aggro range in the game, 700) and has nothing in mind but coming closer
-       only needs to walk toward her: no behaviour state machine, no crowding. It is the same movement the full version would give it. */
+       only needs to walk toward her: no behavior state machine, no crowding. It is the same movement the full version would give it. */
     const far = !G.attract && d > FAR_CHEAP_D && !e.big && e.state === 'idle' && e.stunT <= 0 && CHEAP_AI[e.ai] === 1 && !e.def.turret;
     if (far){ mvx = ux * spd; mvy = uy * spd; e.ang = Math.atan2(uy, ux); if (e.stateT !== undefined) e.stateT -= dt; }
 
@@ -270,7 +270,7 @@ function updateEnemies(dt){
           break;
         }
 
-        default: {                                                /* the Space Marines' behaviours live in MARINE_AI */
+        default: {                                                /* the Space Marines' behaviors live in MARINE_AI */
           const f = MARINE_AI[e.ai] || DUST_AI[e.ai] || DOME_AI[e.ai] || TOWER_AI[e.ai];
           if (f){ e.spdE = spd; const r = f(e, dt, ux, uy, d, dx, dy); mvx = r[0]; mvy = r[1]; }
         }
@@ -313,7 +313,7 @@ function updateEnemies(dt){
     if (G.buildings && G.buildings.length && (G.tower || !CITY_FLYERS[e.def.look])){
       const hb = resolveBuildings(e, e.r * 0.85);
       if (hb){
-        if (CITY_CRUSHERS[e.def.look] && e.state === 'dash') damageBuilding(hb, hb.maxHp * 0.5 * dt, 'crush');   /* a charging tank ploughs straight through */
+        if (CITY_CRUSHERS[e.def.look] && e.state === 'dash') damageBuilding(hb, hb.maxHp * 0.5 * dt, 'crush');   /* a charging tank plows straight through */
         /* slide round the corner instead of pressing into the wall */
         let tx = -uy, ty = ux;
         if (tx * (e.x - (hb.x + hb.w / 2)) + ty * (e.y - (hb.y + hb.h / 2)) < 0){ tx = -tx; ty = -ty; }
@@ -337,8 +337,8 @@ function updateEnemies(dt){
 }
 
 const OFFSCREEN_BOOST = [1.3, 1.8, 2.3, 4];
-const FAR_CHEAP_D = 780;                                                  /* the longest trigger distance in the creatures' behaviours is 700 */
-const CHEAP_AI = { chase: 1, dash: 1, charge: 1, ranged: 1, skirmish: 1 };         /* behaviours whose only job when far away is to walk closer */
+const FAR_CHEAP_D = 780;                                                  /* the longest trigger distance in the creatures' behaviors is 700 */
+const CHEAP_AI = { chase: 1, dash: 1, charge: 1, ranged: 1, skirmish: 1 };         /* behaviors whose only job when far away is to walk closer */
 function offscreenBoost(e){
   const hw = G.W / G.zoom / 2 + 90, hh = G.H / G.zoom / 2 + 90;
   return Math.abs(e.x - G.camX) > hw || Math.abs(e.y - G.camY) > hh;

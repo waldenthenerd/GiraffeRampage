@@ -4,7 +4,7 @@
    her gear (drawn by the game's own drawPlayer(), so what you see is what plays), a button for each slot, the pieces for the chosen slot as
    drawn icons (the ones you have not found are dark silhouettes), a side panel with her build, and the crates and trinkets below.
    Pointing at a piece (or tapping it) tries it on in the picture without equipping it. A second view, "Sets", shows each set as three
-   tiles with its bonus. Hats and boots are not here: they stay on the Coat colours screen (the picture shows the ones she wears).
+   tiles with its bonus. Hats and boots are not here: they stay on the Coat colors screen (the picture shows the ones she wears).
    Needs 05a (levels), 33a-33d (art and icons). State: gearPage { slot, selected, hover, view }; the live picture: gearPreview.
    ============================================================================================================================= */
 const gearPage = { slot: 'cape', selected: null, hover: null, view: 'doll' };
@@ -134,7 +134,7 @@ function gearBuildHTML(){
     (active ? '<p class="setactive">' + active.name + ' set complete — ' + active.setDesc + '</p>' : '<p class="sub" style="margin:0 0 6px">No full set yet. Three pieces of one set add its bonus.</p>') +
     (prog ? '<div class="gprogs">' + prog + '</div>' : '') +
     '<div class="gtr">' + (tr.length ? tr.map(function(id){ return '<span title="' + TRINKETS[id].name + '">' + ico(TRINKETS[id].icon) + '</span>'; }).join('') : '<small>No trinkets worn</small>') + '</div>' +
-    '<button class="btn sm ghost" data-a="wardrobe">Hats, boots and colours</button></div>';
+    '<button class="btn sm ghost" data-a="wardrobe">Hats, boots and colors</button></div>';
 }
 /* the side panel: the comparison when a piece is being pointed at or selected, her build otherwise (the comparison is in 41a below) */
 function gearSideHTML(){
@@ -213,7 +213,7 @@ function gearComparePanel(slot, id){
 
 /* ---------- the crate reveal ----------
    openCrate() has already spent the gems and granted the piece when this starts; the animation is only for show. Phases: 0 the crate shakes
-   (0.6s), 1 a burst of light in the piece's rarity colour (0.4s), 2 the piece and what it did. A click skips ahead, then closes. At Visual
+   (0.6s), 1 a burst of light in the piece's rarity color (0.4s), 2 the piece and what it did. A click skips ahead, then closes. At Visual
    effects "off" it goes straight to phase 2 after 0.2s. Every timer is listed in gearReveal.timers and cleared when the reveal ends, which also
    happens whenever the shop is drawn again (leaving the tab, equipping, starting a run). */
 const gearReveal = { active: false, el: null, timers: [], phase: 0, res: null, sounded: false, batch: null };

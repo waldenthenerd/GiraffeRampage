@@ -303,7 +303,7 @@ function townUseX(o){
     }
     case 'sit': {
       const t = townData(); t.n.sat = (t.n.sat | 0) + 1; Save.write();
-      say(pick(['You sit for a while and watch the room. It is a good way to spend a minute.', 'You settle down. Your neck is very comfortable here.', 'A cosy seat. You feel like you could stay a while.']) + (Math.random() < 0.5 ? ' ' + (townHint() || '') : ''));
+      say(pick(['You sit for a while and watch the room. It is a good way to spend a minute.', 'You settle down. Your neck is very comfortable here.', 'A cozy seat. You feel like you could stay a while.']) + (Math.random() < 0.5 ? ' ' + (townHint() || '') : ''));
       return true;
     }
     case 'order': {

@@ -10,7 +10,7 @@
      byte 1   = a check value over the rest, so a damaged or cut-off code is caught
      then bit fields, no padding between them:
        bg 5 | pose 4 | flip 1 | giraffe x 10 | y 10 | size 8 (x100)
-       look: skin 6 | spots 6 | pattern 4 | gear 6 | hat 6 | boots 6 | hat colour 6 | boot colour 6   (hat/boots: 0 none, else ACC_ITEMS index + 1; format 2 used 5 bits for each but pattern)
+       look: skin 6 | spots 6 | pattern 4 | gear 6 | hat 6 | boots 6 | hat color 6 | boot color 6   (hat/boots: 0 none, else ACC_ITEMS index + 1; format 2 used 5 bits for each but pattern)
        item count 5, then per item: kind 1 (0 effect, 1 creature)
          effect:   index in PHOTO_FX 5
          creature: chapter - 1  4 | index in BESTIARY_ORDER 5
@@ -117,7 +117,7 @@ function photoUnpack(bytes){
   const r = new BitR(bytes, 2), d = { v: 1 };
   d.bg = r.r(5); d.pose = r.r(4); d.flip = !!r.r(1);
   d.giraffe = { x: r.r(10), y: r.r(10), s: r.r(8) / 100 };
-  const cb = bytes[0] >= 3 ? 6 : 5;                                          /* version 2 used 5 bits for colours and accessories, version 3 uses 6 */
+  const cb = bytes[0] >= 3 ? 6 : 5;                                          /* version 2 used 5 bits for colors and accessories, version 3 uses 6 */
   const sk = r.r(cb), sp = r.r(cb), pa = r.r(4), ge = r.r(cb), ha = r.r(cb), bo = r.r(cb), hc = r.r(cb), bc = r.r(cb);
   d.look = { skin: sk, spots: sp, pattern: pa, gear: ge, hat: ha ? (ACC_ITEMS[ha - 1] || {}).id || '' : '', boots: bo ? (ACC_ITEMS[bo - 1] || {}).id || '' : '', hatColour: hc, bootColour: bc };
   const n = r.r(5); d.items = [];
@@ -197,7 +197,7 @@ function photoLockedPopup(left){
     '<p style="margin:0 0 6px">This photo has ' + left.length + ' creature' + (left.length === 1 ? '' : 's') + ' you have not discovered yet, so ' + (left.length === 1 ? 'it was' : 'they were') + ' left out.</p>';
   if (unfinished.length) h += '<p style="margin:0 0 6px">To use ' + (left.length === 1 ? 'it' : 'them') + ', finish <b>' + unfinished.length + ' more chapter' + (unfinished.length === 1 ? '' : 's') + '</b> and defeat the creatures there: ' + unfinished.map(nm).join(', ') + '.</p>';
   if (finished.length) h += '<p style="margin:0 0 6px">' + (unfinished.length ? 'And defeat' : 'You have finished the chapter, so just defeat') + ' the missing creatures in ' + finished.map(nm).join(', ') + ' during a run.</p>';
-  h += '<p style="margin:0;opacity:.8;font-size:13px">Her colours, hat and boots from the photo are shown as they were shared.</p>';
+  h += '<p style="margin:0;opacity:.8;font-size:13px">Her colors, hat and boots from the photo are shown as they were shared.</p>';
   photoPopup(h);
 }
 
@@ -266,7 +266,7 @@ function photoApply(res, srcText){
         '<textarea id="photoCode" rows="2" spellcheck="false" placeholder="Photo code" aria-label="Photo code"></textarea>' +
         '<div class="sub" id="photoStats" style="margin:2px 0;font-size:12px;min-height:16px"></div>' +
         '<div class="pchips"><button class="pchip" data-a="ward-photo-getcode">Get code</button><button class="pchip" data-a="ward-photo-opencode">Open</button>' +
-          (PHOTO.look ? '<button class="pchip" data-a="ward-photo-ownlook">Use my own colours and outfit</button>' : '') + '</div>' +
+          (PHOTO.look ? '<button class="pchip" data-a="ward-photo-ownlook">Use my own colors and outfit</button>' : '') + '</div>' +
         (PHOTO.look ? '<div class="sub" style="margin:2px 0;font-size:12px">Showing the outfit from the shared photo.</div>' : '') +
       '</div>');
     const ta = document.getElementById('photoCode');

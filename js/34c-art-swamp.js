@@ -2,7 +2,7 @@
 /* Enemy art, Chapter 3: the swamp (SWAMP_DRAW). */
 /* ======================== Chapter 3: the swamp ======================== */
 /* Local helpers (prefix sw3_). Every creature is drawn in its own local space: +x is forward, +y its right side.
-   Colours are always derived from b / dk (so the hit flash still washes them out); fixed colours are only used
+   Colors are always derived from b / dk (so the hit flash still washes them out); fixed colors are only used
    for eyes, teeth, metal-like accents and the lily-pad / algae greens that mark this swamp. */
 const SW3_P = { x: 0, y: 0 };
 /* a point on a quadratic curve (returned in a shared scratch object, read it straight away) */
@@ -12,7 +12,7 @@ function sw3_q(x0, y0, cx, cy, x1, y1, t){
   SW3_P.y = u * u * y0 + 2 * u * t * cy + t * t * y1;
   return SW3_P;
 }
-/* the swamp's shared eye style: a coloured iris, a dark pupil and one tiny glint */
+/* the swamp's shared eye style: a colored iris, a dark pupil and one tiny glint */
 function sw3_eye(ctx, x, y, r, iris, pup){
   fillCircle(ctx, x, y, r, iris);
   fillCircle(ctx, x + r * 0.15, y, r * 0.5, pup || '#0A0806');
@@ -292,7 +292,7 @@ const SWAMP_DRAW = {
     ctx.stroke();
     lkE2(ctx, 10, bob, 6.4, 2.6, dk); lkE2(ctx, 10.2, bob, 6.4, 1.3, '#E8A8A8');   /* bare black ears, pink inside */
     lkTRI(ctx, 9, bob - 6, 25, bob, 9, bob + 6, d.pale);          /* pointed white face */
-    lkTRI(ctx, 9, bob - 1.6, 17, bob, 9, bob + 1.6, '#C8C8C2');    /* grey crown stripe */
+    lkTRI(ctx, 9, bob - 1.6, 17, bob, 9, bob + 1.6, '#C8C8C2');    /* gray crown stripe */
     lkLN(ctx, [15.4, bob - 1.6, 11, bob - 4.6], 0.9, dk); lkLN(ctx, [15.4, bob + 1.6, 11, bob + 4.6], 0.9, dk);
     fillCircle(ctx, 24.4, bob, 1.6, '#E88A9A');
     sw3_segs(ctx, [20, bob - 1, 26, bob - 3.6, 20, bob + 1, 26, bob + 3.6], 0.5, '#8A8A86');

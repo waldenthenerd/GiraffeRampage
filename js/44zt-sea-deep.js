@@ -2,12 +2,12 @@
 /* =============================================================================================================================
    44zt-sea-deep.js  --  THE DEEP: the sea's border is open, dark ocean, with sharks. A shark bite sinks the boat.
 
-   44zq-sea.js has no wall at the edge of the map: the water deepens toward every edge (seaDeepF, seaLevel and the colour table there; land stays
+   44zq-sea.js has no wall at the edge of the map: the water deepens toward every edge (seaDeepF, seaLevel and the color table there; land stays
    land), past the edge is open water, and you may sail right out into it. This file puts the danger there. When the boat is in the deep
    (seaDeepF > 0.4) shadows rise under it, turn into sharks, stalk it, lunge, and bite. Sharks only live in deep water (seaDeepF > 0.3 and the
    water itself deeper than -0.5, never over shallows, reefs or beaches) and give up when the boat leaves it. One bite destroys the boat: a short
    cutscene follows (the shark breaches over the boat, planks scatter, she floats on a life ring, a rescue boat comes in from the open sea, takes
-   her aboard and tows her home to the Harbour). The boat itself is salvaged, so it is never lost for good, but the repair costs 5% of its price
+   her aboard and tows her home to the Harbor). The boat itself is salvaged, so it is never lost for good, but the repair costs 5% of its price
    (as much as she has, never more). Sailing 120 units past the map's edge is the same as a bite. Fast boats can outrun a stalking shark
    (stalk 170) but not a lunge (340). Skip the scene with any key or a click after two seconds. Esc does the same while it plays.
    Hooks: updateSea, seaDrawFeatures, seaDrawBoat, renderSea, seaMapColour, seaStart (all wrapped).
@@ -202,7 +202,7 @@
       ctx.globalAlpha = Math.min(1, Sea.deepWarn) * pulse; miniText(ctx, 'THE DEEP  ·  SHARKS', W / 2, 96 * s, 20 * s, '#FF8A7A', 'center'); ctx.globalAlpha = 1;
     }
     if (S){
-      const caps = [[0, 'CRUNCH!', '#FF6A5A', 30], [1.3, 'The shark swallowed the boat whole.', '#FFF6E0', 20], [3.2, 'Help!', '#FFE9A0', 26], [4.2, 'A fishing boat has spotted her.', '#FFF6E0', 20], [6.2, 'Hauled aboard, wet and a little embarrassed.', '#FFF6E0', 20], [7.6, 'Home to the Harbour.', '#FFE9A0', 22]];
+      const caps = [[0, 'CRUNCH!', '#FF6A5A', 30], [1.3, 'The shark swallowed the boat whole.', '#FFF6E0', 20], [3.2, 'Help!', '#FFE9A0', 26], [4.2, 'A fishing boat has spotted her.', '#FFF6E0', 20], [6.2, 'Hauled aboard, wet and a little embarrassed.', '#FFF6E0', 20], [7.6, 'Home to the Harbor.', '#FFE9A0', 22]];
       let c = caps[0]; caps.forEach(function(k){ if (S.t >= k[0]) c = k; });
       ctx.fillStyle = 'rgba(8,10,20,.55)'; ctx.fillRect(0, H * 0.78, W, 64 * s); miniText(ctx, c[1], W / 2, H * 0.78 + 40 * s, c[3] * s, c[2], 'center');
       if (S.t > 2 && S.t < 8) miniText(ctx, 'press any key to skip', W - 100 * s, H - 14 * s, 11 * s, 'rgba(255,246,224,.6)', 'center', false);

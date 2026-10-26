@@ -18,7 +18,7 @@ function domeHeli(ctx, o){
   ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-47, 48); ctx.lineTo(-47, 60); ctx.moveTo(37, 52); ctx.lineTo(37, 61); ctx.stroke();      /* the cross-tube clamps */
   fillCircle(ctx, -42, 36, 3.2, '#8A948C'); fillCircle(ctx, 32, 40, 3.2, '#8A948C');                                                                     /* the bolts */
   ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
-  /* tail boom, fin, stabiliser */
+  /* tail boom, fin, stabilizer */
   ctx.fillStyle = GREEN; ctx.beginPath(); ctx.moveTo(-40, -16); ctx.lineTo(-196, -26); ctx.lineTo(-196, -12); ctx.lineTo(-40, 14); ctx.closePath(); ctx.fill();
   ctx.fillStyle = GREEN_D; ctx.beginPath(); ctx.moveTo(-40, 2); ctx.lineTo(-196, -16); ctx.lineTo(-196, -12); ctx.lineTo(-40, 14); ctx.closePath(); ctx.fill();
   ctx.fillStyle = GREEN_L; ctx.beginPath(); ctx.moveTo(-40, -16); ctx.lineTo(-196, -26); ctx.lineTo(-196, -23); ctx.lineTo(-40, -11); ctx.closePath(); ctx.fill();                  /* the sun on top of the boom */
@@ -29,7 +29,7 @@ function domeHeli(ctx, o){
   ctx.fillStyle = GREEN; ctx.beginPath(); ctx.moveTo(-178, -24); ctx.lineTo(-206, -70); ctx.lineTo(-190, -72); ctx.lineTo(-162, -26); ctx.closePath(); ctx.fill();
   ctx.fillStyle = GREEN_D; ctx.beginPath(); ctx.moveTo(-170, -24); ctx.lineTo(-198, -68); ctx.lineTo(-190, -72); ctx.lineTo(-162, -26); ctx.closePath(); ctx.fill();
   ctx.fillStyle = GREEN_L; ctx.beginPath(); ctx.moveTo(-178, -24); ctx.lineTo(-206, -70); ctx.lineTo(-203, -70); ctx.lineTo(-174, -25); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = GREEN_D; ctx.beginPath(); ctx.moveTo(-170, -12); ctx.lineTo(-190, 4); ctx.lineTo(-178, 6); ctx.lineTo(-156, -10); ctx.closePath(); ctx.fill();                  /* the stabiliser */
+  ctx.fillStyle = GREEN_D; ctx.beginPath(); ctx.moveTo(-170, -12); ctx.lineTo(-190, 4); ctx.lineTo(-178, 6); ctx.lineTo(-156, -10); ctx.closePath(); ctx.fill();                  /* the stabilizer */
   ctx.strokeStyle = BAND; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-197, -60); ctx.lineTo(-191, -68); ctx.stroke();                                              /* the fin tip */
   /* tail rotor, on a gearbox at the top of the fin */
   const ta = t * 38 * spin;

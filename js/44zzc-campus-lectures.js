@@ -300,7 +300,7 @@ const UNI_LECTURES = [], UNI_LEC_BY_ID = {};
     X.mc('space', 1, "Which planet is the hottest?", ["Venus", "Mercury", "Mars", "Jupiter"])
   ]);
   L('space', 1, "The Moon and the First Steps", [
-    ["Our neighbour", "The Moon is Earth's natural satellite. It has almost no air, and its gravity is about a sixth of Earth's.", 'moon'],
+    ["Our neighbor", "The Moon is Earth's natural satellite. It has almost no air, and its gravity is about a sixth of Earth's.", 'moon'],
     ["Sputnik", "The first artificial satellite, Sputnik 1, was launched in 1957.", 'rocket'],
     ["First in space", "In 1961 Yuri Gagarin became the first human in space, orbiting the Earth once.", 'rocket'],
     ["Giant leap", "In July 1969 Neil Armstrong became the first person to walk on the Moon, after landing in the Apollo 11 lunar module, Eagle.", 'moon']

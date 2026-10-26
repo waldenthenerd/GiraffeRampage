@@ -1,14 +1,14 @@
 'use strict';
 /* Enemy art, Chapter 9: the fire aliens of Venus (ALIEN_DRAW). */
 /* ======================== Chapter 9: the fire aliens of Venus ======================== */
-/* Seen from above, facing +x. The Venus aliens are one family: a dark, plated carapace (the body colour for the plates,
-   the dark colour for the rim and joints), glowing ember seams between the plates (the definition's pale colour, with a
+/* Seen from above, facing +x. The Venus aliens are one family: a dark, plated carapace (the body color for the plates,
+   the dark color for the rim and joints), glowing ember seams between the plates (the definition's pale color, with a
    hotter core), spiked shoulders, a flame crest and amber eyes. Each species gets its own limbs, silhouette and tools.
-   They use the Space Marines' behaviours (so each slot still plays like its Chapter 8 counterpart); only what you SEE is new.
+   They use the Space Marines' behaviors (so each slot still plays like its Chapter 8 counterpart); only what you SEE is new.
    Helpers prefixed al9 are private to this file; the a* weapon helpers are shared with Chapter 10. */
 const AL9_PAL = new Map(), AL9_LT = new Map();
 const AL9_BONE = '#EBD7AC', AL9_BONE_D = '#B8955E', AL9_EYE = '#FFC83A', AL9_PUPIL = '#3A0C04';
-/* a palette derived once per (body, dark, pale) colour set, so a hit flash (which blends b and dk) still shades correctly */
+/* a palette derived once per (body, dark, pale) color set, so a hit flash (which blends b and dk) still shades correctly */
 function al9Pal(b, dk, pale){
   let p = AL9_PAL.get(b);
   if (p === undefined || p.dk !== dk || p.pale !== pale){
@@ -454,7 +454,7 @@ const ALIEN_DRAW = {  cinderspitter(ctx, e, b, dk, bob, wind, d){
   },
   magmatotem(ctx, e, b, dk, bob, wind, d){
     const P = al9Pal(b, dk, d.pale);
-    ctx.fillStyle = P.deep; ctx.beginPath(); for (let k = 0; k < 8; k++){ const a = k / 8 * TAU + 0.3927; ctx.lineTo(Math.cos(a) * 15, Math.sin(a) * 15); } ctx.closePath(); ctx.fill();      /* an octagonal armoured base */
+    ctx.fillStyle = P.deep; ctx.beginPath(); for (let k = 0; k < 8; k++){ const a = k / 8 * TAU + 0.3927; ctx.lineTo(Math.cos(a) * 15, Math.sin(a) * 15); } ctx.closePath(); ctx.fill();      /* an octagonal armored base */
     ctx.fillStyle = dk; ctx.beginPath(); for (let k = 0; k < 8; k++){ const a = k / 8 * TAU + 0.3927; ctx.lineTo(Math.cos(a) * 12.6, Math.sin(a) * 12.6); } ctx.closePath(); ctx.fill();
     for (let k = 0; k < 4; k++){ const a = k * Math.PI / 2 + 0.7854; lkTRI(ctx, Math.cos(a - 0.3) * 12, Math.sin(a - 0.3) * 12, Math.cos(a) * 18, Math.sin(a) * 18, Math.cos(a + 0.3) * 12, Math.sin(a + 0.3) * 12, P.deep); }   /* corner spikes */
     ctx.fillStyle = '#8A7060'; ctx.beginPath(); for (let k = 0; k < 8; k++){ const a = k / 8 * TAU + 0.3927; ctx.moveTo(Math.cos(a) * 13.6 + 0.9, Math.sin(a) * 13.6); ctx.arc(Math.cos(a) * 13.6, Math.sin(a) * 13.6, 0.9, 0, TAU); } ctx.fill();   /* bolts */
@@ -481,7 +481,7 @@ const ALIEN_DRAW = {  cinderspitter(ctx, e, b, dk, bob, wind, d){
       lkTRI(ctx, -8 * s, bob + k * 4 * s - 2.6 * s, -L * 0.92 - fl, bob + k * 9.2 * s, -8 * s, bob + k * 4 * s + 2.6 * s, d.pale);
       lkTRI(ctx, -8 * s, bob + k * 4 * s - 1.2 * s, -L * 0.6 - fl, bob + k * 7 * s, -8 * s, bob + k * 4 * s + 1.2 * s, P.hot); }
     aBody(ctx, b, dk, d.pale, s, bob, e, AL9_WARLORD);
-    ctx.strokeStyle = d.pale; ctx.lineWidth = 1.2 * s; ctx.globalAlpha = 0.55; ctx.beginPath(); ctx.ellipse(-1 * s, bob, 10.4 * s, 13.4 * s, 0, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;   /* a gilded armour trim */
+    ctx.strokeStyle = d.pale; ctx.lineWidth = 1.2 * s; ctx.globalAlpha = 0.55; ctx.beginPath(); ctx.ellipse(-1 * s, bob, 10.4 * s, 13.4 * s, 0, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;   /* a gilded armor trim */
     ctx.fillStyle = P.hot; ctx.beginPath(); for (let k = 0; k < 5; k++){ const a = -1.1 + k * 0.55; for (let i = 0; i < 2; i++){ const x = -1 * s + Math.cos(a) * 10.4 * s, y = bob + (i ? 1 : -1) * Math.sin(a) * 13.4 * s * 0.8; ctx.moveTo(x + 0.8 * s, y); ctx.arc(x, y, 0.8 * s, 0, TAU); } } ctx.fill();
     lkTRI(ctx, -8 * s, bob, -5 * s, bob - 3.4 * s, -2 * s, bob, P.deep); lkTRI(ctx, -8 * s, bob, -5 * s, bob + 3.4 * s, -2 * s, bob, P.deep); lkTRI(ctx, -6.4 * s, bob, -5 * s, bob - 1.8 * s, -3.6 * s, bob, d.pale); lkTRI(ctx, -6.4 * s, bob, -5 * s, bob + 1.8 * s, -3.6 * s, bob, d.pale);   /* a war-rune on its back */
     lkLN(ctx, [1 * s, bob + 10 * s, 9 * s, bob + 3 * s], 4.4 * s, dk); fillCircle(ctx, 9 * s, bob + 3 * s, 3.4 * s, P.deep); fillCircle(ctx, 9.4 * s, bob + 2.6 * s, 1.6 * s, P.mid);
@@ -592,7 +592,7 @@ const ALIEN_DRAW = {  cinderspitter(ctx, e, b, dk, bob, wind, d){
       csGlow(ctx, -30 * s, bob + sy * 40 * s, 24 * s, d.pale, 0.35);
     }
     csGlow(ctx, 0, bob, 40 * s, d.pale, 0.4);
-    for (let i = 0; i < 2; i++){ const sy = i ? 1 : -1;                                                                /* four armoured legs and two raking arms */
+    for (let i = 0; i < 2; i++){ const sy = i ? 1 : -1;                                                                /* four armored legs and two raking arms */
       lkLN(ctx, [-4 * s, bob + sy * 9 * s, -9 * s, bob + sy * 17 * s, -3 * s, bob + sy * 22 * s], 4.4 * s, P.deep); lkLN(ctx, [-4 * s, bob + sy * 9 * s, -9 * s, bob + sy * 17 * s, -3 * s, bob + sy * 22 * s], 2.4 * s, P.mid);
       lkLN(ctx, [6 * s, bob + sy * 9 * s, 14 * s, bob + sy * 16 * s, 24 * s, bob + sy * 13 * s], 4.4 * s, P.deep); lkLN(ctx, [6 * s, bob + sy * 9 * s, 14 * s, bob + sy * 16 * s, 24 * s, bob + sy * 13 * s], 2.4 * s, b);
       ctx.fillStyle = AL9_BONE; ctx.beginPath(); for (let k = -1; k <= 1; k++){ ctx.moveTo(23.4 * s, bob + sy * 13 * s + k * 2.2 * s - 1.2 * s); ctx.lineTo(30 * s, bob + sy * 13 * s + k * 3.6 * s); ctx.lineTo(23.4 * s, bob + sy * 13 * s + k * 2.2 * s + 1.2 * s); ctx.closePath(); } ctx.fill(); }

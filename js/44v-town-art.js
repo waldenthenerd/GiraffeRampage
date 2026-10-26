@@ -3,7 +3,7 @@
 /* ========================= 44v. TOWN ART ========================= */
 /* Three layers per district are painted once into canvases and reused: the far skyline (moves at 25% of the camera), the middle
    distance (55%), and the street itself (100%: ground, buildings, scenery). Everything that moves (water, flags, lights, the people,
-   things to find) is drawn each frame on top. The painted layers are in daylight colours; evening and night are a tint drawn over them
+   things to find) is drawn each frame on top. The painted layers are in daylight colors; evening and night are a tint drawn over them
    plus a glow where the lights are. World units: the street is 600 high and the ground line is at y 500 (TOWN_GROUND). */
 const TG = TOWN_GROUND;
 function tRect(c, col, x, y, w, h){ c.fillStyle = col; c.fillRect(x, y, w, h); }
@@ -42,8 +42,8 @@ function tShade(hex, k){ return wardShade(hex, k); }
 
 /* ---- the giraffe ---- */
 /* Side view, feet at (x, gy), facing right (o.flip turns her). Like drawSideGiraffe (44f), but the neck can stretch: o.reach goes from -0.4
-   (a short, lowered neck) to 1 (stretched all the way up). o.look is another giraffe's colours (coat, spot, dark, pat, hat, boot, hc, bc); without
-   it she is drawn in the player's own colours, hat and boots. Returns where the head is, for picking things up and for props. */
+   (a short, lowered neck) to 1 (stretched all the way up). o.look is another giraffe's colors (coat, spot, dark, pat, hat, boot, hc, bc); without
+   it she is drawn in the player's own colors, hat and boots. Returns where the head is, for picking things up and for props. */
 function townGiraffe(ctx, x, gy, o){
   const sc = o.s || 1.5, L = o.look, t = o.t === undefined ? Town.t : o.t, reach = o.reach || 0;
   const cl = L ? { coat: L.coat, spot: L.spot, dark: L.dark || tShade(L.coat, 0.78) } : giraffeColours();

@@ -121,7 +121,7 @@ function townHint(forNpc){
   const pool = TOWN_ITEMS.filter(function(it){ return !townFound(it.id) && townOpen(it.d); });
   if (!pool.length) return null;
   const own = pool.filter(function(it){ return forNpc && it.d === TOWN_NPCS[forNpc].d; }), src = own.length && Math.random() < 0.7 ? own : pool;
-  const it = townPick1(src), what = { coin: 'a coin', star: 'a little star', gem: 'a gem', hat: 'a hat', boot: 'a pair of boots', swatch: 'a colour swatch', track: 'some creature tracks' }[it.t];
+  const it = townPick1(src), what = { coin: 'a coin', star: 'a little star', gem: 'a gem', hat: 'a hat', boot: 'a pair of boots', swatch: 'a color swatch', track: 'some creature tracks' }[it.t];
   const where = it.d === Town.d ? 'around here' : 'in ' + TOWN_DIST[it.d].name;
   return 'I heard there is ' + what + ' ' + where + ', ' + it.note + '.';
 }
@@ -136,7 +136,7 @@ function townBuildingTalk(b){
     case 'mission': townShowMission(); return;
     case 'cafe': text = townHint('penny') || 'The café is humming. The gossip is that you have found everything. Impressive.'; break;
     case 'shack': text = townPick1(['Rods, nets, bait and a very old cat who is not for sale.', 'A sign says: GONE FISHING. A second sign says: BACK SOON. A third is just a drawing of a fish.', 'It smells of rope and the sea. Marina is out on the pier.']); break;
-    case 'lamp': Town.lit = !Town.lit; text = Town.lit ? 'You climb up and light the big lamp. The beam sweeps across the water.' : 'You put the lamp out. The harbour goes dark.'; SFX.level(); break;
+    case 'lamp': Town.lit = !Town.lit; text = Town.lit ? 'You climb up and light the big lamp. The beam sweeps across the water.' : 'You put the lamp out. The harbor goes dark.'; SFX.level(); break;
     case 'garden': text = townPick1(['Tomatoes, sunflowers and one extremely proud cactus. The greenhouse is warm and quiet.', 'Skye waters the plants by launching little rockets of water. It mostly works.']); break;
     case 'shed': text = townPick1(['The shed is stuffed with dishes, wires and a radio that only plays the weather. Tonight: more of the same.', 'A hand-written note: DO NOT TOUCH THE GREEN ONE.']); break;
     case 'scope': text = townIsNight() ? 'You put an eye to the telescope. The stars are so crisp you could reach out and take one. (You can, if you stretch.)' : 'You look through the telescope. The sky is a flat bright blue. Come back after dark.'; break;
@@ -268,7 +268,7 @@ function townButtonHTML(){
       '<li><b>Walk</b> with the move keys. <b>Hold up</b> to stretch her neck: some things hang too high to reach any other way. On a touch screen, hold a finger on the street to walk, and hold it above her head to stretch.</li>' +
       '<li><b>Use things</b> with <b>E</b>, Enter or Space, or tap the prompt that appears. <b>J</b> opens the journal, <b>M</b> the map and tram, Escape the menu.</li>' +
       '<li>Doors lead to screens you already know: the tailor is the wardrobe, the trading post is the post, the arcade holds the minigames, and so on. Closing one brings you back to the town.</li>' +
-      '<li><b>Things to find</b>: coins, stars, gems, lost hats and boots, creature tracks and five hidden coat colours. The journal counts what is found in each place, and finding everything in one pays a bonus. Each day three spots in the town glimmer: stand on one and press E to dig it up. Dot, the smallest giraffe, hides somewhere new each day.</li>' +
+      '<li><b>Things to find</b>: coins, stars, gems, lost hats and boots, creature tracks and five hidden coat colors. The journal counts what is found in each place, and finding everything in one pays a bonus. Each day three spots in the town glimmer: stand on one and press E to dig it up. Dot, the smallest giraffe, hides somewhere new each day.</li>' +
       '<li><b>The herd</b> have errands, and each one you finish makes you better friends. Chat once a day, or give a gift (they each like one best). At the friend level they give gems, and at the best friend level a hat or boots.</li>' +
       '<li>The town has a day and night (a day is twelve minutes) and some rain. Some errands want you there after dark.</li>';
     const open = townOpenCount();

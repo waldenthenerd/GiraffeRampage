@@ -2,7 +2,7 @@
 /* Chapters 9 and 10, and the Deflector pulse. */
 /* ========================= CHAPTER 9: VENUS ========================= */
 /* Fire-themed aliens attack the giraffe on Venus, with Space Marines fighting alongside them. Nothing here is a new
-   behaviour: both armies reuse the Chapter 8 AI (MARINE_AI), slot for slot, so a Cinder Spitter plays like a Marine
+   behavior: both armies reuse the Chapter 8 AI (MARINE_AI), slot for slot, so a Cinder Spitter plays like a Marine
    Rifleman and the Inferno Queen fights like the Fleet Admiral. Only the look, the numbers and the world are new. */
 const VENUS_MUL = { common: { hp: 22.0, dmg: 5.4, spd: 1.55, val: 10.0 }, boss: { hp: 16.0, dmg: 4.6, spd: 1.4, val: 7.0 } };
 const VENUS_MARINE_SHARE = 0.35;                     /* about a third of the ordinary troops are Space Marines */
@@ -123,7 +123,7 @@ function updatePulses(dt){
   const ps = G.pulses;
   for (let i = ps.length - 1; i >= 0; i--){
     const q = ps[i];
-    q.t += dt; q.x = P.x; q.y = P.y; q.r = q.max * Math.min(1, q.t / q.dur);       /* the ring stays centred on her as it grows */
+    q.t += dt; q.x = P.x; q.y = P.y; q.r = q.max * Math.min(1, q.t / q.dur);       /* the ring stays centered on her as it grows */
     for (let k = 0; k < G.eproj.length; k++){ const p = G.eproj[k]; if (!p.deflected && hyp(p.x - q.x, p.y - q.y) < q.r) deflectProjectile(p, q.x, q.y); }
     if (q.t >= q.dur) ps.splice(i, 1);
   }
@@ -140,16 +140,16 @@ function drawPulses(ctx){
 
 /* ========================= CHAPTER 10: THE INFERNO ========================= */
 /* Fire aliens only, no Marines, and almost all of them fight up close: the two ranged types (the Slag Slinger and the Cinder
-   Gnat) are only about one enemy in ten. Same battlefield as Chapter 9. Each unit has its own new design; the behaviours are
+   Gnat) are only about one enemy in ten. Same battlefield as Chapter 9. Each unit has its own new design; the behaviors are
    the melee ones from Chapter 8 plus two new ones (the spinning Blade Whirl and the burrowing Magma Maw). The five bosses use
-   the original game's melee boss behaviours. */
+   the original game's melee boss behaviors. */
 const INFERNO_MUL = { common: { hp: 24.0, dmg: 5.8, spd: 1.6, val: 11.0 }, boss: { hp: 17.5, dmg: 5.0, spd: 1.42, val: 8.0 } };
 const INFERNO_DROP_MUL = 1.6;                       /* sulfur and basalt drop 60% more often than in Chapter 9 */
 const INFERNO_NEW_LK = {
   WHIRL:  { ai: 'm_whirler',  kbRes: 0.5, extra: { melee: { type: 'spin', range: 105 } } },
   BURROW: { ai: 'm_burrower', kbRes: 0.3, extra: { melee: { type: 'ring' } } }
 };
-/* which behaviour each slot borrows (a key of MARINE_LOOKS, or one of the new ones above) */
+/* which behavior each slot borrows (a key of MARINE_LOOKS, or one of the new ones above) */
 const INFERNO_SRC = { hyena: 'jackal', cheetah: 'cheetah', rhino: 'rhino', termite: 'termite', grub: 'grub', vulture: 'vulture', jackal: 'WHIRL', warthog: 'hyena', baboon: 'baboon', honeybadger: 'BURROW', mamba: 'mamba', ember: 'ember' };
 const INFERNO_ALIEN = {
   hyena:       { look: 'cinderimp',    color: '#B8321A', dark: '#3A1008', pale: '#FFB030', blood: '#FF6A1E', hpMul: 1.4 },
@@ -173,7 +173,7 @@ const INFERNO_ALIEN = {
 const ETYPES_INFERNO = {};
 Object.keys(ETYPES).forEach(id => {
   const base = ETYPES[id], al = INFERNO_ALIEN[id], big = !!base.big, mul = big ? INFERNO_MUL.boss : INFERNO_MUL.common;
-  if (big){                                                                           /* the original melee boss behaviours, with new bodies */
+  if (big){                                                                           /* the original melee boss behaviors, with new bodies */
     ETYPES_INFERNO[id] = Object.assign({}, base, { hp: base.hp * mul.hp, dmg: base.dmg * mul.dmg, spd: base.spd * mul.spd, val: Math.round(base.val * mul.val),
       color: al.color, dark: al.dark, pale: al.pale, blood: al.blood, look: al.look, title: al.title, alien: true, inferno: true });
     return;

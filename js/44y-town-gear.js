@@ -96,9 +96,9 @@ const TOWN_BOOT_TOP = {
 })();
 
 /* ---- the best friends' gifts: twelve more (eight hats, four boots) ----
-   Each of the sixteen people gives exactly one thing when she becomes a best friend: a hat, boots or a colour (see TOWN_GIFT_OF in
-   js/44zb-town-interiors.js). The four colours are WARD 32 to 35 (WARD_TOWN in 44e-wardrobe.js). Photo codes are version 3 for these:
-   6 bits for accessories and colours (44p-photo-share.js), and version 2 codes are still read. */
+   Each of the sixteen people gives exactly one thing when she becomes a best friend: a hat, boots or a color (see TOWN_GIFT_OF in
+   js/44zb-town-interiors.js). The four colors are WARD 32 to 35 (WARD_TOWN in 44e-wardrobe.js). Photo codes are version 3 for these:
+   6 bits for accessories and colors (44p-photo-share.js), and version 2 codes are still read. */
 [
   { id: 'bicorne', name: 'Mayor\u2019s Bicorne', c: '#1E1E26' }, { id: 'bow', name: 'Tilly\u2019s Big Bow', c: '#F29AC0' }, { id: 'visor', name: 'Photographer\u2019s Visor', c: '#5FBF6A' },
   { id: 'nightcap', name: 'Stargazer\u2019s Nightcap', c: '#26307A' }, { id: 'bonnet', name: 'Granny\u2019s Bonnet', c: '#F4E3C0' }, { id: 'mortarboard', name: 'Scholar\u2019s Mortarboard', c: '#22222A' },

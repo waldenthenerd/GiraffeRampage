@@ -38,7 +38,7 @@ function enemyScale(w){
 
 /* ========================= 18b. FROST VARIANTS (Chapter 2) ========================= */
 /* Chapter 2 reuses every Chapter 1 creature's AI and draw code untouched --
-   only the numbers and the palette change. blendHex cools each colour toward
+   only the numbers and the palette change. blendHex cools each color toward
    pale ice or cold slate so every creature reads as its own frost twin
    without needing a single new case in drawEnemy(). */
 function blendHex(hex, towardHex, amt){
@@ -294,7 +294,7 @@ const CITY_LOOKS = {
 };
 /* flying units ignore buildings entirely */
 const CITY_FLYERS = { helicopter: 1, gunship: 1, drone: 1, a10: 1, pigeon: 1, pigeonflock: 1, grackle: 1 };
-/* armour smashes straight through buildings it pushes against */
+/* armor smashes straight through buildings it pushes against */
 const CITY_CRUSHERS = { lighttank: 1, abrams: 1 };
 const ETYPES_CITY = {};
 Object.keys(ETYPES).forEach(id => {

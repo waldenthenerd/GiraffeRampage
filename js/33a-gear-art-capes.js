@@ -1,6 +1,6 @@
 'use strict';
 /* =============================================================================================================================
-   33a-gear-art-capes.js  --  SIXTEEN CAPES. Each gear set now has its own cape, not one coloured cloth: a patched hide, a leafy shawl,
+   33a-gear-art-capes.js  --  SIXTEEN CAPES. Each gear set now has its own cape, not one colored cloth: a patched hide, a leafy shawl,
    stone flaps, a fur-trimmed cloak, a rippling wave, a night sky of stars and so on. drawPlayer() (33-giraffe-art.js) keeps working out
    where the cloth hangs and how the wind moves it, and hands that to capeDraw(); every design here shares the same cloth frame, so the
    wind, the lag behind her and the flutter are the same for all of them. The level of the piece adds a trim line (3 and up) and a moving

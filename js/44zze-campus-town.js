@@ -5,7 +5,7 @@
 
    THE CAMPUS is a district of its own (id 'campus', 4400 wide, not in TOWN_IDS, like Driftwood Cove). A gate in the Town Square leads to it once
    Chapter 1 is finished; the arch at its west end leads back. Along it, left to right: the Registrar's Hall (with the clock tower), the Lecture
-   Theatre, the University Library, the Homework Hall, the Exam Hall and the Campus Cafe. Each is a door to a room (in_uhall, in_ulecture,
+   Theater, the University Library, the Homework Hall, the Exam Hall and the Campus Cafe. Each is a door to a room (in_uhall, in_ulecture,
    in_ulibrary, in_uhw, in_uexam, in_ucafe).
    WHAT EACH ROOM DOES (the doors are 'u_' buildings; their act is handled below, then in 44zzf):
      Registrar's Hall   the desk (faculties and energy), the faculty board, the Hall of Degrees, the rank cabinet, the notebook

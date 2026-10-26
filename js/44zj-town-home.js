@@ -103,7 +103,7 @@ function homeDrawFish(c, x, t, food){
   if (food > 0){ c.fillStyle = '#C9A24A'; for (let k = 0; k < 6; k++) c.fillRect(x - 14 + k * 5, TG - 64 + (1 - food) * 40 + (k % 2) * 5, 2, 2); }
   tRect(c, '#8A6A44', x - 28, TG - 14, 56, 6);
 }
-/* what the weather and the hour do to a pane of glass at x, y: a dark sky with stars and a moon at night, a grey tint and falling rain when it rains */
+/* what the weather and the hour do to a pane of glass at x, y: a dark sky with stars and a moon at night, a gray tint and falling rain when it rains */
 function homeSkyWindow(ctx, t, x, y, w, h){
   const k = w / 94;
   if (townIsNight()){
@@ -250,7 +250,7 @@ const HOME_LOOK = {
   rug: ['', 'A round rug. Your feet like it very much.', 'A striped runner, straight as a ruler.', 'A savanna hide rug. Nobody is quite sure whose.'],
   art: ['', 'A landscape: green hills and a tidy sun.', 'The starfield. If you stare, it starts to look back.', 'The herd, in gold. Everyone has their good side.'],
   shelf: ['', 'A bookshelf. Most of the books have pictures of leaves.', 'A trophy shelf. Several of the trophies are very small, and still yours.', 'A toy shelf. A wooden train, a wooden giraffe, a wooden you.'],
-  window: ['', 'The curtains are drawn back. You can see the whole park.', 'Stained glass: red, yellow and blue. The floor turns the colours.', 'A flower box under the sill. The bees visit.']
+  window: ['', 'The curtains are drawn back. You can see the whole park.', 'Stained glass: red, yellow and blue. The floor turns the colors.', 'A flower box under the sill. The bees visit.']
 };
 function homeChange(slot){ townCloseDialog(); townShowDecor(slot); }
 function homeInteract(slot){

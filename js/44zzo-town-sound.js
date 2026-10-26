@@ -2,7 +2,7 @@
 /* =============================================================================================================================
    44zzo-town-sound.js  --  THE TOWN'S SOUND, FINISHED. 44zi gave every street and some rooms an ambience bed and two kinds of footstep.
    This adds:
-     FOOTSTEPS   one for every floor she can walk on (townStepSound wrapper): paving, planks (hollow, in the harbour), grass, gravel and metal on
+     FOOTSTEPS   one for every floor she can walk on (townStepSound wrapper): paving, planks (hollow, in the harbor), grass, gravel and metal on
                  the roofs, concrete, dirt, sand, the campus lawn and path, carpet in the library and hall, tile in the café and the exam hall,
                  rubber in the gym, bare boards at home
      DOOR SOUNDS a shop bell going in (a two-note ding; the café and bakery a bright one, the library and the university a soft one), a creak at

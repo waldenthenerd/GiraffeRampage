@@ -82,7 +82,7 @@ function flyPlane(ctx, x, y, o){
     { id: 'rw_g1', d: 'runway', t: 'gem', x: 1760, h: 120, note: 'on top of the fuel truck' },
     { id: 'rw_s1', d: 'runway', t: 'star', x: 2520, h: 268, note: 'at the very top of the beacon' },
     { id: 'rw_tr', d: 'runway', t: 'track', x: 2800, h: 0, ch: 1, type: 'rhino', note: 'in the soft earth past the beacon' },
-    { id: 'hg_c1', d: 'runway', in: 'in_hangar', t: 'coin', x: 300, h: 150, note: 'on the tyre stack in the hangar' }
+    { id: 'hg_c1', d: 'runway', in: 'in_hangar', t: 'coin', x: 300, h: 150, note: 'on the tire stack in the hangar' }
   ].forEach(function(it){ TOWN_ITEMS.push(it); TOWN_ITEM_BY_ID[it.id] = it; });
   TOWN_NPCS.wingnut = { id: 'wingnut', name: 'Wingnut', d: 'in_hangar', x: 900, range: 60, habit: 'tinker', fav: 'sweets', look: { coat: '#E8C070', spot: '#8A5A24', pat: 12, hat: 'aviator', s: 1.05 }, gift: { acc: 'pilot' },
     say: ['Every plane has a personality. Mine are mostly grumpy.', 'Chocks away! Whenever you’re ready.', 'Don’t pull up before you have the speed. The air won’t hold you.', 'Up there you can see the whole world and not one queue.',
@@ -92,7 +92,7 @@ function flyPlane(ctx, x, y, o){
   TOWN_GIFT_OF.wingnut = { acc: 'pilot' }; TOWN_NPCS.wingnut.gift = TOWN_GIFT_OF.wingnut;
   TOWN_LINES.wingnut = { day: ['Clear skies all the way to the Moon, I’d say. Well. Not the Moon.', 'Wind’s from the west. Perfect for a long flight.'], dusk: ['Golden hour. The best light to fly in.'], night: ['Night flying is for the brave. Or the bored.'],
     new: ['Hello! Come to look at the planes? Or to fly one?'], friend: ['You’ve got a pilot’s hands. I can tell.'], best: ['Take any plane you like. I’d say “my plane” but it’s really yours now.'],
-    chap: [[1, 'The savanna looks lovely from up there.'], [6, 'Houston from the air is something else. Big. Grey. Busy.'], [10, 'They say the Changed Savannah glitters from the sky.']] };
+    chap: [[1, 'The savanna looks lovely from up there.'], [6, 'Houston from the air is something else. Big. Gray. Busy.'], [10, 'They say the Changed Savannah glitters from the sky.']] };
   TOWN_ERRANDS.push(
     { id: 'wn1', npc: 'wingnut', title: 'First flight', offer: 'Buy a plane, take off from the runway, and come back. That is all a pilot is.', done: 'First flight in the logbook. Always a special one.', need: { k: 'stat', key: 'flights', n: 1 }, r: { coin: 3 } },
     { id: 'wn2', npc: 'wingnut', title: 'Through the hoops', offer: 'Fly through ten gold rings in the sky. Just to prove you can steer.', done: 'Ten hoops. Smooth as butter.', need: { k: 'stat', key: 'rings', n: 10 }, r: { gems: 25 } });
@@ -450,7 +450,7 @@ function flyDrawCrash(ctx, t){
 function flyH(i, s){ const x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453; return x - Math.floor(x); }
 function flyGroundY(x){ return FLY_GROUND + Math.sin(x * 0.011) * 3 + Math.sin(x * 0.0037) * 5; }
 function flyRegionIndex(x){ for (let i = 0; i < Fly.regions.length; i++) if (x >= Fly.regions[i].x0 && x < Fly.regions[i].x1) return i; return x < 0 ? 0 : Fly.regions.length - 1; }
-/* how much of the neighbouring region's colours to mix in at x: up to half, right at the boundary */
+/* how much of the neighboring region's colors to mix in at x: up to half, right at the boundary */
 function flyBlendAt(x){
   const i = flyRegionIndex(x), R = Fly.regions[i], loc = x - R.x0;
   if (loc < FLY_ZONE && i > 0) return { a: i, b: i - 1, k: 0.5 * (1 - loc / FLY_ZONE) };
@@ -606,7 +606,7 @@ function flyDrawWorld(ctx, W, H, h){
       ctx.fillStyle = 'rgba(255,255,255,' + (l ? 0.34 : 0.5).toFixed(2) + ')'; tEll(ctx, ctx.fillStyle, x, y, 90 + flyH(i, 40) * 50, 16 + l * 4); tEll(ctx, ctx.fillStyle, x + 50, y - 10, 56, 14);
     }
   }
-  /* far mountains and hills at two speeds, in the colours of the place she is over (mixed at the boundaries) */
+  /* far mountains and hills at two speeds, in the colors of the place she is over (mixed at the boundaries) */
   const hill = blendHex(B1.hill, B2.hill, bl.k), mtn = blendHex(wardShade(hill, 0.7), '#8FA6C0', 0.35);
   ctx.fillStyle = mtn; ctx.beginPath(); ctx.moveTo(-40, FLY_GROUND);
   for (let sx = -40; sx <= vw + 40; sx += 40){ const wx = sx + cam * 0.25; ctx.lineTo(sx, FLY_GROUND - 150 - Math.abs(Math.sin(wx * 0.0031 + 1.2)) * 110 - Math.sin(wx * 0.011) * 18); }
@@ -615,7 +615,7 @@ function flyDrawWorld(ctx, W, H, h){
   for (let sx = -40; sx <= vw + 40; sx += 40){ const wx = sx + cam * 0.5; ctx.lineTo(sx, FLY_GROUND - 80 - Math.sin(wx * 0.004 + 2) * 46 - Math.sin(wx * 0.013) * 16); }
   ctx.lineTo(vw + 40, FLY_GROUND); ctx.closePath(); ctx.fill();
   ctx.translate(-cam, 0);
-  /* each region's ground: a rolling top edge, a gradient, detail on it; at each end the neighbour's colours fade in */
+  /* each region's ground: a rolling top edge, a gradient, detail on it; at each end the neighbor's colors fade in */
   Fly.regions.forEach(function(R, i){
     if (R.x1 < cam - 60 || R.x0 > cam + vw + 60) return;
     const B = FLY_BIOME[R.ch] || FLY_BIOME[0];
@@ -662,7 +662,7 @@ function flyDrawWorld(ctx, W, H, h){
     flyPlane(ctx, Fly.x, Fly.y + buffet, { flipScale: Fly.faceVis, bank: -Fly.th * Fly.face, prop: Fly.prop, t: t, s: 1.0, reach: Fly.stall ? 0.0 : 0.05 });
   }
   ctx.restore();
-  /* the colour of the place over the whole picture, and the evening */
+  /* the color of the place over the whole picture, and the evening */
   const tn = B1.tint || [null, 0], tn2 = B2.tint || [null, 0], ta = lerp(tn[1] || 0, tn2[1] || 0, bl.k), tc = tn[0] && tn2[0] ? blendHex(tn[0], tn2[0], bl.k) : (tn[0] || tn2[0]);
   if (tc && ta > 0.005){ ctx.fillStyle = tc; ctx.globalAlpha = ta; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
   if (dark > 0.01){ ctx.fillStyle = 'rgba(10,18,60,' + (dark * 0.35).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H); }

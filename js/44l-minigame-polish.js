@@ -1,8 +1,8 @@
 'use strict';
-/* Minigame polish: ambient life, parallax, a colour grade per scene, squash / stretch / trails / footprints, a nicer intro, the top bar. */
+/* Minigame polish: ambient life, parallax, a color grade per scene, squash / stretch / trails / footprints, a nicer intro, the top bar. */
 /* ========================= 44l. MINIGAMES: VISUAL POLISH ========================= */
 /* Nothing here changes how a minigame plays. It wraps the drawing: each MINI[n].draw gets a camera push-in during the intro, the ambient
-   layers and the colour grade; miniLayer() gets a gentle parallax; the two giraffe drawers get squash, stretch, afterimages and
+   layers and the color grade; miniLayer() gets a gentle parallax; the two giraffe drawers get squash, stretch, afterimages and
    footprints; miniIntro() eases in; miniHud() replaces the plain bar. Per-minigame state lives in m.pol. */
 
 const POL_ICON = { 1: 'x-drop', 2: 'x-flare', 3: 'x-lotus', 4: 'x-riptide', 5: 'x-tree', 6: 'x-home', 7: 'x-fuel', 8: 'x-moon', 9: 'x-bubbles', 10: 'x-barrel',
@@ -157,7 +157,7 @@ miniLayer = function(ctx, m, g, key, paint, w, h, x, y){
   miniAmbient(ctx, m, g, 'back');
 };
 
-/* ---- a colour grade for each scene: light, haze and a mood ---- */
+/* ---- a color grade for each scene: light, haze and a mood ---- */
 const POL_GRADE = {
   1:  { ops: [['soft-light', '255,170,70', 0.5, 'full'], ['screen', '255,200,120', 0.16, 'tr']], rays: '255,230,170' },
   2:  { ops: [['soft-light', '110,170,255', 0.45, 'full'], ['screen', '150,220,255', 0.1, 'top']] },
@@ -188,7 +188,7 @@ function miniGrade(ctx, m, g){
     else { fill = ctx.createLinearGradient(0, o[3] === 'top' ? 0 : H, 0, o[3] === 'top' ? H * 0.6 : H * 0.4); fill.addColorStop(0, 'rgba(' + o[1] + ',' + o[2] + ')'); fill.addColorStop(1, 'rgba(' + o[1] + ',0)'); }
     ctx.fillStyle = fill; ctx.fillRect(0, 0, W, H);
   }
-  if (fx < 2){ ctx.restore(); return; }                                    /* Medium keeps the colour grade; the shafts, haze and glints are for High */
+  if (fx < 2){ ctx.restore(); return; }                                    /* Medium keeps the color grade; the shafts, haze and glints are for High */
   ctx.globalCompositeOperation = 'screen';
   if (d.rays){                                                          /* slanting shafts of light */
     for (let i = 0; i < 4; i++){

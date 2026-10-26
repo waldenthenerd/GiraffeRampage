@@ -4,7 +4,7 @@
 
 /* Shared helpers (ar2_ prefix). Palette rule for this world: pale animals get a cool blue-grey rim and
    shade so they never melt into the snow; every predator shares amber eyes; warm accents are pink noses
-   and ochre horn/ivory. Colours are derived from b / dk so the white hit-flash still works. */
+   and ochre horn/ivory. Colors are derived from b / dk so the white hit-flash still works. */
 const AR2_COOL = '#5E7C99';
 function ar2_cool(c, t){ return blendHex(c, AR2_COOL, t); }
 /* a flat eye: iris, pupil and one glint */
@@ -435,7 +435,7 @@ const ARCTIC_DRAW = {
     ar2_body(ctx, 31, bob, 16, 14, b, rim, 1.7);
     ctx.globalAlpha = 0.35; lkOV(ctx, 31, bob + 5, 13, 6, shd); ctx.globalAlpha = 1;
     for (let s = -1; s <= 1; s += 2){
-      ar2_body(ctx, 22, bob + s * 11.4, 4.6, 4.4, b, rim, 1.2);   /* round ears with dusky centres */
+      ar2_body(ctx, 22, bob + s * 11.4, 4.6, 4.4, b, rim, 1.2);   /* round ears with dusky centers */
       fillCircle(ctx, 22.4, bob + s * 11.4, 2.5, shd);
       lkOV(ctx, 35.4, bob + s * 9.6, 3.6, 1.1, shd, -s * 0.3);    /* brow shadow */
     }

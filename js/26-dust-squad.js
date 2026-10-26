@@ -3,7 +3,7 @@
 /* ========================= THE DUST SQUAD (the alliance after Chapter 13) ========================= */
 /* With the dust aliens as allies, up to five can be hired into the giraffe's squad. Hiring needs the Venus colony fully built (the Deep Colony) because they
    live in rooms built into the anthill. In a run, keys 1-5 (or a click on the right-hand panel) call one in; it fights the nearest enemy until it falls, then needs
-   a cooldown before it can be called again. A squad alien has ten times the giraffe's health, and her armour does not help it. */
+   a cooldown before it can be called again. A squad alien has ten times the giraffe's health, and her armor does not help it. */
 const SQUAD_CD = 40;
 const SQUAD_SLOTS = [
   { type: 'warthog',     name: 'Bulwark Beetle' },
@@ -31,7 +31,7 @@ function squadSectionHTML(){
   if (!squadAvailable()){
     return out + '<p class="sub">The dust aliens will fight beside you, but they only live in a fully built colony. Build the <b>Deep Colony</b> at the Venus outpost (and unlock the ant colony) to give them rooms in the anthill.</p>';
   }
-  out += '<p class="sub">Up to five dust aliens join the squad. In a run, ' + (Input.hasTouch ? 'tap them in the squad strip on the right edge' : 'keys <b>1–5</b>') + ' call them in; each has ten times your health (armour does not help it), fights the nearest enemy, and can be called again ' + SQUAD_CD + ' seconds after it falls. Each lives in a room of the anthill.</p><div class="shoplist">';
+  out += '<p class="sub">Up to five dust aliens join the squad. In a run, ' + (Input.hasTouch ? 'tap them in the squad strip on the right edge' : 'keys <b>1–5</b>') + ' call them in; each has ten times your health (armor does not help it), fights the nearest enemy, and can be called again ' + SQUAD_CD + ' seconds after it falls. Each lives in a room of the anthill.</p><div class="shoplist">';
   for (let i = 0; i < SQUAD_SLOTS.length; i++){
     const s = SQUAD_SLOTS[i], k = DUST_KIT[s.type], hired = squadHired(i), c = squadCost(i), can = canPay(c);
     out += '<div class="shoprow"><div class="ic" style="color:' + k.color + '">' + (i + 1) + '</div><div class="txt"><div class="nm">' + s.name + (hired ? ' ✔' : '') + '</div><div class="ds">Key ' + (i + 1) + '. A dust alien of the Martian plains.</div></div>' +

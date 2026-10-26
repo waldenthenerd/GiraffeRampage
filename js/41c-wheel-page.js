@@ -50,7 +50,7 @@ const WHEELS = {
 };
 const wheelPage = { id: 'normal', batch: null, n: 1 };
 const WRARITY = { common: '#A9997F', rare: '#7E9B4E', epic: '#9A5BD6', legendary: '#FFD84D', mythical: '#FF6BD6' };
-function wico(i){ return ico(i + ':#FFFFFF'); }                                             /* white on the coloured slice, whatever the icon's usual colour */
+function wico(i){ return ico(i + ':#FFFFFF'); }                                             /* white on the colored slice, whatever the icon's usual color */
 function wheelView(seg){ return WHEEL_VIEW[seg.id] || { icon: '@t-x-gift', rank: 1 }; }
 function wheelCur(){ return WHEELS[wheelPage.id] || WHEELS.normal; }
 function wheelKeysOf(W){ return Save.data[W.field] | 0; }

@@ -1,13 +1,13 @@
 ﻿'use strict';
 /* Enemy art, Chapter 8: Space Marines (MARINE_DRAW). Chapters 12 and 13 reuse this code. */
 /* ======================== Chapter 8: Space Marines ======================== */
-/* Earth's marines, seen from above and facing +x: blue-and-white armour, a glass visor, a rifle. Every unit is the
-   same base soldier with its own kit, which is what makes them read as one army. A unit's own colour (d.pale) is the
+/* Earth's marines, seen from above and facing +x: blue-and-white armor, a glass visor, a rifle. Every unit is the
+   same base soldier with its own kit, which is what makes them read as one army. A unit's own color (d.pale) is the
    one accent: chest bar, shoulder stripes and helmet crest. Shared look: gunmetal kit, cyan visor, cyan energy strip.
    Chapter 12 passes d.look = 'a51_*' and the soldier then wears desert camouflage (a51Camo in 35f-art-a51.js). */
 const MR8_G0 = '#161A22', MR8_G1 = '#20242E', MR8_G2 = '#2E333F', MR8_G3 = '#4A505E', MR8_ST = '#8A93A8', MR8_VIS = '#7FD8FF', MR8_VIS2 = '#4FA6D6';
 const MR8_PAL = {}; let mr8_palN = 0;
-/* the tight palette of one unit: hi (lighter), sh (darker, same hue), mid, deep (outlines), and two camouflage tones. Cached by colour pair. */
+/* the tight palette of one unit: hi (lighter), sh (darker, same hue), mid, deep (outlines), and two camouflage tones. Cached by color pair. */
 function mr8_pal(b, dk){
   const k = b + dk; let p = MR8_PAL[k];
   if (!p){
@@ -67,8 +67,8 @@ function mr8_upper(ctx, b, dk, pale, s, bob, d, o){
   lkOV(ctx, 6.6 * s, bob - 1.7 * s, 0.9 * s, 1.5 * s, '#FFFFFF', -0.25);
 }
 /* A detailed marine rifle, seen from above, pointing along +x: stock, receiver with an ejection port, a vented handguard,
-   magazine, grip, a top rail with an optic, a barrel with a muzzle brake, and a glowing energy strip in the unit's colour.
-   Drawn from x = 3s to 3s + len, so the muzzle sits where the old single line ended. acc (optional): a colour band on the handguard. */
+   magazine, grip, a top rail with an optic, a barrel with a muzzle brake, and a glowing energy strip in the unit's color.
+   Drawn from x = 3s to 3s + len, so the muzzle sits where the old single line ended. acc (optional): a color band on the handguard. */
 function mRifle(ctx, s, bob, len, glow, heavy, acc){
   const L = Math.max(len, 11 * s), x0 = 3 * s, y = bob + 3 * s, dk1 = MR8_G1, dk2 = MR8_G2, mid = MR8_G3, steel = MR8_ST, ga = ctx.globalAlpha;
   ctx.fillStyle = dk1; ctx.fillRect(x0 - 4.6 * s, y - 1.9 * s, 5.4 * s, 3.8 * s);                                         /* the stock */
@@ -79,7 +79,7 @@ function mRifle(ctx, s, bob, len, glow, heavy, acc){
   ctx.fillStyle = mid; ctx.fillRect(x0 + L * 0.42, y - 2.3 * s, L * 0.3, 4.6 * s);                                        /* the handguard */
   ctx.fillStyle = dk1;
   for (let k = 0; k < 2; k++) ctx.fillRect(x0 + L * (0.47 + k * 0.1), y - 1.1 * s, L * 0.04, 2.2 * s);               /* its vents */
-  if (acc){ ctx.fillStyle = acc; ctx.fillRect(x0 + L * 0.42, y - 2.3 * s, L * 0.035, 4.6 * s); }                          /* the unit's colour band */
+  if (acc){ ctx.fillStyle = acc; ctx.fillRect(x0 + L * 0.42, y - 2.3 * s, L * 0.035, 4.6 * s); }                          /* the unit's color band */
   ctx.fillStyle = dk1; ctx.fillRect(x0 + L * 0.3, y + 2.5 * s, 2.8 * s, (heavy ? 6.4 : 5) * s);                        /* the magazine */
   lkLN(ctx, [x0 + L * 0.17, y + 2.6 * s, x0 + L * 0.13, y + 6.2 * s], 2 * s, dk1);                                         /* the grip */
   lkLN(ctx, [x0 + L * 0.72, y, x0 + L, y], 1.7 * s, steel);                                                              /* the barrel */
@@ -89,7 +89,7 @@ function mRifle(ctx, s, bob, len, glow, heavy, acc){
   ctx.globalAlpha = ga * 0.9; ctx.fillStyle = glow; ctx.fillRect(x0 + L * 0.04, y - 0.5 * s, L * 0.3, 1 * s); ctx.globalAlpha = ga;   /* the energy strip */
   fillCircle(ctx, x0 + L * 0.58, y + 0.4 * s, 2 * s, MR8_G0); fillCircle(ctx, x0 + L * 0.15, y + 3.2 * s, 1.9 * s, MR8_G0);   /* gloved hands */
 }
-/* both arms reach the rifle: a sleeve in the armour colour (sl) to the elbow, a dark forearm to the glove. skipL leaves the left arm to the caller. */
+/* both arms reach the rifle: a sleeve in the armor color (sl) to the elbow, a dark forearm to the glove. skipL leaves the left arm to the caller. */
 function mArms(ctx, s, bob, len, col, sl, glow, acc, skipL){
   const L = Math.max(len, 11 * s), x0 = 3 * s, y = bob + 3 * s, hx = x0 + L * 0.58, hy = y + 0.4 * s, tx = x0 + L * 0.15, ty = y + 3.2 * s;
   sl = sl || col;
@@ -124,7 +124,7 @@ const MARINE_DRAW = {
     const s = e.r / 14, z = e.z || 0, up = e.state === 'air' || wind, p = mr8_pal(b, dk), pl = d.pale;
     ctx.translate(0, -z);
     if (up){ for (const sy of [-5, 5]){ csGlow(ctx, -14 * s, bob + sy * s, 16 + z * 0.1, '#FF8A2A', 0.75); lkTRI(ctx, -9 * s, bob + (sy - 2.4) * s, -26 * s - z * 0.12, bob + sy * s, -9 * s, bob + (sy + 2.4) * s, '#FFD070'); } }
-    /* the jet pack: a cross brace, twin fuel tanks with a colour band, nozzle bells and wing fins */
+    /* the jet pack: a cross brace, twin fuel tanks with a color band, nozzle bells and wing fins */
     mr8_rect(ctx, -10.6 * s, bob - 4.2 * s, 3.6 * s, 8.4 * s, MR8_G2);
     for (const sy of [-1, 1]){
       const y = bob + sy * 5 * s;
@@ -178,7 +178,7 @@ const MARINE_DRAW = {
     fillCircle(ctx, 9.6, bob - 2.8, 0.9, wind ? '#FF5A4A' : MR8_ST); fillCircle(ctx, 9.6, bob + 2.8, 0.9, wind ? '#FF5A4A' : MR8_ST);
     lkLN(ctx, [-4.6, bob, -9.4, bob], 1, MR8_ST); fillCircle(ctx, -9.4, bob, 1, pl);                                                      /* antenna */
     lkOV(ctx, 0, bob, 6.8, 5.6, p.deep); lkOV(ctx, 0, bob, 6, 4.8, b); lkOV(ctx, -1.2, bob - 1.4, 3.2, 1.7, p.hi);
-    lkLN(ctx, [-5, bob + 2.4, 1, bob + 2.4], 1.1, p.sh); lkLN(ctx, [-5.4, bob - 3, 0, bob - 3], 0.9, pl);                                 /* panel line, colour stripe */
+    lkLN(ctx, [-5, bob + 2.4, 1, bob + 2.4], 1.1, p.sh); lkLN(ctx, [-5.4, bob - 3, 0, bob - 3], 0.9, pl);                                 /* panel line, color stripe */
     fillCircle(ctx, 3, bob, 2.9, MR8_G0); fillCircle(ctx, 3, bob, 2.2, wind ? '#FFFFFF' : pl); fillCircle(ctx, 3.7, bob - 0.7, 0.7, '#FFFFFF');   /* the eye */
     if (wind) csGlow(ctx, 3, bob, 12, '#FF5A4A', 0.8);
   },
@@ -263,7 +263,7 @@ const MARINE_DRAW = {
   },
   siegebreaker(ctx, e, b, dk, bob, wind, d){
     const s = e.r / 11, up = wind, rec = e.state === 'recover', fx = (up ? 15 : 19) * s, fy = bob - (up ? 20 : 9) * s, p = mr8_pal(b, dk), pl = d.pale;
-    mr8_rect(ctx, -16 * s, bob - 8.6 * s, 10 * s, 17.2 * s, p.deep); mr8_rect(ctx, -15 * s, bob - 7.6 * s, 8 * s, 15.2 * s, MR8_G1);       /* the armoured pack */
+    mr8_rect(ctx, -16 * s, bob - 8.6 * s, 10 * s, 17.2 * s, p.deep); mr8_rect(ctx, -15 * s, bob - 7.6 * s, 8 * s, 15.2 * s, MR8_G1);       /* the armored pack */
     for (let k = 0; k < 3; k++) mr8_rect(ctx, (-14 + k * 2.6) * s, bob - 5.4 * s, 1.2 * s, 10.8 * s, MR8_G3);
     if (rec) csGlow(ctx, 20 * s, bob, 30 * s, pl, 0.4);
     mr8_lower(ctx, b, dk, pl, s, bob, e.anim * 0.8, d, 0);
@@ -425,7 +425,7 @@ const MARINE_DRAW = {
       fillCircle(ctx, Math.cos(a) * r, bob + Math.sin(a) * r, 4 * s, '#FFFFFF'); fillCircle(ctx, Math.cos(a) * r, bob + Math.sin(a) * r, 2 * s, pl);
     }
     ctx.globalAlpha = 1;
-    fillCircle(ctx, 0, bob, 28.4 * s, p.deep); fillCircle(ctx, 0, bob, 25.4 * s, b);                                      /* the armoured shell */
+    fillCircle(ctx, 0, bob, 28.4 * s, p.deep); fillCircle(ctx, 0, bob, 25.4 * s, b);                                      /* the armored shell */
     ctx.lineWidth = 6 * s;
     for (let k = 0; k < 8; k++){ ctx.strokeStyle = k % 2 ? p.sh : p.mid; ctx.beginPath(); ctx.arc(0, bob, 22.4 * s, k * TAU / 8 + 0.04, (k + 1) * TAU / 8 - 0.04); ctx.stroke(); }   /* plates */
     fillCircle(ctx, 0, bob, 18.6 * s, p.deep);
@@ -446,7 +446,7 @@ const MARINE_DRAW = {
     ctx.fillStyle = p.mid; ctx.beginPath(); ctx.moveTo(56 * s, bob); ctx.lineTo(-6 * s, bob - 62 * s); ctx.lineTo(-36 * s, bob - 50 * s); ctx.lineTo(-20 * s, bob - 14 * s); ctx.lineTo(-38 * s, bob); ctx.lineTo(-20 * s, bob + 14 * s); ctx.lineTo(-36 * s, bob + 50 * s); ctx.lineTo(-6 * s, bob + 62 * s); ctx.closePath(); ctx.fill();
     for (const sy of [-1, 1]){
       if (camo) a51Camo(ctx, 2 * s, bob + sy * 30 * s, 18 * s, 22 * s, sy < 0 ? 1 : 2, p.c1, dk, p.c3);
-      lkTRI(ctx, 50 * s, bob + sy * 3 * s, 0, bob + sy * 54 * s, -14 * s, bob + sy * 46 * s, b);                                          /* leading armour plate */
+      lkTRI(ctx, 50 * s, bob + sy * 3 * s, 0, bob + sy * 54 * s, -14 * s, bob + sy * 46 * s, b);                                          /* leading armor plate */
       lkTRI(ctx, 50 * s, bob + sy * 3 * s, -14 * s, bob + sy * 46 * s, 10 * s, bob + sy * 3 * s, p.hi);
       lkTRI(ctx, -16 * s, bob + sy * 44 * s, -33 * s, bob + sy * 48 * s, -20 * s, bob + sy * 15 * s, p.sh);                               /* trailing plate */
       for (let k = 1; k <= 3; k++) fillCircle(ctx, (44 - k * 14) * s, bob + sy * (k * 13 + 2) * s, 1.8 * s, k % 2 ? pl : '#FFFFFF');      /* wing lights */

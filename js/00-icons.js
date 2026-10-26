@@ -3,7 +3,7 @@
 const ICONS = {};
 const ICON_ALIAS = {};                                  /* old name -> new key, filled by 00b-icons-custom.js */
 
-/* Icon colours by what the thing is (water blue, plants green, fire orange ...). Overrides any colour passed in. */
+/* Icon colors by what the thing is (water blue, plants green, fire orange ...). Overrides any color passed in. */
 const ICON_COL = {
   't-wind':'#A8E6F0','t-tornado':'#E8A070','t-cloud-storm':'#E8A070','t-bell':'#F2C14A','t-ear':'#7AE8D0','t-wave-sine':'#9AF0E0','t-speakerphone':'#D8FFF4',
   't-shield-star':'#F2B33D','t-shield-chevron':'#B8C4CE','t-shield-half':'#9FB4C8','t-horseshoe':'#E8A060','t-bomb':'#FF8A3D','t-sun-electricity':'#FFF3CC','t-stars':'#FFC98A',
@@ -67,10 +67,10 @@ const ICONS_T = {                                      /* drawn for this game: 2
   'wave-sine':'M2.5 12c1.5-7 4-7 5.5 0s4 7 5.5 0 4-7 5.5 0 M19 12h2.5',
   'wind':'M3 9h11.5a2.8 2.8 0 1 0-2.8-2.8 M3 13.5h16a2.8 2.8 0 1 1-2.8 2.8 M3 18h6'
 };
-/* Filled icons would go in ICONS; outlined icons (2px, written '@t-name') are in ICONS_T. Both are inline SVG paths, written '@name'. Colours: '@t-name:#RRGGBB' draws in that colour. */
+/* Filled icons would go in ICONS; outlined icons (2px, written '@t-name') are in ICONS_T. Both are inline SVG paths, written '@name'. Colors: '@t-name:#RRGGBB' draws in that color. */
 function ico(v, col){
   if (typeof v !== 'string' || v.charAt(0) !== '@') return v;
-  let key = v.slice(1), ov = null; const ci = key.indexOf(':'); if (ci > 0){ ov = key.slice(ci + 1); key = key.slice(0, ci); }      /* '@t-x-drop:#A8D24A' draws that icon in its own colour */
+  let key = v.slice(1), ov = null; const ci = key.indexOf(':'); if (ci > 0){ ov = key.slice(ci + 1); key = key.slice(0, ci); }      /* '@t-x-drop:#A8D24A' draws that icon in its own color */
   if (ICON_ALIAS[key]) key = ICON_ALIAS[key];
   const tab = key.indexOf('t-') === 0;
   const p = tab ? ICONS_T[key.slice(2)] : ICONS[key]; if (!p) return '';

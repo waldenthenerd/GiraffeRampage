@@ -108,7 +108,7 @@ function afJet(ctx, o){
   fillCircle(ctx, -74, -15, 2.2, blink ? '#FF4A3A' : '#7A2A22'); fillCircle(ctx, 156, 4, 2, blink ? '#FFFFFF' : '#8A8A8A');
   ctx.restore();
 }
-/* the giraffe with her body centre at (cx, cy), turned by rot, with an orange parachute pack on her back if g.pack is set */
+/* the giraffe with her body center at (cx, cy), turned by rot, with an orange parachute pack on her back if g.pack is set */
 function afGiraffeAt(ctx, cx, cy, rot, g){
   const s = g.s || 1;
   ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot || 0);

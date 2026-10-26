@@ -2,9 +2,9 @@
 /* Cheaper drawing for slow devices. */
 /* ========================= 44zzs. SHADOW CACHE ========================= */
 /* softShadow() (36i-lighting.js) is called for every creature, ant, prop and the giraffe on every frame, and each call builds two
-   colour strings and fills two ellipses. Here the pair of ellipses is painted once into a small offscreen picture per size, offset,
-   darkness and sun colour (sizes rounded to a quarter pixel, offsets to a half, darkness to a hundredth: nobody can see that), and the picture is drawn instead.
-   The picture is made at the screen's scale, so the edges stay as soft as before. The cache is emptied when the sun colour or the
+   color strings and fills two ellipses. Here the pair of ellipses is painted once into a small offscreen picture per size, offset,
+   darkness and sun color (sizes rounded to a quarter pixel, offsets to a half, darkness to a hundredth: nobody can see that), and the picture is drawn instead.
+   The picture is made at the screen's scale, so the edges stay as soft as before. The cache is emptied when the sun color or the
    scale changes, and when it grows past SHADOW_MAX pictures. Anything the cache cannot take (a huge shadow, effects off) goes the old way. */
 const SHADOW_MAX = 420;
 const ShadowCache = (function(){
