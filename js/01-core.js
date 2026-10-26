@@ -190,7 +190,7 @@ const SAVE_KEY = 'giraffe_rampage_save_v1';
 const DEFAULT_SAVE = { inputMode: '', gold: 0, gems: 0, meta: {}, gear: {}, equipped: { cape: null, weapon: null, armor: null }, equippedTrinkets: [],
   best: 0, bestWave: 0, runs: 0, totalKills: 0, chaptersComplete: 0, chapter1Complete: false, chapter2Complete: false, chapter3Complete: false, chapter4Complete: false, chapter5Complete: false, chapter6Complete: false, chapter7Complete: false, chapter8Complete: false, chapter9Complete: false, chapter10Complete: false, enginePart: false, spaceplane: 0, homecoming: false, grubs: 0, city: {}, chapter11Complete: false, chapter12Complete: false, chapter13Complete: false, chapter14Complete: false, chapter15Complete: false, mutationVial: false, iron: 0, argon: 0, marsUp: {}, mutations: {}, mutUses: 0, vials: 0, vialGiven: false, squad: {}, sulfur: 0, basalt: 0, venusUp: {}, antsUnlocked: false, food: 0, ants: null, cratesOpened: 0,
   wheelKeys: 0, lastWheelKeyAt: 0, spottedKeys: 0, lastSpottedKeyAt: 0, runSave: null, combos: {}, fusions: 0, mastered: {}, comboClaims: {}, bestiary: null, lastForageAt: 0, menuChapter: 1,
-  muted: false, autoKick: true, aimMode: 'cursor', ach: {} };
+  muted: false, autoKick: true, aimMode: 'cursor', ach: {}, gagsDone: 0 };
 
 /* a save's own copy of the defaults. DEFAULT_SAVE holds lists and objects (combos, city, squad...); copying it with Object.assign alone would hand every save the same ones, so
    progress made by a player who started fresh would be written into DEFAULT_SAVE itself and survive "Erase all progress". */
@@ -272,6 +272,7 @@ const Save = {
     this.data.lastWheelKeyAt = +this.data.lastWheelKeyAt || 0;
     this.data.spottedKeys = Math.max(0, Math.round(+this.data.spottedKeys || 0));
     this.data.lastSpottedKeyAt = +this.data.lastSpottedKeyAt || 0;
+    this.data.gagsDone = scoreInt(this.data.gagsDone);                           /* pointless things she has done (js/44zzzc-gags.js) */
     return this.data;
   },
   write(){                                                                        /* a JSON string holding the packed save (GR2 now, repacked as GR3 a moment later: js/01b-savepack.js) */

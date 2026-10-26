@@ -119,6 +119,9 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   add('ship4', W, 'Spaceplane Built', 'Finish building the spaceplane', SHIP_STAGES.length, 15, function(){ return D().spaceplane | 0; });
 
   /* everything else */
+  add('gag1', M, 'Pointless', 'Watch her do something completely pointless', 1, 2, function(){ return scoreInt(D().gagsDone); });
+  add('gag25', M, 'Professional Nuisance', 'Watch her do 25 pointless things', 25, 5, function(){ return scoreInt(D().gagsDone); });
+  add('gag100', M, 'Chaos Gremlin', 'Watch her do 100 pointless things', 100, 10, function(){ return scoreInt(D().gagsDone); });
   add('ants1', M, 'Colony', 'Find the ants', 1, 5, function(){ return D().antsUnlocked ? 1 : 0; });
   add('ants100', M, 'Ant Farm', 'Own 100 ants', 100, 8, antTotal);
   add('city5', M, 'City Builder', 'Build 5 things in the Giraffe City', 5, 8, cityBuilt);
