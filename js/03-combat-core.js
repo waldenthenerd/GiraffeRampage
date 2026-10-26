@@ -166,9 +166,9 @@ function killEnemy(e, opts){
      5 and 6 are measured against the matching chapter-4 wave, so their higher
      wave numbers never inflate the payout. Score still climbs as usual. */
   const xch = chapterOf(G.wave);
-  const xpWave = xch >= 5 ? G.wave - WAVES_PER_CHAPTER * (xch - 4) : G.wave;
+  const xpWave = xch >= DOME_CHAPTER ? WAVES_PER_CHAPTER * 3 + chapterWaveOf(G.wave) : xch >= 5 ? G.wave - WAVES_PER_CHAPTER * (xch - 4) : G.wave;     /* the Domes and the Tower (waves 326 on) pay like the top of chapter 4, not by their wave number */
   const kv = e.big ? 1 : KILL_VALUE;                          /* waves have fewer enemies now (WAVE_COUNT_MUL), so each is worth more: the same experience, score and drops per wave */
-  const gained = Math.round(e.xp * 1.35 * (1 + 0.085 * (xpWave - 1)) * P.stats.xpMul * CHAPTER_XP_MUL[xch - 1] * kv);
+  const gained = Math.round(e.xp * 1.35 * (1 + 0.085 * (xpWave - 1)) * P.stats.xpMul * (CHAPTER_XP_MUL[xch - 1] || CHAPTER_XP_MUL[CHAPTER_XP_MUL.length - 1]) * kv);
   const pts = Math.round(e.xp * e.val * waveMul * kv);
   /* gems are the gear currency: a small chance on anything, a handful from bosses */
   const onVenus = chapterOf(G.wave) >= 9 && chapterOf(G.wave) <= 10, infernoRate = chapterOf(G.wave) === 10 ? INFERNO_DROP_MUL : 1;     /* the Inferno drops sulfur and basalt more often */               /* on Venus there are no gems or gold: basalt and sulfur drop in their place */

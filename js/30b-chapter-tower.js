@@ -1,7 +1,7 @@
 'use strict';
 /* Chapter 14 (internal chapter 15): the Tower. Twenty-five waves, 336 to 360, one floor each, with a boss on every fifth floor. */
 /* ========================= CHAPTER 14: THE TOWER ========================= */
-/* In New York the trail ends at the headquarters of the company that paid for the domes. The giraffe goes up through it floor by floor, in a lift, and on every
+/* In New York the trail ends at the headquarters of the company that paid for the domes. The giraffe goes up through it floor by floor, in a elevator, and on every
    floor the walls are solid: small rooms joined by doorways (js/30c-tower-floors.js). What lives in the building is all new: office machines and lab animals that
    the glimmer has got into. The twelve ordinary kinds and five bosses sit in the Bestiary's usual slots (TOWER_KIT, like DUST_KIT on Mars). The numbers are tuned by
    hand and are the ones to change if it is too hard or too easy: TOWER_MUL is the strength of the table, towerScale takes it from TOWER_TUNE.hp0 to hp1 (and the same
@@ -85,7 +85,7 @@ function buildTowerWave(w, isBoss){
   return q;
 }
 
-/* ---- behaviours. Each is called like a Marine behaviour from the enemy update's default branch: (e, dt, ux, uy, d) -> [mvx, mvy], e.spdE is its speed.
+/* ---- behaviors. Each is called like a Marine behavior from the enemy update's default branch: (e, dt, ux, uy, d) -> [mvx, mvy], e.spdE is its speed.
    ux and uy already point along the way round the walls when she is out of sight (towerSteer in js/30c-tower-floors.js), and every shot dies on a wall, but
    the shooters still check towerSight so they do not waste a volley on a wall. ---- */
 function twSight(e){ return towerSight(e.x, e.y, P.x, P.y); }

@@ -1,11 +1,12 @@
 /* domes: Chapter 13.5, the Domes (internal chapter 14, waves 326 to 335): the chapter table, the menu card, the two films, a whole run through all ten waves with both bosses,
-   the end of the run, the save, the Bestiary, Play together and the coat colour. */
+   the end of the run, the save, the Bestiary, Play together and the coat color. */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
   function freshSave(){ Save.reset(); }
-  function steps(n, dt){ for (var i = 0; i < n; i++) GR.step(dt || 1 / 30); }
-  function killAll(){ G.enemies.slice().forEach(function(e){ if (!e.dead) damageEnemy(e, 1e18, { noCrit: true, quiet: true }); }); }
+  function noLevels(){ G.pendingLevels = 0; G.levelGate = 0; if (G.state === 'levelup'){ G.state = 'playing'; G.offer = null; hideOverlay(); } }     /* kills pay XP, so a level-up card can pause the game under a test */
+  function steps(n, dt){ for (var i = 0; i < n; i++){ GR.step(dt || 1 / 30); noLevels(); } }
+  function killAll(){ G.enemies.slice().forEach(function(e){ if (!e.dead) damageEnemy(e, 1e18, { noCrit: true, quiet: true }); }); noLevels(); }
   try {
     /* the chapter table: the old chapters are exactly as they were, the Domes are ten waves after Chapter 13 */
     out.table = chapterOf(1) === 1 && chapterOf(25) === 1 && chapterOf(26) === 2 && chapterOf(300) === 12 && chapterOf(301) === 13 && chapterOf(325) === 13 && chapterOf(326) === DOME_CHAPTER && chapterOf(335) === DOME_CHAPTER &&
@@ -43,7 +44,7 @@
     for (var w = 326; w <= 335; w++){
       if (w > 326){ startWave(w); }
       var types = {}, boss = null, n = 0;
-      for (var f = 0; f < 600 && (G.spawnQueue.length || f < 30); f++){ GR.step(1 / 30); G.enemies.forEach(function(e){ types[e.type] = 1; n++; if (e.big) boss = e.type; }); P.hp = P.maxHp; P.invuln = 1e9; if (G.enemies.length > 60) killAll(); }
+      for (var f = 0; f < 300 && (G.spawnQueue.length || f < 30); f++){ GR.step(1 / 30); noLevels(); G.enemies.forEach(function(e){ types[e.type] = 1; n++; if (e.big) boss = e.type; }); P.hp = P.maxHp; P.invuln = 1e9; if (G.enemies.length > 60) killAll(); }
       counts.push(G.spawnQueue.length);
       Object.keys(types).forEach(function(t){ seen[t] = 1; }); if (boss) bosses.push(w + ':' + boss);
       killAll(); steps(20); G.enemies.length = 0;
@@ -53,32 +54,32 @@
     out.cast = ['hyena', 'cheetah', 'termite', 'rhino', 'vulture', 'jackal', 'warthog', 'baboon', 'honeybadger', 'mamba'].every(function(t){ return seen[t]; });
     out.domeLook = ETYPES_DOME.hyena.look === 'arcticwolf' && ETYPES_DOME.hyena.glim === true && ETYPES_DOME.hyena.twist === 'hyena' && ETYPES_DOME.thawed.big === true && ETYPES_DOME.iceheart.big === true;
 
-    /* the bosses' behaviour, state by state: each one runs, aims at her and makes its hazards without an error */
+    /* the bosses' behavior, state by state: each one runs, aims at her and makes its hazards without an error */
     G.waveState = 'intro'; G.waveTimer = 1e9; G.spawnQueue = [];
     var names = { thawed: ['idle', 'shardwind', 'slumpwind', 'slide', 'roofwind', 'meltdown'], iceheart: ['idle', 'novawind', 'volleywind', 'beamwind', 'spikewind', 'roar'] }, bossOk = true, made = {};
     Object.keys(names).forEach(function(b){
       names[b].forEach(function(st){
         G.enemies.length = 0; G.eproj.length = 0; G.markers.length = 0; G.hzones.length = 0; G.blasts.length = 0; G.beams && (G.beams.length = 0);
         var e = spawnEnemy(b, P.x + 400, P.y, b === 'thawed' ? 330 : 335); if (!e){ bossOk = false; return; }
-        e.state = st; e.stateT = 0.01; for (var i = 0; i < 60; i++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; }
+        e.state = st; e.stateT = 0.01; for (var i = 0; i < 25; i++){ GR.step(1 / 30); noLevels(); P.hp = P.maxHp; P.invuln = 1e9; }
         made[b + ':' + st] = G.eproj.length + G.markers.length + G.hzones.length + G.blasts.length + (G.beams ? G.beams.length : 0) + G.enemies.length;
         if (e.hp !== e.hp || e.x !== e.x || e.y !== e.y) bossOk = false;
       });
     });
     G.enemies.length = 0;
     out.bossBehaviour = bossOk && made['thawed:shardwind'] > 0 && made['thawed:roofwind'] > 0 && made['iceheart:novawind'] > 0 && made['iceheart:volleywind'] > 0 && made['iceheart:spikewind'] > 0;
-    G.waveState = 'intro'; G.waveTimer = 1e9; var th = spawnEnemy('thawed', P.x + 300, P.y, 330); th.hp = th.maxHp * 0.4; th.state = 'idle'; th.stateT = 0.01; for (var i = 0; i < 90; i++){ GR.step(1 / 30); P.hp = P.maxHp; }
+    G.waveState = 'intro'; G.waveTimer = 1e9; var th = spawnEnemy('thawed', P.x + 300, P.y, 330); th.hp = th.maxHp * 0.4; th.state = 'idle'; th.stateT = 0.01; for (var i = 0; i < 40; i++){ GR.step(1 / 30); noLevels(); P.hp = P.maxHp; }
     out.phase2 = th.p2 === true; G.enemies.length = 0;
 
     /* the Ice Heart falling ends wave 335 at once, stray monsters and all */
     freshSave(); Save.data.chapter13Complete = true;
     startRun(14, 335); steps(5); G.introFX = null; G.banner = null; P.invuln = 1e9; P.hp = P.maxHp = 1e12;
-    for (var q = 0; q < 900 && (G.spawnQueue.length || !G.bossAlive); q++) GR.step(1 / 30);
+    for (var q = 0; q < 900 && (G.spawnQueue.length || !G.bossAlive); q++) { GR.step(1 / 30); noLevels(); };
     spawnEnemy('frostling', P.x + 500, P.y, 335); var strays = G.enemies.filter(function(e){ return !e.dead && e !== G.boss; }).length;
-    damageEnemy(G.boss, 1e18, { noCrit: true, quiet: true }); for (var q = 0; q < 6; q++) GR.step(1 / 30);
+    damageEnemy(G.boss, 1e18, { noCrit: true, quiet: true }); for (var q = 0; q < 6; q++) { GR.step(1 / 30); noLevels(); };
     out.bossEnds = strays > 0 && G.waveState === 'clear' && G.enemies.every(function(e){ return e.dead; });
 
-    /* the end of the run: the last wave clears, the film, then the report; the save and the coat colour follow */
+    /* the end of the run: the last wave clears, the film, then the report; the save and the coat color follow */
     freshSave(); Save.data.chapter13Complete = true;
     startRun(14, 335); steps(5); G.introFX = null; G.banner = null; P.invuln = 1e9; P.hp = P.maxHp = 1e12;
     out.lastWave = G.wave === 335 && isChapterFinaleWave(G.wave) && isRunEnd(335) === true;

@@ -218,7 +218,7 @@ function coNextRound(){
   const k = (Co.round - 1) % CO_ROUND_WAVES.length, cyc = Math.floor((Co.round - 1) / CO_ROUND_WAVES.length);
   const w = chapterFirstWave(Co.chapter) - 1 + CO_ROUND_WAVES[k];
   G.wave = w; G.chapter = Co.chapter;
-  if (Co.chapter === TOWER_CHAPTER){ towerPrepareFloor(w); Co.pl[0].x = P.x - 60; Co.pl[1].x = P.x + 60; Co.pl[0].y = Co.pl[1].y = P.y; }       /* the Tower: a new floor each round, and both giraffes come out of its lift */
+  if (Co.chapter === TOWER_CHAPTER){ towerPrepareFloor(w); Co.pl[0].x = P.x - 60; Co.pl[1].x = P.x + 60; Co.pl[0].y = Co.pl[1].y = P.y; }       /* the Tower: a new floor each round, and both giraffes come out of its elevator */
   /* the chapter's own mix of creatures, but only a few at first (a later chapter's wave is far bigger than two giraffes without cards can take): five and two more every round, then a third of that (CO_EASE) */
   let q = buildWave(w).filter(function(s){ return !s.boss && !s.ally; }).slice(0, Math.max(2, Math.round((5 + 2 * Co.round) / CO_EASE)));
   Co.cyc = cyc;

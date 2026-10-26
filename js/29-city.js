@@ -72,7 +72,7 @@ function cityTabHTML(){
       (maxed ? '<div class="maxed">' + (it.max > 1 ? 'Maxed' : 'Owned') + '</div>' : '<button class="btn sm buy' + (why ? ' ghost' : '') + '" data-city="' + it.id + '"' + (why ? ' disabled' : '') + '>' + (lv > 0 ? 'Upgrade' : it.max > 1 ? 'Learn' : 'Buy') + '</button>') + '</div>';
   }
   if (cityLevel('c_fusion') > 0) out += '<div class="row" style="margin-top:18px"><button class="btn" data-a="fusion-open">Open the Card Fusion Machine<small>' + Object.keys(Save.data.combos || {}).length + ' combos unlocked</small></button></div>';
-  if (chapterUnlocked(11)) out += '<div class="row" style="margin-top:18px"><button class="btn" data-a="city-lift">Take the lift up to the savannah (Chapter 11)</button></div>';
+  if (chapterUnlocked(11)) out += '<div class="row" style="margin-top:18px"><button class="btn" data-a="city-lift">Take the elevator up to the savannah (Chapter 11)</button></div>';
   return out;
 }
 /* ---- what the purchases do ---- */

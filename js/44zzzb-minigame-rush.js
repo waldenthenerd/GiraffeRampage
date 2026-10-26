@@ -2,8 +2,8 @@
 /* Rush Hour: the minigame after Chapter 14, the Tower (internal chapter 15). */
 /* ========================= 44zzzb. RUSH HOUR ========================= */
 /* The lobby at half past eight, from above: six lanes of things on wheels (swivel chairs, trolleys, delivery drones) cross the hall, and she has to get from the door
-   at the bottom to the lift at the top, and back to the door for another floor, as many times as she can in 45 seconds. Three lives; a hit sends her back to the door.
-   Registered like the others (44f-minigames.js); its stars are in MINI_STAR (44k-minigame-rewards.js) and its coat colour, Brass Button, is WARD 48 for three stars. */
+   at the bottom to the elevator at the top, and back to the door for another floor, as many times as she can in 45 seconds. Three lives; a hit sends her back to the door.
+   Registered like the others (44f-minigames.js); its stars are in MINI_STAR (44k-minigame-rewards.js) and its coat color, Brass Button, is WARD 48 for three stars. */
 MINI_STAR[TOWER_CHAPTER] = { t: [9, 12], lab: ['6', '9', '12'] };
 const RUSH_LANES = 6;
 function rushLanes(m, g, level){
@@ -19,10 +19,10 @@ function rushLanes(m, g, level){
 }
 registerMini({
   ch: TOWER_CHAPTER, id: 'rush', name: 'Rush Hour', unit: 'floors', dur: 45, goal: 6,
-  blurb: 'Half past eight in the lobby, and everything on wheels is going somewhere.\nGet from the door to the lift, and back for another go, without being run over.',
+  blurb: 'Half past eight in the lobby, and everything on wheels is going somewhere.\nGet from the door to the elevator, and back for another go, without being run over.',
   hint: 'Move with WASD or the arrow keys, or hold the mouse button to walk toward the pointer.\nChairs, trolleys and drones cross the hall in lanes: slip between them.',
   touchHint: 'Drag your finger: she walks toward it.\nChairs, trolleys and drones cross the hall in lanes: slip between them.',
-  goalText: 'Goal: reach the lift 6 times in 45 seconds',
+  goalText: 'Goal: reach the elevator 6 times in 45 seconds',
   init: function(m, g){
     m.p = { x: g.W / 2, y: g.H * 0.92, ph: 0, moving: false }; m.lives = 3; m.inv = 0; m.level = 0; m.lanes = rushLanes(m, g, 0); m.dingT = 0;
   },
@@ -41,13 +41,13 @@ registerMini({
         }
       }
     }
-    if (p.y < g.H * 0.1){                                                           /* the lift: another floor, and a faster hall */
+    if (p.y < g.H * 0.1){                                                           /* the elevator: another floor, and a faster hall */
       m.level++; m.score = m.level; m.dingT = 0.9; SFX.level(); miniPop(m, p.x, p.y + 30 * s, 'Floor ' + m.level + '!', '#9AE8FF');
       p.x = g.W / 2; p.y = g.H * 0.92; m.lanes = rushLanes(m, g, m.level);
     }
   }
 });
-/* the picture: a marble lobby with six lanes marked on it, the brass lift doors at the top, a mat at the bottom */
+/* the picture: a marble lobby with six lanes marked on it, the brass elevator doors at the top, a mat at the bottom */
 function rushFloor(c, w, h, s, rng){
   const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#CFC8B4'); g.addColorStop(1, '#E6E0CE'); c.fillStyle = g; c.fillRect(0, 0, w, h);
   c.strokeStyle = 'rgba(120,110,86,.28)'; c.lineWidth = 2; for (let x = 0; x < w; x += 120 * s){ c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); } for (let y = 0; y < h; y += 120 * s){ c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke(); }
@@ -59,11 +59,11 @@ function rushFloor(c, w, h, s, rng){
 MINI[TOWER_CHAPTER].draw = function(ctx, m, g){
   const s = g.s, W = g.W, H = g.H, t = G.time, p = m.p;
   const tile = miniBg(m, g, 'rush', rushFloor, W, H); ctx.drawImage(tile.cv, 0, 0, W, H);
-  const ly = H * 0.1, lw = Math.min(W * 0.5, 420 * s);                                                       /* the lift doors */
+  const ly = H * 0.1, lw = Math.min(W * 0.5, 420 * s);                                                       /* the elevator doors */
   ctx.fillStyle = '#22262E'; ctx.fillRect(W / 2 - lw / 2 - 10, 0, lw + 20, ly + 6); ctx.fillStyle = m.dingT > 0 ? '#DFF8FF' : '#B8A060'; ctx.fillRect(W / 2 - lw / 2, 0, lw / 2 - 2, ly); ctx.fillRect(W / 2 + 2, 0, lw / 2 - 2, ly);
   ctx.fillStyle = '#E8D890'; ctx.fillRect(W / 2 - lw / 2 + 4, 4, lw / 2 - 10, 6); ctx.fillRect(W / 2 + 6, 4, lw / 2 - 10, 6);
   if (m.dingT > 0){ miniGlow(ctx, W / 2, ly, lw * 0.7, '154,232,255', 0.5 * (m.dingT / 0.9)); }
-  miniText(ctx, 'LIFT', W / 2, ly * 0.75, 15 * s, '#2A2238');
+  miniText(ctx, 'ELEVATOR', W / 2, ly * 0.75, 15 * s, '#2A2238');
   for (let i = 0; i < m.lanes.length; i++){
     const L = m.lanes[i];
     for (let k = 0; k < L.objs.length; k++){

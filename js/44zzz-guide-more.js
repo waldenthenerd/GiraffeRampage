@@ -38,15 +38,15 @@
   place({ id: 'domes', title: 'Chapter 13.5: the Domes', show: function(){ return !!(Save.data && Save.data.chapter13Complete); }, html: function(){
     return '<p>A short chapter between Mars and the next place: <b>ten waves</b>, 326 to 335, with a boss on wave 330 and another on 335. It opens when you finish Chapter 13, and begins with the town helicopter flying out to a ring of mirrored domes.</p><ul class="helplist">' +
       '<li>It is hot outside and freezing inside. The creatures are Chapter 2\u2019s, changed by the glimmer, and they hit <b>about one and a third to two times</b> harder than the end of Chapter 13.</li>' +
-      '<li>Finish wave 335 and the helicopter takes off, and you win the coat colour <b>Frost Mylar</b>. There is no minigame after it.</li>' +
+      '<li>Finish wave 335 and the helicopter takes off, and you win the coat color <b>Frost Mylar</b>. There is no minigame after it.</li>' +
       '<li>You can play it from the menu with its own card, and in Play together.</li></ul>';
   } }, 'chapters');
   place({ id: 'tower', title: 'Chapter 14: the Tower', show: function(){ return !!(Save.data && Save.data.chapter14Complete); }, html: function(){
     return '<p>The last place the trail goes: a glass tower in New York, <b>twenty-five floors</b> (waves 336 to 360), one wave on each, with a boss on every fifth floor. It opens when you finish Chapter 13.5.</p><ul class="helplist">' +
       '<li>Every floor is a different set of rooms joined by doorways. <b>The walls and the furniture cannot be broken</b>, and they stop every shot, yours and theirs. Creatures that cannot see you come round through the doors.</li>' +
-      '<li>When a floor is clear the lift opens. Walk into it to go up. It saves your run, and the next floor starts when you step out.</li>' +
+      '<li>When a floor is clear the elevator opens. Walk into it to go up. It saves your run, and the next floor starts when you step out.</li>' +
       '<li>Everything in the building is new: office machines and lab animals the glimmer has got into.</li>' +
-      '<li>Finish wave 360 and you win the coat colour <b>Executive Navy</b>, the usual chapter rewards, and one more <b>Mutation Vial</b> for the lab. You can play it from the menu and in Play together.</li></ul>';
+      '<li>Finish wave 360 and you win the coat color <b>Executive Navy</b>, the usual chapter rewards, and one more <b>Mutation Vial</b> for the lab. You can play it from the menu and in Play together.</li></ul>';
   } }, 'chapters');
   place({ id: 'intel', title: 'Intelligence', show: function(){ return typeof intel === 'function' && intel() > 0; }, html: function(){
     return '<p><b>Intelligence</b> is the average level across all the university faculties, shown as a percentage in the university journal. Yours is <b>' + intelPct() + '%</b>. It is a stat, not a setting: it grows only by studying.</p><ul class="helplist">' +

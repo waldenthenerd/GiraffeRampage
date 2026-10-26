@@ -35,7 +35,7 @@ const CHAPTER_INFO = [
   { name: 'The Domes', biome: 'dome', cast: ['hyena', 'cheetah', 'vulture', 'thawed'],       /* Chapter 13.5, a short one: ten waves */
     desc: 'A ring of mirrored domes shimmers in the savannah heat. Inside, it is freezing.' },
   { name: 'The Tower', biome: 'tower', cast: ['hyena', 'cheetah', 'vulture', 'lion'],            /* Chapter 14: twenty-five floors, one wave each */
-    desc: 'New York. The domes were paid for from the top floor of a glass tower. Take the lift, one floor at a time.' }
+    desc: 'New York. The domes were paid for from the top floor of a glass tower. Take the elevator, one floor at a time.' }
 ];
 const MENU_PREVIEW_CAST = ['hyena', 'cheetah', 'vulture', 'lion'];
 function chapterUnlocked(ch){ if (ch === 11) return !!(Save.data && Save.data.homecoming); return ch <= 1 || !!(Save.data && Save.data['chapter' + (ch - 1) + 'Complete']); }       /* Chapter 11 opens when she has flown home */

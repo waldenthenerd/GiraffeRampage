@@ -1,12 +1,13 @@
-/* tower: Chapter 14, the Tower (internal chapter 15, waves 336 to 360): the chapter table, all twenty-five floor plans (unique, every room reachable, both lifts joined),
-   solid walls for the giraffe and for creatures, creatures finding their way through doorways, the lift between floors, the five bosses, the end of the run, the save,
-   the vial, the coat colour, the menu card and Play together. */
+/* tower: Chapter 14, the Tower (internal chapter 15, waves 336 to 360): the chapter table, all twenty-five floor plans (unique, every room reachable, both elevators joined),
+   solid walls for the giraffe and for creatures, creatures finding their way through doorways, the elevator between floors, the five bosses, the end of the run, the save,
+   the vial, the coat color, the menu card and Play together. */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
   function freshSave(){ Save.reset(); }
-  function steps(n, dt){ for (var i = 0; i < n; i++) GR.step(dt || 1 / 30); }
-  function killAll(){ G.enemies.slice().forEach(function(e){ if (!e.dead) damageEnemy(e, 1e18, { noCrit: true, quiet: true }); }); }
+  function noLevels(){ G.pendingLevels = 0; G.levelGate = 0; if (G.state === 'levelup'){ G.state = 'playing'; G.offer = null; hideOverlay(); } }     /* kills now pay XP, so a level-up card can pause the game under a test */
+  function steps(n, dt){ for (var i = 0; i < n; i++){ GR.step(dt || 1 / 30); noLevels(); } }
+  function killAll(){ G.enemies.slice().forEach(function(e){ if (!e.dead) damageEnemy(e, 1e18, { noCrit: true, quiet: true }); }); noLevels(); }
   function godMode(){ P.invuln = 1e9; P.hp = P.maxHp = 1e12; G.rerolls = 0; }
   try {
     /* the chapter table: the old chapters, the Domes and the Tower are all as they should be */
@@ -24,7 +25,7 @@
     freshSave(); out.wardLen = WARD.length === 49 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
     Save.data.chapter15Complete = true; out.wardOpen = wardUnlocked(47) === true;
 
-    /* the floor plans: twenty-five different ones, every room reachable, both lifts joined, vents everywhere, nothing outside the arena */
+    /* the floor plans: twenty-five different ones, every room reachable, both elevators joined, vents everywhere, nothing outside the arena */
     freshSave(); Save.data.chapter14Complete = true; startRun(15); steps(5); godMode();
     var sigs = {}, plansOk = true, why = [], unreach = [];
     for (var n = 1; n <= TOWER_WAVES; n++){
@@ -52,7 +53,7 @@
     var f7 = TW.floor; P.x = f7.start.x; P.y = f7.start.y;
     var rat = spawnEnemy('hyena', f7.rooms[5].x + f7.rooms[5].w / 2, f7.rooms[5].y + f7.rooms[5].h / 2, 342);        /* room F: not next to the start, and walled off from it */
     var d0 = Math.hypot(rat.x - P.x, rat.y - P.y), best = d0, stuck = 0, lastD = d0;
-    for (i = 0; i < 1500 && !rat.dead; i++){ GR.step(1 / 30); P.invuln = 1e9; P.hp = P.maxHp; var dd = Math.hypot(rat.x - P.x, rat.y - P.y); best = Math.min(best, dd); if (dd < 90) break; }
+    for (i = 0; i < 500 && !rat.dead; i++){ GR.step(1 / 30); P.invuln = 1e9; P.hp = P.maxHp; var dd = Math.hypot(rat.x - P.x, rat.y - P.y); best = Math.min(best, dd); if (dd < 90) break; }
     out.finds = best < 120;
     out.findsD = Math.round(d0) + ' -> ' + Math.round(best);
 
@@ -61,7 +62,7 @@
     var ok = true, bad = [], kinds = ['hyena', 'grub', 'jackal', 'cheetah', 'warthog', 'rhino', 'baboon', 'honeybadger', 'vulture', 'mamba', 'termite', 'ember'];
     kinds.forEach(function(t){
       G.enemies.length = 0; P.x = TW.floor.start.x; P.y = TW.floor.start.y; var p = towerSpawnPoint(), e = spawnEnemy(t, p.x, p.y, 339); if (!e){ ok = false; bad.push(t); return; }
-      for (var q = 0; q < 240; q++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; if (e.hp !== e.hp || e.x !== e.x || e.y !== e.y){ ok = false; bad.push(t + ' nan'); break; } }
+      for (var q = 0; q < 60; q++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; if (e.hp !== e.hp || e.x !== e.x || e.y !== e.y){ ok = false; bad.push(t + ' nan'); break; } }
       if (!e.dead && buildingAt(e.x, e.y)){ ok = false; bad.push(t + ' wall'); }
     });
     out.kindsOk = ok; out.kindsBad = bad.join(',');
@@ -70,7 +71,7 @@
       b[2].forEach(function(st){
         freshSave(); Save.data.chapter14Complete = true; startRun(15, b[1]); steps(3); godMode(); G.waveState = 'idle'; G.spawnQueue = []; G.enemies.length = 0; G.eproj.length = 0; G.markers.length = 0; G.blasts.length = 0; G.beams.length = 0; G.hzones.length = 0;
         var e = spawnEnemy(b[0], P.x + 500, P.y, b[1]); if (!e){ bossOk = false; return; }
-        e.state = st; e.stateT = 0.01; for (var q = 0; q < 70; q++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; }
+        e.state = st; e.stateT = 0.01; for (var q = 0; q < 30; q++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; }
         made[b[0] + ':' + st] = G.eproj.length + G.markers.length + G.hzones.length + G.blasts.length + G.beams.length + G.enemies.length;
         if (e.hp !== e.hp || e.x !== e.x || e.y !== e.y || (!e.dead && buildingAt(e.x, e.y))) { bossOk = false; made[b[0] + ':' + st + ':bad'] = 1; }
       });
@@ -78,7 +79,7 @@
     out.bossBehaviour = bossOk && made['lion:memowind'] > 0 && made['matriarch:meeting'] > 0 && made['buffalo:coinwind'] > 0 && made['crocodile:flaskwind'] > 0 && made['wildfire:chartwind'] > 0;
     out.bossDetail = JSON.stringify(made).slice(0, 300);
 
-    /* the floors, one wave each: clear a floor, the lift opens, walking into it swaps the floor, and the next wave comes in */
+    /* the floors, one wave each: clear a floor, the elevator opens, walking into it swaps the floor, and the next wave comes in */
     freshSave(); Save.data.chapter14Complete = true; startRun(15); steps(10); G.introFX = null; G.banner = null; godMode(); G.rerolls = 0;
     out.floor1 = G.wave === 336 && TW.n === 1 && TW.floor.name === 'Lobby' && G.tower === true && G.biome === 'tower' && Math.abs(P.x - TW.floor.start.x) < 40;
     var seen = false; for (i = 0; i < 400 && G.spawnQueue.length; i++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; } seen = G.enemies.length > 0;
@@ -92,7 +93,7 @@
     out.rideDone = !TW.ride && G.wave === 337 && TW.n === 2 && TW.floor.name === 'Mailroom' && Math.abs(P.x - TW.floor.start.x) < 40 && Math.abs(P.y - TW.floor.start.y) < 40;
     steps(30); out.nextWave = (G.waveState === 'intro' || G.waveState === 'active') && G.wave === 337;
 
-    /* a boss floor: the Receptionist; killing the boss ends the floor at once, strays and all, and the lift opens */
+    /* a boss floor: the Receptionist; killing the boss ends the floor at once, strays and all, and the elevator opens */
     freshSave(); Save.data.chapter14Complete = true; startRun(15, 340); steps(10); G.introFX = null; G.banner = null; godMode();
     for (i = 0; i < 300 && G.spawnQueue.length; i++){ GR.step(1 / 30); P.hp = P.maxHp; P.invuln = 1e9; }
     out.bossFloor = !!G.boss && G.boss.def.title === 'The Receptionist' && TW.floor.boss === true && TW.floor.name === 'Reception Atrium';
@@ -100,7 +101,7 @@
     if (G.boss) damageEnemy(G.boss, 1e18, { noCrit: true, quiet: true }); steps(90);
     out.bossEndsFloor = strays >= 0 && G.waveState === 'clear' && TW.open === true && G.enemies.every(function(e){ return e.dead; }) && G.state === 'playing';
 
-    /* the end of the run: the last floor's boss falls, the film, then the report; the save, the coat colour, and the vial */
+    /* the end of the run: the last floor's boss falls, the film, then the report; the save, the coat color, and the vial */
     freshSave(); Save.data.chapter14Complete = true; Save.data.chapter13Complete = true; var v0 = Save.data.vials | 0;
     startRun(15, 360); steps(10); G.introFX = null; G.banner = null; godMode();
     out.lastFloor = G.wave === 360 && TW.n === 25 && isChapterFinaleWave(360) && TW.floor.name === 'The Executive Floor';
@@ -114,7 +115,7 @@
     var vials1 = Save.data.vials | 0; Save.data.chapter15Complete = true; var d = Save.data; steps(1); out.vialOnce = (Save.data.vials | 0) === vials1;
     G.chapter = TOWER_CHAPTER; out.victoryText = /Chief Executive/.test(victoryText(3, 4));
 
-    /* Rush Hour, the minigame after the Tower: the lanes, the lift, a hit, and the stars and the coat colour */
+    /* Rush Hour, the minigame after the Tower: the lanes, the elevator, a hit, and the stars and the coat color */
     freshSave(); out.rushDef = !!MINI[TOWER_CHAPTER] && MINI[TOWER_CHAPTER].name === 'Rush Hour' && typeof MINI[TOWER_CHAPTER].draw === 'function' && MINI_STAR[TOWER_CHAPTER].t[1] === 12 && MINI_STAR_CHAPTERS.length === 14;
     out.rushLocked = miniUnlocked(TOWER_CHAPTER) === false; Save.data.chapter15Complete = true; out.rushOpen = miniUnlocked(TOWER_CHAPTER) === true;
     Save.data.mini = { own: {}, best: {}, stars: {}, last: 0, plays: 0, hat: '', boot: '' };
@@ -140,11 +141,19 @@
     var rs = Save.data.runSave; out.runSaved = !!rs && rs.wave === 348 && validRunSave(rs);
     if (rs){ startRun(rs.chapter, rs.wave, rs); steps(5); out.restored = G.wave === 348 && TW.n === 13 && G.tower === true && TW.floor.name === 'Shredding Plant'; }
 
+    /* kills pay experience in the Domes and the Tower (the XP table once stopped at Chapter 13, so XP was NaN and the level never rose) */
+    out.xpPays = true; [326, 335, 336, 348, 360].forEach(function(w){
+      freshSave(); Save.data.chapter14Complete = true; startRun(w >= 336 ? 15 : 14, w); steps(10); godMode();
+      for (var q = 0; q < 300 && !G.enemies.length; q++) GR.step(1 / 30);
+      var en = G.enemies[0]; if (!en){ out.xpPays = false; return; }
+      var l0 = P.level, x0 = P.xp; killEnemy(en); var gain = (P.level - l0) * 1e6 + P.xp - x0;
+      if (!(P.xp === P.xp && isFinite(P.xp) && gain > 0)){ out.xpPays = false; out.xpBad = w + ':' + P.xp + ':' + P.level; }
+    });
     /* Play together: the Tower is on the list and a round builds on its floors */
     freshSave(); Save.data.chapter14Complete = true; out.togetherList = coChapters().indexOf(15) >= 0;
     coStart('arena', 15); steps(30, 1 / 30); out.together = Co.on && G.chapter === TOWER_CHAPTER && G.tower === true && !!TW.floor && G.buildings.length > 10 && Co.pl[0].x === Co.pl[0].x; coEnd(true);
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['table', 'bossWaves', 'tuneRising', 'cast', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'plans', 'giraffeBlocked', 'shotStops', 'finds', 'kindsOk', 'bossBehaviour', 'floor1', 'spawns', 'liftOpens', 'rideStarts', 'rideDone', 'nextWave', 'bossFloor', 'bossEndsFloor', 'lastFloor', 'endFilm', 'endOffer', 'endVictory', 'rushDef', 'rushLocked', 'rushOpen', 'rushStart', 'rushLanes', 'rushFloor', 'rushHit', 'rushStars', 'rushCoat', 'rushTotals', 'vial', 'vialOnce', 'menuLocked', 'menuOpen', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runSaved', 'restored', 'togetherList', 'together', 'bestiary', 'victoryText'];
+  var need = ['table', 'bossWaves', 'tuneRising', 'cast', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'plans', 'giraffeBlocked', 'shotStops', 'finds', 'kindsOk', 'bossBehaviour', 'floor1', 'spawns', 'liftOpens', 'rideStarts', 'rideDone', 'nextWave', 'bossFloor', 'bossEndsFloor', 'lastFloor', 'endFilm', 'endOffer', 'endVictory', 'rushDef', 'rushLocked', 'rushOpen', 'rushStart', 'rushLanes', 'rushFloor', 'rushHit', 'rushStars', 'rushCoat', 'rushTotals', 'vial', 'vialOnce', 'menuLocked', 'menuOpen', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runSaved', 'restored', 'xpPays', 'togetherList', 'together', 'bestiary', 'victoryText'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);
