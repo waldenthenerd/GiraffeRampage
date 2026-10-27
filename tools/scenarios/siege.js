@@ -50,9 +50,35 @@
     steps(90);
     out.spawns = G.enemies.length > 0 && G.enemies.every(function(e){ return e.def && e.def.siege === true; });
     out.hud = /THE SIEGE/.test(document.getElementById('hChapter') ? document.getElementById('hChapter').textContent : 'CH.15 THE SIEGE');
+    /* the town: five key buildings, solid houses, gates for the machines, every gate and every key building reachable round the walls */
+    var plan = SG.plan;
+    out.keys5 = SG.keyList.length === 5 && ['hall', 'library', 'post', 'lighthouse', 'mission'].every(function(k){ return SG.keyList.some(function(b){ return b.key === k; }); });
+    out.solid = G.tower === true && !!TW.floor && G.buildings.length === plan.houses.length && G.buildings.every(function(b){ return b.indestructible && b.siege; });
+    var inside = plan.houses.every(function(h){ return h.x >= 0 && h.y >= 0 && h.x + h.w <= ARENA_W && h.y + h.h <= ARENA_H; }); out.inside = inside;
+    var clash = ''; for (var i = 0; i < plan.houses.length; i++) for (var j = i + 1; j < plan.houses.length; j++){ var a1 = plan.houses[i], b1 = plan.houses[j]; if (a1.x < b1.x + b1.w && b1.x < a1.x + a1.w && a1.y < b1.y + b1.h && b1.y < a1.y + a1.h) clash += a1.k + '/' + b1.k + ' '; }
+    out.noOverlap = clash === ''; out.clash = clash;
+    var seen = new Uint8Array(TW_NX * TW_NY), q = [], s0 = siegeStart(), si = (s0.y / TW_NAV | 0) * TW_NX + (s0.x / TW_NAV | 0);
+    out.startOpen = !TW.blocked[si];
+    seen[si] = 1; q.push(si);
+    while (q.length){ var c = q.pop(), ci = c % TW_NX, cj = (c / TW_NX) | 0; for (var k = 0; k < 4; k++){ var ni = ci + [1, -1, 0, 0][k], nj = cj + [0, 0, 1, -1][k]; if (ni < 0 || nj < 0 || ni >= TW_NX || nj >= TW_NY) continue; var n = nj * TW_NX + ni; if (seen[n] || TW.blocked[n]) continue; seen[n] = 1; q.push(n); } }
+    var lost = plan.vents.filter(function(v){ var o = towerOpenNear(v.x, v.y); return !seen[(o.y / TW_NAV | 0) * TW_NX + (o.x / TW_NAV | 0)]; });
+    out.gatesReach = lost.length === 0; out.gatesLost = lost.length;
+    var cut = SG.keyList.filter(function(b){ var ok = false; for (var d = -1; d <= 1 && !ok; d++) for (var e2 = -1; e2 <= 1 && !ok; e2++){ var px = b.x + b.w / 2 + d * (b.w / 2 + 90), py = b.y + b.h + 90 + e2 * 20; ok = !TW.blocked[(py / TW_NAV | 0) * TW_NX + (px / TW_NAV | 0)] && !!seen[(py / TW_NAV | 0) * TW_NX + (px / TW_NAV | 0)]; } return !ok; });
+    out.keysReach = cut.length === 0;
+    var open = 0; for (var u = 0; u < seen.length; u++) if (seen[u]) open++; out.openShare = open / (TW_NX * TW_NY) > 0.55;
+    /* the giraffe cannot walk into a house */
+    var hh = plan.houses.filter(function(h){ return h.k === 'house'; })[0]; P.x = hh.x + hh.w / 2; P.y = hh.y + hh.h / 2; resolveBuildings(P, P.r * 0.8);
+    out.blocked = !(P.x > hh.x && P.x < hh.x + hh.w && P.y > hh.y && P.y < hh.y + hh.h);
+    /* the picture: --params "view=square|market|harbor|park|roofs|launch|south|hall|lighthouse" */
+    var at = { square: [2100, 1700], market: [2100, 600], harbor: [700, 1700], park: [3500, 1600], roofs: [3500, 600], launch: [3500, 2650], south: [2100, 2650], nw: [700, 600], hall: [2100, 1250], lighthouse: [700, 1450], mission: [3400, 2350], post: [2700, 500], library: [1700, 520] };
+    if (QA.params.view === 'map'){                                                       /* the whole town on one canvas, laid over the page */
+      var cv = document.createElement('canvas'); cv.width = 1400; cv.height = 1050; cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99999;background:#000'; var cx2 = cv.getContext('2d');
+      cx2.scale(1400 / ARENA_W, 1050 / ARENA_H); drawGroundSiege(cx2, ARENA_W / 2, ARENA_H / 2, ARENA_W, ARENA_H); document.body.appendChild(cv); QA.done(out); return;
+    }
+    if (QA.params.view && at[QA.params.view]){ Settings.fxLevel = 1; G.enemies.length = 0; G.spawnQueue = []; G.waveState = 'idle'; P.invuln = 1e9; P.x = at[QA.params.view][0]; P.y = at[QA.params.view][1]; for (var z = 0; z < 8; z++){ G.enemies.length = 0; G.spawnQueue = []; GR.step(1 / 30); } QA.done(out); return; }
     G.wave = 385; out.flags = true;
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns'];
+  var need = ['table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);

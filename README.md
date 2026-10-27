@@ -40,16 +40,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 186 | 59,214 | 4.62 MiB (4,848,451 bytes) |
+| JavaScript (`js/`) | 186 | 59,481 | 4.65 MiB (4,876,070 bytes) |
 | Styles (`css/`) | 6 | 1,712 | 158 KiB (161,471 bytes) |
 | Page (`index.html`) | 1 | 234 | 10.1 KiB (10,374 bytes) |
-| **Whole game** | **193** | **61,160** | **4.79 MiB (5,020,296 bytes)** |
+| **Whole game** | **193** | **61,427** | **4.81 MiB (5,047,915 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **60,565 lines, 4.74 MiB (4,973,925 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 186 | 59,214 | 4.62 MiB (4,848,451 bytes) |
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **60,832 lines, 4.77 MiB (5,001,544 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 186 | 59,481 | 4.65 MiB (4,876,070 bytes) |
 | Styles (`css/`) | 6 | 1,712 | 158 KiB (161,471 bytes) |
 | Page (`index.html`) | 1 | 234 | 10.1 KiB (10,374 bytes) |
-| **Whole game** | **193** | **61,160** | **4.79 MiB (5,020,296 bytes)** |
+| **Whole game** | **193** | **61,427** | **4.81 MiB (5,047,915 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -252,7 +252,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/44zzza-tower-floors.js` | 348 | **The Tower in play.** `towerLoadFloor` makes a floor's walls and furniture solid, unbreakable buildings (`G.buildings`, so the giraffe, ants and every creature, flyers too, go round them and every shot dies on them) and builds the 50 px nav maps; `towerFlow` is a flow field (how many steps each spot is from her) and `towerSteer` makes a creature that cannot see her head for the next doorway instead of pressing on a wall; `towerSight`, `towerWallAhead`, `towerOpenNear` and `towerSpawnPoint` (the floor's vents) serve the behaviors and the wave director. When a floor is clear the elevator opens (`towerLiftTick`); walking into it starts the ride (`towerRide*`: black-out, a floor counter, the new floor loaded, the next wave counting in); the wrappers on `startWave`, `drawFeedbackOverlays` and `drawBuilding` hook it in. `drawGroundTower` paints the floor, rugs, doors, furniture, lifts and walls from the plan, with a look for each kind of room (lobby, carpet, marble, server, lab, vault, penthouse...). |
 | `js/44zzzb-minigame-rush.js` | 91 | **Rush Hour**, the minigame after Chapter 14 (the Tower), registered like the others in `44f-minigames.js` as `MINI[15]`: the lobby at half past eight, from above, with six lanes of swivel chairs, trolleys and delivery drones crossing it (`rushLanes`, faster on every floor); she walks from the door at the bottom to the elevator at the top for a floor, three lives, 45 seconds, six floors to win. Its stars are `MINI_STAR[15]` (9 and 12 floors), `MINI_STAR_CHAPTERS` in `44k-minigame-rewards.js` lists the fourteen chapters that have a minigame (Chapter 13.5 has none, so stars are out of 42), and three stars win the coat color Brass Button (WARD 48, `miniWardOf`). After the Tower's last floor the run saves first (`towerFinishSave`: the flag, the vial), then the film, then the minigame offer, then the report. |
 | `js/44zzzc-gags.js` | 286 | **Silly gags**: pointless things the giraffe does by herself, with a small chance, when she is near something (`PROP_GAGS` by scenery id: a bite out of a tree that leaves it bare for the rest of the run, a splash in the lilies, a word to a dish; `TOWER_GAGS`: she smashes office furniture and it stays a wreck; `ROBOT_LINES`: "Ignore all previous instructions and leave me alone. Make no mistakes." to a robot nearby, and a stiff answer; `IDLE_LINES`). One at a time with a quiet gap, a cap per kind per run, nothing while the game is not in play, a clean slate every run. Cosmetic only. `Save.data.gagsDone` counts them (achievements Pointless, Professional Nuisance, Chaos Gremlin). |
-| `js/44zzzd-siege-town.js` | 7 | **The Siege in play**: Longneck Town as the arena (`buildSiegeWorld`, `drawGroundSiege`). |
+| `js/44zzzd-siege-town.js` | 274 | **The Siege in play, the town**: Longneck Town as the arena, seen from above on a 3x3 grid of 1400x1050 cells (the Square in the middle, Market Street, Willow Park, the Harbor, the Rooftops, the Launchpad and three outskirt cells). `siegeLayout()` is the plan as data (solid houses, stalls, tanks and the five key buildings: Herd Hall, Library, Trading Post, Lighthouse, Mission Control; the `vents` are the gates the machines arrive by); `buildSiegeWorld` makes them solid buildings and reuses the Tower's flow field (`TW.floor`) so creatures come round them; `drawGroundSiege` paints the streets, lots, plaza, signs and every building. |
 | `js/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/45b-dev-panel.js` | 595 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/46-main.js` | 4 | Starts the game. |
