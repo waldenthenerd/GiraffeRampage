@@ -59,6 +59,8 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   add('ch135', R, 'Under the Mylar', 'Clear Chapter 13.5, the Domes', 1, 25, function(){ return D().chapter14Complete ? 1 : 0; });
   add('ch14', R, 'Top Floor', 'Clear Chapter 14, the Tower', 1, 40, function(){ return D().chapter15Complete ? 1 : 0; });
   add('ch15', R, 'Hold the Line', 'Clear Chapter 15, the Siege', 1, 50, function(){ return D().chapter16Complete ? 1 : 0; });
+  add('siegeheld', R, 'A Town Worth Holding', 'Hold the town through 10 waves of the Siege', 10, 40, function(){ return Math.min(10, D().siegeHeldBest | 0); });
+  add('siegeflaw', R, 'Not a Scratch', 'Hold the town through all 25 waves of the Siege, with no building wrecked', 1, 80, function(){ return D().siegeFlawless ? 1 : 0; });
   add('home', R, 'Home Again', 'Fly the spaceplane home', 1, 20, function(){ return D().homecoming ? 1 : 0; });
   add('gold1m', R, 'Gold Hoarder', 'Hold 1,000,000 gold at once', 1e6, 10, function(){ return goldInt(D().gold); });
   add('gems500', R, 'Gem Cache', 'Hold 500 gems at once', 500, 10, function(){ return scoreInt(D().gems); });

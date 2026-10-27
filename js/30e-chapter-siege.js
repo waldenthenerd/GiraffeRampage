@@ -8,7 +8,7 @@
    if it is too hard or too easy: SIEGE_MUL is the strength of the table, siegeScale takes it from SIEGE_TUNE.hp0 to hp1 (and the same for damage) times Chapter 13's last
    wave, which puts the first wave where the Tower's last one was. SIEGE_TUNE.hard scales both together, split evenly between health and damage like the Domes. */
 const SIEGE_MUL = { common: { hp: 30, dmg: 7.0, spd: 1.6, val: 20 }, boss: { hp: 24, dmg: 5.8, spd: 1.4, val: 16 } };
-const SIEGE_TUNE = { hp0: 3.2, hp1: 5.0, dmg0: 1.9, dmg1: 3.0, count0: 70, countStep: 3.4, hard: 1 };
+const SIEGE_TUNE = { hp0: 3.2, hp1: 5.0, dmg0: 1.9, dmg1: 3.0, count0: 100, countStep: 4.2, hard: 1 };
 const SIEGE_HARD = Math.sqrt(SIEGE_TUNE.hard);
 function siegeScale(cw){
   const k = clamp((cw - 1) / (SIEGE_WAVES - 1), 0, 1), b = enemyScale(WAVES_PER_CHAPTER);

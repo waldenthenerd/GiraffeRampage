@@ -42,12 +42,19 @@
       '<li>You can play it from the menu with its own card, and in Play together.</li></ul>';
   } }, 'chapters');
   place({ id: 'tower', title: 'Chapter 14: the Tower', show: function(){ return !!(Save.data && Save.data.chapter14Complete); }, html: function(){
-    return '<p>The last place the trail goes: a glass tower in New York, <b>twenty-five floors</b> (waves 336 to 360), one wave on each, with a boss on every fifth floor. It opens when you finish Chapter 13.5.</p><ul class="helplist">' +
+    return '<p>Where the trail goes after the domes: a glass tower in New York, <b>twenty-five floors</b> (waves 336 to 360), one wave on each, with a boss on every fifth floor. It opens when you finish Chapter 13.5.</p><ul class="helplist">' +
       '<li>Every floor is a different set of rooms joined by doorways. <b>The walls and the furniture cannot be broken</b>, and they stop every shot, yours and theirs. Creatures that cannot see you come round through the doors.</li>' +
       '<li>When a floor is clear the elevator opens. Walk into it to go up. It saves your run, and the next floor starts when you step out.</li>' +
       '<li>Everything in the building is new: office machines and lab animals the glimmer has got into.</li>' +
       '<li>Finish wave 360 and you win the coat color <b>Executive Navy</b>, the usual chapter rewards, and one more <b>Mutation Vial</b> for the lab. You can play it from the menu and in Play together.</li></ul>';
   } }, 'chapters');
+  place({ id: 'siege', title: 'Chapter 15: the Siege', show: function(){ return !!(Save.data && Save.data.chapter16Complete); }, html: function(){
+    return '<p>The machines come for Longneck Town: <b>twenty-five waves</b> (361 to 385), a boss every fifth, fought across the whole town. It opens when you finish Chapter 14.</p><ul class="helplist">' +
+      '<li>Five buildings matter: the <b>Herd Hall, Library, Trading Post, Lighthouse and Mission Control</b>. Machines hit one as they pass, and some of them (the Dozer, Sapper, Gnawer, Ram and others) go straight for the nearest one. At <b>25 points or less</b> a building is wrecked and left alone; it is never destroyed, and the militia mend it between waves.</li>' +
+      '<li>A wave in which no building is wrecked is <b>held</b>, and pays gold and gems. Every wave held pays a chest at the end, and holding all twenty-five is a trophy.</li>' +
+      '<li>The <b>militia</b> are friendly giraffes with rifles at sandbag posts: one shot kills a common creature, a heavy one takes two, a boss only a chip. A post worn down to 30 is abandoned, and its giraffes fight on foot. <b>Walk over a hurt or fallen militia giraffe to heal her.</b> Everyone is back on their feet at the next wave, and nobody is lost for good.</li>' +
+      '<li>The town\u2019s herd is hiding in the Burrows. Finish wave 385 and you win the coat color <b>Town Watch</b> and the usual chapter rewards. You can play it from the menu and in Play together.</li></ul>';
+  } }, 'tower');
   place({ id: 'intel', title: 'Intelligence', show: function(){ return typeof intel === 'function' && intel() > 0; }, html: function(){
     return '<p><b>Intelligence</b> is the average level across all the university faculties, shown as a percentage in the university journal. Yours is <b>' + intelPct() + '%</b>. It is a stat, not a setting: it grows only by studying.</p><ul class="helplist">' +
       '<li>Up to <b>60% fewer falls</b> off boards and bikes.</li>' +

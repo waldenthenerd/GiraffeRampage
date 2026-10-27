@@ -111,7 +111,7 @@
     showBestiary('creatures'); out.bestHtml = /Chapter 13\.5/.test(OV.innerHTML) && /1 \/ 14/.test(OV.innerHTML) && /Chapter 13 — Mars/.test(OV.innerHTML) && /0 \/ 17/.test(OV.innerHTML);
 
     /* Play together */
-    freshSave(); out.coLocked = coChapters().indexOf(14) < 0; var real = coRealSave; Save.data.chapter13Complete = true; out.coOpen = coChapters().indexOf(14) >= 0 && CO_CHAPTERS.length === 15;
+    freshSave(); out.coLocked = coChapters().indexOf(14) < 0; var real = coRealSave; Save.data.chapter13Complete = true; out.coOpen = coChapters().indexOf(14) >= 0 && CO_CHAPTERS.length === 16;
 
     /* the other lists that count chapters */
     freshSave(); Save.data.chapter14Complete = true; Save.data.chapter13Complete = true;

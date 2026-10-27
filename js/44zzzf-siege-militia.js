@@ -7,7 +7,7 @@
    or less is ABANDONED: its giraffes leave it and fight on foot, near whichever key building is under the most pressure, and run from anything that gets close. Between waves
    the posts are mended (+40) and manned again. A giraffe that has no health left lies down (nobody dies, and nothing is lost for good): she gets up when the giraffe walks
    over her, which heals a hurt one too, and every one of them is on her feet again at the start of the next wave. In Play together either giraffe can heal them. */
-const MIL = { per: 2, range: 560, reload: 1.9, footReload: 2.5, hp: 100, hitDmg: 22, hitCd: 1.0, shotDmg: 22, postHp: 100, abandon: 30, mend: 40, heal: 150, healR: 36, speed: 150, flee: 100 };
+const MIL = { per: 2, range: 500, reload: 3.4, footReload: 4.4, hp: 100, hitDmg: 22, hitCd: 1.0, shotDmg: 22, postHp: 100, abandon: 30, mend: 40, heal: 150, healR: 36, speed: 150, flee: 100 };
 const MIL_HEAVY = { warthog: 1, rhino: 1 };                                       /* two shots, not one */
 const SGM = { posts: [], men: [], tracers: [], tipped: false };
 const MIL_COATS = [['#C8A04A', '#7A5A1E'], ['#A9B86A', '#5E6E2E'], ['#D08A5A', '#7E4A28'], ['#8AAED0', '#42607E'], ['#C89AB8', '#7E4A6A'], ['#B8A0D8', '#62487E']];
@@ -55,7 +55,7 @@ function milShot(m, e){
   burstParticles(m.x + Math.cos(a) * 24, m.y + Math.sin(a) * 24, 3, '#FFE9A0', 140, 2.4, { glow: true });
   sfx('zap', 0.07, m.x, m.y);
   if (dmg >= e.hp) e.xp *= 0.5;                                                  /* the experience for a militia kill is half: they did the work */
-  dmgSrc = 'allies'; damageEnemy(e, dmg, { noCrit: true, quiet: true, color: '#FFE9A0' });
+  dmgSrc = 'militia'; damageEnemy(e, dmg, { noCrit: true, quiet: true, color: '#FFE9A0' });
 }
 
 /* ---- being hit, going down, getting up ---- */

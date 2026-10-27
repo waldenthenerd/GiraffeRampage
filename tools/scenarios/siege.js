@@ -173,8 +173,54 @@
     out.endVictory = G.state === 'victory' && Save.data.chapter16Complete === true && Save.data.chapter15Complete === true && wardUnlocked(49) === true;
     G.chapter = SIEGE_CHAPTER; out.victoryText = /Warden/.test(victoryText(3, 4)) && !/the end|thanks for playing/i.test(victoryText(3, 4));
     freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();
+    /* the Bestiary, the Guide, the trophies, the run report, the gags and Play together */
+    freshSave(); var bz = bestiaryData();
+    out.bestName = bestiaryName(16, 'wildfire').title === 'The Warden' && bestiaryName(16, 'hyena').title === 'Patrol Bot' && bestiaryName(1, 'hyena').title === 'Spotted Hyena';
+    var ez = { type: 'wildfire', waveRef: 385, x: 0, y: 0, r: 60, def: ETYPES_SIEGE.wildfire }; recordBestiaryKill(ez);
+    out.bestKill = bz.creatures['16:wildfire'] === 1 && !bz.creatures['16:lion'];
+    showBestiary('creatures'); out.bestHtml = /Chapter 15/.test(OV.innerHTML) && /The Siege/.test(OV.innerHTML) && /1 \/ 17/.test(OV.innerHTML);
+    hideOverlay();
+    out.report = srcInfo('militia', []).name === 'The militia' && srcInfo('allies', []).name === 'Dust allies';
+    out.gagRobots = ['sg_patrol', 'sg_skitter', 'sg_dozer', 'sg_walker', 'sg_warden'].every(function(l){ return GAG_ROBOT.test(l); }) && IDLE_CHAPTER[16].length >= 4;
+    freshSave(); var ach = function(id){ return ACH.filter(function(x){ return x.id === id; })[0]; };
+    out.ach = !!ach('ch15') && !!ach('siegeheld') && !!ach('siegeflaw') && ach('ch15').val() === 0 && ach('siegeheld').val() === 0 && ach('siegeflaw').val() === 0;
+    Save.data.chapter16Complete = true; Save.data.siegeHeldBest = 14; Save.data.siegeFlawless = true; out.ach2 = ach('ch15').val() === 1 && ach('siegeheld').val() === 10 && ach('siegeflaw').val() === 1;
+    freshSave(); out.guideLocked = !/Chapter 15: the Siege/.test(guideTopicsHTML()); Save.data.chapter16Complete = true; out.guideOpen = /Chapter 15: the Siege/.test(guideTopicsHTML());
+    freshSave(); out.coLocked = coChapters().indexOf(16) < 0 && CO_CHAPTERS.length === 16; Save.data.chapter15Complete = true; out.coOpen = coChapters().indexOf(16) >= 0;
+    coStart('arena', 16); steps(40); out.together = Co.on && G.chapter === SIEGE_CHAPTER && G.biome === 'siege' && G.tower === true && G.buildings.length > 30 && SGM.men.length === 20 && Co.pl[0].x === Co.pl[0].x;
+    var cman = SGM.men[0]; cman.hp = 20; Co.pl[1].x = cman.x + 4; Co.pl[1].y = cman.y; Co.pl[1].down = false; siegeMilitiaTick(0.2); out.togetherHeal = cman.hp > 20; coEnd(true);
+    freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();
+    /* a saved run keeps how many waves were held */
+    freshSave(); Save.data.chapter15Complete = true; startRun(16, 370); steps(3); G.sg.held = 7; var snap = runSnapshot(); out.snapHeld = snap.sgHeld === 7 && validRunSave(snap);
+    Save.data.runSave = snap; startRun(16, 370, snap); steps(3); out.restoreHeld = G.sg.held === 7;
+    var old = JSON.parse(JSON.stringify(snap)); delete old.sgHeld; startRun(16, 370, old); steps(3); out.restoreOld = G.sg.held === 0;
+    freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();
     /* the picture: --params "view=square|market|harbor|park|roofs|launch|south|hall|lighthouse" */
     var at = { square: [2100, 1700], market: [2100, 600], harbor: [700, 1700], park: [3500, 1600], roofs: [3500, 600], launch: [3500, 2650], south: [2100, 2650], nw: [700, 600], hall: [2100, 1250], lighthouse: [700, 1450], mission: [3400, 2350], post: [2700, 500], library: [1700, 520], militia: [1800, 1640] };
+    if (QA.params.view === 'menu'){ G.state = 'menu'; Save.data.chapter15Complete = true; setMenuChapter(16); showMenu(); for (var mm = 0; mm < 4; mm++) GR.step(1 / 30); drawMenuPreview(); QA.done(out); return; }
+    if (QA.params.view === 'bench'){                                                     /* timing: --params "view=bench&ch=16" (or 15 for the Tower, to compare) */
+      var chb = +QA.params.ch || 16; freshSave(); Save.data.chapter15Complete = true; Save.data.chapter14Complete = true; startRun(chb, chapterFirstWave(chb) + 9); steps(3); godMode(); G.introFX = null; G.banner = null; G.waveState = 'idle'; G.spawnQueue = [];
+      var tys = ['hyena', 'grub', 'jackal', 'cheetah', 'warthog', 'vulture', 'rhino', 'baboon', 'honeybadger', 'mamba', 'ember', 'termite'];
+      for (var ib = 0; ib < 100; ib++){ var pb = chb === 16 ? towerOpenNear(500 + (ib * 137) % 3200, 400 + (ib * 211) % 2400) : towerSpawnPoint(); spawnEnemy(tys[ib % 12], pb.x, pb.y, chapterFirstWave(chb) + 9); }
+      var t0 = performance.now(); for (var sb = 0; sb < 150; sb++){ GR.step(1 / 30); noLevels(); P.hp = P.maxHp; P.invuln = 1e9; } out.msPerStep = Math.round((performance.now() - t0) / 150 * 100) / 100; out.alive = G.enemies.length; QA.done(out); return;
+    }
+    if (QA.params.view === 'sim'){                                                       /* balance: --params "view=sim&wave=361" plays waves with the giraffe standing in the Square doing nothing */
+      var w0 = +QA.params.wave || 361, rep = []; freshSave(); Save.data.chapter15Complete = true; startRun(16, w0); steps(2); P.invuln = 1e9; P.hp = P.maxHp = 1e12; G.rerolls = 0;
+      for (var wv = 0; wv < (+QA.params.waves || 1); wv++){
+        var kills0 = G.kills, mk = 0, steps0 = 0, ms0 = G.runDmg && G.runDmg.militia || 0;
+        for (var sf = 0; sf < 2400 && steps0 < 2400; sf++){ steps0++; GR.step(1 / 30); noLevels(); P.hp = P.maxHp; P.invuln = 1e9; P.x = 2100; P.y = 1900; if (G.waveState === 'clear' && G.waveTimer <= 0.05) break; }
+        rep.push({ w: G.wave, sec: Math.round(steps0 / 30), kills: G.kills - kills0, hold: G.sg.held, bld: Object.keys(SGB).map(function(k){ return Math.round(SGB[k].hp); }).join('/'), wrecked: Object.keys(SGB).filter(function(k){ return SGB[k].wrecked; }).length, abandoned: SGM.posts.filter(function(p){ return p.abandoned; }).length, down: SGM.men.filter(function(m){ return m.state === 'down'; }).length, militiaDmg: Math.round((G.runDmg.militia || 0) / 1e3) });
+        if (G.state !== 'playing') break; startWave(G.wave + 1);
+      }
+      out.sim = rep; QA.done(out); return;
+    }
+    if (QA.params.view === 'battle'){                                                    /* a picture of a fight in the Square: --params "view=battle" */
+      Settings.fxLevel = 1; freshSave(); Save.data.chapter15Complete = true; startRun(16, 373); steps(3); G.introFX = null; G.banner = null; G.waveState = 'idle'; G.spawnQueue = []; G.enemies.length = 0; P.invuln = 1e9; P.hp = P.maxHp = 1e12; P.x = 2000; P.y = 1900;
+      var bt = ['hyena', 'jackal', 'cheetah', 'warthog', 'vulture', 'rhino', 'baboon', 'honeybadger', 'mamba', 'ember', 'termite', 'grub'];
+      for (var ib2 = 0; ib2 < 22; ib2++){ var ang = ib2 * 2.4, rad = 140 + (ib2 % 5) * 60, pb2 = towerOpenNear(P.x + Math.cos(ang) * rad * 1.5, P.y + Math.sin(ang) * rad); spawnEnemy(bt[ib2 % 12], pb2.x, pb2.y, 373); }
+      SGB.hall.hp = 60; SGB.post.hp = 40; SGM.men[0].hp = 40; SGM.men[1].state = 'down'; SGM.men[1].hp = 0;
+      for (var z2 = 0; z2 < 14; z2++){ GR.step(1 / 30); noLevels(); P.hp = P.maxHp; } QA.done(out); return;
+    }
     if (QA.params.film){                                                                 /* one frame of a film: --params "film=siegeflight&t=11" --w 1280 --h 720 */
       var cvf = document.createElement('canvas'); cvf.width = CS_W; cvf.height = CS_H; cvf.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99999;background:#000'; var cxf = cvf.getContext('2d');
       MARS_FILMS[QA.params.film].scene(cxf, +QA.params.t || 0); MARS_FILMS[QA.params.film].over(cxf, +QA.params.t || 0); document.body.appendChild(cvf); QA.done(out); return;
@@ -196,7 +242,7 @@
     if (QA.params.view && at[QA.params.view]){ Settings.fxLevel = 1; G.enemies.length = 0; G.spawnQueue = []; G.waveState = 'idle'; P.invuln = 1e9; if (QA.params.damage){ SGB.hall.hp = 45; SGB.library.hp = 12; SGB.library.wrecked = true; SGB.post.hp = 70; SGB.post.alert = 99; SGB.lighthouse.hp = 30; SGM.men[0].hp = 35; SGM.men[1].state = 'down'; SGM.men[1].hp = 0; SGM.posts[0].hp = 55; SGM.posts[1].hp = 20; SGM.posts[1].abandoned = true; SGM.men[2].hp = 100; } P.x = at[QA.params.view][0]; P.y = at[QA.params.view][1]; for (var z = 0; z < 8; z++){ G.enemies.length = 0; G.spawnQueue = []; GR.step(1 / 30); noLevels(); } G.texts.length = 0; G.particles.length = 0; GR.step(1 / 30); QA.done(out); return; }
     G.wave = 385; out.flags = true;
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked', 'dStart', 'dHurt', 'dWreck', 'dLeftAlone', 'dPass', 'dCooldown', 'dSapper', 'dHunter', 'dWalks', 'dRepair', 'dHeld', 'dNotHeld', 'dFinale', 'dSave', 'dSave2', 'dDraws', 'mStart', 'mSpot', 'mOneShot', 'mReload', 'mHeavy', 'mBoss', 'mRange', 'mHurt', 'mHurtCd', 'mShot', 'mDown', 'mDownQuiet', 'mUp', 'mHealHurt', 'pAbandon', 'pFoot', 'pMend', 'mDraws', 'kindsOk', 'bossBehaviour', 'artDraws', 'menuFilm', 'filmsDraw', 'gallery', 'lastWave', 'endFilm', 'endVictory', 'victoryText'];
+  var need = ['table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked', 'dStart', 'dHurt', 'dWreck', 'dLeftAlone', 'dPass', 'dCooldown', 'dSapper', 'dHunter', 'dWalks', 'dRepair', 'dHeld', 'dNotHeld', 'dFinale', 'dSave', 'dSave2', 'dDraws', 'mStart', 'mSpot', 'mOneShot', 'mReload', 'mHeavy', 'mBoss', 'mRange', 'mHurt', 'mHurtCd', 'mShot', 'mDown', 'mDownQuiet', 'mUp', 'mHealHurt', 'pAbandon', 'pFoot', 'pMend', 'mDraws', 'kindsOk', 'bossBehaviour', 'artDraws', 'menuFilm', 'filmsDraw', 'gallery', 'lastWave', 'endFilm', 'endVictory', 'victoryText', 'bestName', 'bestKill', 'bestHtml', 'report', 'gagRobots', 'ach', 'ach2', 'guideLocked', 'guideOpen', 'coLocked', 'coOpen', 'together', 'togetherHeal', 'snapHeld', 'restoreHeld', 'restoreOld'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);

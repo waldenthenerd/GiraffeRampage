@@ -14,7 +14,7 @@
    Save.data.gagsDone counts them all (the "pointless" achievements). */
 const GAG = { cd: 6, scanT: 0, n: 0, kinds: {}, timers: [], idleT: 0, prop: null };
 const GAG_GAP = [7, 13];                                                       /* seconds of quiet after a gag */
-const GAG_ROBOT = /drone|mech|sentry|walker|turret|copter|gunship|bomber|tank|railgun|plasma|a10|tw_(copier|roller|safe|shredder|cam|battery|vault|mite|hive|courier)/;
+const GAG_ROBOT = /drone|mech|sentry|walker|turret|copter|gunship|bomber|tank|railgun|plasma|a10|tw_(copier|roller|safe|shredder|cam|battery|vault|mite|hive|courier)|sg_(patrol|skitter|raptor|dozer|spotter|sapper|torch|walker|ram|carrier|warden)/;
 
 /* id: { act, say: [lines], range: how close (px beyond its own size), rate: chance per second while in range, max: cap per run, ghost: a second line said a moment later } */
 const PROP_GAGS = {
@@ -128,6 +128,7 @@ const ROBOT_LINES = [
 ];
 const IDLE_CHAPTER = {                                                         /* lines that belong to one place, mixed into the general ones (internal chapter number) */
   14: ['Is it me, or is the sun in a jar?', 'Frozen things in a hot place. Classic.', 'I could use a sweater. Odd.', '*breathes out a little cloud*', 'The foil is judging me.'],
+  16: ['Is that a drone, or a very fast bird?', 'Please stop breaking the town.', 'I could really use a sandbag. Oh, there are many.', 'Is the herd still in the Burrows? Good.', 'Everyone is being very brave. Me too.'],
   15: ['Is this meeting a meeting?', 'I should check my email. I have no email.', '*presses the elevator button twice*', 'Whose lunch is this? Mine now.', 'Beige. Everything is beige.', 'Per my last roar.']
 };
 const IDLE_LINES = ['*yaaawn*', 'Is it Tuesday?', '*sneezes*', 'I forgot why I am here.', 'Nice weather. For fighting.', '*checks a watch she does not have*', 'Anyone have a snack?', '...', 'Hmm.', 'I should really stretch.'];

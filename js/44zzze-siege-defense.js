@@ -8,13 +8,13 @@
    pays a bonus; every wave held at the end earns the chest, and all 25 is the trophy. State lives in SGB (by building key), reset for each run. */
 const SIEGE_BLD = { max: 100, wreck: 25, repair: 30, hitCd: 1.5, reach: 46, hunterHits: 3, hunterCd: 0.9, hunterNear: 300 };
 const SIEGE_HIT = { hyena: 1.5, grub: 0.5, jackal: 1, cheetah: 2, warthog: 5, vulture: 1, rhino: 4, baboon: 2, honeybadger: 18, mamba: 1.5, ember: 3, termite: 2, lion: 8, matriarch: 3, buffalo: 15, crocodile: 6, wildfire: 10 };
-const SIEGE_HUNTERS = { warthog: 1, honeybadger: 1, termite: 1, buffalo: 1, rhino: 0.7, ember: 0.5, jackal: 0.3, vulture: 0.3, baboon: 0.25, mamba: 0.2, hyena: 0.15, cheetah: 0.15 };
+const SIEGE_HUNTERS = { warthog: 1, honeybadger: 1, termite: 1, buffalo: 1, rhino: 0.8, ember: 0.6, jackal: 0.45, vulture: 0.4, baboon: 0.4, mamba: 0.35, hyena: 0.3, cheetah: 0.35 };
 const SGB = {};
 const SIEGE_SHORT = { hall: 'HALL', library: 'LIBRARY', post: 'POST', lighthouse: 'LIGHT', mission: 'MISSION' };       /* the names on the row at the top of the screen */
 function siegeDefenseInit(){
   Object.keys(SGB).forEach(function(k){ delete SGB[k]; });
   SG.keyList.forEach(function(b){ SGB[b.key] = { b: b, hp: SIEGE_BLD.max, wrecked: false, flash: 0, alert: 0, hurt: 0, smokeT: 0, name: (SG.plan.keys[b.key] || {}).name || b.key, field: null }; });
-  G.sg = { held: 0, waves: 0, dip: false, flawless: true, texts: {} };
+  G.sg = { held: G.sgHeldRestore | 0, waves: 0, dip: false, flawless: true, texts: {} }; G.sgHeldRestore = 0;
   SG.keyList.forEach(function(b){ SGB[b.key].field = siegeField(b); });
 }
 /* how many steps every open cell is from this building: the way a hunter finds it round the other buildings */
