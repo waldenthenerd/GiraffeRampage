@@ -188,7 +188,7 @@ const _q = [], _q2 = [];
 /* ========================= 4. SAVE / META ========================= */
 const SAVE_KEY = 'giraffe_rampage_save_v1';
 const DEFAULT_SAVE = { inputMode: '', gold: 0, gems: 0, meta: {}, gear: {}, equipped: { cape: null, weapon: null, armor: null }, equippedTrinkets: [],
-  best: 0, bestWave: 0, runs: 0, totalKills: 0, chaptersComplete: 0, chapter1Complete: false, chapter2Complete: false, chapter3Complete: false, chapter4Complete: false, chapter5Complete: false, chapter6Complete: false, chapter7Complete: false, chapter8Complete: false, chapter9Complete: false, chapter10Complete: false, enginePart: false, spaceplane: 0, homecoming: false, grubs: 0, city: {}, chapter11Complete: false, chapter12Complete: false, chapter13Complete: false, chapter14Complete: false, chapter15Complete: false, mutationVial: false, iron: 0, argon: 0, marsUp: {}, mutations: {}, mutUses: 0, vials: 0, vialGiven: false, squad: {}, sulfur: 0, basalt: 0, venusUp: {}, antsUnlocked: false, food: 0, ants: null, cratesOpened: 0,
+  best: 0, bestWave: 0, runs: 0, totalKills: 0, chaptersComplete: 0, chapter1Complete: false, chapter2Complete: false, chapter3Complete: false, chapter4Complete: false, chapter5Complete: false, chapter6Complete: false, chapter7Complete: false, chapter8Complete: false, chapter9Complete: false, chapter10Complete: false, enginePart: false, spaceplane: 0, homecoming: false, grubs: 0, city: {}, chapter11Complete: false, chapter12Complete: false, chapter13Complete: false, chapter14Complete: false, chapter15Complete: false, chapter16Complete: false, mutationVial: false, iron: 0, argon: 0, marsUp: {}, mutations: {}, mutUses: 0, vials: 0, vialGiven: false, squad: {}, sulfur: 0, basalt: 0, venusUp: {}, antsUnlocked: false, food: 0, ants: null, cratesOpened: 0,
   wheelKeys: 0, lastWheelKeyAt: 0, spottedKeys: 0, lastSpottedKeyAt: 0, runSave: null, combos: {}, fusions: 0, mastered: {}, comboClaims: {}, bestiary: null, lastForageAt: 0, menuChapter: 1,
   muted: false, autoKick: true, aimMode: 'cursor', ach: {}, gagsDone: 0 };
 
@@ -255,7 +255,7 @@ const Save = {
     this.data.spaceplane = Math.max(0, Math.min(4, Math.floor(+this.data.spaceplane) || 0)); this.data.homecoming = !!this.data.homecoming; this.data.enginePart = !!this.data.enginePart;
     this.data.grubs = Math.max(0, Math.floor(+this.data.grubs) || 0); this.data.chapter11Complete = !!this.data.chapter11Complete;
     this.data.chapter12Complete = !!this.data.chapter12Complete; this.data.mutationVial = !!this.data.mutationVial;
-    this.data.chapter13Complete = !!this.data.chapter13Complete; this.data.chapter14Complete = !!this.data.chapter14Complete; this.data.chapter15Complete = !!this.data.chapter15Complete;       /* chapter14 is Chapter 13.5, the Domes; chapter15 is Chapter 14, the Tower */
+    this.data.chapter13Complete = !!this.data.chapter13Complete; this.data.chapter14Complete = !!this.data.chapter14Complete; this.data.chapter15Complete = !!this.data.chapter15Complete; this.data.chapter16Complete = !!this.data.chapter16Complete;       /* chapter14 is Chapter 13.5, the Domes; chapter15 is Chapter 14, the Tower; chapter16 is Chapter 15, the Siege */
     this.data.iron = Math.max(0, Math.floor(+this.data.iron) || 0); this.data.argon = Math.max(0, Math.floor(+this.data.argon) || 0);
     if (!this.data.marsUp || typeof this.data.marsUp !== 'object' || Array.isArray(this.data.marsUp)) this.data.marsUp = {};
     if (!this.data.mutations || typeof this.data.mutations !== 'object' || Array.isArray(this.data.mutations)) this.data.mutations = {};

@@ -33,7 +33,8 @@ const AMB_PROFILES = {
   12: { wind: 0.05, windF: 480, hum: 0.03 },
   13: { wind: 0.09, windF: 260, rumble: 0.02 },
   14: { wind: 0.03, windF: 700, hum: 0.04, chirp: { kind: 'sparkle', every: [3, 7] } },
-  15: { wind: 0.02, windF: 500, hum: 0.06, chirp: { kind: 'pop', every: [4, 9] } }
+  15: { wind: 0.02, windF: 500, hum: 0.06, chirp: { kind: 'pop', every: [4, 9] } },
+  16: { wind: 0.05, windF: 900, hum: 0.03, chirp: { kind: 'pop', every: [3, 8] } }
 };
 /* weather adds to the bed: [layer, extra gain at full strength] */
 const AMB_WEATHER = {

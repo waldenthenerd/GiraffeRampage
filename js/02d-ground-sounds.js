@@ -27,6 +27,7 @@
       case 'jungle': o.g = 'leaf'; break;
       case 'city': o.g = 'asphalt'; break;
       case 'moon': case 'mars': case 'space': case 'dome': case 'tower': o.g = 'metal'; break;
+      case 'siege': o.g = 'asphalt'; break;
       case 'venus': o.g = 'cinder'; break;
       case 'inferno': o.g = 'rock'; break;
       case 'area51': o.g = 'sand'; break;

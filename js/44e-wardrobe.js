@@ -30,11 +30,12 @@ const WARD_TOWN = [['Brickwork', '#B5543C', 'pk_sw'], ['Sea Glass', '#7FD1C0', '
 /* 36 to 41: found out at sea, in the air and in the two villages (js/44zs-explore-rewards.js) */
 WARD_TOWN.push(['Jet Stream', '#8ED0F0', 'fl_sw'], ['Seafoam', '#6FD8B8', 'sea_sw1'], ['Coral Reef', '#F0707A', 'sea_sw2'], ['Cornfield', '#E8C44A', 'fm_sw1'], ['Harvest Orange', '#E8862A', 'fm_sw2'], ['Shell Pink', '#F4C4D0', 'is_sw1'], ['Gold Medal', '#E8B830', 'gym_gold']);
 WARD_TOWN.forEach(function(w){ WARD.push({ name: w[0], c: w[1] }); });
-const WARD_MAX = 48;                                    /* 43 to 45: the university ranks Graduate, Professor and Chancellor (js/44zz-campus.js); 46: Frost Mylar, for finishing Chapter 13.5; 47: Executive Navy, for finishing Chapter 14; 48: Brass Button, for three stars in Rush Hour, the Tower's minigame */
+const WARD_MAX = 49;                                    /* 43 to 45: the university ranks Graduate, Professor and Chancellor (js/44zz-campus.js); 46: Frost Mylar, for finishing Chapter 13.5; 47: Executive Navy, for finishing Chapter 14; 48: Brass Button, for three stars in Rush Hour, the Tower's minigame */
 function wardStarOf(n){ const s = Save.data && Save.data.mini && Save.data.mini.stars; return s ? (s[n === 48 ? TOWER_CHAPTER : n - 13] | 0) : 0; }
 function miniWardOf(ch){ return ch === TOWER_CHAPTER ? 48 : 13 + ch; }                 /* the coat color three stars in a chapter's minigame earn */
 function wardUnlocked(n){
   if (n === 0) return true;
+  if (n === 49) return !!(Save.data && Save.data.chapter16Complete);                                                            /* Town Watch: Chapter 15, the Siege */
   if (n === 48) return wardStarOf(48) >= 3;
   if (n === 47) return !!(Save.data && Save.data.chapter15Complete);                                                            /* Executive Navy: Chapter 14, the Tower */
   if (n === 46) return !!(Save.data && Save.data.chapter14Complete);                                                            /* Frost Mylar: Chapter 13.5 */
@@ -97,10 +98,10 @@ function wardSwatches(kind, cur){
     const chap = typeof BESTIARY_CHAPTERS !== 'undefined' ? BESTIARY_CHAPTERS[n - 1] : '';
     const mg = n === 48 ? (typeof MINI !== 'undefined' && MINI[TOWER_CHAPTER] ? MINI[TOWER_CHAPTER].name : 'the Tower\u2019s minigame') : n > 13 && n <= 26 && typeof MINI !== 'undefined' && MINI[n - 13] ? MINI[n - 13].name : '';
     const nm = kind === 'pat' ? WARD_PATTERNS[n] : n ? WARD[n].name : (kind === 'gear' ? 'Her gear’s own colors' : 'Her own colors');
-    const label = nm + (n === 48 ? ' (three stars in ' + mg + ')' : n === 47 ? ' (Chapter 14, The Tower)' : n === 46 ? ' (Chapter 13.5, The Domes)' : n > 31 ? ' (a best friend\u2019s gift)' : n > 26 ? ' (hidden in Longneck Town)' : n > 13 ? ' (three stars in ' + mg + ')' : n ? ' (Chapter ' + n + ', ' + chap + ')' : '');
+    const label = nm + (n === 48 ? ' (three stars in ' + mg + ')' : n === 49 ? ' (Chapter 15, The Siege)' : n === 47 ? ' (Chapter 14, The Tower)' : n === 46 ? ' (Chapter 13.5, The Domes)' : n > 31 ? ' (a best friend\u2019s gift)' : n > 26 ? ' (hidden in Longneck Town)' : n > 13 ? ' (three stars in ' + mg + ')' : n ? ' (Chapter ' + n + ', ' + chap + ')' : '');
     const style = kind === 'pat' ? '' : ' style="background:' + (n ? col : 'linear-gradient(135deg,' + (kind === 'gear' ? '#9A6A38 55%,#C9CDD9 55%' : WARD_CLASSIC.coat + ' 55%,' + WARD_CLASSIC.spot + ' 55%') + ')') + '"';
     h += '<button class="swatch' + (kind === 'pat' ? ' pat' : '') + (on ? ' on' : '') + (un ? '' : ' locked') + '" data-a="ward-' + kind + '-' + n + '"' + (un ? '' : ' disabled') + style +
-      ' title="' + (un ? label : n === 48 ? 'Get three stars in ' + mg + ' to unlock' : n === 47 ? 'Finish Chapter 14 to unlock' : n === 46 ? 'Finish Chapter 13.5 to unlock' : n > 31 ? 'A gift from a best friend in Longneck Town' : n > 26 ? 'Find this color hidden in Longneck Town' : n > 13 ? 'Get three stars in ' + mg + ' to unlock' : 'Finish Chapter ' + n + ' to unlock') + '" aria-label="' + label + '">' + (kind === 'pat' ? '<canvas width="30" height="30" data-pat="' + n + '"></canvas>' : '') + '</button>';
+      ' title="' + (un ? label : n === 48 ? 'Get three stars in ' + mg + ' to unlock' : n === 49 ? 'Finish Chapter 15 to unlock' : n === 47 ? 'Finish Chapter 14 to unlock' : n === 46 ? 'Finish Chapter 13.5 to unlock' : n > 31 ? 'A gift from a best friend in Longneck Town' : n > 26 ? 'Find this color hidden in Longneck Town' : n > 13 ? 'Get three stars in ' + mg + ' to unlock' : 'Finish Chapter ' + n + ' to unlock') + '" aria-label="' + label + '">' + (kind === 'pat' ? '<canvas width="30" height="30" data-pat="' + n + '"></canvas>' : '') + '</button>';
   }
   return h + '</div>';
 }

@@ -45,6 +45,7 @@ body{
 .chaptag{display:block;font-size:9px;letter-spacing:.06em;color:var(--dust);font-weight:600;margin-top:1px}
 .chaptag.snow{color:#8FE0FF}
 .chaptag.tower{color:#E8C84A}
+.chaptag.siege{color:#E8723A}
 .chaptag.swamp{color:#9ACB5E}
 .chaptag.ocean{color:#3EE8D8}
 .chaptag.jungle{color:#7FD65A}
