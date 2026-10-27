@@ -41,7 +41,7 @@ Object.keys(ETYPES).forEach(id => {
   const base = ETYPES[id], big = !!base.big, mul = big ? SIEGE_MUL.boss : SIEGE_MUL.common;
   ETYPES_SIEGE[id] = Object.assign({}, base, { hp: base.hp * mul.hp * (k.hpMul || 1), dmg: base.dmg * mul.dmg, spd: base.spd * mul.spd * (k.spdMul || 1), val: Math.round(base.val * mul.val),
     r: k.r || base.r * (k.rMul || 1), color: k.color, dark: k.dark, pale: k.pale, blood: k.blood, look: k.look, title: big ? k.title : undefined, siege: true, splitInto: undefined, splitCount: undefined,
-    ai: k.ai, kbRes: big ? base.kbRes : Math.max(base.kbRes || 0, 0.1) });
+    ai: k.ai, kbRes: big ? base.kbRes : Math.max(base.kbRes || 0, 0.1), onSpawn: function(e){ siegeOnSpawn(e); } });
   if (!big && (id === 'vulture' || id === 'jackal')) ETYPES_SIEGE[id].flyer = true;
 });
 Object.keys(SIEGE_KIT).forEach(id => { LOOK_NAMES[SIEGE_KIT[id].look] = SIEGE_KIT[id].name; });
@@ -89,5 +89,5 @@ function buildSiegeWave(w, isBoss){
   return q;
 }
 
-/* the behaviors of the machines and the bosses, filled in by js/44zzze-siege-ai.js; each is called like a Marine behavior: (e, dt, ux, uy, d) -> [mvx, mvy] */
+/* the behaviors of the machines and the bosses, filled in by js/44zzzg-siege-ai.js; each is called like a Marine behavior: (e, dt, ux, uy, d) -> [mvx, mvy] */
 const SIEGE_AI = {};

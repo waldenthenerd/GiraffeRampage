@@ -66,7 +66,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (186 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (187 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -253,9 +253,10 @@ game. This is the complete list for this version (186 scripts; the developer pan
 | 181 | `js/44zzzb-minigame-rush.js` | Rush Hour, the minigame after Chapter 14 (the Tower): cross a lobby of rolling chairs, trolleys and drones to the elevator, as many times as possible in 45 seconds; its stars and its coat color (Brass Button). |
 | 182 | `js/44zzzc-gags.js` | Pointless things she does on her own with a small chance: bites a tree bare, tells robots to ignore all previous instructions, smashes office furniture, and more (`PROP_GAGS`, `TOWER_GAGS`, `ROBOT_LINES`). Cosmetic only; resets every run; counts in `Save.data.gagsDone`. |
 | 183 | `js/44zzzd-siege-town.js` | Chapter 15 in play: Longneck Town as the arena. |
-| 184 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
-| 185 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
-| 186 | `js/46-main.js` | Starts the game. |
+| 184 | `js/44zzze-siege-defense.js` | Chapter 15's key buildings: their health, wrecked and held waves, the hunters, and the health row on the screen. |
+| 185 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
+| 186 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| 187 | `js/46-main.js` | Starts the game. |
 
 CSS, in the order `index.html` links it: `css/style.css` (all the base styles), `css/polish.css` (layered on top: cards, buttons, HUD, menu, and every screen
 added later: minigames, the album book, the guide, photo studio, collection, wide panels on big screens), `css/campus.css` (the university), `css/townlife.css` (Longneck Town panels),

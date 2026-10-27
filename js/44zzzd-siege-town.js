@@ -49,6 +49,7 @@ function buildSiegeWorld(){
   G.buildings = plan.houses.map(siegeWallBuilding); G.tower = true; G.rocket = null;
   SG.keyList = G.buildings.filter(function(b){ return !!b.key; });
   towerNavBuild(f);
+  siegeDefenseInit();
 }
 /* where she stands when the run starts: the open street below the Square's fountain */
 function siegeStart(){ return { x: 1400 + 700, y: 1050 + 860 }; }
@@ -62,6 +63,9 @@ startRun = function(){
 /* the buildings are drawn with the ground (they are flat, like the Tower's walls), so the city's own drawBuilding skips them */
 const siegeBaseDrawBuilding = drawBuilding;
 drawBuilding = function(ctx, b){ if (b.siege) return; return siegeBaseDrawBuilding.apply(this, arguments); };
+/* kicking a wall throws sparks but no "Indestructible" note: there are buildings everywhere */
+const siegeBaseDeflect = deflectSpark;
+deflectSpark = function(b){ if (!b.siege) return siegeBaseDeflect.apply(this, arguments); const keep = G.rocketNoteT; G.rocketNoteT = 1e18; siegeBaseDeflect.apply(this, arguments); G.rocketNoteT = keep; };
 
 /* ---------------------------------------------------------------- the ground */
 function sgPattern(kind){
@@ -230,6 +234,7 @@ function sgDrawBuilding(ctx, b, t){
     ctx.fillStyle = '#E8E8EE'; ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w * 0.2, 0, TAU); ctx.fill(); ctx.fillStyle = '#D8483A'; ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w * 0.1, 0, TAU); ctx.fill();
     ctx.fillStyle = '#C8CCD4'; for (let i = 0; i < 4; i++){ const a = i * TAU / 4 + 0.78; ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(a); ctx.fillRect(w * 0.18, -7, w * 0.26, 14); ctx.restore(); }
   } else sgDrawKey(ctx, b, t);
+  if (b.key) sgDrawKeyStatus(ctx, b, t);
 }
 /* the five key buildings, each with something that says what it is */
 function sgDrawKey(ctx, b, t){

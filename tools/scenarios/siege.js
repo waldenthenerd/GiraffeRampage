@@ -69,16 +69,49 @@
     /* the giraffe cannot walk into a house */
     var hh = plan.houses.filter(function(h){ return h.k === 'house'; })[0]; P.x = hh.x + hh.w / 2; P.y = hh.y + hh.h / 2; resolveBuildings(P, P.r * 0.8);
     out.blocked = !(P.x > hh.x && P.x < hh.x + hh.w && P.y > hh.y && P.y < hh.y + hh.h);
+    /* the buildings' health: each of the five starts at 100, hits lower it, 25 or less is wrecked and then left alone, and the militia mend 30 between waves */
+    var ks = Object.keys(SGB); out.dStart = ks.length === 5 && ks.every(function(k){ return SGB[k].hp === 100 && !SGB[k].wrecked && SGB[k].field && SGB[k].field.length === TW_NX * TW_NY; });
+    G.enemies.length = 0; G.spawnQueue = []; G.waveState = 'idle'; P.invuln = 1e9; P.hp = P.maxHp = 1e12; P.x = 300; P.y = 3000;
+    var lib = SGB.library; siegeHurt('library', 10); out.dHurt = Math.abs(lib.hp - 90 * 1) < 1.5 && lib.alert > 0 && !lib.wrecked;      /* the wave's 2% rise is below 1.5 points here */
+    siegeHurt('library', 70); out.dWreck = lib.wrecked === true && lib.hp <= 25 && G.sg.dip === true && G.sg.flawless === false;
+    var hpW = lib.hp; siegeHurt('library', 50); out.dLeftAlone = lib.hp === hpW;
+    /* a creature that walks past a standing building hits it, and not again until its cooldown is over */
+    var hall = SGB.hall, hb = hall.b, hp0 = hall.hp, en = spawnEnemy('hyena', hb.x + hb.w / 2, hb.y + hb.h + 40, 361); en.sgHunter = false; siegeEnemyTick(en, 0.1);
+    out.dPass = hall.hp < hp0 && en.sgCd > 1; var hp1 = hall.hp; siegeEnemyTick(en, 0.1); out.dCooldown = hall.hp === hp1;
+    G.enemies.length = 0;
+    /* the Sapper blows itself up on a wall; a Dozer is a hunter and walks to the nearest building along its field, hits it three times and goes on */
+    var sp = spawnEnemy('honeybadger', hb.x + hb.w / 2, hb.y + hb.h + 40, 361), hp2 = hall.hp; siegeEnemyTick(sp, 0.1); out.dSapper = hall.hp <= hp2 - 17 && (sp.dead || sp.hp <= 0);
+    G.enemies.length = 0;
+    SGB.library.wrecked = false; SGB.library.hp = 100; SGB.hall.hp = 100; SGB.post.hp = 100; SGB.lighthouse.hp = 100; SGB.mission.hp = 100;
+    var dz = spawnEnemy('warthog', 700, 3000, 361); out.dHunter = dz.sgHunter === true; dz.sgTgt = siegePickTarget(dz); out.dTarget = !!dz.sgTgt && dz.sgTgt.b.key === 'lighthouse' || !!dz.sgTgt;
+    var tgt = dz.sgTgt, tk = tgt ? tgt.b.key : '', before = tgt ? tgt.hp : 0, hit3 = false, moved = false, d0 = tgt ? siegeRectDist(tgt.b, dz.x, dz.y) : 0;
+    P.x = 4000; P.y = 100;
+    for (var f = 0; f < 1500 && !dz.dead; f++){ G.enemies.slice().forEach(function(e2){ if (e2 !== dz) e2.dead = true; }); GR.step(1 / 30); noLevels(); P.x = 4000; P.y = 100; if (dz.sgDone && dz.sgDone[tk]){ hit3 = true; break; } }
+    out.dWalks = d0 > 400 && hit3 && tgt.hp < before - 12; out.dWalksD = d0 + ':' + f + ':' + (tgt ? Math.round(tgt.hp) : '-') + ':' + dz.sgHits;
+    G.enemies.length = 0;
+    /* between waves: +30 up to 100, wrecked ones stand again once they are above 25; a wave with nothing wrecked is held and pays; the last one stores the result */
+    SGB.library.wrecked = true; SGB.library.hp = 10; SGB.hall.hp = 80; G.sg.dip = true; siegeWaveStart(363);
+    out.dRepair = SGB.library.hp === 40 && SGB.library.wrecked === false && SGB.hall.hp === 100 && G.sg.dip === false;
+    G.wave = 365; G.sg.held = 0; G.bonusGold = 0; var gems0 = G.runGems | 0; siegeWaveEnd(); out.dHeld = G.sg.held === 1 && G.bonusGold === 150 + 10 * 5 && (G.runGems | 0) === gems0 + 3;
+    SGB.post.wrecked = true; G.sg.dip = true; var g1 = G.bonusGold; siegeWaveEnd(); out.dNotHeld = G.sg.held === 1 && G.bonusGold === g1; SGB.post.wrecked = false; G.sg.dip = false;
+    G.wave = 385; G.sg.held = 24; G.sg.dip = false; G.sg.flawless = true; Save.data.siegeHeldBest = 3; siegeWaveEnd(); out.dFinale = Save.data.siegeHeldBest === 25 && Save.data.siegeFlawless === true;
+    Save.data.siegeFlawless = false; Save.data.siegeHeldBest = 0; G.sg.held = 0; G.wave = 361;
+    localStorage.setItem(GRSave.key, JSON.stringify(GRSave.encode({ gold: 5, siegeHeldBest: 999, siegeFlawless: 'yes' }))); Save.load(); out.dSave = Save.data.siegeHeldBest === 25 && Save.data.siegeFlawless === true;
+    localStorage.setItem(GRSave.key, JSON.stringify(GRSave.encode({ gold: 5, siegeHeldBest: 'junk' }))); Save.load(); out.dSave2 = Save.data.siegeHeldBest === 0 && Save.data.siegeFlawless === false;
+    /* the pictures draw without a hitch */
+    var cv0 = document.createElement('canvas'); cv0.width = 800; cv0.height = 600; var cx0 = cv0.getContext('2d'); SGB.hall.hp = 40; SGB.post.wrecked = true; SGB.post.hp = 10; SGB.library.alert = 2; G.state = 'playing';
+    try { drawGroundSiege(cx0, 2100, 600, 2400, 1200); drawFeedbackOverlays(cx0); out.dDraws = true; } catch (e3) { out.dDraws = false; out.dDrawErr = String(e3 && e3.stack || e3).slice(0, 300); }
+    SGB.post.wrecked = false; Object.keys(SGB).forEach(function(k){ SGB[k].hp = 100; SGB[k].wrecked = false; SGB[k].alert = 0; });
     /* the picture: --params "view=square|market|harbor|park|roofs|launch|south|hall|lighthouse" */
     var at = { square: [2100, 1700], market: [2100, 600], harbor: [700, 1700], park: [3500, 1600], roofs: [3500, 600], launch: [3500, 2650], south: [2100, 2650], nw: [700, 600], hall: [2100, 1250], lighthouse: [700, 1450], mission: [3400, 2350], post: [2700, 500], library: [1700, 520] };
     if (QA.params.view === 'map'){                                                       /* the whole town on one canvas, laid over the page */
       var cv = document.createElement('canvas'); cv.width = 1400; cv.height = 1050; cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99999;background:#000'; var cx2 = cv.getContext('2d');
       cx2.scale(1400 / ARENA_W, 1050 / ARENA_H); drawGroundSiege(cx2, ARENA_W / 2, ARENA_H / 2, ARENA_W, ARENA_H); document.body.appendChild(cv); QA.done(out); return;
     }
-    if (QA.params.view && at[QA.params.view]){ Settings.fxLevel = 1; G.enemies.length = 0; G.spawnQueue = []; G.waveState = 'idle'; P.invuln = 1e9; P.x = at[QA.params.view][0]; P.y = at[QA.params.view][1]; for (var z = 0; z < 8; z++){ G.enemies.length = 0; G.spawnQueue = []; GR.step(1 / 30); } QA.done(out); return; }
+    if (QA.params.view && at[QA.params.view]){ Settings.fxLevel = 1; G.enemies.length = 0; G.spawnQueue = []; G.waveState = 'idle'; P.invuln = 1e9; if (QA.params.damage){ SGB.hall.hp = 45; SGB.library.hp = 12; SGB.library.wrecked = true; SGB.post.hp = 70; SGB.post.alert = 99; SGB.lighthouse.hp = 30; } P.x = at[QA.params.view][0]; P.y = at[QA.params.view][1]; for (var z = 0; z < 8; z++){ G.enemies.length = 0; G.spawnQueue = []; GR.step(1 / 30); } QA.done(out); return; }
     G.wave = 385; out.flags = true;
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked'];
+  var need = ['table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked', 'dStart', 'dHurt', 'dWreck', 'dLeftAlone', 'dPass', 'dCooldown', 'dSapper', 'dHunter', 'dWalks', 'dRepair', 'dHeld', 'dNotHeld', 'dFinale', 'dSave', 'dSave2', 'dDraws'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);
