@@ -8,6 +8,12 @@
    TW.floor like a floor of walls (it has `vents`, the gates the machines arrive by). Five of the buildings are KEY buildings she has to protect (js/44zzze-siege-defense.js).
    siegeLayout() is the plan as data (x, y, w, h in arena pixels, k the kind that decides how it is drawn); drawGroundSiege paints the streets, the lots and every building. */
 const SG_CW = 1400, SG_CH = 1050;
+/* the militia's posts: a sandbag nest with a wall of sandbags to each side (x, y of the nest, in arena pixels). Each is solid, so creatures go round it; the militia in it are in js/44zzzf-siege-militia.js */
+const SIEGE_POSTS = [
+  { id: 'hallw', x: 1735, y: 1500 }, { id: 'halle', x: 2395, y: 1500 }, { id: 'lib', x: 1700, y: 500 }, { id: 'tpost', x: 2400, y: 500 }, { id: 'light', x: 640, y: 1450 },
+  { id: 'mission', x: 3100, y: 2560 }, { id: 'south', x: 2010, y: 2480 }, { id: 'park', x: 3000, y: 1850 }, { id: 'harbor', x: 1100, y: 1950 }, { id: 'roofs', x: 3300, y: 800 }
+];
+const SG_NEST = { w: 110, h: 70 }, SG_WING = { w: 80, h: 26 };
 function sgC(col, row, x, y, w, h, k, extra){ return Object.assign({ x: col * SG_CW + x, y: row * SG_CH + y, w: w, h: h, k: k }, extra || {}); }
 function siegeLayout(){
   const H = [], K = {};
@@ -36,12 +42,16 @@ function siegeLayout(){
   /* the Launchpad */
   K.mission = add(sgC(2, 2, 150, 150, 420, 250, 'mission', { key: 'mission', name: 'Mission Control' }));
   add(sgC(2, 2, 820, 320, 190, 190, 'rocket')); add(sgC(2, 2, 1100, 190, 110, 110, 'tank')); add(sgC(2, 2, 1100, 600, 110, 110, 'tank')); add(sgC(2, 2, 600, 640, 150, 150, 'scope')); add(sgC(2, 2, 200, 600, 200, 140, 'crates'));
+  SIEGE_POSTS.forEach(function(p){
+    add({ x: p.x, y: p.y, w: SG_NEST.w, h: SG_NEST.h, k: 'nest', post: p.id });
+    add({ x: p.x - 86, y: p.y + 22, w: SG_WING.w, h: SG_WING.h, k: 'wing', post: p.id }); add({ x: p.x + SG_NEST.w + 6, y: p.y + 22, w: SG_WING.w, h: SG_WING.h, k: 'wing', post: p.id });
+  });
   /* where the machines come in: the gates at the ends of the roads, on the edges of the map */
   const V = [{ x: 700, y: 110 }, { x: 2100, y: 110 }, { x: 3500, y: 110 }, { x: 4100, y: 500 }, { x: 4100, y: 1575 }, { x: 4100, y: 2650 }, { x: 700, y: 3040 }, { x: 2100, y: 3040 }, { x: 3500, y: 3040 }, { x: 110, y: 300 }, { x: 110, y: 2850 }];
   return { houses: H, keys: K, vents: V };
 }
 const SG = { plan: null, keyList: [], cache: {} };
-function siegeWallBuilding(r){ return { x: r.x, y: r.y, w: r.w, h: r.h, style: 'tower', tower: true, siege: true, kind: r.k, key: r.key || null, hp: 1, maxHp: 1, collapsed: false, flash: 0, indestructible: true, units: [], cracks: [], rubble: [] }; }
+function siegeWallBuilding(r){ return { x: r.x, y: r.y, w: r.w, h: r.h, style: 'tower', tower: true, siege: true, kind: r.k, key: r.key || null, post: r.post || null, hp: 1, maxHp: 1, collapsed: false, flash: 0, indestructible: true, units: [], cracks: [], rubble: [] }; }
 function buildSiegeWorld(){
   const plan = siegeLayout(); SG.plan = plan;
   const f = { walls: plan.houses, boxes: [], rooms: [], doors: [], vents: plan.vents, props: [], start: { x: ARENA_W / 2 - 120, y: SG_CH + 760 }, n: 1, name: 'Longneck Town', kind: 'siege', lift: null };
@@ -49,7 +59,7 @@ function buildSiegeWorld(){
   G.buildings = plan.houses.map(siegeWallBuilding); G.tower = true; G.rocket = null;
   SG.keyList = G.buildings.filter(function(b){ return !!b.key; });
   towerNavBuild(f);
-  siegeDefenseInit();
+  siegeDefenseInit(); siegeMilitiaInit();
 }
 /* where she stands when the run starts: the open street below the Square's fountain */
 function siegeStart(){ return { x: 1400 + 700, y: 1050 + 860 }; }
@@ -233,8 +243,10 @@ function sgDrawBuilding(ctx, b, t){
     ctx.fillStyle = '#4A4E58'; ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w / 2, 0, TAU); ctx.fill(); ctx.strokeStyle = '#E8C84A'; ctx.lineWidth = 4; ctx.setLineDash([14, 10]); ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w / 2 - 8, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle = '#E8E8EE'; ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w * 0.2, 0, TAU); ctx.fill(); ctx.fillStyle = '#D8483A'; ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w * 0.1, 0, TAU); ctx.fill();
     ctx.fillStyle = '#C8CCD4'; for (let i = 0; i < 4; i++){ const a = i * TAU / 4 + 0.78; ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(a); ctx.fillRect(w * 0.18, -7, w * 0.26, 14); ctx.restore(); }
-  } else sgDrawKey(ctx, b, t);
+  } else if (k === 'nest' || k === 'wing') sgDrawSandbags(ctx, b, t);
+  else sgDrawKey(ctx, b, t);
   if (b.key) sgDrawKeyStatus(ctx, b, t);
+  if (b.post && k === 'nest') sgDrawPostStatus(ctx, b, t);
 }
 /* the five key buildings, each with something that says what it is */
 function sgDrawKey(ctx, b, t){
