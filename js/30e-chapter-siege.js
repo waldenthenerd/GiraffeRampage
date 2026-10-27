@@ -17,23 +17,23 @@ function siegeScale(cw){
 /* Which kinds are machines and which are mutants: a machine is bolted together out of what the humans had (scrap panels, lenses, a red eye), a mutant is an animal with
    the glimmer grown through it. The art is in js/35k-art-siege.js. hpMul, spdMul and rMul trim each kind against the Savanna cast it stands in for. */
 const SIEGE_KIT = {
-  hyena:       { look: 'sg_patrol',   ai: 'chase',  color: '#7C8694', dark: '#2A3038', pale: '#D6DEE8', blood: '#4A5564', rMul: 0.95, hpMul: 0.8,  spdMul: 1.1,  name: 'Patrol Bot' },
+  hyena:       { look: 'sg_patrol',   ai: 'sg_patrol',  color: '#7C8694', dark: '#2A3038', pale: '#D6DEE8', blood: '#4A5564', rMul: 0.95, hpMul: 0.8,  spdMul: 1.1,  name: 'Patrol Bot' },
   grub:        { look: 'sg_maggot',   ai: 'chase',  color: '#BFE86A', dark: '#4A6A1A', pale: '#F2FFC0', blood: '#8AC83A', rMul: 0.65, hpMul: 0.45, spdMul: 1.35, name: 'Glimmer Maggot' },
-  jackal:      { look: 'sg_skitter',  ai: 'chase',  color: '#C8A04A', dark: '#52401A', pale: '#FFE9A8', blood: '#8A6E2A', rMul: 0.85, hpMul: 0.65, spdMul: 1.25, name: 'Skitter Drone' },
-  cheetah:     { look: 'sg_raptor',   ai: 'chase',  color: '#5A7A9A', dark: '#1A2A3E', pale: '#A8C8E8', blood: '#34506E', rMul: 1.0,  hpMul: 0.85, spdMul: 1.0,  name: 'Raptor Bot' },
+  jackal:      { look: 'sg_skitter',  ai: 'sg_skitter',  color: '#C8A04A', dark: '#52401A', pale: '#FFE9A8', blood: '#8A6E2A', rMul: 0.85, hpMul: 0.65, spdMul: 1.25, name: 'Skitter Drone' },
+  cheetah:     { look: 'sg_raptor',   ai: 'sg_raptor',  color: '#5A7A9A', dark: '#1A2A3E', pale: '#A8C8E8', blood: '#34506E', rMul: 1.0,  hpMul: 0.85, spdMul: 1.0,  name: 'Raptor Bot' },
   warthog:     { look: 'sg_dozer',    ai: 'chase',  color: '#C8A02A', dark: '#52400A', pale: '#FFE680', blood: '#7A6212', rMul: 1.25, hpMul: 1.8,  spdMul: 0.65, name: 'Dozer Bot' },
-  vulture:     { look: 'sg_spotter',  ai: 'chase',  color: '#4A5260', dark: '#14181E', pale: '#9AA6B8', blood: '#2A3040', rMul: 0.95, hpMul: 0.65, spdMul: 1.0,  name: 'Spotter Drone' },
-  rhino:       { look: 'sg_hornback', ai: 'chase',  color: '#7A9A6A', dark: '#2A4220', pale: '#C8F0A8', blood: '#4A7A3A', rMul: 1.3,  hpMul: 1.5,  spdMul: 0.8,  name: 'Glimmerhorn' },
-  baboon:      { look: 'sg_hurler',   ai: 'chase',  color: '#8A7AA8', dark: '#342A4E', pale: '#DCCCF8', blood: '#5E4E7E', rMul: 1.0,  hpMul: 0.9,  spdMul: 1.0,  name: 'Rockhurler' },
+  vulture:     { look: 'sg_spotter',  ai: 'sg_spotter',  color: '#4A5260', dark: '#14181E', pale: '#9AA6B8', blood: '#2A3040', rMul: 0.95, hpMul: 0.65, spdMul: 1.0,  name: 'Spotter Drone' },
+  rhino:       { look: 'sg_hornback', ai: 'sg_hornback',  color: '#7A9A6A', dark: '#2A4220', pale: '#C8F0A8', blood: '#4A7A3A', rMul: 1.12, hpMul: 1.5,  spdMul: 0.8,  name: 'Glimmerhorn' },
+  baboon:      { look: 'sg_hurler',   ai: 'sg_hurler',  color: '#8A7AA8', dark: '#342A4E', pale: '#DCCCF8', blood: '#5E4E7E', rMul: 1.0,  hpMul: 0.9,  spdMul: 1.0,  name: 'Rockhurler' },
   honeybadger: { look: 'sg_sapper',   ai: 'chase',  color: '#B8503A', dark: '#4A1A10', pale: '#FFB8A0', blood: '#7A2A1A', rMul: 0.9,  hpMul: 1.0,  spdMul: 1.05, name: 'Sapper Bot' },
-  mamba:       { look: 'sg_glassfang', ai: 'chase', color: '#6AD8C8', dark: '#12504A', pale: '#C8FFF4', blood: '#2E9A8A', rMul: 1.05, hpMul: 1.1,  spdMul: 1.0,  name: 'Glassfang' },
-  ember:       { look: 'sg_torch',    ai: 'chase',  color: '#E8723A', dark: '#5A2410', pale: '#FFD0A0', blood: '#A8481E', rMul: 0.95, hpMul: 0.6,  spdMul: 0.8,  name: 'Torch Bot' },
+  mamba:       { look: 'sg_glassfang', ai: 'sg_glassfang', color: '#6AD8C8', dark: '#12504A', pale: '#C8FFF4', blood: '#2E9A8A', rMul: 1.05, hpMul: 1.1,  spdMul: 1.0,  name: 'Glassfang' },
+  ember:       { look: 'sg_torch',    ai: 'sg_torch',  color: '#E8723A', dark: '#5A2410', pale: '#FFD0A0', blood: '#A8481E', rMul: 1.25, hpMul: 0.6,  spdMul: 0.8,  name: 'Torch Bot' },
   termite:     { look: 'sg_gnawer',   ai: 'chase',  color: '#A8B84A', dark: '#3E4A12', pale: '#EEF8A8', blood: '#6E7E22', rMul: 1.0,  hpMul: 1.0,  spdMul: 0.9,  name: 'Gnawer' },
-  lion:        { look: 'sg_walker',   ai: 'chase',  color: '#8A8E96', dark: '#24262C', pale: '#D8DCE4', blood: '#4A4E56', title: 'The Scrap Walker', name: 'The Scrap Walker', r: 56 },
-  matriarch:   { look: 'sg_queen',    ai: 'chase',  color: '#9AE86A', dark: '#2E5A14', pale: '#E8FFC0', blood: '#5AA02A', title: 'The Brood Queen', name: 'The Brood Queen', r: 58 },
-  buffalo:     { look: 'sg_ram',      ai: 'chase',  color: '#B8863A', dark: '#44300E', pale: '#F0D08A', blood: '#6E4E1A', title: 'The Battering Ram', name: 'The Battering Ram', r: 66 },
-  crocodile:   { look: 'sg_carrier',  ai: 'chase',  color: '#5E6E86', dark: '#181E2A', pale: '#B0C0DC', blood: '#343E52', title: 'The Hive Carrier', name: 'The Hive Carrier', r: 60 },
-  wildfire:    { look: 'sg_warden',   ai: 'chase',  color: '#3A4252', dark: '#0C0E14', pale: '#FF5A4A', blood: '#6A1E18', title: 'The Warden', name: 'The Warden', r: 64 }
+  lion:        { look: 'sg_walker',   ai: 'sg_walker',  color: '#8A8E96', dark: '#24262C', pale: '#D8DCE4', blood: '#4A4E56', title: 'The Scrap Walker', name: 'The Scrap Walker', r: 56 },
+  matriarch:   { look: 'sg_queen',    ai: 'sg_queen',  color: '#9AE86A', dark: '#2E5A14', pale: '#E8FFC0', blood: '#5AA02A', title: 'The Brood Queen', name: 'The Brood Queen', r: 58 },
+  buffalo:     { look: 'sg_ram',      ai: 'sg_ram',  color: '#B8863A', dark: '#44300E', pale: '#F0D08A', blood: '#6E4E1A', title: 'The Battering Ram', name: 'The Battering Ram', r: 66 },
+  crocodile:   { look: 'sg_carrier',  ai: 'sg_carrier',  color: '#5E6E86', dark: '#181E2A', pale: '#B0C0DC', blood: '#343E52', title: 'The Hive Carrier', name: 'The Hive Carrier', r: 60 },
+  wildfire:    { look: 'sg_warden',   ai: 'sg_warden',  color: '#3A4252', dark: '#0C0E14', pale: '#FF5A4A', blood: '#6A1E18', title: 'The Warden', name: 'The Warden', r: 64 }
 };
 const ETYPES_SIEGE = {};
 Object.keys(ETYPES).forEach(id => {

@@ -237,6 +237,8 @@ function filmList(){
   L.push({ kind: 'domeout', title: 'The Long Flight to New York', sub: 'The domes light up, and the trail goes north.', un: !!d.chapter14Complete });
   L.push({ kind: 'towerflight', title: 'The Tower', sub: 'The helicopter comes in over New York, and the glass tower.', un: !!d.chapter14Complete });
   L.push({ kind: 'towerout', title: 'Out the Top', sub: 'The vial, the paraglider, and a second helicopter.', un: !!d.chapter15Complete });
+  L.push({ kind: 'siegeflight', title: 'Smoke Over Longneck Town', sub: 'The helicopter brings her home, and the militia hold the edge of town.', un: !!d.chapter15Complete });
+  L.push({ kind: 'siegeout', title: 'The Morning After', sub: 'The Warden, the hatch in the Square, and one small drone going east.', un: !!d.chapter16Complete });
   return L;
 }
 function galleryButtonHTML(){
@@ -705,6 +707,7 @@ function showDeath(){
 
 function victoryText(mins, secs){
   const tm = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's';
+  if (G.chapter >= SIEGE_CHAPTER) return 'The Warden goes down at the edge of Longneck Town, and the siren on the Hall winds to silence. You held the town for ' + tm + ', and ' + ((G.sg && G.sg.held) | 0) + ' of its twenty-five waves without losing a building. The militia are sitting on their sandbags, and the hatch in the Square is lifting a crack. Out on the grass, one small drone with a green light on its belly is slipping away east, toward the waterhole.';
   if (G.chapter >= TOWER_CHAPTER) return 'The Chief Executive folds into the chair behind the desk, and the whole top floor goes quiet except for the elevator chiming somewhere far below. You climbed twenty-five floors in ' + tm + '. In the glass case on the wall, a vial of something green was still turning slowly in the light, and it is in your harness now. There is a window, a paraglider on a rack, and the lights of another building across the dark.';
   if (G.chapter >= DOME_CHAPTER) return 'The Ice Heart breaks apart in a rain of cold light, and the glowing root under the dome goes dark. You held the glass for ' + tm + ' while the mylar rang like a bell all round you. The helicopter is still turning on its pad. Among the wreckage was a shipping label, stamped with a city: New York.';
   if (G.chapter >= 13) return 'Fleet Marshal Dray’s flagship comes apart in the red sky, and the dust aliens melt back into the dunes. You held the Martian plain for ' + tm + ' between two armies. The vial hums in your harness, and there is a long way home.';

@@ -378,7 +378,7 @@ function updateWaves(dt){
         G.huntWarned = true;
         addText(P.x, P.y - 58, 'The herd is closing in', '#E8604A', 17, false);
       }
-      const domeBossDown = (G.chapter === DOME_CHAPTER ? finale : G.chapter === TOWER_CHAPTER && G.wave % 5 === 0) && !G.bossAlive;     /* the Domes end the moment the Ice Heart falls, and so does every boss floor of the Tower: whatever is left of the crowd goes with it */
+      const domeBossDown = (G.chapter === DOME_CHAPTER || G.chapter === SIEGE_CHAPTER ? finale : G.chapter === TOWER_CHAPTER && G.wave % 5 === 0) && !G.bossAlive;     /* the Domes end the moment the Ice Heart falls, and so does every boss floor of the Tower: whatever is left of the crowd goes with it */
       if (domeBossDown) G.enemies.forEach(e => { if (!e.dead){ burstParticles(e.x, e.y, 8, e.blood || '#9AE8FF', 160, 4); e.dead = true; } });
       if (G.enemies.length === 0 || domeBossDown || (!finale && G.chapter !== TOWER_CHAPTER && G.waveOver > WAVE_PATIENCE_S)){
         G.waveState = 'clear';
@@ -413,7 +413,7 @@ function updateWaves(dt){
     if (G.chapter === TOWER_CHAPTER && !isRunEnd(G.wave)){ if (G.waveTimer <= 0) towerLiftTick(dt); return; }      /* the Tower: the next floor is a ride in the elevator away */
     if (G.waveTimer <= 0){
       marsClearAllies();
-      if (isRunEnd(G.wave)){ if (G.chapter === TOWER_CHAPTER){ towerFinishSave(); startCutscene(function(){ marsRestoreHUD(); if (!miniOffer(TOWER_CHAPTER, chapterComplete)) chapterComplete(); }, false, 'towerout'); } else if (G.chapter === DOME_CHAPTER) startCutscene(function(){ marsRestoreHUD(); chapterComplete(); }, false, 'domeout'); else chapterComplete(); }       /* the last chapter's own film, then the report */
+      if (isRunEnd(G.wave)){ if (G.chapter === TOWER_CHAPTER){ towerFinishSave(); startCutscene(function(){ marsRestoreHUD(); if (!miniOffer(TOWER_CHAPTER, chapterComplete)) chapterComplete(); }, false, 'towerout'); } else if (G.chapter === SIEGE_CHAPTER){ siegeFinishSave(); startCutscene(function(){ marsRestoreHUD(); chapterComplete(); }, false, 'siegeout'); } else if (G.chapter === DOME_CHAPTER) startCutscene(function(){ marsRestoreHUD(); chapterComplete(); }, false, 'domeout'); else chapterComplete(); }       /* the last chapter's own film, then the report */
       else if (isChapterFinaleWave(G.wave)) finishChapter();
       else if (G.chapter === 13 && chapterWaveOf(G.wave) === MARS_SWITCH_WAVE && !G.marsShipsSeen){      /* the Marine ships come down: a short film, then the war */
         G.marsShipsSeen = true; saveRunAtBoundary(true); startCutscene(function(){ marsRestoreHUD(); startWave(G.wave + 1); }, false, 'mships');

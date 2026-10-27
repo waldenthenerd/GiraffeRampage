@@ -153,6 +153,8 @@ function siegeWaveEnd(){
     const d = Save.data; if (d){ d.siegeHeldBest = Math.max(d.siegeHeldBest | 0, G.sg.held); if (G.sg.held >= SIEGE_WAVES) d.siegeFlawless = true; Save.write(); }
   }
 }
+/* the last wave is won: the flag is saved before the film, so quitting during it loses nothing */
+function siegeFinishSave(){ const d = Save.data; if (!d) return; d.chapter14Complete = true; d.chapter15Complete = true; d.chapter16Complete = true; Save.write(); }
 const siegeBaseStartWave = startWave;
 startWave = function(n){ if (chapterOf(n) === SIEGE_CHAPTER) siegeWaveStart(n); return siegeBaseStartWave.apply(this, arguments); };
 const siegeBaseWaveClear = waveClearFX;

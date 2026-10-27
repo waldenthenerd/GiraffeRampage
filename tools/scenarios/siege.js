@@ -6,6 +6,7 @@
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
   function freshSave(){ Save.reset(); }
   function noLevels(){ G.pendingLevels = 0; G.levelGate = 0; if (G.state === 'levelup'){ G.state = 'playing'; G.offer = null; hideOverlay(); } }
+  function godMode(){ P.invuln = 1e9; P.hp = P.maxHp = 1e12; G.rerolls = 0; }
   function steps(n, dt){ for (var i = 0; i < n; i++){ GR.step(dt || 1 / 30); noLevels(); } }
   try {
     /* the chapter table */
@@ -45,7 +46,7 @@
     out.menuLocked = /disabled/.test(html) && /Clear Chapter 14/.test(html) && /Chapter 15/.test(html) && /The Siege/.test(html) && /Waves 361–385 · 5 bosses/.test(html);
     Save.data.chapter15Complete = true; html = chapterSelectorHTML();
     out.menuOpen = /data-a="play16"/.test(html) && /Start Chapter 15/.test(html) && /Straight to wave 361/.test(html) && /ch-next" aria-label="Next chapter" disabled/.test(html) && (html.match(/class="chdot[ "]/g) || []).length === 16;
-    handleAction('play16'); steps(3);
+    handleAction('play16'); out.menuFilm = G.state === 'cutscene' && !!G.cut && G.cut.kind === 'siegeflight'; G.cut.t = SG_FLIGHT_T.END - 0.01; steps(3);
     out.starts = G.state === 'playing' && G.wave === 361 && G.chapter === SIEGE_CHAPTER && G.biome === 'siege';
     steps(90);
     out.spawns = G.enemies.length > 0 && G.enemies.every(function(e){ return e.def && e.def.siege === true; });
@@ -134,8 +135,60 @@
     try { var cv1 = document.createElement('canvas'); cv1.width = 800; cv1.height = 600; var cx1 = cv1.getContext('2d'); SGM.men[0].hp = 30; SGM.men[1].state = 'down'; SGM.posts[0].hp = 50; SGM.posts[1].abandoned = true; SGM.tracers.push({ x1: 0, y1: 0, x2: 50, y2: 50, t: 0.1 });
       G.camX = 1800; G.camY = 1550; drawGroundSiege(cx1, 1800, 1550, 1600, 1200); drawGiraffeGroup(cx1); out.mDraws = true; } catch (e4) { out.mDraws = false; out.mDrawErr = String(e4 && e4.stack || e4).slice(0, 300); }
     SGM.men[0].hp = 100; SGM.men[1].state = 'post'; SGM.posts[0].hp = 100; SGM.posts[1].abandoned = false;
+    /* the creatures: all twelve kinds run for two seconds without a bad number or a stand inside a building, and each boss makes something in each of its attacks */
+    freshSave(); Save.data.chapter15Complete = true; startRun(16, 365); steps(5); godMode(); G.waveState = 'idle'; G.spawnQueue = []; SGM.men.forEach(function(m2){ m2.state = 'down'; m2.hp = 0; });
+    var kk = ['hyena', 'grub', 'jackal', 'cheetah', 'warthog', 'rhino', 'baboon', 'honeybadger', 'vulture', 'mamba', 'termite', 'ember'], aiOk = true, aiBad = [];
+    kk.forEach(function(t){
+      G.enemies.length = 0; P.x = siegeStart().x; P.y = siegeStart().y; var p = towerSpawnPoint(), e6 = spawnEnemy(t, p.x, p.y, 365); if (!e6){ aiOk = false; aiBad.push(t); return; }
+      for (var q2 = 0; q2 < 60; q2++){ GR.step(1 / 30); noLevels(); P.hp = P.maxHp; P.invuln = 1e9; SGM.men.forEach(function(m2){ m2.state = 'down'; }); if (e6.hp !== e6.hp || e6.x !== e6.x || e6.y !== e6.y){ aiOk = false; aiBad.push(t + ' nan'); break; } }
+      if (!e6.dead && buildingAt(e6.x, e6.y)){ aiOk = false; aiBad.push(t + ' wall'); }
+    });
+    out.kindsOk = aiOk; out.kindsBad = aiBad.join(',');
+    var made2 = {}, bossOk2 = true;
+    [['lion', 365, ['stompwind', 'cannonwind', 'beamwind']], ['matriarch', 370, ['spawnwind', 'spitwind', 'pool']], ['buffalo', 375, ['chargewind', 'charge']], ['crocodile', 380, ['launchwind', 'bombwind', 'ringwind']], ['wildfire', 385, ['barragewind', 'beamwind', 'stompwind', 'roar']]].forEach(function(b){
+      b[2].forEach(function(st){
+        freshSave(); Save.data.chapter15Complete = true; startRun(16, b[1]); steps(3); godMode(); G.waveState = 'idle'; G.spawnQueue = []; G.enemies.length = 0; G.eproj.length = 0; G.markers.length = 0; G.blasts.length = 0; G.beams.length = 0; G.hzones.length = 0; SGM.men.forEach(function(m2){ m2.state = 'down'; m2.hp = 0; });
+        var sp = towerOpenNear(P.x + 500, P.y), e7 = spawnEnemy(b[0], sp.x, sp.y, b[1]); if (!e7){ bossOk2 = false; return; }
+        e7.state = st; e7.stateT = 0.01; for (var q3 = 0; q3 < 30; q3++){ GR.step(1 / 30); noLevels(); P.hp = P.maxHp; P.invuln = 1e9; SGM.men.forEach(function(m2){ m2.state = 'down'; }); }
+        made2[b[0] + ':' + st] = G.eproj.length + G.markers.length + G.hzones.length + G.blasts.length + G.beams.length + G.enemies.length;
+        if (e7.hp !== e7.hp || e7.x !== e7.x || e7.y !== e7.y || (!e7.dead && buildingAt(e7.x, e7.y))){ bossOk2 = false; made2[b[0] + ':' + st + ':bad'] = 1; }
+      });
+    });
+    out.bossBehaviour = bossOk2 && made2['lion:cannonwind'] > 1 && made2['matriarch:spawnwind'] > 1 && made2['matriarch:pool'] > 0 && made2['buffalo:chargewind'] > 0 && made2['crocodile:launchwind'] > 1 && made2['crocodile:bombwind'] > 1 && made2['wildfire:beamwind'] > 1 && made2['wildfire:barragewind'] > 1;
+    out.bossDetail = JSON.stringify(made2).slice(0, 400);
+    /* the art: every one of the seventeen draws without a throw */
+    var drawOk = true; BESTIARY_ORDER.slice(0, 17).forEach(function(k){ try { var ex = spawnEnemy(k, 600, 600, 365); G.enemies.length = 0; var cvd = document.createElement('canvas'); cvd.width = 300; cvd.height = 300; var cd = cvd.getContext('2d'); cd.translate(150 - ex.x, 150 - ex.y); ex.state = 'idle'; drawEnemy(cd, ex); ['wind', 'lunge', 'charge', 'burn', 'aim', 'stompwind', 'launch', 'roar', 'beamwind'].forEach(function(st){ ex.state = st; drawEnemy(cd, ex); }); } catch (e8){ drawOk = false; out.drawErr = k + ': ' + String(e8 && e8.message); } });
+    out.artDraws = drawOk;
+    freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();
+    /* the films: both draw at every moment without a throw, and the run ends with the second one, the save flag, the coat and the report */
+    var filmOk = true; [['siegeflight', SG_FLIGHT_T.END], ['siegeout', SG_OUT_T.END]].forEach(function(f){ var fc = document.createElement('canvas'); fc.width = CS_W; fc.height = CS_H; var fx = fc.getContext('2d'); for (var ft = 0.2; ft < f[1]; ft += 1.1){ try { MARS_FILMS[f[0]].scene(fx, ft); MARS_FILMS[f[0]].over(fx, ft); } catch (e9){ filmOk = false; out.filmErr = f[0] + '@' + ft.toFixed(1) + ' ' + String(e9 && e9.message); } } });
+    out.filmsDraw = filmOk && !!MARS_FILMS.siegeflight.cues.length && !!MARS_FILMS.siegeout.cues.length;
+    out.gallery = filmList().filter(function(x){ return x.kind === 'siegeflight' || x.kind === 'siegeout'; }).length === 2;
+    freshSave(); Save.data.chapter15Complete = true; Save.data.chapter14Complete = true; Save.data.chapter13Complete = true;
+    startRun(16, 385); steps(10); G.introFX = null; G.banner = null; godMode();
+    out.lastWave = G.wave === 385 && isChapterFinaleWave(385) && isRunEnd(385) === true;
+    G.spawnQueue = []; G.enemies.length = 0; G.bossAlive = false; G.waveState = 'clear'; G.waveTimer = 0.01; steps(3);
+    out.endFilm = G.state === 'cutscene' && !!G.cut && G.cut.kind === 'siegeout' && Save.data.chapter16Complete === true;
+    G.cut.t = SG_OUT_T.END - 0.01; steps(60);
+    out.endVictory = G.state === 'victory' && Save.data.chapter16Complete === true && Save.data.chapter15Complete === true && wardUnlocked(49) === true;
+    G.chapter = SIEGE_CHAPTER; out.victoryText = /Warden/.test(victoryText(3, 4)) && !/the end|thanks for playing/i.test(victoryText(3, 4));
+    freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();
     /* the picture: --params "view=square|market|harbor|park|roofs|launch|south|hall|lighthouse" */
     var at = { square: [2100, 1700], market: [2100, 600], harbor: [700, 1700], park: [3500, 1600], roofs: [3500, 600], launch: [3500, 2650], south: [2100, 2650], nw: [700, 600], hall: [2100, 1250], lighthouse: [700, 1450], mission: [3400, 2350], post: [2700, 500], library: [1700, 520], militia: [1800, 1640] };
+    if (QA.params.film){                                                                 /* one frame of a film: --params "film=siegeflight&t=11" --w 1280 --h 720 */
+      var cvf = document.createElement('canvas'); cvf.width = CS_W; cvf.height = CS_H; cvf.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99999;background:#000'; var cxf = cvf.getContext('2d');
+      MARS_FILMS[QA.params.film].scene(cxf, +QA.params.t || 0); MARS_FILMS[QA.params.film].over(cxf, +QA.params.t || 0); document.body.appendChild(cvf); QA.done(out); return;
+    }
+    if (QA.params.view === 'cast'){                                                      /* the seventeen creatures on one canvas: --params "view=cast" --w 1400 --h 900 */
+      var cvc = document.createElement('canvas'); cvc.width = 1400; cvc.height = 900; cvc.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99999;background:#7A7468'; var cxc = cvc.getContext('2d');
+      cxc.font = '700 15px sans-serif'; cxc.textAlign = 'center'; cxc.fillStyle = '#10141C';
+      BESTIARY_ORDER.slice(0, 17).forEach(function(k, i){
+        var ex = spawnEnemy(k, 0, 0, 361); G.enemies.length = 0; var col = i % 6, row = (i / 6) | 0, sc = ex.big ? 1.1 : 2.4, px = 120 + col * 230, py = 120 + row * 280;
+        cxc.save(); cxc.translate(px, py); cxc.scale(sc, sc); cxc.translate(-ex.x, -ex.y); try { drawEnemy(cxc, ex); } catch (e5) { out.castErr = String(e5 && e5.stack || e5).slice(0, 200); } cxc.restore();
+        cxc.fillText(LOOK_NAMES[ex.def.look] + ' (' + k + ')', px, py + 100);
+      });
+      document.body.appendChild(cvc); QA.done(out); return;
+    }
     if (QA.params.view === 'map'){                                                       /* the whole town on one canvas, laid over the page */
       var cv = document.createElement('canvas'); cv.width = 1400; cv.height = 1050; cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99999;background:#000'; var cx2 = cv.getContext('2d');
       cx2.scale(1400 / ARENA_W, 1050 / ARENA_H); drawGroundSiege(cx2, ARENA_W / 2, ARENA_H / 2, ARENA_W, ARENA_H); document.body.appendChild(cv); QA.done(out); return;
@@ -143,7 +196,7 @@
     if (QA.params.view && at[QA.params.view]){ Settings.fxLevel = 1; G.enemies.length = 0; G.spawnQueue = []; G.waveState = 'idle'; P.invuln = 1e9; if (QA.params.damage){ SGB.hall.hp = 45; SGB.library.hp = 12; SGB.library.wrecked = true; SGB.post.hp = 70; SGB.post.alert = 99; SGB.lighthouse.hp = 30; SGM.men[0].hp = 35; SGM.men[1].state = 'down'; SGM.men[1].hp = 0; SGM.posts[0].hp = 55; SGM.posts[1].hp = 20; SGM.posts[1].abandoned = true; SGM.men[2].hp = 100; } P.x = at[QA.params.view][0]; P.y = at[QA.params.view][1]; for (var z = 0; z < 8; z++){ G.enemies.length = 0; G.spawnQueue = []; GR.step(1 / 30); noLevels(); } G.texts.length = 0; G.particles.length = 0; GR.step(1 / 30); QA.done(out); return; }
     G.wave = 385; out.flags = true;
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked', 'dStart', 'dHurt', 'dWreck', 'dLeftAlone', 'dPass', 'dCooldown', 'dSapper', 'dHunter', 'dWalks', 'dRepair', 'dHeld', 'dNotHeld', 'dFinale', 'dSave', 'dSave2', 'dDraws', 'mStart', 'mSpot', 'mOneShot', 'mReload', 'mHeavy', 'mBoss', 'mRange', 'mHurt', 'mHurtCd', 'mShot', 'mDown', 'mDownQuiet', 'mUp', 'mHealHurt', 'pAbandon', 'pFoot', 'pMend', 'mDraws'];
+  var need = ['table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked', 'dStart', 'dHurt', 'dWreck', 'dLeftAlone', 'dPass', 'dCooldown', 'dSapper', 'dHunter', 'dWalks', 'dRepair', 'dHeld', 'dNotHeld', 'dFinale', 'dSave', 'dSave2', 'dDraws', 'mStart', 'mSpot', 'mOneShot', 'mReload', 'mHeavy', 'mBoss', 'mRange', 'mHurt', 'mHurtCd', 'mShot', 'mDown', 'mDownQuiet', 'mUp', 'mHealHurt', 'pAbandon', 'pFoot', 'pMend', 'mDraws', 'kindsOk', 'bossBehaviour', 'artDraws', 'menuFilm', 'filmsDraw', 'gallery', 'lastWave', 'endFilm', 'endVictory', 'victoryText'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);
