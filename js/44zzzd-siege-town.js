@@ -135,6 +135,7 @@ function drawGroundSiege(ctx, cx, cy, vw, vh){
     ctx.fillStyle = sgPattern(L[4]); ctx.fillRect(lx, ly, lw, lh);
   }
   sgDrawPlaza(ctx, x0, y0, x1, y1, t);
+  sgDrawDecor(ctx, x0, y0, x1, y1, t);
   for (let i = 0; i < SG_FLOWERS.length; i++){ const f = SG_FLOWERS[i]; if (f.x < x0 || f.x > x1 || f.y < y0 || f.y > y1) continue; ctx.fillStyle = f.c; ctx.fillRect(f.x, f.y, 4, 4); }
   const plan = SG.plan || (SG.plan = siegeLayout());
   for (let i = 0; i < plan.houses.length; i++){ const b = plan.houses[i]; if (sgHit(b, x0, y0, x1, y1, 120)) continue; sgDrawBuilding(ctx, b, t); }
@@ -173,6 +174,85 @@ function sgDrawSigns(ctx, x0, y0, x1, y1){
   ctx.save(); ctx.font = '800 34px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,246,216,.30)';
   for (let i = 0; i < SG_SIGNS.length; i++){ const s = SG_SIGNS[i]; if (s[1] + 240 < x0 || s[1] - 240 > x1 || s[2] + 30 < y0 || s[2] - 30 > y1) continue; ctx.fillText(s[0], s[1], s[2]); }
   ctx.restore();
+}
+
+/* ---------------------------------------------------------------- the small details: flat things on the ground that nothing collides with (the buildings are drawn over them) */
+const SG_DECOR = { drains: [], crates: [], bollards: [], benches: [], vents: [], stripes: [] };
+(function(){
+  for (let i = 0; i < 46; i++) SG_DECOR.drains.push({ x: 120 + csR(i + 33000) * 4000, y: 120 + csR(i + 33100) * 2900 });
+  for (let i = 0; i < 26; i++) SG_DECOR.crates.push({ x: 90 + csR(i + 33200) * 1200, y: 1050 + 90 + csR(i + 33300) * 880, s: 16 + csR(i + 33400) * 14, b: csR(i + 33500) > 0.5 });
+  for (let i = 0; i < 14; i++) SG_DECOR.bollards.push({ x: 58 + i * 94, y: 1050 + 60 });
+  for (let i = 0; i < 10; i++) SG_DECOR.benches.push({ x: 2800 + 260 + (i % 5) * 190 + csR(i + 33600) * 40, y: 1050 + (i < 5 ? 190 : 840) });
+  for (let i = 0; i < 18; i++) SG_DECOR.vents.push({ x: 2800 + 200 + csR(i + 33700) * 1000, y: 160 + csR(i + 33800) * 740, r: 16 + csR(i + 33900) * 14 });
+})();
+function sgDrawDecor(ctx, x0, y0, x1, y1, t){
+  const on = function(x, y, m){ return x > x0 - m && x < x1 + m && y > y0 - m && y < y1 + m; };
+  /* lane lines down the middle of every street between cells, with a crosswalk at each crossing */
+  ctx.fillStyle = 'rgba(245,225,120,.55)';
+  for (let k = 1; k <= 2; k++){
+    const rx = k * SG_CW, ry = k * SG_CH;
+    if (rx > x0 - 20 && rx < x1 + 20) for (let y = Math.max(0, Math.floor((y0 - 40) / 90) * 90); y < Math.min(3150, y1 + 40); y += 90){ if (Math.abs((y % SG_CH) - 0) < 170 || Math.abs((y % SG_CH) - SG_CH) < 170) continue; ctx.fillRect(rx - 3, y, 6, 46); }
+    if (ry > y0 - 20 && ry < y1 + 20) for (let x = Math.max(0, Math.floor((x0 - 40) / 90) * 90); x < Math.min(4200, x1 + 40); x += 90){ if (Math.abs((x % SG_CW) - 0) < 170 || Math.abs((x % SG_CW) - SG_CW) < 170) continue; ctx.fillRect(x, ry - 3, 46, 6); }
+  }
+  ctx.fillStyle = 'rgba(240,240,236,.5)';
+  for (let a = 1; a <= 2; a++) for (let b = 1; b <= 2; b++){
+    const cx = a * SG_CW, cy = b * SG_CH; if (!on(cx, cy, 200)) continue;
+    for (let i = -3; i <= 3; i++){ ctx.fillRect(cx + i * 16 - 5, cy - 150, 10, 56); ctx.fillRect(cx + i * 16 - 5, cy + 94, 10, 56); ctx.fillRect(cx - 150, cy + i * 16 - 5, 56, 10); ctx.fillRect(cx + 94, cy + i * 16 - 5, 56, 10); }
+  }
+  /* storm drains and manholes */
+  for (let i = 0; i < SG_DECOR.drains.length; i++){
+    const d = SG_DECOR.drains[i]; if (!on(d.x, d.y, 30)) continue;
+    if (i % 3){ ctx.fillStyle = 'rgba(50,52,58,.85)'; ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(20,22,26,.8)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(d.x, d.y, 9, 0, TAU); ctx.moveTo(d.x - 9, d.y); ctx.lineTo(d.x + 9, d.y); ctx.stroke(); }
+    else { ctx.fillStyle = 'rgba(30,32,36,.8)'; ctx.fillRect(d.x - 18, d.y - 6, 36, 12); ctx.fillStyle = 'rgba(120,124,132,.8)'; for (let k = 0; k < 6; k++) ctx.fillRect(d.x - 16 + k * 6, d.y - 4, 3, 8); }
+  }
+  /* the Park: a pond with a path round it, benches under the trees */
+  if (on(3500, 1575, 520)){
+    const px = 3500, py = 1575;
+    ctx.strokeStyle = 'rgba(206,188,148,.85)'; ctx.lineWidth = 34; ctx.lineCap = 'round'; ctx.beginPath(); ctx.ellipse(px, py, 330, 200, 0, 0, TAU); ctx.moveTo(px - 330, py); ctx.lineTo(2800 + 160, py); ctx.moveTo(px + 330, py); ctx.lineTo(4200 - 160, py); ctx.moveTo(px, py - 200); ctx.lineTo(px, 1050 + 170); ctx.moveTo(px, py + 200); ctx.lineTo(px, 2100 - 170); ctx.stroke(); ctx.lineCap = 'butt';
+    ctx.fillStyle = '#2E6A8E'; ctx.beginPath(); ctx.ellipse(px, py, 290, 164, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#4A92B6'; ctx.beginPath(); ctx.ellipse(px - 20, py - 12, 250, 134, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 2;
+    for (let i = 0; i < 6; i++){ const w = ((t * 0.3 + i / 6) % 1); ctx.globalAlpha = 0.5 * (1 - w); ctx.beginPath(); ctx.ellipse(px + Math.sin(i * 2.1) * 120, py + Math.cos(i * 1.7) * 60, 14 + w * 40, 7 + w * 20, 0, 0, TAU); ctx.stroke(); }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#4E8A3A'; for (let i = 0; i < 7; i++){ const a = i * 0.9 + 0.3; ctx.beginPath(); ctx.ellipse(px + Math.cos(a) * 190, py + Math.sin(a) * 100, 16, 10, a, 0, TAU); ctx.fill(); }
+    ctx.fillStyle = '#F6A8C8'; for (let i = 0; i < 7; i += 2){ const a = i * 0.9 + 0.3; ctx.beginPath(); ctx.arc(px + Math.cos(a) * 190, py + Math.sin(a) * 100, 4, 0, TAU); ctx.fill(); }
+  }
+  for (let i = 0; i < SG_DECOR.benches.length; i++){
+    const b = SG_DECOR.benches[i]; if (!on(b.x, b.y, 40)) continue;
+    ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(b.x - 24, b.y - 6, 52, 18); ctx.fillStyle = '#7A5634'; ctx.fillRect(b.x - 26, b.y - 10, 52, 16); ctx.fillStyle = '#5E4026'; ctx.fillRect(b.x - 26, b.y - 14, 52, 5); ctx.fillStyle = '#2E2E34'; ctx.fillRect(b.x - 24, b.y + 6, 4, 6); ctx.fillRect(b.x + 18, b.y + 6, 4, 6);
+  }
+  /* the Harbor: bollards along the quay, crates and barrels stacked about, a coil of rope */
+  for (let i = 0; i < SG_DECOR.bollards.length; i++){
+    const b = SG_DECOR.bollards[i]; if (!on(b.x, b.y, 20)) continue;
+    ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(b.x + 3, b.y + 5, 9, 5, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#2E3038'; ctx.beginPath(); ctx.arc(b.x, b.y, 8, 0, TAU); ctx.fill(); ctx.fillStyle = '#6A707C'; ctx.beginPath(); ctx.arc(b.x - 1, b.y - 1, 5, 0, TAU); ctx.fill();
+    if (i % 3 === 0){ ctx.strokeStyle = '#C8B07A'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(b.x + 24, b.y + 4, 9, 0, TAU); ctx.stroke(); ctx.beginPath(); ctx.arc(b.x + 24, b.y + 4, 4, 0, TAU); ctx.stroke(); }
+  }
+  for (let i = 0; i < SG_DECOR.crates.length; i++){
+    const c = SG_DECOR.crates[i]; if (!on(c.x, c.y, 40)) continue;
+    ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(c.x - c.s / 2 + 5, c.y - c.s / 2 + 7, c.s, c.s);
+    if (c.b){ ctx.fillStyle = '#6E4A2A'; ctx.beginPath(); ctx.arc(c.x, c.y, c.s * 0.55, 0, TAU); ctx.fill(); ctx.strokeStyle = '#B4B8C0'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(c.x, c.y, c.s * 0.38, 0, TAU); ctx.stroke(); }
+    else { ctx.fillStyle = '#A8824E'; ctx.fillRect(c.x - c.s / 2, c.y - c.s / 2, c.s, c.s); ctx.strokeStyle = '#6A4C2A'; ctx.lineWidth = 2; ctx.strokeRect(c.x - c.s / 2 + 1, c.y - c.s / 2 + 1, c.s - 2, c.s - 2); ctx.beginPath(); ctx.moveTo(c.x - c.s / 2, c.y - c.s / 2); ctx.lineTo(c.x + c.s / 2, c.y + c.s / 2); ctx.stroke(); }
+  }
+  /* the Rooftops: rows of roof vents and a painted walkway */
+  for (let i = 0; i < SG_DECOR.vents.length; i++){
+    const v = SG_DECOR.vents[i]; if (!on(v.x, v.y, 50)) continue;
+    ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.arc(v.x + 4, v.y + 6, v.r, 0, TAU); ctx.fill(); ctx.fillStyle = '#7C8088'; ctx.beginPath(); ctx.arc(v.x, v.y, v.r, 0, TAU); ctx.fill(); ctx.fillStyle = '#4A4E58'; ctx.beginPath(); ctx.arc(v.x, v.y, v.r * 0.6, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#A4A8B0'; ctx.lineWidth = 2; ctx.beginPath(); for (let a = 0; a < 3; a++){ const q = a * 2.09 + t * 0.8; ctx.moveTo(v.x, v.y); ctx.lineTo(v.x + Math.cos(q) * v.r * 0.55, v.y + Math.sin(q) * v.r * 0.55); } ctx.stroke();
+  }
+  if (on(3500, 520, 640)){
+    ctx.fillStyle = 'rgba(244,214,90,.55)'; for (let x = 2800 + 140; x < 4200 - 140; x += 60){ ctx.fillRect(x, 1050 - 150, 34, 8); }
+    ctx.fillStyle = 'rgba(255,255,255,.12)'; for (let y = 150; y < 900; y += 90) ctx.fillRect(2800 + 134, y, 1132, 3);
+  }
+  /* the Launchpad: a helipad ring, hazard stripes round the pad, and a row of landing lights */
+  if (on(3500, 2625, 560)){
+    const px = 3500, py = 2625;
+    ctx.strokeStyle = 'rgba(244,244,236,.6)'; ctx.lineWidth = 8; ctx.beginPath(); ctx.arc(px, py, 150, 0, TAU); ctx.stroke(); ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(px, py, 128, 0, TAU); ctx.stroke();
+    ctx.fillStyle = 'rgba(244,244,236,.6)'; ctx.fillRect(px - 52, py - 52, 12, 104); ctx.fillRect(px + 40, py - 52, 12, 104); ctx.fillRect(px - 52, py - 8, 104, 16);
+    ctx.save(); ctx.beginPath(); ctx.arc(px, py, 190, 0, TAU); ctx.arc(px, py, 168, 0, TAU, true); ctx.clip();
+    for (let i = -8; i < 8; i++){ ctx.fillStyle = i % 2 ? 'rgba(244,196,40,.7)' : 'rgba(30,30,34,.7)'; ctx.beginPath(); ctx.moveTo(px - 200 + i * 28, py - 200); ctx.lineTo(px - 172 + i * 28, py - 200); ctx.lineTo(px + 200 + i * 28, py + 200); ctx.lineTo(px + 172 + i * 28, py + 200); ctx.fill(); }
+    ctx.restore();
+    for (let i = 0; i < 12; i++){ const a = i * TAU / 12, lx = px + Math.cos(a) * 222, ly = py + Math.sin(a) * 222, on2 = ((t * 2 + i * 0.5) % 2) < 1; ctx.fillStyle = on2 ? '#FF7A5A' : '#6E3A30'; ctx.beginPath(); ctx.arc(lx, ly, 5, 0, TAU); ctx.fill(); }
+  }
 }
 
 /* ---------------------------------------------------------------- the buildings */
