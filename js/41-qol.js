@@ -447,6 +447,7 @@ let gearSearchQuery = '';
 function escAttr(str){ return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
 
 function showShop(tab){
+  const keepScroll = G.state === 'shop' && OV.classList.contains('on') && (!tab || tab === shopTab) ? OV.scrollTop : 0;   /* a buy redraws the page: stay where the player was */
   G.state = 'shop'; G.attract = true; G.subScreen = ''; G.venusScreen = false; G.marsScreen = false; G.labScreen = false;
   HUD.classList.remove('on');
   if (tab) shopTab = tab;
@@ -472,6 +473,7 @@ function showShop(tab){
         '<button class="btn sm ghost" data-a="wipe">Erase all progress</button>' +
       '</div>' +
     '</div>');
+  if (keepScroll) OV.scrollTop = keepScroll;
   if (shopTab === 'gear'){
     const inp = document.getElementById('gearSearch');
     if (inp){
