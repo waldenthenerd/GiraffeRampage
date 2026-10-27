@@ -8,7 +8,7 @@
    pays a bonus; every wave held at the end earns the chest, and all 25 is the trophy. State lives in SGB (by building key), reset for each run. */
 const SIEGE_BLD = { max: 100, wreck: 25, repair: 30, hitCd: 1.5, reach: 46, hunterHits: 3, hunterCd: 0.9, hunterNear: 300 };
 const SIEGE_HIT = { hyena: 1.5, grub: 0.5, jackal: 1, cheetah: 2, warthog: 5, vulture: 1, rhino: 4, baboon: 2, honeybadger: 18, mamba: 1.5, ember: 3, termite: 2, lion: 8, matriarch: 3, buffalo: 15, crocodile: 6, wildfire: 10 };
-const SIEGE_HUNTERS = { warthog: 1, honeybadger: 1, termite: 1, buffalo: 1, rhino: 0.8, ember: 0.6, jackal: 0.45, vulture: 0.4, baboon: 0.4, mamba: 0.35, hyena: 0.3, cheetah: 0.35 };
+const SIEGE_HUNTERS = { warthog: 1, honeybadger: 1, termite: 1, buffalo: 1, lion: 1, rhino: 0.8, ember: 0.6, jackal: 0.45, vulture: 0.4, baboon: 0.4, mamba: 0.35, hyena: 0.3, cheetah: 0.35 };
 const SGB = {};
 const SIEGE_SHORT = { hall: 'HALL', library: 'LIBRARY', post: 'POST', lighthouse: 'LIGHT', mission: 'MISSION' };       /* the names on the row at the top of the screen */
 function siegeDefenseInit(){

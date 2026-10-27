@@ -195,6 +195,54 @@
     Save.data.runSave = snap; startRun(16, 370, snap); steps(3); out.restoreHeld = G.sg.held === 7;
     var old = JSON.parse(JSON.stringify(snap)); delete old.sgHeld; startRun(16, 370, old); steps(3); out.restoreOld = G.sg.held === 0;
     freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();
+    /* events, crates, scars, boss attacks and the radio (js/44zzzh-siege-events.js) */
+    out.evTable = [6, 8, 12, 14, 17, 19, 21, 23].every(function(k){ return !!SIEGE_EVENTS[k] && k % 5 !== 0 && SIEGE_EVENTS[k].say.length > 0; }) && Object.keys(SG_STORY).every(function(k){ return SG_STORY[k].every(function(l){ return !!SG_WHO[l[0]]; }); });
+    var qf = buildSiegeWave(372, false), qh = buildSiegeWave(368, false), qn = buildSiegeWave(366, false);
+    out.evMix = qf.length > 10 && qf.every(function(q){ return q.type === 'jackal' || q.type === 'vulture'; }) && qh.filter(function(q){ return q.type === 'grub'; }).length > qh.length * 0.25 && qn.filter(function(q){ return q.type === 'vulture'; }).length > 0;
+    G.waveState = 'active'; G.sg.ev = 'hatch'; var hp1 = towerSpawnPoint(), hp2 = towerSpawnPoint();
+    out.evHatch = hyp(hp1.x - SG_HATCH.x, hp1.y - SG_HATCH.y) < 200 && hyp(hp2.x - SG_HATCH.x, hp2.y - SG_HATCH.y) < 200;
+    G.sg.ev = 'fronts'; G.sg.side = 0; var fs = [towerSpawnPoint(), towerSpawnPoint(), towerSpawnPoint(), towerSpawnPoint()];
+    out.evFronts = fs[0].x < 1600 && fs[1].x > 2600 && fs[2].x < 1600 && fs[3].x > 2600; G.sg.ev = null;
+    out.crates = G.sg.caches.length === 5 && G.sg.caches.every(function(c){ return c.ready && !TW.blocked[twCell(c.x, c.y)]; });
+    function crate(id){ return G.sg.caches.filter(function(c){ return c.id === id; })[0]; }
+    function stepOn(id){ var c = crate(id); P.x = c.x; P.y = c.y; siegeEventsTick(0.016); return c; }
+    G.state = 'playing'; G.attract = false; G.waveState = 'intro'; G.waveTimer = 9999; G.markers.length = 0; G.hzones.length = 0; G.enemies.length = 0;
+    SGB.hall.hp = 40; SGB.hall.wrecked = false; SGM.posts[0].hp = 10; var c1 = stepOn('market');
+    out.crMarket = !c1.ready && SGB.hall.hp >= 69 && SGM.posts[0].hp >= 35;
+    var c2 = stepOn('harbor'); out.crHarbor = !c2.ready && G.sg.fast > 20;
+    P.hp = 100; SGM.men[0].hp = 10; var c3 = stepOn('park'); out.crPark = !c3.ready && P.hp > 100 && SGM.men[0].hp === MIL.hp;
+    var hyA = spawnEnemy('hyena', 3200, 520, 361); var c4 = stepOn('roofs'); siegeEventsTick(0.016); out.crRoofs = !c4.ready && G.sg.flood > 8 && hyA.slowMul <= 0.5;
+    G.enemies.length = 0; var c5 = crate('launch'); P.x = c5.x; P.y = c5.y; siegeEventsTick(0.016); out.crMissileWaits = c5.ready === true;
+    var hz = [0, 1, 2].map(function(i){ var h = spawnEnemy('hyena', 3560 + i * 30, 2400, 361); h.stunT = 20; return h; }); SGM.men.forEach(function(m){ m.state = 'down'; }); P.x = c5.x; P.y = c5.y; siegeEventsTick(0.016);
+    SGM.men.forEach(function(m){ m.state = 'down'; }); for (var ms = 0; ms < 150; ms++) GR.step(1 / 30); noLevels(); SGM.men.forEach(function(m){ m.state = 'post'; m.hp = MIL.hp; });
+    out.crMissile = !c5.ready && hz.every(function(e){ return e.dead || G.enemies.indexOf(e) < 0; });
+    G.enemies.length = 0; G.sg.caches.forEach(function(c){ c.ready = false; }); siegeEventStart(364); out.crRefill = G.sg.caches.every(function(c){ return c.ready; });
+    P.x = 2100; P.y = 1910; G.sg.scars.length = 0; hostileBlast(2100, 1910, 100, 0, '#FFB070'); var sc1 = G.sg.scars.length; hostileBlast(2100, 1300, 100, 0, '#FFB070');
+    out.scars = sc1 === 1 && G.sg.scars.length === 1;
+    for (var sb = 0; sb < 400; sb++) sgScar(100 + (sb * 53) % 4000, 100 + (sb * 97) % 2900, 40, 'scorch'); out.scarCap = G.sg.scars.length <= SG_SCAR_MAX && G.sg.scars.every(function(s){ return !TW.solid[twCell(s.x, s.y)]; });
+    try { var cvs = document.createElement('canvas'); cvs.width = 800; cvs.height = 600; var cs = cvs.getContext('2d'); G.wave = 385; drawGroundSiege(cs, 2100, 1575, 1400, 1050); drawGroundSiege(cs, 3500, 600, 1400, 1050); out.wearDraws = true; } catch (e6) { out.wearErr = String(e6 && e6.stack || e6).slice(0, 200); }
+    G.wave = 361;
+    function hpSum(){ var n = 0; for (var k in SGB) n += SGB[k].hp; return n; }
+    for (var k1 in SGB){ SGB[k1].hp = 100; SGB[k1].wrecked = false; } var h0 = hpSum(); sgCollateral(2100, 1300, 100, 10); out.bossCollateral = h0 - hpSum() >= 9;
+    var h1 = hpSum(); sgBombRun({ x: 2100, y: 1700, dmg: 100 }); for (var bm = 0; bm < 45; bm++) GR.step(1 / 30); noLevels(); out.bossBomb = h1 - hpSum() >= 13;
+    var h2 = hpSum(); sgAcidOn({ x: 2100, y: 1700, dmg: 100, p2: true }); for (var ac = 0; ac < 200; ac++) GR.step(1 / 30); noLevels(); out.bossAcid = h2 - hpSum() >= 17;
+    out.bossHunter = SIEGE_HUNTERS.lion === 1;
+    var mj = SGM.men.filter(function(m){ return m.state !== 'down'; })[0]; G.sg.jam = 2; G.sg.fast = 0; mj.reload = 5; siegeEventsTick(0.1); out.jam = Math.abs(mj.reload - 5.1) < 0.001;
+    G.sg.jam = 0; G.sg.fast = 5; mj.reload = 5; siegeEventsTick(0.1); out.fastReload = Math.abs(mj.reload - 4.9) < 0.001; G.sg.fast = 0;
+    G.sg.story.length = 0; G.sg.line = null; G.banner = null; sgSay([['fern', 'One.'], ['mc', 'Two.']]); out.sayQueued = G.sg.story.length === 2;
+    siegeEventsTick(0.5); var showed = !!G.sg.line; try { sgDrawStory(CTX); } catch (e7) { out.storyErr = String(e7 && e7.message); }
+    for (var sy = 0; sy < 12; sy++) siegeEventsTick(1); out.radio = showed && G.sg.story.length === 0 && !G.sg.line;
+    G.sg.story.length = 0; siegeEventStart(361); out.openingSay = G.sg.story.length >= 2; G.sg.story.length = 0; siegeEventStart(385); out.finaleSay = G.sg.story.length === 2 && G.sg.story[0].who === 'warden';
+    G.sg.ev = 'night'; G.waveState = 'active'; G.sg.nightA = 0; for (var nt = 0; nt < 5; nt++) siegeEventsTick(0.5); try { drawFeedbackOverlays(CTX); out.nightDraws = G.sg.nightA > 0.7; } catch (e8) { out.nightErr = String(e8 && e8.message); }
+    G.sg.ev = null; G.sg.nightA = 0; G.sg.story.length = 0; G.sg.line = null; G.waveState = 'idle'; G.markers.length = 0; G.hzones.length = 0; G.enemies.length = 0; G.eproj.length = 0; G.sg.scars.length = 0; G.wave = 361;
+    for (var k2 in SGB){ SGB[k2].hp = 100; SGB[k2].wrecked = false; }
+
+    function viewExtras(){                                                               /* --params "ev=night|hatch&wear=22&scars=1&story=1" */
+      if (QA.params.wear) G.wave = 360 + (+QA.params.wear);
+      if (QA.params.ev){ G.sg.ev = QA.params.ev; G.waveState = 'intro'; G.waveTimer = 99; G.sg.nightA = 1; }
+      if (QA.params.scars) for (var q = 0; q < 24; q++) sgScar(P.x + Math.cos(q * 2.4) * (60 + q * 22), P.y + Math.sin(q * 2.4) * (50 + q * 14), q % 3 ? 50 : 100, q % 3 ? 'scorch' : 'crater');
+            if (QA.params.story){ G.sg.line = { who: 'mc', text: 'We traced their signal. Every machine is calling home to the same place, deep under the waterhole.', t: 3, dur: 99 }; }
+    }
     /* the picture: --params "view=square|market|harbor|park|roofs|launch|south|hall|lighthouse" */
     var at = { square: [2100, 1700], market: [2100, 600], harbor: [700, 1700], park: [3500, 1600], roofs: [3500, 600], launch: [3500, 2650], south: [2100, 2650], nw: [700, 600], hall: [2100, 1250], lighthouse: [700, 1450], mission: [3400, 2350], post: [2700, 500], library: [1700, 520], militia: [1800, 1640] };
     if (QA.params.view === 'menu'){ G.state = 'menu'; Save.data.chapter15Complete = true; setMenuChapter(16); showMenu(); for (var mm = 0; mm < 4; mm++) GR.step(1 / 30); drawMenuPreview(); QA.done(out); return; }
@@ -239,10 +287,10 @@
       var cv = document.createElement('canvas'); cv.width = 1400; cv.height = 1050; cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99999;background:#000'; var cx2 = cv.getContext('2d');
       cx2.scale(1400 / ARENA_W, 1050 / ARENA_H); drawGroundSiege(cx2, ARENA_W / 2, ARENA_H / 2, ARENA_W, ARENA_H); document.body.appendChild(cv); QA.done(out); return;
     }
-    if (QA.params.view && at[QA.params.view]){ Settings.fxLevel = 1; G.enemies.length = 0; G.spawnQueue = []; G.waveState = 'idle'; P.invuln = 1e9; if (QA.params.damage){ SGB.hall.hp = 45; SGB.library.hp = 12; SGB.library.wrecked = true; SGB.post.hp = 70; SGB.post.alert = 99; SGB.lighthouse.hp = 30; SGM.men[0].hp = 35; SGM.men[1].state = 'down'; SGM.men[1].hp = 0; SGM.posts[0].hp = 55; SGM.posts[1].hp = 20; SGM.posts[1].abandoned = true; SGM.men[2].hp = 100; } P.x = at[QA.params.view][0]; P.y = at[QA.params.view][1]; for (var z = 0; z < 8; z++){ G.enemies.length = 0; G.spawnQueue = []; GR.step(1 / 30); noLevels(); } G.texts.length = 0; G.particles.length = 0; GR.step(1 / 30); QA.done(out); return; }
+    if (QA.params.view && at[QA.params.view]){ Settings.fxLevel = 1; G.enemies.length = 0; G.spawnQueue = []; G.waveState = 'idle'; P.invuln = 1e9; viewExtras(); if (QA.params.damage){ SGB.hall.hp = 45; SGB.library.hp = 12; SGB.library.wrecked = true; SGB.post.hp = 70; SGB.post.alert = 99; SGB.lighthouse.hp = 30; SGM.men[0].hp = 35; SGM.men[1].state = 'down'; SGM.men[1].hp = 0; SGM.posts[0].hp = 55; SGM.posts[1].hp = 20; SGM.posts[1].abandoned = true; SGM.men[2].hp = 100; } P.x = at[QA.params.view][0]; P.y = at[QA.params.view][1]; for (var z = 0; z < 8; z++){ G.enemies.length = 0; G.spawnQueue = []; GR.step(1 / 30); noLevels(); } G.texts.length = 0; G.particles.length = 0; GR.step(1 / 30); out.dbgN = [G.waveState, G.sg.ev, G.sg.nightA, G.chapter, G.attract, G.state]; QA.done(out); return; }
     G.wave = 385; out.flags = true;
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked', 'dStart', 'dHurt', 'dWreck', 'dLeftAlone', 'dPass', 'dCooldown', 'dSapper', 'dHunter', 'dWalks', 'dRepair', 'dHeld', 'dNotHeld', 'dFinale', 'dSave', 'dSave2', 'dDraws', 'mStart', 'mSpot', 'mOneShot', 'mReload', 'mHeavy', 'mBoss', 'mRange', 'mHurt', 'mHurtCd', 'mShot', 'mDown', 'mDownQuiet', 'mUp', 'mHealHurt', 'pAbandon', 'pFoot', 'pMend', 'mDraws', 'kindsOk', 'bossBehaviour', 'artDraws', 'menuFilm', 'filmsDraw', 'gallery', 'lastWave', 'endFilm', 'endVictory', 'victoryText', 'bestName', 'bestKill', 'bestHtml', 'report', 'gagRobots', 'ach', 'ach2', 'guideLocked', 'guideOpen', 'coLocked', 'coOpen', 'together', 'togetherHeal', 'snapHeld', 'restoreHeld', 'restoreOld'];
+  var need = ['evTable', 'evMix', 'evHatch', 'evFronts', 'crates', 'crMarket', 'crHarbor', 'crPark', 'crRoofs', 'crMissileWaits', 'crMissile', 'crRefill', 'scars', 'scarCap', 'wearDraws', 'bossCollateral', 'bossBomb', 'bossAcid', 'bossHunter', 'jam', 'fastReload', 'sayQueued', 'radio', 'openingSay', 'finaleSay', 'nightDraws', 'table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked', 'dStart', 'dHurt', 'dWreck', 'dLeftAlone', 'dPass', 'dCooldown', 'dSapper', 'dHunter', 'dWalks', 'dRepair', 'dHeld', 'dNotHeld', 'dFinale', 'dSave', 'dSave2', 'dDraws', 'mStart', 'mSpot', 'mOneShot', 'mReload', 'mHeavy', 'mBoss', 'mRange', 'mHurt', 'mHurtCd', 'mShot', 'mDown', 'mDownQuiet', 'mUp', 'mHealHurt', 'pAbandon', 'pFoot', 'pMend', 'mDraws', 'kindsOk', 'bossBehaviour', 'artDraws', 'menuFilm', 'filmsDraw', 'gallery', 'lastWave', 'endFilm', 'endVictory', 'victoryText', 'bestName', 'bestKill', 'bestHtml', 'report', 'gagRobots', 'ach', 'ach2', 'guideLocked', 'guideOpen', 'coLocked', 'coOpen', 'together', 'togetherHeal', 'snapHeld', 'restoreHeld', 'restoreOld'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);

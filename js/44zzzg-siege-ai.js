@@ -76,7 +76,7 @@ const SIEGE_AI_COMMON = {
 
 /* ---- the bosses ---- */
 const SIEGE_BOSS_AI = {
-  sg_walker(e, dt, ux, uy, d){                                  /* The Scrap Walker: slow, and it stamps, fires its shoulder cannon, and sweeps a beam; at half it is faster and stamps with a ring of scrap */
+  sg_walker(e, dt, ux, uy, d){                                  /* The Scrap Walker: a hunter that goes for the buildings first (its stomps crack the ones near it), and it stamps, fires its shoulder cannon, and sweeps a beam; at half it is faster and stamps with a ring of scrap */
     e.ang = turnTo(e.ang, Math.atan2(uy, ux), 2 * dt); e.stateT -= dt;
     if (e.pat === undefined){ e.pat = 0; e.p2 = false; }
     if (!e.p2 && e.hp < e.maxHp * 0.5){ e.p2 = true; e.state = 'stompwind'; e.stateT = 0.9; e.stompMk = undefined; sfx('boom', 0.2); addShake(10); screenFlash('#FFB070', 0.2, 0.3); }
@@ -88,7 +88,7 @@ const SIEGE_BOSS_AI = {
     }
     if (e.state === 'stompwind'){
       if (e.stompMk === undefined){ e.stompMk = true; addMarker(e.x, e.y, 230, e.stateT, '#FFB84A', null, { owner: e }); }
-      if (e.stateT <= 0){ e.stompMk = undefined; hostileBlast(e.x, e.y, 230, e.dmg, '#FFB84A', { kb: 160, shake: 14 }); addShock(e.x, e.y, 260, 0.6, 0, '#FFB84A'); if (e.p2) twRing(e, 10, 300, 0.35, '#C8CCD4', 5); e.state = 'idle'; e.stateT = 1.5 * fast; }
+      if (e.stateT <= 0){ e.stompMk = undefined; hostileBlast(e.x, e.y, 230, e.dmg, '#FFB84A', { kb: 160, shake: 14 }); sgCollateral(e.x, e.y, 230, 7); addShock(e.x, e.y, 260, 0.6, 0, '#FFB84A'); if (e.p2) twRing(e, 10, 300, 0.35, '#C8CCD4', 5); e.state = 'idle'; e.stateT = 1.5 * fast; }
       return [0, 0];
     }
     if (e.state === 'cannonwind'){
@@ -117,7 +117,7 @@ const SIEGE_BOSS_AI = {
       return [0, 0];
     }
     if (e.state === 'pool'){
-      if (e.stateT <= 0){ const n = e.p2 ? 5 : 3; for (let k = 0; k < n; k++){ const p = towerOpenNear(P.x + P.vx * 0.4 + (k ? rand(-220, 220) : 0), P.y + P.vy * 0.4 + (k ? rand(-220, 220) : 0)); addMarker(p.x, p.y, 95, 0.7 + k * 0.1, '#BFFF6A', function(m){ hostileZone(m.x, m.y, 95, 4, e.dmg * 0.15, '#9AE86A'); }); } e.state = 'idle'; e.stateT = 1.6 * fast; }
+      if (e.stateT <= 0){ const n = e.p2 ? 5 : 3; for (let k = 0; k < n; k++){ const p = towerOpenNear(P.x + P.vx * 0.4 + (k ? rand(-220, 220) : 0), P.y + P.vy * 0.4 + (k ? rand(-220, 220) : 0)); addMarker(p.x, p.y, 95, 0.7 + k * 0.1, '#BFFF6A', function(m){ hostileZone(m.x, m.y, 95, 4, e.dmg * 0.15, '#9AE86A'); }); } e.state = 'idle'; e.stateT = 1.6 * fast; sgAcidOn(e); }
       return [0, 0];
     }
     e.state = 'idle'; e.stateT = 1; return [0, 0];
@@ -131,7 +131,7 @@ const SIEGE_BOSS_AI = {
       e.ang = Math.atan2(e.dashVY, e.dashVX);
       const wall = towerWallAhead(e, Math.cos(e.ang), Math.sin(e.ang), e.r + 50);
       if (e.stateT <= 0 || wall){
-        if (wall){ e.state = 'stun'; e.stateT = 1.4; hostileBlast(e.x + Math.cos(e.ang) * e.r, e.y + Math.sin(e.ang) * e.r, 170, e.dmg * 0.6, '#FFD890', { kb: 100, shake: 14 }); addShake(14); sfx('boom', 0.2); addText(e.x, e.y - e.r - 14, 'Stuck!', '#FFD890', 16, true); e.dashVX = e.dashVY = 0; }
+        if (wall){ e.state = 'stun'; e.stateT = 1.4; hostileBlast(e.x + Math.cos(e.ang) * e.r, e.y + Math.sin(e.ang) * e.r, 170, e.dmg * 0.6, '#FFD890', { kb: 100, shake: 14 }); addShake(14); sfx('boom', 0.2); sgCollateral(e.x, e.y, 170, 10); addText(e.x, e.y - e.r - 14, 'Stuck!', '#FFD890', 16, true); e.dashVX = e.dashVY = 0; }
         else { e.state = 'idle'; e.stateT = 1.1 * fast; }
         if (e.p2) twRing(e, 8, 300, 0.35, '#B8863A', 5);
         return [0, 0];
@@ -159,7 +159,7 @@ const SIEGE_BOSS_AI = {
     }
     if (e.state === 'launchwind'){ if (e.stateT <= 0){ twSpawnNear(e, 'jackal', e.p2 ? 5 : 3, e.r + 40); sfx('whoosh', 0.1); e.state = 'idle'; e.stateT = 1.8 * fast; } return [0, 0]; }
     if (e.state === 'bombwind'){
-      if (e.stateT <= 0){ const n = e.p2 ? 7 : 5, dm = e.dmg * 0.7; for (let k = 0; k < n; k++){ const p = towerOpenNear(P.x + (k ? rand(-280, 280) : 0), P.y + (k ? rand(-280, 280) : 0)); addMarker(p.x, p.y, 100, 0.8 + k * 0.1, '#FF5A4A', function(m){ hostileBlast(m.x, m.y, 100, dm, '#FFB070', { shake: 6, column: true }); }); } e.state = 'idle'; e.stateT = 1.7 * fast; }
+      if (e.stateT <= 0){ const n = e.p2 ? 7 : 5, dm = e.dmg * 0.7; for (let k = 0; k < n; k++){ const p = towerOpenNear(P.x + (k ? rand(-280, 280) : 0), P.y + (k ? rand(-280, 280) : 0)); addMarker(p.x, p.y, 100, 0.8 + k * 0.1, '#FF5A4A', function(m){ hostileBlast(m.x, m.y, 100, dm, '#FFB070', { shake: 6, column: true }); }); } e.state = 'idle'; e.stateT = 1.7 * fast; sgBombRun(e); }
       return [0, 0];
     }
     if (e.state === 'ringwind'){ if (e.stateT <= 0){ twRing(e, e.p2 ? 16 : 12, 300, 0.35, '#B0C0DC', 5, Math.random() * TAU); sfx('boom', 0.1); e.state = 'idle'; e.stateT = 1.5 * fast; } return [0, 0]; }
@@ -169,7 +169,7 @@ const SIEGE_BOSS_AI = {
     e.ang = turnTo(e.ang, Math.atan2(uy, ux), 2.2 * dt); e.stateT -= dt;
     const f = e.hp / e.maxHp, ph = f < 0.25 ? 3 : f < 0.55 ? 2 : 1;
     if (e.pat === undefined){ e.pat = 0; e.phase = 1; e.glow = 0; }
-    if (ph > e.phase){ e.phase = ph; e.state = 'roar'; e.stateT = 1; sfx('boom', 0.2); addShake(12); screenFlash('#FF5A4A', 0.2, 0.3); twSpawnNear(e, 'hyena', ph === 2 ? 3 : 5, e.r + 60); }
+    if (ph > e.phase){ e.phase = ph; e.state = 'roar'; e.stateT = 1; sfx('boom', 0.2); addShake(12); screenFlash('#FF5A4A', 0.2, 0.3); twSpawnNear(e, 'hyena', ph === 2 ? 3 : 5, e.r + 60); siegeJam(ph === 2 ? 8 : 10); }
     e.glow = clamp((e.glow || 0) + (e.phase > 1 ? dt : -dt), 0, 1);
     const fast = ph === 1 ? 1 : ph === 2 ? 0.8 : 0.62;
     if (e.state === 'roar'){ if (e.stateT <= 0){ e.state = 'idle'; e.stateT = 0.6; } return [0, 0]; }
@@ -188,7 +188,7 @@ const SIEGE_BOSS_AI = {
     }
     if (e.state === 'stompwind'){
       if (e.stompMk === undefined){ e.stompMk = true; addMarker(e.x, e.y, 260, e.stateT, '#FF5A4A', null, { owner: e }); }
-      if (e.stateT <= 0){ e.stompMk = undefined; hostileBlast(e.x, e.y, 260, e.dmg * 0.8, '#FF5A4A', { kb: 160, shake: 14 }); addShock(e.x, e.y, 290, 0.6, 0, '#FF8A6A'); twRing(e, ph === 1 ? 10 : 14, 320, 0.4, '#FF8A6A', 5); if (ph >= 2) twSpawnNear(e, 'hyena', 2, e.r + 50); e.state = 'idle'; e.stateT = 1.5 * fast; }
+      if (e.stateT <= 0){ e.stompMk = undefined; hostileBlast(e.x, e.y, 260, e.dmg * 0.8, '#FF5A4A', { kb: 160, shake: 14 }); sgCollateral(e.x, e.y, 260, 7); addShock(e.x, e.y, 290, 0.6, 0, '#FF8A6A'); twRing(e, ph === 1 ? 10 : 14, 320, 0.4, '#FF8A6A', 5); if (ph >= 2) twSpawnNear(e, 'hyena', 2, e.r + 50); e.state = 'idle'; e.stateT = 1.5 * fast; }
       return [0, 0];
     }
     e.state = 'idle'; e.stateT = 1; return [0, 0];
