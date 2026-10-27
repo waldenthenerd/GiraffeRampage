@@ -296,7 +296,7 @@ function handleDebugAction(a){
     case 'debug-venus': Save.data.chapter8Complete = true; Save.data.sulfur = (Save.data.sulfur | 0) + 300; Save.data.basalt = (Save.data.basalt | 0) + 300; Save.write(); SFX.buy(); showDebugPanel(); break;
     case 'debug-scout': Save.data.chapter8Complete = true; Save.write(); startScout(); break;
     case 'debug-unlockall':
-      Save.data.chapter1Complete = true; Save.data.chapter2Complete = true; Save.data.chapter3Complete = true; Save.data.chapter4Complete = true; Save.data.chapter5Complete = true; Save.data.chapter6Complete = true; Save.data.chapter7Complete = true; Save.data.chapter8Complete = true; Save.data.chapter9Complete = true; Save.data.chapter10Complete = true; Save.data.chapter11Complete = true; Save.data.chapter12Complete = true;
+      for (let n = 1; n <= TOTAL_CHAPTERS; n++) Save.data['chapter' + n + 'Complete'] = true;        /* every chapter, the Domes, the Tower and the Siege included */
       Save.write(); SFX.buy(); showDebugPanel();
       break;
   }

@@ -40,16 +40,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 191 | 60,422 | 4.74 MiB (4,972,570 bytes) |
+| JavaScript (`js/`) | 191 | 60,422 | 4.74 MiB (4,972,307 bytes) |
 | Styles (`css/`) | 6 | 1,712 | 158 KiB (161,471 bytes) |
 | Page (`index.html`) | 1 | 239 | 10.4 KiB (10,611 bytes) |
-| **Whole game** | **198** | **62,373** | **4.91 MiB (5,144,652 bytes)** |
+| **Whole game** | **198** | **62,373** | **4.91 MiB (5,144,389 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **61,774 lines, 4.86 MiB (5,097,593 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 191 | 60,422 | 4.74 MiB (4,972,570 bytes) |
+| JavaScript (`js/`) | 191 | 60,422 | 4.74 MiB (4,972,307 bytes) |
 | Styles (`css/`) | 6 | 1,712 | 158 KiB (161,471 bytes) |
 | Page (`index.html`) | 1 | 239 | 10.4 KiB (10,611 bytes) |
-| **Whole game** | **198** | **62,373** | **4.91 MiB (5,144,652 bytes)** |
+| **Whole game** | **198** | **62,373** | **4.91 MiB (5,144,389 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
