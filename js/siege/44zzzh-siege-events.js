@@ -108,7 +108,7 @@ function sgDrawStory(ctx){
   const words = L.text.slice(0, n).split(' '), full = L.text.split(' ');                                                      /* lay out the whole line first so the panel does not grow as it types */
   const wrap = function(ws){ const out = []; let c = ''; for (let i = 0; i < ws.length; i++){ const t = c ? c + ' ' + ws[i] : ws[i]; if (ctx.measureText(t).width > w - 28 && c){ out.push(c); c = ws[i]; } else c = t; } if (c) out.push(c); return out; };
   const total = wrap(full).length, shown = wrap(words);
-  const h = 30 + total * 20, y = H - h - (portrait ? 210 : 74);
+  const h = 30 + total * 20, y = H - h - (portrait ? 270 : 150);                   /* above the one-time hint, which sits at the foot of the screen */
   ctx.fillStyle = 'rgba(14,12,16,.82)'; ctx.fillRect(x, y, w, h); ctx.fillStyle = who[1]; ctx.fillRect(x, y, 4, h);
   ctx.font = '800 12px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; ctx.fillText(who[0].toUpperCase(), x + 14, y + 17);
   ctx.font = '600 15px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; ctx.fillStyle = '#FFF6D8';
