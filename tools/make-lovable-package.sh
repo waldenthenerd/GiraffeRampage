@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the ZIP that goes to Lovable: index.html (without the developer panel line), css/, js/ (without js/45b-dev-panel.js),
+# Builds the ZIP that goes to Lovable: index.html (without the developer panel line), css/, js/ (without js/dev/45b-dev-panel.js),
 # README.md, lovable.md and LICENSE. Refuses to finish if any developer-panel text is left in the shipped files.
 # usage: tools/make-lovable-package.sh [output.zip]      (default: dist/GiraffeRampage-lovable.zip)
 set -euo pipefail

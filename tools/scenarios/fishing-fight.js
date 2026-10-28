@@ -1,4 +1,4 @@
-/* fishing-fight: the third part of the fishing (js/44zzy-fishing-fight.js). The fight after the hook (hold to wind in, the line snaps when it is too tight, the fish comes in
+/* fishing-fight: the third part of the fishing (js/sea/44zzy-fishing-fight.js). The fight after the hook (hold to wind in, the line snaps when it is too tight, the fish comes in
    only while she winds), how each of the 35 kinds pulls, conditions (dawn, midday, rain, storm, fog) and the daily spots at sea, the catch card, the mounted fish at home,
    auto-recast, the Cast-again key, the way to the tackle shop, and the sounds. There are no real timers: fishTick is called by hand. */
 (function(){

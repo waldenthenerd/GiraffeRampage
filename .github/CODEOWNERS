@@ -4,8 +4,8 @@
 /lovable.md                             @waldenthenerd
 /LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md    @waldenthenerd
 /tools/make-lovable-package.sh          @waldenthenerd
-/js/01b-savepack.js                     @waldenthenerd
-/js/45-test-exports.js                  @waldenthenerd
+/js/core/01b-savepack.js               @waldenthenerd
+/js/core/45-test-exports.js            @waldenthenerd
 /AGENTS.md                              @waldenthenerd
 /CLAUDE.md                              @waldenthenerd
 /.github/                               @waldenthenerd

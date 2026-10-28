@@ -1,4 +1,4 @@
-/* The Upgrades tab (js/41e-upgrades-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/upgrades-page.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --touch --params "view=combat|body|ants|all|afford|confirm|maxed|summary|locked"] */
+/* The Upgrades tab (js/ui/41e-upgrades-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/upgrades-page.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --touch --params "view=combat|body|ants|all|afford|confirm|maxed|summary|locked"] */
 GR.handleAction('splash-go');
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
 function $(s){ return document.querySelector(s); } function $$(s){ return [].slice.call(document.querySelectorAll(s)); }

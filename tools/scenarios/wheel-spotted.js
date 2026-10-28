@@ -1,4 +1,4 @@
-/* The prize wheels and the Spotted wheel (js/41c-wheel-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/wheel-spotted.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --params "view=normal|spotted|batch|new|nokeys|jackpot"] */
+/* The prize wheels and the Spotted wheel (js/ui/41c-wheel-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/wheel-spotted.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --params "view=normal|spotted|batch|new|nokeys|jackpot"] */
 GR.handleAction('splash-go');
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
 try {

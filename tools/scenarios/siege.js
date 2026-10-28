@@ -195,7 +195,7 @@
     Save.data.runSave = snap; startRun(16, 370, snap); steps(3); out.restoreHeld = G.sg.held === 7;
     var old = JSON.parse(JSON.stringify(snap)); delete old.sgHeld; startRun(16, 370, old); steps(3); out.restoreOld = G.sg.held === 0;
     freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();
-    /* events, crates, scars, boss attacks and the radio (js/44zzzh-siege-events.js) */
+    /* events, crates, scars, boss attacks and the radio (js/siege/44zzzh-siege-events.js) */
     out.evTable = [6, 8, 12, 14, 17, 19, 21, 23].every(function(k){ return !!SIEGE_EVENTS[k] && k % 5 !== 0 && SIEGE_EVENTS[k].say.length > 0; }) && Object.keys(SG_STORY).every(function(k){ return SG_STORY[k].every(function(l){ return !!SG_WHO[l[0]]; }); });
     var qf = buildSiegeWave(372, false), qh = buildSiegeWave(368, false), qn = buildSiegeWave(366, false);
     out.evMix = qf.length > 10 && qf.every(function(q){ return q.type === 'jackal' || q.type === 'vulture'; }) && qh.filter(function(q){ return q.type === 'grub'; }).length > qh.length * 0.25 && qn.filter(function(q){ return q.type === 'vulture'; }).length > 0;

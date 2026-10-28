@@ -1,4 +1,4 @@
-/* gags: the pointless things she does on her own (js/44zzzc-gags.js): a bite out of a tree that leaves it bare, a line to a robot, smashed office furniture, idle lines; the quiet gap and the caps,
+/* gags: the pointless things she does on her own (js/town/44zzzc-gags.js): a bite out of a tree that leaves it bare, a line to a robot, smashed office furniture, idle lines; the quiet gap and the caps,
    nothing while paused, a clean slate every run, the save counter and its sanitising. Add `--params "view=tree"` or `view=desk` with `--shot x.png` for the picture.
    Run: node tools/qa-cloud.mjs tools/scenarios/gags.js --wait 60000 */
 (function(){

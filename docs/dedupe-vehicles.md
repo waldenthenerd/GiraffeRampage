@@ -4,13 +4,13 @@ Baseline: main at 4f918b3. The parser inventory regenerated 25 duplicated global
 
 | Name | Earlier declaration removed | Live declaration retained | Intervening captures / assignments |
 |---|---|---|---|
-| planeOwned | js/44ze-town-runway.js:30 | js/44zf-town-economy.js:37 | None |
-| planeColour | js/44ze-town-runway.js:31 | js/44zf-town-economy.js:39 | None |
-| planeBuy | js/44ze-town-runway.js:32 | js/44zf-town-economy.js:40 | None |
-| planePaint | js/44ze-town-runway.js:37 | js/44zf-town-economy.js:45 | None |
-| townCarOwned | js/44z-town-bread-car.js:79 | js/44zf-town-economy.js:101 | None |
-| townCarBuy | js/44z-town-bread-car.js:81 | js/44zf-town-economy.js:105 | None |
-| townCarRunMul | js/44z-town-bread-car.js:90 | js/44zf-town-economy.js:104 | None |
+| planeOwned | js/town/44ze-town-runway.js:30 | js/town/44zf-town-economy.js:37 | None |
+| planeColour | js/town/44ze-town-runway.js:31 | js/town/44zf-town-economy.js:39 | None |
+| planeBuy | js/town/44ze-town-runway.js:32 | js/town/44zf-town-economy.js:40 | None |
+| planePaint | js/town/44ze-town-runway.js:37 | js/town/44zf-town-economy.js:45 | None |
+| townCarOwned | js/town/44z-town-bread-car.js:79 | js/town/44zf-town-economy.js:101 | None |
+| townCarBuy | js/town/44z-town-bread-car.js:81 | js/town/44zf-town-economy.js:105 | None |
+| townCarRunMul | js/town/44z-town-bread-car.js:90 | js/town/44zf-town-economy.js:104 | None |
 
 Reproduce the inventory with `npm ci --prefix tools`, then `node tools/duplicate-functions.mjs`. It parses the QA dependency's Babel AST, inspects Program-level declarations, and includes captures and assignments between declarations. The complete baseline has these names:
 

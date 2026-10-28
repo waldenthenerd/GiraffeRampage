@@ -1,4 +1,4 @@
-/* town-layers: the draw order of a street (the tiers are written above townDynamicBehind in js/44w-town-engine.js). A street with things that move behind its props (D.behind: the
+/* town-layers: the draw order of a street (the tiers are written above townDynamicBehind in js/town/44w-town-engine.js). A street with things that move behind its props (D.behind: the
    harbor's sailboats) keeps a back picture (water and ground) and a front picture (every prop and building); the things behind are drawn between them. This proves it for every such
    street: a loud marker is painted in the "behind" slot over the whole street, and wherever a prop or building is solid, none of it may show. It also checks that streets without such
    things pay for no second picture, and that nobody fakes depth with clip shapes again. */
@@ -45,7 +45,7 @@
     Town.fixHour = 12; Town.fixWeather = 'clear';
     /* the sailboats are drawn by the behind slot, and the old cut-out shapes are gone for good */
     var xhr = new XMLHttpRequest(), bad = [];
-    ['js/44zc-town-life.js', 'js/44w-town-engine.js', 'js/44v-town-art.js', 'js/44zw-town-detail.js', 'js/44zb-town-interiors.js', 'js/44zzo-town-sound.js'].forEach(function(f){ xhr.open('GET', '/' + f, false); xhr.send(); if (/clip\('evenodd'\)|hide\.push/.test(xhr.responseText)) bad.push(f); });
+    ['js/town/44zc-town-life.js', 'js/town/44w-town-engine.js', 'js/town/44v-town-art.js', 'js/town/44zw-town-detail.js', 'js/town/44zb-town-interiors.js', 'js/audio/44zzo-town-sound.js'].forEach(function(f){ xhr.open('GET', '/' + f, false); xhr.send(); if (/clip\('evenodd'\)|hide\.push/.test(xhr.responseText)) bad.push(f); });
     out.noClipHacks = bad.length === 0; out.clipHacks = bad;
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
   var need = ['socketBehindSofa', 'homeOneWindowUnder', 'homeSkyDay', 'homeSkyNight', 'homeSkyRain', 'harbourBehind', 'solids', 'visibleElsewhere', 'eachChecked', 'singlePicture', 'noClipHacks'];

@@ -1,5 +1,5 @@
 /* gold-bank: a bank past 2,147,483,647 gold stays positive. `x | 0` wraps past that into a negative number, so the town's pay-outs, the boat shop and the
-   other price checks are run with 3 billion gold, and every script is read to make sure no gold is read or written through `| 0` again (goldInt, js/01-core.js). */
+   other price checks are run with 3 billion gold, and every script is read to make sure no gold is read or written through `| 0` again (goldInt, js/core/01-core.js). */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
   GR.handleAction('splash-go');

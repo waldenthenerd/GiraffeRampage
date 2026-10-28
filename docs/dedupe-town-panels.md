@@ -4,16 +4,16 @@ Baseline: main at 4f918b3. The parser inventory regenerated 25 duplicated global
 
 | Name | Earlier declaration removed | Live declaration retained | Intervening captures / assignments |
 |---|---|---|---|
-| townShowMenu | js/44x-town-ui.js:243 | js/44zd-town-panels.js:169 | None |
-| townShowJournal | js/44x-town-ui.js:250 | js/44zd-town-panels.js:86 | None |
-| townShowMap | js/44x-town-ui.js:313 | js/44zd-town-panels.js:142 | None |
-| townShowHall | js/44x-town-ui.js:322 | js/44zd-town-panels.js:58 | None |
-| townShowBoard | js/44x-town-ui.js:334 | js/44zd-town-panels.js:30 | None |
-| townShowScores | js/44x-town-ui.js:355 | js/44zd-town-panels.js:72 | None |
-| townShowLibrary | js/44x-town-ui.js:366 | js/44zd-town-panels.js:163 | None |
-| townShowMission | js/44x-town-ui.js:372 | js/44zd-town-panels.js:155 | None |
-| townShowGarage | js/44zd-town-panels.js:196 | js/44zf-town-economy.js:131 | None |
-| townShowHangar | js/44ze-town-runway.js:270 | js/44zf-town-economy.js:72 | None |
+| townShowMenu | js/town/44x-town-ui.js:243 | js/town/44zd-town-panels.js:169 | None |
+| townShowJournal | js/town/44x-town-ui.js:250 | js/town/44zd-town-panels.js:86 | None |
+| townShowMap | js/town/44x-town-ui.js:313 | js/town/44zd-town-panels.js:142 | None |
+| townShowHall | js/town/44x-town-ui.js:322 | js/town/44zd-town-panels.js:58 | None |
+| townShowBoard | js/town/44x-town-ui.js:334 | js/town/44zd-town-panels.js:30 | None |
+| townShowScores | js/town/44x-town-ui.js:355 | js/town/44zd-town-panels.js:72 | None |
+| townShowLibrary | js/town/44x-town-ui.js:366 | js/town/44zd-town-panels.js:163 | None |
+| townShowMission | js/town/44x-town-ui.js:372 | js/town/44zd-town-panels.js:155 | None |
+| townShowGarage | js/town/44zd-town-panels.js:196 | js/town/44zf-town-economy.js:131 | None |
+| townShowHangar | js/town/44ze-town-runway.js:270 | js/town/44zf-town-economy.js:72 | None |
 
 Reproduce the inventory with `npm ci --prefix tools`, then `node tools/duplicate-functions.mjs`. It parses the QA dependency's Babel AST, inspects Program-level declarations, and includes captures and assignments between declarations. The complete baseline has these names:
 

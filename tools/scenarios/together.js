@@ -1,4 +1,4 @@
-/* together: "Play together" (js/44zzt-together.js): two giraffes on one screen, for fun, with nothing kept.
+/* together: "Play together" (js/game/44zzt-together.js): two giraffes on one screen, for fun, with nothing kept.
    The menu button, the real save left exactly as it was (nothing written while playing, back untouched afterwards), the two giraffes moving and kicking on their own
    keys, hits dealt to the giraffe that was touched, a giraffe going down and being helped up, both down, rounds, the yard (a goal, a match), pause and leave. */
 (function(){

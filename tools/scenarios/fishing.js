@@ -1,4 +1,4 @@
-/* fishing: the grown fishing of js/44zzv-fishing.js. 35 kinds in five groups, what bites on the pier and in each kind of water (and by weather, night and bait), the
+/* fishing: the grown fishing of js/sea/44zzv-fishing.js. 35 kinds in five groups, what bites on the pier and in each kind of water (and by weather, night and bait), the
    timing game (a catch, a miss, a bite that is not answered), sizes and records, tackle unlocked free by how many kinds she has caught and put on, Brine's
    weekly order, the fish book, casting from a boat (F, the Cast button, Esc, only when the boat is nearly still), and trophies. There are no real timers here:
    the game is stepped by hand with fishTick. */

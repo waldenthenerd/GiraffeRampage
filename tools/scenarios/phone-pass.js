@@ -1,4 +1,4 @@
-/* The phone pass (css/phone.css, the chapter title in js/36-atmosphere.js). Run as a phone: node tools/qa-cloud.mjs tools/scenarios/phone-pass.js --touch --w 390 --h 844 --wait 90000 [--shot x.png --params "screen=upgrades|bestiary|settings|wardrobe|photo|fusion|wheel|ants"]; add --h 390 --w 844 for the landscape checks (they are skipped in portrait). */
+/* The phone pass (css/phone.css, the chapter title in js/render/36-atmosphere.js). Run as a phone: node tools/qa-cloud.mjs tools/scenarios/phone-pass.js --touch --w 390 --h 844 --wait 90000 [--shot x.png --params "screen=upgrades|bestiary|settings|wardrobe|photo|fusion|wheel|ants"]; add --h 390 --w 844 for the landscape checks (they are skipped in portrait). */
 GR.handleAction('splash-go');
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
 function px(sel, prop){ var el = document.querySelector(sel); return el ? parseFloat(getComputedStyle(el)[prop]) : NaN; }
@@ -68,7 +68,7 @@ try {
     });
     townCarOwned = realCar; G.state = 'menu'; Town.on = false; out.townHud = hits.length === 0 && shown >= 4; out.townHudHits = hits.join(', ');
   })();
-  /* at sea: a finger held on the screen steers and the boat moves (js/43-input.js has to treat 'sail' like the town), and it does not drift back to the dock by itself */
+  /* at sea: a finger held on the screen steers and the boat moves (js/core/43-input.js has to treat 'sail' like the town), and it does not drift back to the dock by itself */
   (function(){
     var sd = seaData(), realSel = sd.sel, st = document.getElementById('stage'), rc = st.getBoundingClientRect();
     function touch(type, x, y){

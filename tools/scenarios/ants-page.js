@@ -1,4 +1,4 @@
-/* The ants tab as an anthill cutaway (js/41d-ants-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/ants-page.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --params "view=full|empty|locked|deep|lockeddeep"] */
+/* The ants tab as an anthill cutaway (js/ui/41d-ants-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/ants-page.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --params "view=full|empty|locked|deep|lockeddeep"] */
 GR.handleAction('splash-go');
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
 try {

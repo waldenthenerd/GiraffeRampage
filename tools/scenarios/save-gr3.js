@@ -1,4 +1,4 @@
-/* GR3 save packing (js/01b-savepack.js): a known-answer test that pins the format, round trips, the fast-then-repack write path, damage handling and the old formats.
+/* GR3 save packing (js/core/01b-savepack.js): a known-answer test that pins the format, round trips, the fast-then-repack write path, damage handling and the old formats.
    Run: node tools/qa-cloud.mjs tools/scenarios/save-gr3.js --wait 90000 */
 GR.handleAction('splash-go');
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
