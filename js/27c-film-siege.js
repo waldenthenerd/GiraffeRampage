@@ -84,10 +84,20 @@ MARS_FILMS.siegeflight = {
 };
 
 /* ---- film 2 (22 s): the morning after ---- */
-function sgWreck(ctx, x, gy, s, t){                                                   /* the Warden, down: a dark heap of plate with one red light left, and smoke */
-  ctx.fillStyle = '#0C0E14'; ctx.beginPath(); ctx.moveTo(x - 150 * s, gy); ctx.lineTo(x - 110 * s, gy - 90 * s); ctx.lineTo(x - 30 * s, gy - 130 * s); ctx.lineTo(x + 60 * s, gy - 100 * s); ctx.lineTo(x + 150 * s, gy - 40 * s); ctx.lineTo(x + 170 * s, gy); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#1E2030'; ctx.fillRect(x - 90 * s, gy - 96 * s, 60 * s, 22 * s); ctx.fillRect(x + 20 * s, gy - 80 * s, 70 * s, 18 * s); ctx.strokeStyle = '#0C0E14'; ctx.lineWidth = 12 * s; ctx.beginPath(); ctx.moveTo(x + 150 * s, gy - 60 * s); ctx.lineTo(x + 250 * s, gy - 20 * s); ctx.stroke();
-  fillCircle(ctx, x - 40 * s, gy - 70 * s, 7 * s, Math.sin(t * 2) > 0.2 ? '#FF3A2A' : '#4A1410'); sgSmoke(ctx, x, gy - 110 * s, t, 200 * s, 0.7);
+function sgWreck(ctx, x, gy, s, t){                                                   /* the Warden, down: a toppled heap of plate lit along its top edge by the morning, with one red light left, and smoke */
+  ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(x + 20 * s, gy + 6 * s, 210 * s, 14 * s, 0, 0, TAU); ctx.fill();
+  const top = [[x - 150 * s, gy], [x - 110 * s, gy - 90 * s], [x - 30 * s, gy - 130 * s], [x + 60 * s, gy - 100 * s], [x + 150 * s, gy - 40 * s], [x + 170 * s, gy]];
+  ctx.fillStyle = '#141824'; ctx.beginPath(); ctx.moveTo(top[0][0], top[0][1]); for (let i = 1; i < top.length; i++) ctx.lineTo(top[i][0], top[i][1]); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'rgba(232,150,110,.85)'; ctx.lineWidth = 3 * s; ctx.beginPath(); ctx.moveTo(top[1][0], top[1][1]); ctx.lineTo(top[2][0], top[2][1]); ctx.lineTo(top[3][0], top[3][1]); ctx.lineTo(top[4][0], top[4][1]); ctx.stroke();      /* the lit edge */
+  ctx.fillStyle = '#2A2E42'; ctx.fillRect(x - 90 * s, gy - 96 * s, 60 * s, 22 * s); ctx.fillRect(x + 20 * s, gy - 80 * s, 70 * s, 18 * s); ctx.fillRect(x - 60 * s, gy - 50 * s, 120 * s, 16 * s);
+  ctx.fillStyle = '#4A5068'; ctx.fillRect(x - 90 * s, gy - 96 * s, 60 * s, 3 * s); ctx.fillRect(x + 20 * s, gy - 80 * s, 70 * s, 3 * s); ctx.fillRect(x - 60 * s, gy - 50 * s, 120 * s, 3 * s);
+  ctx.fillStyle = '#E0B030'; ctx.beginPath(); ctx.moveTo(x - 128 * s, gy - 30 * s); ctx.lineTo(x - 112 * s, gy - 30 * s); ctx.lineTo(x - 120 * s, gy - 46 * s); ctx.closePath(); ctx.fill();   /* the Warden's yellow marking */
+  ctx.strokeStyle = '#141824'; ctx.lineWidth = 12 * s; ctx.lineCap = 'round';
+  for (const dy of [-26, -10]){ ctx.beginPath(); ctx.moveTo(x + 150 * s, gy + dy * s - 20 * s); ctx.lineTo(x + 250 * s, gy + dy * s + 10 * s); ctx.stroke(); }          /* the twin barrels, one drooping */
+  ctx.beginPath(); ctx.moveTo(x - 120 * s, gy - 4 * s); ctx.lineTo(x - 168 * s, gy - 34 * s); ctx.lineTo(x - 190 * s, gy - 4 * s); ctx.stroke();                          /* a broken leg */
+  ctx.lineCap = 'butt';
+  const lit = Math.sin(t * 2) > 0.2; fillCircle(ctx, x - 40 * s, gy - 70 * s, 7 * s, lit ? '#FF3A2A' : '#4A1410'); if (lit) csGlow(ctx, x - 40 * s, gy - 70 * s, 26 * s, '#FF3A2A', 0.5);
+  sgSmoke(ctx, x, gy - 110 * s, t, 200 * s, 0.7);
 }
 function siegeOutScene(ctx, t){
   const T = SG_OUT_T;

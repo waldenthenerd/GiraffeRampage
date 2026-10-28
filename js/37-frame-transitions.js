@@ -102,8 +102,10 @@ function drawScreenFX(ctx){
     ctx.fillStyle = '#CF4433'; ctx.fillRect(x, y, w * p, 14);
     ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(x, y, w * p, 5);
     ctx.font = '700 12px ui-sans-serif, "Segoe UI", Roboto, sans-serif';
-    ctx.textAlign = 'center'; ctx.fillStyle = '#EFE6D4';
-    ctx.fillText(G.boss.def.title + '   ' + Math.ceil(G.boss.hp) + ' / ' + Math.ceil(G.boss.maxHp), G.W / 2, y - 8);
+    ctx.textAlign = 'center';
+    const bl = G.boss.def.title + '   ' + Math.ceil(G.boss.hp) + ' / ' + Math.ceil(G.boss.maxHp), bw = ctx.measureText(bl).width + 16;      /* on a plate, so it reads on snow and tile too */
+    ctx.fillStyle = 'rgba(18,13,10,.72)'; ctx.fillRect(G.W / 2 - bw / 2, y - 23, bw, 17);
+    ctx.fillStyle = '#EFE6D4'; ctx.fillText(bl, G.W / 2, y - 10);
     ctx.textAlign = 'left';
   }
 

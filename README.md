@@ -40,16 +40,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 192 | 60,788 | 4.77 MiB (5,006,464 bytes) |
+| JavaScript (`js/`) | 192 | 60,808 | 4.78 MiB (5,009,583 bytes) |
 | Styles (`css/`) | 6 | 1,712 | 158 KiB (161,471 bytes) |
 | Page (`index.html`) | 1 | 240 | 10.4 KiB (10,661 bytes) |
-| **Whole game** | **199** | **62,740** | **4.94 MiB (5,178,596 bytes)** |
+| **Whole game** | **199** | **62,760** | **4.94 MiB (5,181,715 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **62,141 lines, 4.89 MiB (5,131,800 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 192 | 60,788 | 4.77 MiB (5,006,464 bytes) |
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **62,161 lines, 4.90 MiB (5,134,919 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 192 | 60,808 | 4.78 MiB (5,009,583 bytes) |
 | Styles (`css/`) | 6 | 1,712 | 158 KiB (161,471 bytes) |
 | Page (`index.html`) | 1 | 240 | 10.4 KiB (10,661 bytes) |
-| **Whole game** | **199** | **62,740** | **4.94 MiB (5,178,596 bytes)** |
+| **Whole game** | **199** | **62,760** | **4.94 MiB (5,181,715 bytes)** |
 
 Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -96,18 +96,18 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/20-chapters-9-10.js` | 188 | Chapters 9 and 10, and the Deflector pulse. |
 | `js/21-film-homecoming.js` | 349 | The homecoming film. |
 | `js/22-film-area51.js` | 295 | The Area 51 film. |
-| `js/23-film-short.js` | 141 | The short travel films between chapters. |
+| `js/23-film-short.js` | 148 | The short travel films between chapters. |
 | `js/24-mars-outpost.js` | 606 | The Mars outpost. |
 | `js/25-lab.js` | 89 | The Giraffe Lab (Mutation Vial). |
 | `js/26-dust-squad.js` | 135 | The dust squad (alliance after chapter 13). |
 | `js/27-film-mars.js` | 204 | The Mars films. |
 | `js/27a-film-domes.js` | 405 | **The Dome films** (Chapter 13.5). `MARS_FILMS.domeflight` (30 s: the dark green town helicopter, `domeHeli`, lifts off from Longneck Town, flies over the glittering savannah to a ring of mirror-skinned domes, `domeBuilding`, sees frost behind a lifted flap of mylar and lands) and `MARS_FILMS.domeout` (28 s: the dome glows and cracks, the helicopter takes off, a long flight and the skyline of New York). It plays after the Chapter 13 films, and when 13.5 is started from the menu. |
 | `js/27b-film-tower.js` | 257 | **The Tower films** (Chapter 14), with nobody in them but the giraffe. `MARS_FILMS.towerflight` (31 s): the town helicopter comes in over a night-time New York toward the glass tower with its name down the side (`twTower`, layered towers in `twCity`), sets down on the plaza pad, she crosses the paving to the brass doors under the sign (`twFacade`), and goes into the marble lobby and the elevator (`twLobby`, `twLiftDoors`). `MARS_FILMS.towerout` (32 s): the corner office with the vial in its glass case (`twOffice`), the terrace and the rail, the paraglider she jumps with (`twGlider`: a canopy of cells, lines, and the giraffe tucked into the harness), a glide past searchlights to another roof (`twRoof`), and a second, black helicopter (`domeHeli` with a palette, `TW_HELI_PAL`) that lifts away into a paling sky. No text says it is the end. |
-| `js/27c-film-siege.js` | 124 | **The Siege films** (Chapter 15). `MARS_FILMS.siegeflight` (24 s: the helicopter over the grass at dusk with smoke on the horizon, Longneck Town in silhouette with machines on the road, the drop in beside the militia) and `MARS_FILMS.siegeout` (22 s: the morning after, the Warden's wreck, the hatch in the Square lifting, one small drone going east toward the waterhole; it closes nothing). Same format as the Tower films. |
+| `js/27c-film-siege.js` | 134 | **The Siege films** (Chapter 15). `MARS_FILMS.siegeflight` (24 s: the helicopter over the grass at dusk with smoke on the horizon, Longneck Town in silhouette with machines on the road, the drop in beside the militia) and `MARS_FILMS.siegeout` (22 s: the morning after, the Warden's wreck, the hatch in the Square lifting, one small drone going east toward the waterhole; it closes nothing). Same format as the Tower films. |
 | `js/28-spaceplane.js` | 102 | The spaceplane. |
 | `js/29-city.js` | 123 | The Underground Giraffe City. |
 | `js/30-chapters-11-13.js` | 756 | Chapters 11, 12 and 13. |
-| `js/30a-chapter-domes.js` | 174 | **Chapter 13.5: the Domes** (internal chapter 14, waves 326 to 335). `ETYPES_DOME`: Chapter 2's creatures (`ARCTIC_LOOKS`) with Chapter 11's twists and glimmer, at Mars strength, and two new bosses, The Thawed (wave 330) and The Ice Heart (wave 335). `domeScale` takes the strength from 1.33x to 2x of Chapter 13's last wave (`DOME_TUNE` holds the numbers to tune), `buildDomeWave` builds the ten waves, `DOME_AI` holds both bosses' behavior (shards, slides, splashes and falling ice; novas, volleys, beams and spikes). |
+| `js/30a-chapter-domes.js` | 175 | **Chapter 13.5: the Domes** (internal chapter 14, waves 326 to 335). `ETYPES_DOME`: Chapter 2's creatures (`ARCTIC_LOOKS`) with Chapter 11's twists and glimmer, at Mars strength, and two new bosses, The Thawed (wave 330) and The Ice Heart (wave 335). `domeScale` takes the strength from 1.33x to 2x of Chapter 13's last wave (`DOME_TUNE` holds the numbers to tune), `buildDomeWave` builds the ten waves, `DOME_AI` holds both bosses' behavior (shards, slides, splashes and falling ice; novas, volleys, beams and spikes). |
 | `js/30d-tower-layouts.js` | 207 | **The Tower's twenty-five floor plans**, as pure data and arithmetic with no game globals, so `tools/scenarios/tower.js` can build and check every one. A floor is the whole arena, 28 x 21 cells of 150 px, cut into rectangular rooms that tile it exactly (`TOWER_PLANS`: each has its rooms, its doors between pairs of rooms, a furniture pattern for some of the rooms, and the two elevators); `twBuildPlan(n)` turns one into wall rectangles (a wall along every boundary between rooms except where a door is cut into it, and a "full" door joins two rooms into one space), furniture boxes laid out by the `TW_PAT` patterns (cubicles, racks, shelves, belts, safes, tanks...) inside each room with a clear margin so doorways and the rim stay open, the elevator spaces and the spawn vents. No two floors share a layout, and the boss floors (5, 10, 15, 20, 25) are big halls. |
 | `js/30b-chapter-tower.js` | 366 | **Chapter 14: the Tower** (internal chapter 15, waves 336 to 360, one floor each, a boss every fifth). `TOWER_KIT` gives the twelve ordinary kinds (Scrap Rat, Staple Mite, Courier Drone, Swivel Charger, Copier Brute, Safe Slammer, Mutated Intern, Paper Shredder, Watching Orb, Cable Serpent, Server Hive, Spark Battery) and the five bosses (The Receptionist, The Floor Manager, The Vault, The Chief Scientist, The Chief Executive) the Bestiary slots of the old creatures, `TOWER_MUL` and `TOWER_TUNE` hold the strength numbers to tune (`towerScale` takes them from 1.5x to 3x of Chapter 13's last wave in health), `buildTowerWave` builds a floor's wave, and `TOWER_AI` holds every behavior (they check `towerSight` before shooting; the Floor Manager's charge ends in a stun if it hits a wall). |
 | `js/30e-chapter-siege.js` | 93 | **Chapter 15: the Siege of Longneck Town** (internal chapter 16, waves 361 to 385, a boss every fifth). `SIEGE_KIT` gives the twelve ordinary kinds (machines and mutants: Patrol Bot, Glimmer Maggot, Skitter Drone, Raptor Bot, Dozer Bot, Spotter Drone, Glimmerhorn, Rockhurler, Sapper Bot, Glassfang, Torch Bot, Gnawer) and five bosses (the Scrap Walker, Brood Queen, Battering Ram, Hive Carrier, Warden) in the Bestiary's usual slots; `SIEGE_MUL` and `SIEGE_TUNE` (with its `hard` dial) are the numbers, `siegeScale` the climb, `buildSiegeWave` the waves. |
@@ -149,7 +149,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/36g-scenery-moon-venus-inferno.js` | 542 | Scenery definitions: moon-venus-inferno (see js/36a-scenery-core.js for the format). |
 | `js/36h-scenery-area51-mars.js` | 424 | Scenery definitions: area51-mars (see js/36a-scenery-core.js for the format). Chapter 12 Area 51 and chapter 13 Mars; everything is inside one function so it adds no globals, and the runway, hangars, hatch and Mars base are kept clear of scenery. |
 | `js/36n-scenery-domes.js` | 137 | Scenery and the floor of the Domes (chapter 14): frosted steel plates, veins of glowing crystal root, frozen crates, seed pods, grow-lamps, vents breathing fog, falling flakes, and the dome's own rim of mylar panels. `drawGroundDome`, `buildGroundDome`, `buildDomeWorld`. |
-| `js/37-frame-transitions.js` | 407 | Frame composition, transform sequence, chapter transitions. |
+| `js/37-frame-transitions.js` | 409 | Frame composition, transform sequence, chapter transitions. |
 | `js/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
 | `js/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
 | `js/40-fusion.js` | 881 | Card fusion: combos, the machine screen, the film. |

@@ -12,11 +12,12 @@ function domeScale(cw){
   const k = clamp((cw - 1) / (DOME_WAVES - 1), 0, 1), b = enemyScale(WAVES_PER_CHAPTER);                    /* Chapter 13's last wave, then more */
   return { hp: b.hp * DOME_HARD * (DOME_TUNE.hp0 + (DOME_TUNE.hp1 - DOME_TUNE.hp0) * k), dmg: b.dmg * DOME_HARD * (DOME_TUNE.dmg0 + (DOME_TUNE.dmg1 - DOME_TUNE.dmg0) * k), spd: b.spd };
 }
+const DOME_RIM = { hyena: '#3C5666', jackal: '#3C5666', ember: '#3C5666' };               /* the white animals' outline, darkened so they stand out on the pale floor */
 const ETYPES_DOME = {};
 Object.keys(ETYPES).forEach(id => {
   const base = ETYPES[id], lk = ARCTIC_LOOKS[id]; if (base.big || !lk) return;
   ETYPES_DOME[id] = Object.assign({}, base, { hp: base.hp * DOME_MUL.common.hp, dmg: base.dmg * DOME_MUL.common.dmg, spd: base.spd * DOME_MUL.common.spd, val: Math.round(base.val * DOME_MUL.common.val),
-    look: lk.look, color: lk.color, dark: lk.dark, pale: lk.pale || base.pale, blood: '#BEEFFF', frost: true, glim: true, twist: id, dome: true, splitInto: undefined, splitCount: undefined });
+    look: lk.look, color: lk.color, dark: DOME_RIM[id] || lk.dark, pale: lk.pale || base.pale, blood: '#BEEFFF', frost: true, glim: true, twist: id, dome: true, splitInto: undefined, splitCount: undefined });
 });
 /* the two bosses are new creatures with their own art (DOME_DRAW, js/35i-art-domes.js) and behavior (DOME_AI below) */
 ETYPES_DOME.thawed = { hp: 3000, spd: 92, dmg: 30, r: 46, xp: 1800, kbRes: 0.04, ai: 'd14_thawed', color: '#9FD6EA', dark: '#2A5A72', pale: '#EAFBFF', blood: '#8FE0FF',

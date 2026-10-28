@@ -213,7 +213,7 @@ h2{margin:6px;font-size:14px}
 (function(){
   var q = new URLSearchParams(location.search);
   var ch = +q.get('ch') || 1, scale = +q.get('scale') || 3, cols = +q.get('cols') || 6, state = q.get('state') || 'idle', bg = q.get('bg') || 'chapter';
-  var CH_BG = { 1: '#7F6C45', 2: '#C3D6E0', 3: '#3E4A2C', 4: '#0F3A52', 5: '#2A3A1C', 6: '#6A6862', 7: '#5F7F3C', 8: '#8D8C88', 9: '#8A5028', 10: '#4A2A1A', 11: '#7F6C45', 12: '#C2A573', 13: '#B4552F' };
+  var CH_BG = { 1: '#7F6C45', 2: '#C3D6E0', 3: '#3E4A2C', 4: '#0F3A52', 5: '#2A3A1C', 6: '#6A6862', 7: '#5F7F3C', 8: '#8D8C88', 9: '#8A5028', 10: '#4A2A1A', 11: '#7F6C45', 12: '#C2A573', 13: '#B4552F', 14: '#C6DCE6', 15: '#D2D4D8', 16: '#8A8478' };
   var bgc = /^[0-9a-fA-F]{6}$/.test(bg) ? '#' + bg : ({ dark: '#241A12', light: '#E8E0D0', mid: '#808080' }[bg] || CH_BG[ch] || '#7F6C45');
   var table = GR.bestiaryTable(ch), names = Object.keys(table);
   document.getElementById('title').textContent = 'Chapter ' + ch + ' - ' + names.length + ' creatures - state ' + state + ' - scale ' + scale + ' - bg ' + bg;
