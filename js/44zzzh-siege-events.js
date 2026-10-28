@@ -118,28 +118,35 @@ function sgDrawStory(ctx){
 
 /* ---- the crates ---- */
 function sgHeroes(){ return (typeof Co !== 'undefined' && Co.on && Co.pl) ? Co.pl.filter(function(h){ return !h.down; }) : [P]; }
+function sgTier2(){ return chapterWaveOf(G.wave) >= 16; }                                                         /* after wave 15 the crates come reinforced */
 function sgCrateTake(c, hero){
-  const sg = G.sg; let done = true;
+  const sg = G.sg, t2 = sgTier2();
   if (c.id === 'market'){
-    let low = null; for (const k in SGB){ if (!low || SGB[k].hp < low.hp) low = SGB[k]; }
-    if (low){ low.hp = Math.min(SIEGE_BLD.max, low.hp + 30); if (low.hp > SIEGE_BLD.wreck) low.wrecked = false; addText(low.b.x + low.b.w / 2, low.b.y - 18, low.name + ' patched up', '#BFF0A0', 16, true); }
-    SGM.posts.forEach(function(p){ p.hp = Math.min(MIL.postHp, p.hp + 25); if (p.abandoned && p.hp > MIL.abandon){ p.abandoned = false; p.men.forEach(function(m){ if (m.state === 'foot') m.state = 'post'; }); } });
-  } else if (c.id === 'harbor'){ sg.fast = 25; }
+    const order = Object.keys(SGB).map(function(k){ return SGB[k]; }).sort(function(a, b){ return a.hp - b.hp; });
+    order.slice(0, t2 ? 2 : 1).forEach(function(low){ low.hp = Math.min(SIEGE_BLD.max, low.hp + (t2 ? 45 : 30)); if (low.hp > SIEGE_BLD.wreck) low.wrecked = false; addText(low.b.x + low.b.w / 2, low.b.y - 18, low.name + ' patched up', '#BFF0A0', 16, true); });
+    SGM.posts.forEach(function(p){ p.hp = Math.min(MIL.postHp, p.hp + (t2 ? 40 : 25)); if (p.abandoned && p.hp > MIL.abandon){ p.abandoned = false; p.men.forEach(function(m){ if (m.state === 'foot') m.state = 'post'; }); } });
+  } else if (c.id === 'harbor'){ sg.fast = t2 ? 40 : 25; }
   else if (c.id === 'park'){
-    sgHeroes().forEach(function(h){ h.hp = Math.min(h.maxHp, h.hp + h.maxHp * 0.4); });
+    sgHeroes().forEach(function(h){ h.hp = Math.min(h.maxHp, h.hp + h.maxHp * (t2 ? 0.7 : 0.4)); });
     SGM.men.forEach(function(m){ milHeal(m, MIL.hp); });
-  } else if (c.id === 'roofs'){ sg.flood = 9; }
+  } else if (c.id === 'roofs'){ sg.flood = t2 ? 14 : 9; sg.floodMul = t2 ? 0.35 : 0.5; }
   else {                                                                                                                         /* the missile: on the boss, or where the crowd is thickest */
     const es = G.enemies.filter(function(e){ return !e.dead && !e.untarg && e.def && e.def.siege; });
     if (!es.length){ addText(hero.x, hero.y - 70, 'Nothing to hit yet', '#FFD8C8', 15, false); return; }
-    let tgt = G.bossAlive && G.boss && !G.boss.dead ? G.boss : null, best = -1;
-    if (!tgt){ for (let i = 0; i < es.length && i < 70; i++){ let n = 0; for (let k = 0; k < es.length && k < 70; k++) if (hyp(es[i].x - es[k].x, es[i].y - es[k].y) < 260) n++; if (n > best){ best = n; tgt = es[i]; } } }
-    const tx = tgt.x, ty = tgt.y;
-    addMarker(tx, ty, 280, 1.0, '#FF5A4A', function(m){
-      addShock(m.x, m.y, 320, 0.5, 0, '#FFB070', { width: 16, filled: true }); burstParticles(m.x, m.y, 26, '#FFB070', 320, 6, { glow: true }); addShake(14); sfx('boom', 0.2, m.x, m.y);
-      sgScar(m.x, m.y, 150, 'crater');
-      const near = enemiesNear(m.x, m.y, 340, []);
-      for (let i = 0; i < near.length; i++){ const e = near[i]; if (e.dead || e.untarg || !e.def || !e.def.siege || hyp(e.x - m.x, e.y - m.y) > 280 + e.r) continue; damageEnemy(e, e.big ? e.maxHp * 0.1 : e.hp * 2 + 1, { noCrit: true, quiet: true, color: '#FFB070' }); }
+    const aim = function(skip){
+      let tgt = G.bossAlive && G.boss && !G.boss.dead && !skip ? G.boss : null, best = -1;
+      if (!tgt){ for (let i = 0; i < es.length && i < 70; i++){ if (skip && hyp(es[i].x - skip.x, es[i].y - skip.y) < 320) continue; let n = 0; for (let k = 0; k < es.length && k < 70; k++) if (hyp(es[i].x - es[k].x, es[i].y - es[k].y) < 260) n++; if (n > best){ best = n; tgt = es[i]; } } }
+      return tgt;
+    };
+    const shots = [aim(null)]; if (t2){ const t = aim(shots[0] || { x: 1e9, y: 1e9 }); if (t) shots.push({ x: t.x, y: t.y, e: t }); }
+    const tx = shots[0].x, ty = shots[0].y;
+    shots.forEach(function(tgt, si){
+      addMarker(tgt.x, tgt.y, 280, 1.0 + si * 0.5, '#FF5A4A', function(m){
+        addShock(m.x, m.y, 320, 0.5, 0, '#FFB070', { width: 16, filled: true }); burstParticles(m.x, m.y, 26, '#FFB070', 320, 6, { glow: true }); addShake(14); sfx('boom', 0.2, m.x, m.y);
+        sgScar(m.x, m.y, 150, 'crater');
+        const near = enemiesNear(m.x, m.y, 340, []);
+        for (let i = 0; i < near.length; i++){ const e = near[i]; if (e.dead || e.untarg || !e.def || !e.def.siege || hyp(e.x - m.x, e.y - m.y) > 280 + e.r) continue; damageEnemy(e, e.big ? e.maxHp * 0.1 : e.hp * 2 + 1, { noCrit: true, quiet: true, color: '#FFB070' }); }
+      });
     });
     sfx('whoosh', 0.2); addText(tx, ty - 60, 'Missile inbound!', '#FF8A6A', 18, true);
   }
@@ -153,6 +160,7 @@ function sgDrawCrate(ctx, c, t){
   if (!c.ready){ ctx.fillStyle = '#5E5A54'; ctx.fillRect(c.x - 18, c.y - 18, 36, 32); ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(c.x - 18, c.y - 18, 36, 32); return; }
   ctx.strokeStyle = c.col; ctx.lineWidth = 3; ctx.globalAlpha = 0.35 + 0.4 * pulse; ctx.beginPath(); ctx.arc(c.x, c.y, 38 + 5 * pulse, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
   ctx.fillStyle = '#7A5C36'; ctx.fillRect(c.x - 18, c.y - 18, 36, 32); ctx.fillStyle = '#9A7848'; ctx.fillRect(c.x - 18, c.y - 18, 36, 8);
+  if (sgTier2()){ ctx.strokeStyle = '#F2D060'; ctx.lineWidth = 3; ctx.strokeRect(c.x - 19.5, c.y - 19.5, 39, 35); }                                   /* reinforced: gold trim */
   ctx.fillStyle = c.col; ctx.fillRect(c.x - 4, c.y - 14, 8, 24); ctx.fillRect(c.x - 12, c.y - 6, 24, 8);
   ctx.font = '800 12px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = c.col; ctx.fillText(c.name.toUpperCase(), c.x, c.y - 28);
 }
@@ -206,6 +214,9 @@ function sgFires(dt){
     if (Math.random() < dt * 2.5) addParticle(b.x + Math.random() * b.w, b.y + Math.random() * b.h * 0.6, rand(-8, 8), -rand(25, 50), rand(9, 15), rand(1.2, 1.9), 'rgba(50,44,40,.45)', { drag: 0.6 });
   }
 }
+/* the town's ground changes while she plays (crates, scars, soot, fires' glow, the boon crates), so the ground cache (js/44ca-ground-cache.js), which paints the ground once at low effects, is not used for it */
+const siegeEvBaseCacheOn = groundCacheOn;
+groundCacheOn = function(){ return G.biome !== 'siege' && siegeEvBaseCacheOn.apply(this, arguments); };
 const siegeEvBaseGround = drawGroundSiege;
 drawGroundSiege = function(ctx, cx, cy, vw, vh){
   siegeEvBaseGround.apply(this, arguments);
@@ -232,7 +243,7 @@ function sgBombRun(e){                                                          
   addMarker(b.x + b.w / 2, b.y + b.h / 2, 120, 0.9, '#FF5A4A', function(m){ hostileBlast(m.x, m.y, 120, dm, '#FFB070', { shake: 8, column: true }); siegeHurt(key, 14, { x: m.x, y: m.y }); });
   addText(b.x + b.w / 2, b.y - 40, 'Bombing run on the ' + s.name + '!', '#FF8A6A', 17, true);
 }
-function siegeJam(sec){ if (!G.sg) return; G.sg.jam = sec; addText(P.x, P.y - 110, 'The Warden jams the militia radios!', '#FF8A6A', 18, true); screenFlash('#8AD0F0', 0.12, 0.3); }
+function siegeJam(sec){ if (!G.sg) return; G.sg.jam = sec * (typeof sgHas === 'function' && sgHas('jam') ? 0.5 : 1); addText(P.x, P.y - 110, 'The Warden jams the militia radios!', '#FF8A6A', 18, true); screenFlash('#8AD0F0', 0.12, 0.3); }
 
 /* ---- every frame ---- */
 function siegeEventsTick(dt){
@@ -245,7 +256,7 @@ function siegeEventsTick(dt){
     if (sg.jam > 0){ m.reload += dt; if (Math.random() < dt * 3) addParticle(m.x + rand(-10, 10), m.y - 20, 0, -rand(10, 30), rand(2, 3), 0.4, '#9AD8FF', { glow: true }); }
     else if (sg.fast > 0) m.reload -= dt;
   }
-  if (sg.flood > 0){ const es = G.enemies; for (let i = 0; i < es.length; i++){ const e = es[i]; if (e.dead || !e.def || !e.def.siege || e.big) continue; e.slowT = Math.max(e.slowT || 0, 0.3); e.slowMul = Math.min(e.slowMul === undefined ? 1 : e.slowMul, 0.5); } }
+  if (sg.flood > 0){ const es = G.enemies; for (let i = 0; i < es.length; i++){ const e = es[i]; if (e.dead || !e.def || !e.def.siege || e.big) continue; e.slowT = Math.max(e.slowT || 0, 0.3); e.slowMul = Math.min(e.slowMul === undefined ? 1 : e.slowMul, sg.floodMul || 0.5); } }
   const hs = sgHeroes();
   for (let i = 0; i < sg.caches.length; i++){
     const c = sg.caches[i]; if (c.flash > 0) c.flash -= dt;

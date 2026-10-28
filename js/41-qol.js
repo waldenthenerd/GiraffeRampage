@@ -271,7 +271,7 @@ function runSnapshot(){
   return { v: 1, wave: G.wave, chapter: G.chapter, score: scoreInt(G.score), kills: G.kills | 0, bonusGold: G.bonusGold || 0, runTime: G.runTime || 0,
     speedLevel: G.runSpeedLevel | 0, rerolls: G.rerolls | 0, revives: G.revives | 0, pending: G.pendingLevels | 0,
     gems: G.runGems | 0, sulfur: G.runSulfur | 0, basalt: G.runBasalt | 0, grubs: G.runGrubs | 0, iron: G.runIron | 0, argon: G.runArgon | 0,
-    level: P.level | 0, xp: P.xp || 0, xpNext: P.xpNext || 50, hp: P.hp || 1, marsShips: !!G.marsShipsSeen, sgHeld: G.sg ? G.sg.held | 0 : 0, cards: cards };
+    level: P.level | 0, xp: P.xp || 0, xpNext: P.xpNext || 50, hp: P.hp || 1, marsShips: !!G.marsShipsSeen, sgHeld: G.sg ? G.sg.held | 0 : 0, sgBoons: G.sg && G.sg.boons ? G.sg.boons.slice() : [], sgStreak: G.sg && G.sg.streak ? Object.assign({}, G.sg.streak) : {}, cards: cards };
 }
 function saveRunNow(){
   if (G.attract || G.state !== 'playing' || P.dead || G.noSnap) return;
@@ -301,7 +301,7 @@ function restoreRun(r){
     if (!ownedCard(id) && visibleCards().length >= maxCards()) continue;           /* a damaged save cannot hold more cards than the slots allow */
     for (let k = 0; k < lv; k++) takeCard(id);
   }
-  G.score = r.score; G.kills = r.kills; G.bonusGold = r.bonusGold; G.runTime = r.runTime; G.sgHeldRestore = clamp(r.sgHeld | 0, 0, 24);        /* the Siege: how many waves she has held so far (the world is built after this) */
+  G.score = r.score; G.kills = r.kills; G.bonusGold = r.bonusGold; G.runTime = r.runTime; G.sgHeldRestore = clamp(r.sgHeld | 0, 0, 24); G.sgBoonsRestore = Array.isArray(r.sgBoons) ? r.sgBoons.filter(function(b){ return typeof SG_BOONS !== 'undefined' && SG_BOONS[b]; }).slice(0, 2) : []; G.sgStreakRestore = r.sgStreak && typeof r.sgStreak === 'object' ? r.sgStreak : {};        /* the Siege: how many waves she has held so far (the world is built after this) */
   G.runSpeedLevel = r.speedLevel | 0; G.runSpeed = G.runSpeedLevel > 0;
   G.rerolls = r.rerolls; G.revives = r.revives; G.pendingLevels = r.pending | 0;
   G.runGems = r.gems; G.runSulfur = r.sulfur; G.runBasalt = r.basalt; G.runGrubs = r.grubs; G.runIron = r.iron; G.runArgon = r.argon;

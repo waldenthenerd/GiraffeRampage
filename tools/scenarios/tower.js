@@ -23,7 +23,7 @@
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter15Complete === false;
     Save.data.chapter15Complete = 'junk'; Save.load(); out.saveSane = typeof Save.data.chapter15Complete === 'boolean';
-    freshSave(); out.wardLen = WARD.length === 50 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
+    freshSave(); out.wardLen = WARD.length === 51 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
     Save.data.chapter15Complete = true; out.wardOpen = wardUnlocked(47) === true;
 
     /* the floor plans: twenty-five different ones, every room reachable, both elevators joined, vents everywhere, nothing outside the arena */
