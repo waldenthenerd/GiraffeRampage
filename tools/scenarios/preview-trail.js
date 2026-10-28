@@ -4,6 +4,7 @@ GR.handleAction('splash-go');
   Save.data = freshSave(); recalcStats();
   var out = { failed: [] }, check = function(k, v){ if (!v) out.failed.push(k); };
   Settings.fxLevel = 2; Settings.autoPerf = false;
+  grantGear(Object.keys(GEAR_INDEX)[0]);                                        /* a new player sees the first-steps card instead of the doll */
   showShop('gear');
   var cv = document.getElementById('gearPreview'), live = [{ x: 9000, y: 8000, f: 1, age: 0.1 }];
   GF.trail = live; GF.trailT = 0.123;

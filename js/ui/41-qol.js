@@ -193,6 +193,10 @@ function showSettings(){
         '<ul class="helplist"><li>Controller: <b>left stick</b> moves, <b>right stick</b> aims, <b>A</b> / <b>RT</b> kicks, <b>B</b> slows time, <b>X</b> rover, <b>Start</b> pauses. In menus use the stick or D-pad, <b>A</b> to choose and <b>B</b> to go back.</li>' +
         '<li>Keyboard menus: arrow keys or WASD move between buttons, Enter chooses, Esc goes back.</li></ul>' +
       '</div>' +
+      (G.state === 'paused' ? '' :
+        '<div class="sub" style="margin:22px 0 2px;font-weight:700;color:#FF8A6A">Danger zone</div>' +
+        '<div class="kv" style="width:100%"><div>Erase all progress<small>Clears the save on this device: gold, upgrades, gear, ants, the bestiary, photos and Longneck Town. You are asked twice.</small></div>' +
+          '<button class="btn sm ghost" data-a="wipe">Erase&hellip;</button></div>') +
       '<div class="row stickyback" style="margin-top:18px"><button class="btn sm" data-a="settings-back">Back</button></div>' +
     '</div>');
   wireSlider('setMusic', function(v){ s.musicVol = v; try { Music.refresh(); } catch (e) {} });
@@ -260,7 +264,7 @@ function showGallery(){
     '<div class="panel slab wide" style="max-width:560px">' +
       '<h2 class="head">Films</h2><p class="sub">Replay the cutscenes you have unlocked. ' + (Input.hasTouch ? 'Tap Skip to leave one early.' : 'Esc skips one.') + '</p>' +
       '<div class="shoplist">' + rows + '</div>' +
-      '<div class="row" style="margin-top:18px"><button class="btn sm" data-a="gallery-back">Back to menu</button></div>' +
+      '<div class="row stickyback" style="margin-top:18px"><button class="btn sm" data-a="gallery-back">Back to menu</button></div>' +
     '</div>');
 }
 
@@ -404,7 +408,7 @@ function showHelp(){
         musicRowHTML() +
         hitFlashRowHTML() +
       '</div>' +
-      '<div class="row" style="margin-top:22px"><button class="btn sm" data-a="menu">Back to menu</button></div>' +
+      '<div class="row stickyback" style="margin-top:22px"><button class="btn sm" data-a="menu">Back to menu</button></div>' +
     '</div>');
   wireHitFlashSlider(); wireMusicSlider();
 }
@@ -456,23 +460,22 @@ function showShop(tab){
   if (shopTab === 'city' && !cityUnlocked()) shopTab = 'upgrades';
   setOverlay(
     '<div class="panel slab">' +
-      '<div class="goldline">' +
-        '<span class="goldnum">' + fmt(Save.data.gold) + '</span><span class="sub" style="margin:0">gold</span>' +
-        '<span class="gemnum">' + fmt(Save.data.gems | 0) + '</span><span class="sub" style="margin:0">gems</span>' +
-      '</div>' +
-      '<h2 class="head">Trading post</h2>' +
-      '<div class="tabs">' +
-        '<button class="tab' + (shopTab === 'upgrades' ? ' on' : '') + '" data-a="tab-upgrades">Upgrades</button>' +
-        '<button class="tab' + (shopTab === 'gear' ? ' on' : '') + '" data-a="tab-gear">Gear</button>' +
-        '<button class="tab' + (shopTab === 'ants' ? ' on' : '') + '" data-a="tab-ants">Ants</button>' +
-        '<button class="tab' + (shopTab === 'wheel' ? ' on' : '') + '" data-a="tab-wheel">Wheel</button>' +
-        (cityUnlocked() ? '<button class="tab' + (shopTab === 'city' ? ' on' : '') + '" data-a="tab-city">City</button>' : '') +
+      '<div class="shophead">' +
+        '<div class="shoptop"><h2 class="head">Trading post</h2>' +
+          '<div class="goldline"><span class="goldnum">' + fmt(Save.data.gold) + '</span><span class="sub" style="margin:0">gold</span>' +
+          '<span class="gemnum">' + fmt(Save.data.gems | 0) + '</span><span class="sub" style="margin:0">gems</span></div></div>' +
+        '<div class="tabs">' +
+          '<button class="tab' + (shopTab === 'upgrades' ? ' on' : '') + '" data-a="tab-upgrades">Upgrades</button>' +
+          '<button class="tab' + (shopTab === 'gear' ? ' on' : '') + '" data-a="tab-gear">Gear</button>' +
+          '<button class="tab' + (shopTab === 'ants' ? ' on' : '') + '" data-a="tab-ants">Ants</button>' +
+          '<button class="tab' + (shopTab === 'wheel' ? ' on' : '') + '" data-a="tab-wheel">Wheel</button>' +
+          (cityUnlocked() ? '<button class="tab' + (shopTab === 'city' ? ' on' : '') + '" data-a="tab-city">City</button>' : '') +
+        '</div>' +
       '</div>' +
       (shopTab === 'city' ? cityTabHTML() : shopTab === 'upgrades' ? upgradesTabHTML() : shopTab === 'ants' ? antsTabHTML() : shopTab === 'wheel' ? wheelTabHTML() : gearTabHTML()) +
-      '<div class="row" style="margin-top:20px">' +
+      '<div class="row stickyback" style="margin-top:20px">' +
         '<button class="btn sm" data-a="play">Start a run</button>' +
         '<button class="btn sm ghost" data-a="menu">Back to menu</button>' +
-        '<button class="btn sm ghost" data-a="wipe">Erase all progress</button>' +
       '</div>' +
     '</div>');
   if (keepScroll) OV.scrollTop = keepScroll;
@@ -681,6 +684,7 @@ function showDeath(){
       '<canvas id="deathGir" class="deathgir" width="150" height="110"></canvas>' +
       '<h2 class="deadtitle display">DOWN</h2>' +
       '<p class="sub">You lasted ' + mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's and reached wave ' + r.wave + '.</p>' +
+      '<div class="drgrid"><div class="drl">' +
       '<div class="summary">' +
         '<div class="sum"><span>Wave</span><b>' + r.wave + '</b></div>' +
         '<div class="sum"><span>Kills</span><b>' + fmt(r.kills) + '</b></div>' +
@@ -692,12 +696,14 @@ function showDeath(){
         (r.iron || r.argon ? '<div class="sum"><span>Iron</span><b>' + fmt(r.iron | 0) + '</b></div><div class="sum"><span>Argon</span><b>' + fmt(r.argon | 0) + '</b></div>' : '') +
       '</div>' +
       runReportHTML(r, true) +
+      '</div><div class="drr">' +
       '<div class="runmap"><canvas id="runMap" width="480" height="270"></canvas><div class="sub" style="margin:4px 0 0;font-size:12px">Your route: green is where she started, red X is where she fell. Dots are kills, gold rings are bosses and diamonds are elites.</div></div>' +
       '<p class="sub">0.2% of ' + fmt(r.score) + ' points is ' + fmt(r.base) + ' gold' +
         (r.bonus ? ', plus ' + fmt(r.bonus) + ' picked up in the field' : '') +
         (r.mult > 1.001 ? ', multiplied by ' + Math.round(r.mult * 100) + '%' : '') +
         '. Banked: ' + fmt(Save.data.gold) + ' gold.</p>' +
-      '<div class="row">' +
+      '</div></div>' +
+      '<div class="row stickyback">' +
         '<button class="btn sm" data-a="play">Run it again</button>' +
         '<button class="btn sm ghost" data-a="shop">Spend the gold</button>' +
         (typeof miniUnlocked === 'function' && miniUnlocked(G.chapter) ? '<button class="btn sm ghost" data-a="mini-menu">Minigame</button>' : '') +
@@ -744,7 +750,7 @@ function showVictory(){
         (r.bonus ? ', plus ' + fmt(r.bonus) + ' picked up in the field' : '') +
         ', with a 50% completion bonus for finishing the chapter' +
         '. Banked: ' + fmt(Save.data.gold) + ' gold.</p>' +
-      '<div class="row">' +
+      '<div class="row stickyback">' +
         '<button class="btn sm" data-a="play">Run it again</button>' +
         '<button class="btn sm ghost" data-a="shop">Spend the gold</button>' +
         (typeof miniUnlocked === 'function' && miniUnlocked(G.chapter) ? '<button class="btn sm ghost" data-a="mini-menu">Minigame</button>' : '') +

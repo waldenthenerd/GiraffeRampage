@@ -54,3 +54,21 @@
 @media (max-width:520px){
   #nextWaveBtn{top:max(122px,calc(98px + env(safe-area-inset-top,0px)))}
 }
+
+@media (max-width:700px){
+  .shophead{--shp:15px;margin:-15px -15px 10px;padding:10px 50px 0 15px}
+  .shophead h2.head{font-size:19px}
+  .shophead .goldnum,.shophead .gemnum{font-size:18px}
+  .shophead .tab{padding:10px 12px;min-height:40px}
+}
+
+/* the heads-up display on a phone: the label and the number on one line, so the top strip is as thin as the wave box and the bars */
+@media (max-width:760px){
+  .hudtop{gap:6px}
+  .stat{padding:3px 7px;font-size:11px;white-space:nowrap}
+  .stat b{display:inline;margin:0 0 0 4px;font-size:13px}
+  .stat .chaptag{margin:0;line-height:1.1}
+  .stat.wave b{font-size:15px}
+  #bars{gap:3px}
+  .bar{height:12px}.bar span{line-height:12px}
+}

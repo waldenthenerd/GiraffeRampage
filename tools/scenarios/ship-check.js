@@ -25,7 +25,7 @@
     var bad = [];
     [1, 4, 6, 9, 11, 13].forEach(function(ch){ try { GR.startRun(ch); GR.G.introFX = null; for (var i = 0; i < 40; i++){ GR.P.invuln = 99; GR.step(1 / 60); } } catch (e) { bad.push('ch' + ch + ': ' + e.message); } });
     out.runs = bad.length === 0; if (bad.length) out.bad = bad;
-    GR.showMenu(); GR.G.state = 'menu'; GR.showShop('gear'); out.gearPage = !!document.querySelector('.ttile') && !!document.getElementById('gearPreview');
+    GR.showMenu(); GR.G.state = 'menu'; grantGear(Object.keys(GEAR_INDEX)[0]); GR.showShop('gear'); out.gearPage = !!document.querySelector('.ttile') && !!document.getElementById('gearPreview');
     out.noPanelAction = (function(){ try { GR.handleAction('debug-addgold'); return true; } catch (e) { return false; } })() && !/Developer Panel/.test((document.getElementById('overlay') || {}).textContent || '');
     out.pass = out.noDevPanel && out.grOk && out.grsave && out.menu && out.packed && out.gr3 && out.reload && out.oldSave && out.repacked && out.guideClean && out.runs && out.gearPage && out.noPanelAction && out.errs.length === 0;
   } catch (e) { out.err = String(e && e.stack || e); }

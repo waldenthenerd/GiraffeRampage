@@ -31,7 +31,7 @@ try {
   screens.fusion(); var row = document.querySelector('.shoprow'), nm = row && row.querySelector('.nm'), ch = row && row.querySelector('.btn');
   out.fusionRow = !!ch && !!nm && Math.abs(ch.getBoundingClientRect().top - nm.getBoundingClientRect().top) < 40;
   /* bestiary: three to a row on a phone */
-  screens.bestiary(); var gc = getComputedStyle(document.querySelector('.bst-grid')).gridTemplateColumns.split(' ').length; out.bestiary3 = innerWidth > 520 || gc === 3;
+  bestiaryData().creatures['1:' + BESTIARY_ORDER[0]] = 1; screens.bestiary(); var gc = getComputedStyle(document.querySelector('.bst-grid')).gridTemplateColumns.split(' ').length; out.bestiary3 = innerWidth > 520 || gc === 3;
   /* the chapter title never runs off a narrow screen: a long name shrinks, a long line splits in two */
   var cv = document.createElement('canvas'); cv.width = innerWidth; cv.height = innerHeight; var c = cv.getContext('2d'), widest = 0, drawn = 0, ft = c.fillText.bind(c), st = c.strokeText.bind(c);
   c.fillText = function(t, x, y){ drawn++; widest = Math.max(widest, c.measureText(t).width); return ft(t, x, y); };

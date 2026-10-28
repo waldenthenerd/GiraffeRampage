@@ -337,18 +337,21 @@ function handleAction(a){
     case 't-gear-live': Settings.showGear = !Settings.showGear; Settings.save(); showPause(); SFX.click(); break;
     case 't-mute-live': Settings.muted = !Settings.muted; SFX.setMuted(Settings.muted); Settings.save(); showPause(); SFX.click(); break;
     case 'wipe': SFX.click(); confirmWipe(); break;
-    case 'wipe-yes': Save.reset(); Settings.load(); recalcStats(); SFX.buy(); showShop(); break;
-    case 'wipe-no': SFX.click(); showShop(); break;
+    case 'wipe-ask': SFX.click(); confirmWipe(2); break;
+    case 'wipe-yes': Save.reset(); Settings.load(); recalcStats(); SFX.buy(); showMenu(); break;
+    case 'wipe-no': SFX.click(); showSettings(); break;
   }
 }
 
-function confirmWipe(){
+function confirmWipe(step){                                                /* two steps, and only from Settings: the first says what goes, the second is the last chance */
+  const last = step === 2;
   setOverlay(
     '<div class="panel slab" style="max-width:430px">' +
-      '<h2 class="head">Erase all progress</h2>' +
-      '<p class="sub">This clears everything: your gold and gems, every upgrade, your gear and trinkets, your ants, the bestiary, your photo album, outfits and accessories, and your Longneck Town progress. Your settings stay. It cannot be undone.</p>' +
+      '<h2 class="head">' + (last ? 'Really erase everything?' : 'Erase all progress') + '</h2>' +
+      (last ? '<p class="sub">Last chance. Everything on this device goes, and it cannot be undone.</p>'
+            : '<p class="sub">This clears everything: your gold and gems, every upgrade, your gear and trinkets, your ants, the bestiary, your photo album, outfits and accessories, and your Longneck Town progress. Your settings stay. It cannot be undone.</p>') +
       '<div class="row"><button class="btn sm" data-a="wipe-no">Keep my progress</button>' +
-      '<button class="btn sm ghost" data-a="wipe-yes">Erase everything</button></div>' +
+      '<button class="btn sm ghost" data-a="' + (last ? 'wipe-yes' : 'wipe-ask') + '">' + (last ? 'Yes, erase everything' : 'Continue') + '</button></div>' +
     '</div>');
 }
 

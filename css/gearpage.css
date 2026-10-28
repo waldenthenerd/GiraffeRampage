@@ -323,3 +323,11 @@
 .aproom.eng{grid-column:1/-1}.aproom.eng .arcv{height:150px}
 .aproom.eng.locked{opacity:.85}.aplock{display:flex;gap:8px;align-items:center;color:var(--dust);font-size:12.5px;padding:6px 0}.aplock .ico,.aplock svg{width:20px;height:20px;flex:none}.aplock b{color:var(--bone)}
 @media (max-height:500px) and (min-width:560px){.aproom.eng .arcv{height:100px}}
+
+/* the Ants tab before the colony opens: a progress card instead of a line of text */
+.antlock{background:rgba(255,236,200,.04);border:1px solid rgba(122,90,64,.5);border-radius:8px;padding:18px 18px 16px;margin:6px 0 4px}
+.antlock .alh{font-size:18px;font-weight:800;color:var(--bone)}
+.antlock .sub{margin:6px 0 12px}
+.upbar.big{height:12px;border-radius:6px;margin-top:0}
+.antlock .alp{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:13px;color:var(--dust)}
+.antlock .alp b{color:var(--sun)}

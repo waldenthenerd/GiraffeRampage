@@ -172,6 +172,14 @@ function gearSetsHTML(){
 }
 function gearTabHTML(){
   const ownedCount = Object.keys(Save.data.gear || {}).filter(function(k){ return k.indexOf('trinket:') !== 0; }).length;
+  if (!ownedCount && gearPage.view !== 'sets'){                                             /* nothing to dress her in yet: the way to the first piece, then the crates */
+    const gems = Save.data.gems | 0, cost = CRATES.normal.cost, ok = gems >= cost;
+    return '<div class="antlock"><div class="alh">Find your first piece of gear</div>' +
+      '<p class="sub">Gear makes her stronger and changes how she looks. It comes out of crates, and crates cost gems, which enemies drop during a run. ' + (ok ? 'You have enough for a crate now.' : 'Play a run, then come back and open one.') + '</p>' +
+      '<i class="upbar big"><u style="width:' + Math.min(100, gems / cost * 100).toFixed(1) + '%"></u></i>' +
+      '<div class="alp"><span>Gems: <b>' + fmt(gems) + '</b> of ' + fmt(cost) + ' for the first crate</span><span>' + Math.min(100, Math.floor(gems / cost * 100)) + '%</span></div></div>' +
+      '<h3 class="gh">Crates</h3>' + gearCratesHTML() + gearCrateResultHTML() + (typeof trinketHeadHTML === 'function' ? trinketHeadHTML() : '<h3 class="gh">Trinkets</h3>') + trinketsHTML();
+  }
   const head = '<p class="sub">Gear is bought with gems, which enemies drop during a run. You own ' + ownedCount + ' of ' + Object.keys(GEAR_INDEX).length + ' pieces.' +
     (ownedCount ? '' : ' Nothing yet: collect gems in a run, then open a crate below to find your first piece.') + '</p>' +
     '<div class="gviews"><button class="gview-b' + (gearPage.view === 'doll' ? ' on' : '') + '" data-a="gear-view-doll">Dress her</button><button class="gview-b' + (gearPage.view === 'sets' ? ' on' : '') + '" data-a="gear-view-sets">Sets</button></div>';
