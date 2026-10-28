@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <title>Giraffe Rampage</title>
+<style>#boot{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#14100E;color:#F3E6C8;font:800 clamp(26px,6vw,46px)/1.1 system-ui,"Segoe UI",sans-serif;letter-spacing:.02em;text-align:center}#boot small{font:600 15px system-ui,"Segoe UI",sans-serif;color:#B8A98A;letter-spacing:.12em;text-transform:uppercase}#boot i{display:block;width:120px;height:4px;border-radius:2px;background:#3A2E22;overflow:hidden;position:relative}#boot i:after{content:"";position:absolute;inset:0 70% 0 0;background:#E8B23A;border-radius:2px;animation:bootbar 1.1s ease-in-out infinite}@keyframes bootbar{0%{transform:translateX(-100%)}100%{transform:translateX(450%)}}</style>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/polish.css">
 <link rel="stylesheet" href="css/campus.css">
@@ -17,6 +18,7 @@
 <link rel="stylesheet" href="css/phone.css">
 </head>
 <body>
+<div id="boot">Giraffe Rampage<i></i><small>Loading</small></div>
 <canvas id="stage"></canvas>
 
 <div id="hud">

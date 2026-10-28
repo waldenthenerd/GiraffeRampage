@@ -54,16 +54,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 193 | 61,021 | 4.80 MiB (5,028,018 bytes) |
+| JavaScript (`js/`) | 193 | 61,022 | 4.80 MiB (5,028,196 bytes) |
 | Styles (`css/`) | 6 | 1,712 | 158 KiB (161,492 bytes) |
-| Page (`index.html`) | 1 | 241 | 11.5 KiB (11,814 bytes) |
-| **Whole game** | **200** | **62,974** | **4.96 MiB (5,201,324 bytes)** |
+| Page (`index.html`) | 1 | 243 | 12.3 KiB (12,620 bytes) |
+| **Whole game** | **200** | **62,977** | **4.96 MiB (5,202,308 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **62,375 lines, 4.92 MiB (5,154,524 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 193 | 61,021 | 4.80 MiB (5,028,018 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **62,378 lines, 4.92 MiB (5,155,508 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 193 | 61,022 | 4.80 MiB (5,028,196 bytes) |
 | Styles (`css/`) | 6 | 1,712 | 158 KiB (161,492 bytes) |
-| Page (`index.html`) | 1 | 241 | 11.5 KiB (11,814 bytes) |
-| **Whole game** | **200** | **62,974** | **4.96 MiB (5,201,324 bytes)** |
+| Page (`index.html`) | 1 | 243 | 12.3 KiB (12,620 bytes) |
+| **Whole game** | **200** | **62,977** | **4.96 MiB (5,202,308 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -276,7 +276,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/siege/44zzzi-siege-rewards.js` | 184 | **What holding the town pays**: each key building's unbroken streak and the gifts at ten and twenty-five waves (`SG_REWARD`: the coat color Hall Crimson, a card reroll, 5% off Upgrades, gems, more health), the twenty named militia giraffes who keep kills and ranks between runs (`SG_RANKS`: faster fire, tougher, a second chance), and the two boon crates after waves 10 and 20 (`SG_BOONS`). |
 | `js/core/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/dev/45b-dev-panel.js` | 599 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
-| `js/core/46-main.js` | 4 | Starts the game. |
+| `js/core/46-main.js` | 5 | Starts the game. |
 
 ## Tests
 
