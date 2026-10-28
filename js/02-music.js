@@ -23,6 +23,7 @@ const MUSIC_THEMES = {
   glimmer:  { bpm: 96,  root: 55, scale: 'lydian',   prog: [0,4,2,7],   minor: false, bass: 'triangle', lead: 'sine',     drum: 'soft' },
   area51:   { bpm: 100, root: 45, scale: 'minor',    prog: [0,0,3,1],   minor: true,  bass: 'square',   lead: 'square',   drum: 'beat' },
   mars:     { bpm: 94,  root: 47, scale: 'dorian',   prog: [0,3,0,10],  minor: true,  bass: 'sawtooth', lead: 'triangle', drum: 'beat' },
+  siege:    { bpm: 118, root: 43, scale: 'minor',    prog: [0,5,3,6],   minor: true,  bass: 'sawtooth', lead: 'square',   drum: 'heavy' },
   tower:    { bpm: 100, root: 45, scale: 'minor',    prog: [0,3,5,3],   minor: true,  bass: 'triangle', lead: 'sine',     drum: 'soft' },
   dome:     { bpm: 92,  root: 48, scale: 'dorian',   prog: [0,5,3,1],   minor: true,  bass: 'triangle', lead: 'sine',     drum: 'soft' },
   marswar:  { bpm: 118, root: 45, scale: 'harm',     prog: [0,0,3,1],   minor: true,  bass: 'sawtooth', lead: 'square',   drum: 'beat' },
@@ -61,7 +62,7 @@ const MUSIC_THEMES = {
   boss14: { bpm: 122, root: 46, scale: 'phrygian', prog: [0,1,0,8],   minor: true, bass: 'sawtooth', lead: 'square',   drum: 'heavy', boss: true },
   boss13: { bpm: 128, root: 45, scale: 'harm',     prog: [0,0,3,8],   minor: true, bass: 'sawtooth', lead: 'square',   drum: 'heavy', boss: true }
 };
-const MUSIC_BY_CHAPTER = [null, 'savanna', 'frost', 'swamp', 'ocean', 'jungle', 'city', 'space', 'moon', 'venus', 'inferno', 'glimmer', 'area51', 'mars', 'dome', 'tower'];
+const MUSIC_BY_CHAPTER = [null, 'savanna', 'frost', 'swamp', 'ocean', 'jungle', 'city', 'space', 'moon', 'venus', 'inferno', 'glimmer', 'area51', 'mars', 'dome', 'tower', 'siege'];
 const Music = {
   gain: null, stemG: null, stems: { bass: 1, drums: 1, lead: 1, near: 0, spike: 0, low: 0 }, dest: null, stemOn: false, timer: null, step: 0, nextT: 0, cur: null, want: { theme: 'menu', lvl: 0, tempo: 1 }, duck: 1, started: false,
   vol(){ return typeof Settings.musicVol === 'number' ? Settings.musicVol : 0.6; },
@@ -111,7 +112,7 @@ const Music = {
     else if (s === 'cutscene' && G.cut){
       const K = G.cut.kind, shn = shChapterOf(K);
       theme = shn ? (MUSIC_BY_CHAPTER[shn + 1] || chTheme) : K === 'a51' ? 'film51' : K === 'home' ? 'filmhome' : K === 'venus' ? 'filmvenus'
-            : K === 'marshome' || K === 'fusion' || K === 'domeflight' || K === 'towerflight' ? 'filmhome' : K === 'mships' || K === 'domeout' || K === 'towerout' ? 'filmwar' : MARS_FILMS[K] ? 'filmmars' : 'film';
+            : K === 'marshome' || K === 'fusion' || K === 'domeflight' || K === 'towerflight' || K === 'siegeflight' ? 'filmhome' : K === 'mships' || K === 'domeout' || K === 'towerout' || K === 'siegeout' ? 'filmwar' : MARS_FILMS[K] ? 'filmmars' : 'film';
       lvl = (!shn && G.cut.t > 14) ? 1 : 0;
     }
     else if (s === 'cutscene'){ theme = 'film'; lvl = 0; }

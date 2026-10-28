@@ -200,17 +200,19 @@ const WAVE_COUNT_MUL = 0.6;
 const KILL_VALUE = 1 / WAVE_COUNT_MUL;
 const WAVE_INTRO_S = 0.8, WAVE_CLEAR_S = 1.0, WAVE_PATIENCE_S = 6;      /* were 1.6, 2.1 and 11 */
 /* Chapters 1 to 13 are 25 waves each. Internal chapter 14 is the mini-chapter shown as "13.5" (the Domes): ten waves, 326 to 335, with a boss on 330 and 335,
-   and its run ends there. Internal chapter 15 is shown as "14" (the Tower): 25 waves, 336 to 360, a boss every fifth wave. CHAPTER_LABEL is the name the player sees. */
-const TOTAL_CHAPTERS = 15;
+   and its run ends there. Internal chapter 15 is shown as "14" (the Tower): 25 waves, 336 to 360, a boss every fifth wave. Internal chapter 16 is shown as "15" (the Siege of Longneck Town): 25 waves, 361 to 385. CHAPTER_LABEL is the name the player sees. */
+const TOTAL_CHAPTERS = 16;
 const MAIN_CHAPTERS = 13, DOME_CHAPTER = 14, DOME_FIRST_WAVE = WAVES_PER_CHAPTER * MAIN_CHAPTERS + 1, DOME_WAVES = 10, DOME_LAST_WAVE = DOME_FIRST_WAVE + DOME_WAVES - 1;
 const TOWER_CHAPTER = 15, TOWER_FIRST_WAVE = DOME_LAST_WAVE + 1, TOWER_WAVES = 25;
-const CHAPTER_LAST_WAVE = TOWER_FIRST_WAVE + TOWER_WAVES - 1;
-const CHAPTER_LABEL = { 14: '13.5', 15: '14' };
+const TOWER_LAST_WAVE = TOWER_FIRST_WAVE + TOWER_WAVES - 1;
+const SIEGE_CHAPTER = 16, SIEGE_FIRST_WAVE = TOWER_LAST_WAVE + 1, SIEGE_WAVES = 25;       /* Chapter 15, the Siege of Longneck Town: waves 361 to 385 */
+const CHAPTER_LAST_WAVE = SIEGE_FIRST_WAVE + SIEGE_WAVES - 1;
+const CHAPTER_LABEL = { 14: '13.5', 15: '14', 16: '15' };
 function chapterLabel(ch){ return CHAPTER_LABEL[ch] || String(ch); }
-function chapterOf(w){ return w >= TOWER_FIRST_WAVE ? TOWER_CHAPTER : w >= DOME_FIRST_WAVE ? DOME_CHAPTER : Math.ceil(w / WAVES_PER_CHAPTER); }
-function chapterWaveOf(w){ return w >= TOWER_FIRST_WAVE ? w - TOWER_FIRST_WAVE + 1 : w >= DOME_FIRST_WAVE ? w - DOME_FIRST_WAVE + 1 : ((w - 1) % WAVES_PER_CHAPTER) + 1; }
+function chapterOf(w){ return w >= SIEGE_FIRST_WAVE ? SIEGE_CHAPTER : w >= TOWER_FIRST_WAVE ? TOWER_CHAPTER : w >= DOME_FIRST_WAVE ? DOME_CHAPTER : Math.ceil(w / WAVES_PER_CHAPTER); }
+function chapterWaveOf(w){ return w >= SIEGE_FIRST_WAVE ? w - SIEGE_FIRST_WAVE + 1 : w >= TOWER_FIRST_WAVE ? w - TOWER_FIRST_WAVE + 1 : w >= DOME_FIRST_WAVE ? w - DOME_FIRST_WAVE + 1 : ((w - 1) % WAVES_PER_CHAPTER) + 1; }
 function chapterLen(ch){ return ch === DOME_CHAPTER ? DOME_WAVES : WAVES_PER_CHAPTER; }
-function chapterFirstWave(ch){ return ch >= TOWER_CHAPTER ? TOWER_FIRST_WAVE : ch >= DOME_CHAPTER ? DOME_FIRST_WAVE : (ch - 1) * WAVES_PER_CHAPTER + 1; }
+function chapterFirstWave(ch){ return ch >= SIEGE_CHAPTER ? SIEGE_FIRST_WAVE : ch >= TOWER_CHAPTER ? TOWER_FIRST_WAVE : ch >= DOME_CHAPTER ? DOME_FIRST_WAVE : (ch - 1) * WAVES_PER_CHAPTER + 1; }
 function isChapterFinaleWave(w){ return chapterWaveOf(w) === chapterLen(chapterOf(w)); }
 
 function buildWave(w){
@@ -231,6 +233,7 @@ function buildWave(w){
   budget = Math.max(2, Math.round(budget * WAVE_COUNT_MUL));               /* shorter waves: fewer enemies at the same rate (the kills are worth more, see KILL_VALUE) */
   if (chapterOf(w) === DOME_CHAPTER) return buildDomeWave(w, isBoss);        /* Chapter 13.5 builds its own waves (js/30a-chapter-domes.js) */
   if (chapterOf(w) === TOWER_CHAPTER) return buildTowerWave(w, isBoss);      /* and so does Chapter 14 (js/30b-chapter-tower.js) */
+  if (chapterOf(w) === SIEGE_CHAPTER) return buildSiegeWave(w, isBoss);      /* and Chapter 15 (js/30e-chapter-siege.js) */
 
   const pool = [];
   const add = (t, wt) => { if (wt > 0) pool.push({ t: t, w: wt }); };
@@ -325,8 +328,8 @@ function startWave(n){
   const isBossWave = (n % 5 === 0);
   const bossType = isBossWave ? bossForWave(n) : null;
   const cw = chapterWaveOf(n);
-  const flavArr = G.chapter === TOWER_CHAPTER ? WAVE_FLAVOUR_TOWER : G.chapter === DOME_CHAPTER ? WAVE_FLAVOUR_DOME : G.chapter === 13 ? (cw > MARS_SWITCH_WAVE ? WAVE_FLAVOUR_MARS_WAR : WAVE_FLAVOUR_MARS) : G.chapter === 12 ? WAVE_FLAVOUR_A51 : G.chapter === 11 ? WAVE_FLAVOUR_GLIM : G.chapter === 10 ? WAVE_FLAVOUR_INFERNO : G.chapter === 9 ? WAVE_FLAVOUR_VENUS : G.chapter === 8 ? WAVE_FLAVOUR_MOON : G.chapter === 7 ? WAVE_FLAVOUR_SPACE : G.chapter === 6 ? WAVE_FLAVOUR_CITY : G.chapter === 5 ? WAVE_FLAVOUR_JUNGLE : G.chapter === 4 ? WAVE_FLAVOUR_OCEAN : G.chapter === 3 ? WAVE_FLAVOUR_SWAMP : G.chapter === 2 ? WAVE_FLAVOUR_SNOW : WAVE_FLAVOUR;
-  const introMap = G.chapter === TOWER_CHAPTER ? BOSS_INTRO_TOWER : G.chapter === DOME_CHAPTER ? BOSS_INTRO_DOME : G.chapter === 13 ? BOSS_INTRO_MARS : G.chapter === 12 ? BOSS_INTRO_A51 : G.chapter === 11 ? BOSS_INTRO_GLIM : G.chapter === 10 ? BOSS_INTRO_INFERNO : G.chapter === 9 ? BOSS_INTRO_VENUS : G.chapter === 8 ? BOSS_INTRO_MOON : G.chapter === 7 ? BOSS_INTRO_SPACE : G.chapter === 6 ? BOSS_INTRO_CITY : G.chapter === 5 ? BOSS_INTRO_JUNGLE : G.chapter === 4 ? BOSS_INTRO_OCEAN : G.chapter === 3 ? BOSS_INTRO_SWAMP : G.chapter === 2 ? BOSS_INTRO_FROST : BOSS_INTRO;
+  const flavArr = G.chapter === SIEGE_CHAPTER ? WAVE_FLAVOUR_SIEGE : G.chapter === TOWER_CHAPTER ? WAVE_FLAVOUR_TOWER : G.chapter === DOME_CHAPTER ? WAVE_FLAVOUR_DOME : G.chapter === 13 ? (cw > MARS_SWITCH_WAVE ? WAVE_FLAVOUR_MARS_WAR : WAVE_FLAVOUR_MARS) : G.chapter === 12 ? WAVE_FLAVOUR_A51 : G.chapter === 11 ? WAVE_FLAVOUR_GLIM : G.chapter === 10 ? WAVE_FLAVOUR_INFERNO : G.chapter === 9 ? WAVE_FLAVOUR_VENUS : G.chapter === 8 ? WAVE_FLAVOUR_MOON : G.chapter === 7 ? WAVE_FLAVOUR_SPACE : G.chapter === 6 ? WAVE_FLAVOUR_CITY : G.chapter === 5 ? WAVE_FLAVOUR_JUNGLE : G.chapter === 4 ? WAVE_FLAVOUR_OCEAN : G.chapter === 3 ? WAVE_FLAVOUR_SWAMP : G.chapter === 2 ? WAVE_FLAVOUR_SNOW : WAVE_FLAVOUR;
+  const introMap = G.chapter === SIEGE_CHAPTER ? BOSS_INTRO_SIEGE : G.chapter === TOWER_CHAPTER ? BOSS_INTRO_TOWER : G.chapter === DOME_CHAPTER ? BOSS_INTRO_DOME : G.chapter === 13 ? BOSS_INTRO_MARS : G.chapter === 12 ? BOSS_INTRO_A51 : G.chapter === 11 ? BOSS_INTRO_GLIM : G.chapter === 10 ? BOSS_INTRO_INFERNO : G.chapter === 9 ? BOSS_INTRO_VENUS : G.chapter === 8 ? BOSS_INTRO_MOON : G.chapter === 7 ? BOSS_INTRO_SPACE : G.chapter === 6 ? BOSS_INTRO_CITY : G.chapter === 5 ? BOSS_INTRO_JUNGLE : G.chapter === 4 ? BOSS_INTRO_OCEAN : G.chapter === 3 ? BOSS_INTRO_SWAMP : G.chapter === 2 ? BOSS_INTRO_FROST : BOSS_INTRO;
   const flav = bossType ? (introMap[bossType] || 'Something big is coming')
                         : (flavArr[Math.min(flavArr.length - 1, cw - 1)] || 'The wilds keep coming');
   const title = isChapterFinaleWave(n) ? 'CHAPTER FINALE' : ('WAVE ' + n);
@@ -375,7 +378,7 @@ function updateWaves(dt){
         G.huntWarned = true;
         addText(P.x, P.y - 58, 'The herd is closing in', '#E8604A', 17, false);
       }
-      const domeBossDown = (G.chapter === DOME_CHAPTER ? finale : G.chapter === TOWER_CHAPTER && G.wave % 5 === 0) && !G.bossAlive;     /* the Domes end the moment the Ice Heart falls, and so does every boss floor of the Tower: whatever is left of the crowd goes with it */
+      const domeBossDown = (G.chapter === DOME_CHAPTER || G.chapter === SIEGE_CHAPTER ? finale : G.chapter === TOWER_CHAPTER && G.wave % 5 === 0) && !G.bossAlive;     /* the Domes end the moment the Ice Heart falls, and so does every boss floor of the Tower: whatever is left of the crowd goes with it */
       if (domeBossDown) G.enemies.forEach(e => { if (!e.dead){ burstParticles(e.x, e.y, 8, e.blood || '#9AE8FF', 160, 4); e.dead = true; } });
       if (G.enemies.length === 0 || domeBossDown || (!finale && G.chapter !== TOWER_CHAPTER && G.waveOver > WAVE_PATIENCE_S)){
         G.waveState = 'clear';
@@ -410,7 +413,7 @@ function updateWaves(dt){
     if (G.chapter === TOWER_CHAPTER && !isRunEnd(G.wave)){ if (G.waveTimer <= 0) towerLiftTick(dt); return; }      /* the Tower: the next floor is a ride in the elevator away */
     if (G.waveTimer <= 0){
       marsClearAllies();
-      if (isRunEnd(G.wave)){ if (G.chapter === TOWER_CHAPTER){ towerFinishSave(); startCutscene(function(){ marsRestoreHUD(); if (!miniOffer(TOWER_CHAPTER, chapterComplete)) chapterComplete(); }, false, 'towerout'); } else if (G.chapter === DOME_CHAPTER) startCutscene(function(){ marsRestoreHUD(); chapterComplete(); }, false, 'domeout'); else chapterComplete(); }       /* the last chapter's own film, then the report */
+      if (isRunEnd(G.wave)){ if (G.chapter === TOWER_CHAPTER){ towerFinishSave(); startCutscene(function(){ marsRestoreHUD(); if (!miniOffer(TOWER_CHAPTER, chapterComplete)) chapterComplete(); }, false, 'towerout'); } else if (G.chapter === SIEGE_CHAPTER){ siegeFinishSave(); startCutscene(function(){ marsRestoreHUD(); chapterComplete(); }, false, 'siegeout'); } else if (G.chapter === DOME_CHAPTER) startCutscene(function(){ marsRestoreHUD(); chapterComplete(); }, false, 'domeout'); else chapterComplete(); }       /* the last chapter's own film, then the report */
       else if (isChapterFinaleWave(G.wave)) finishChapter();
       else if (G.chapter === 13 && chapterWaveOf(G.wave) === MARS_SWITCH_WAVE && !G.marsShipsSeen){      /* the Marine ships come down: a short film, then the war */
         G.marsShipsSeen = true; saveRunAtBoundary(true); startCutscene(function(){ marsRestoreHUD(); startWave(G.wave + 1); }, false, 'mships');

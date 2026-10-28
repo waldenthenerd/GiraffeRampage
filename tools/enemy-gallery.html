@@ -50,12 +50,14 @@ h2{margin:6px;font-size:14px}
 <script src="../js/27-film-mars.js"></script>
 <script src="../js/27a-film-domes.js"></script>
 <script src="../js/27b-film-tower.js"></script>
+<script src="../js/27c-film-siege.js"></script>
 <script src="../js/28-spaceplane.js"></script>
 <script src="../js/29-city.js"></script>
 <script src="../js/30-chapters-11-13.js"></script>
 <script src="../js/30a-chapter-domes.js"></script>
 <script src="../js/30d-tower-layouts.js"></script>
 <script src="../js/30b-chapter-tower.js"></script>
+<script src="../js/30e-chapter-siege.js"></script>
 <script src="../js/31-waves-update.js"></script>
 <script src="../js/32-render.js"></script>
 <script src="../js/33-giraffe-art.js"></script>
@@ -79,6 +81,7 @@ h2{margin:6px;font-size:14px}
 <script src="../js/35h-draw-enemy.js"></script>
 <script src="../js/35i-art-domes.js"></script>
 <script src="../js/35j-art-tower.js"></script>
+<script src="../js/35k-art-siege.js"></script>
 <script src="../js/36a-scenery-core.js"></script>
 <script src="../js/36c-scenery-savanna.js"></script>
 <script src="../js/36d-scenery-arctic-swamp.js"></script>
@@ -195,6 +198,11 @@ h2{margin:6px;font-size:14px}
 <script src="../js/44zzza-tower-floors.js"></script>
 <script src="../js/44zzzb-minigame-rush.js"></script>
 <script src="../js/44zzzc-gags.js"></script>
+<script src="../js/44zzzd-siege-town.js"></script>
+<script src="../js/44zzze-siege-defense.js"></script>
+<script src="../js/44zzzf-siege-militia.js"></script>
+<script src="../js/44zzzg-siege-ai.js"></script>
+<script src="../js/44zzzh-siege-events.js"></script>
 <script src="../js/45-test-exports.js"></script>
 <script src="../js/45b-dev-panel.js"></script>   <!-- developer panel: testing only, never ship to the website (see LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md) -->
 <script src="../js/46-main.js"></script>
@@ -205,7 +213,7 @@ h2{margin:6px;font-size:14px}
 (function(){
   var q = new URLSearchParams(location.search);
   var ch = +q.get('ch') || 1, scale = +q.get('scale') || 3, cols = +q.get('cols') || 6, state = q.get('state') || 'idle', bg = q.get('bg') || 'chapter';
-  var CH_BG = { 1: '#7F6C45', 2: '#C3D6E0', 3: '#3E4A2C', 4: '#0F3A52', 5: '#2A3A1C', 6: '#6A6862', 7: '#5F7F3C', 8: '#8D8C88', 9: '#8A5028', 10: '#4A2A1A', 11: '#7F6C45', 12: '#C2A573', 13: '#B4552F' };
+  var CH_BG = { 1: '#7F6C45', 2: '#C3D6E0', 3: '#3E4A2C', 4: '#0F3A52', 5: '#2A3A1C', 6: '#6A6862', 7: '#5F7F3C', 8: '#8D8C88', 9: '#8A5028', 10: '#4A2A1A', 11: '#7F6C45', 12: '#C2A573', 13: '#B4552F', 14: '#C6DCE6', 15: '#D2D4D8', 16: '#8A8478' };
   var bgc = /^[0-9a-fA-F]{6}$/.test(bg) ? '#' + bg : ({ dark: '#241A12', light: '#E8E0D0', mid: '#808080' }[bg] || CH_BG[ch] || '#7F6C45');
   var table = GR.bestiaryTable(ch), names = Object.keys(table);
   document.getElementById('title').textContent = 'Chapter ' + ch + ' - ' + names.length + ' creatures - state ' + state + ' - scale ' + scale + ' - bg ' + bg;

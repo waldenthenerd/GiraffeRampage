@@ -58,7 +58,7 @@ function townShowBoard(){
 function townShowHall(){
   const d = Save.data;
   let cups = '';
-  for (let c = 1; c <= TOTAL_CHAPTERS; c++){ const done = townDoneCh(c); cups += '<span class="cup' + (done ? ' on' : '') + '" title="' + (done ? CHAPTER_INFO[c - 1].name : 'Chapter ' + chapterLabel(c) + ' is not finished') + '" style="' + (done ? '--c:' + WARD[c === TOWER_CHAPTER ? 47 : c === DOME_CHAPTER ? 46 : c].c : '') + '"><i></i><b>' + chapterLabel(c) + '</b></span>'; }
+  for (let c = 1; c <= TOTAL_CHAPTERS; c++){ const done = townDoneCh(c); cups += '<span class="cup' + (done ? ' on' : '') + '" title="' + (done ? CHAPTER_INFO[c - 1].name : 'Chapter ' + chapterLabel(c) + ' is not finished') + '" style="' + (done ? '--c:' + WARD[c === SIEGE_CHAPTER ? 49 : c === TOWER_CHAPTER ? 47 : c === DOME_CHAPTER ? 46 : c].c : '') + '"><i></i><b>' + chapterLabel(c) + '</b></span>'; }
   const row = function(a, b){ return '<div class="rec"><span>' + a + '</span><b>' + b + '</b></div>'; };
   townPanelT('hall', '<div class="tp-title">HERD HALL</div><div class="shelf">' + cups + '</div><div class="plaque">' +
     row('Best run', fmt(scoreInt(d.best)) + ' points, wave ' + (d.bestWave | 0)) + row('Runs', (d.runs | 0) + '  ·  ' + fmt(d.totalKills | 0) + ' kills') +

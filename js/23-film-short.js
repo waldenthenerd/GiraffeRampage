@@ -35,7 +35,13 @@ function shFront(ctx, name, sc, a, hy){
   for (let k = 0; k < N; k++){
     const par = 0.75 + csR(k + 11100) * 0.5, y = hy + 8 + csR(k + 11200) * 70, s = 0.7 + csR(k + 11300) * 0.7 + (y - hy) / 200;
     const x = (((csR(k + 11000 + name.length * 7) * 2200 - sc * par) % 2200) + 2200) % 2200 - 400;
-    if (name === 'savanna') afAcacia(ctx, x, y, s);
+    if (name === 'snow' || name === 'swamp' || name === 'jungle'){ ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.beginPath(); ctx.ellipse(x + 6 * s, y + 2 * s, (name === 'snow' ? 34 : name === 'swamp' ? 36 : 46) * s, 7 * s, 0, 0, TAU); ctx.fill(); }          /* each stands on a shadow */
+    if (name === 'savanna'){                                                                                 /* daylight acacias: a brown trunk and an olive canopy, not a black silhouette */
+      ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x + 8 * s, y + 2 * s, 46 * s, 7 * s, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#5A3E26'; ctx.beginPath(); ctx.moveTo(x - 6 * s, y); ctx.lineTo(x - 3 * s, y - 62 * s); ctx.lineTo(x + 3 * s, y - 62 * s); ctx.lineTo(x + 7 * s, y); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#5E6A2E'; ctx.beginPath(); ctx.ellipse(x, y - 70 * s, 58 * s, 15 * s, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#7E8A3E'; ctx.beginPath(); ctx.ellipse(x - 4 * s, y - 76 * s, 44 * s, 10 * s, 0, 0, TAU); ctx.fill();
+    }
     else if (name === 'snow'){
       ctx.fillStyle = '#4A3A2A'; ctx.fillRect(x - 3 * s, y - 14 * s, 6 * s, 14 * s);
       for (let i = 0; i < 3; i++){ ctx.fillStyle = i % 2 ? '#2E5A46' : '#3A6A52'; ctx.beginPath(); ctx.moveTo(x - (34 - i * 8) * s, y - (10 + i * 26) * s); ctx.lineTo(x, y - (60 + i * 26) * s); ctx.lineTo(x + (34 - i * 8) * s, y - (10 + i * 26) * s); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#F4F8FA'; ctx.beginPath(); ctx.moveTo(x - 12 * s, y - (38 + i * 26) * s); ctx.lineTo(x, y - (60 + i * 26) * s); ctx.lineTo(x + 12 * s, y - (38 + i * 26) * s); ctx.closePath(); ctx.fill(); }
@@ -77,6 +83,7 @@ function shWalk(ctx, t, f){
   shFront(ctx, f.from, sc, 1 - p, hy); shFront(ctx, f.to, sc, p, hy);
   const ws = (f.from === 'snow' ? 1 - p : 0) + (f.to === 'snow' ? p : 0);
   const wa = (A.water ? 1 - p : 0) + (B.water ? p : 0);
+  if (wa < 0.95){ ctx.fillStyle = 'rgba(0,0,0,' + (0.28 * (1 - wa)).toFixed(3) + ')'; ctx.beginPath(); ctx.ellipse(548, 614, 78, 11, 0, 0, TAU); ctx.fill(); }          /* her shadow on the ground, so she stands on it */
   csGiraffe(ctx, { x: 560, y: 612 + 20 * wa + Math.sin(t * 7) * 1.5, s: 0.95, face: 1, walk: t * 7, moving: true, neck: 0.3, head: 0.1, bare: true, boots: false });
   if (wa > 0.02){                                                                                       /* she is up to her knees, then deeper, in water */
     const wy = 580;
