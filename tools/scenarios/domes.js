@@ -19,7 +19,7 @@
 
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter14Complete === false;
-    out.wardLen = WARD.length; out.wardLocked = wardUnlocked(46) === false && WARD[46] && WARD[46].name === 'Frost Mylar' && WARD.length === 50;
+    out.wardLen = WARD.length; out.wardLocked = wardUnlocked(46) === false && WARD[46] && WARD[46].name === 'Frost Mylar' && WARD.length === 51;
     Save.data.chapter14Complete = 'junk'; out.saveSane = typeof (Save.data.chapter14Complete = !!Save.data.chapter14Complete) === 'boolean';
     Save.data.chapter14Complete = true; out.wardOpen = wardUnlocked(46) === true && wardChoice('skinCol') === 0;
     Save.data.skinCol = 46; out.wardChoice = wardChoice('skinCol') === 46; Save.data.skinCol = 0;

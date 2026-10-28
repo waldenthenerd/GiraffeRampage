@@ -209,7 +209,7 @@ const UNI_SWATCH = {};
 WARD.push({ name: 'Frost Mylar', c: '#CFE2EE' });                       /* 46: Chapter 13.5's color (wardUnlocked in js/ui/44e-wardrobe.js); it has to come after the three above, so it sits here */
 WARD.push({ name: 'Executive Navy', c: '#2F4376' });                     /* 47: Chapter 14's color, the same way */
 WARD.push({ name: 'Brass Button', c: '#C8A24A' });                       /* 48: three stars in Rush Hour, Chapter 14's minigame (MINI_STAR_CHAPTERS in js/minigames/44k-minigame-rewards.js) */
-WARD.push({ name: 'Town Watch', c: '#6E8A4A' });                         /* 49: Chapter 15's color, for holding Longneck Town (wardUnlocked in js/ui/44e-wardrobe.js) */
+WARD.push({ name: 'Town Watch', c: '#6E8A4A' }); WARD.push({ name: 'Hall Crimson', c: '#B4503C' });                         /* 49: Chapter 15's color, for holding Longneck Town (wardUnlocked in js/ui/44e-wardrobe.js) */
 })();
 
 /* ---- the smart giraffe: an IQ chip over the bars in a run (the study cap and her rank), shown once she has studied anything ---- */

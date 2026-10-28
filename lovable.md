@@ -70,7 +70,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 This list is of the **source** files, which the ZIP no longer contains one by one (the build joins them into a few files in exactly this order and
 minifies them; the folder names are only for finding things). The scripts are loaded in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/core/46-main.js`, which starts the
-game. This is the complete list for this version (192 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (193 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -263,6 +263,7 @@ game. This is the complete list for this version (192 scripts; the developer pan
 | 187 | `js/siege/44zzzf-siege-militia.js` | Chapter 15's militia: friendly giraffes with rifles in posts, healed by walking over them. |
 | 188 | `js/siege/44zzzg-siege-ai.js` | How Chapter 15's machines, mutants and bosses move and attack. |
 | 189 | `js/siege/44zzzh-siege-events.js` | Chapter 15's set-piece waves, supply crates, scars on the town, boss attacks on the buildings and the radio story lines. |
+| 190 | `js/siege/44zzzi-siege-rewards.js` | Chapter 15's rewards: building streaks and gifts, named militia with ranks, and the two boon crates. |
 | 190 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
 | 191 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | 192 | `js/core/46-main.js` | Starts the game. |
@@ -294,8 +295,8 @@ The code is `GR2:` followed by Base64 of:
 
 | bytes | meaning |
 |---|---|
-| 2 | format: `0` = the JSON text as UTF-8 (only used if compressing would not shrink it), `1` = LZW |
-| 5 | length of the JSON text in bytes, big endian |
+| 3 | format: `0` = the JSON text as UTF-8 (only used if compressing would not shrink it), `1` = LZW |
+| 6 | length of the JSON text in bytes, big endian |
 | rest | the payload |
 
 **LZW details** (so you can decode it anywhere): the input is the UTF-8 bytes of `JSON.stringify(save)`. Codes `0..255` are
@@ -320,7 +321,7 @@ group of 1 to 3 bytes becomes 2 to 4) of these bytes:
 | bytes | meaning |
 |---|---|
 | 1 to 4 | length of the JSON text in bytes, little-endian 7-bit groups, high bit = more follow |
-| 3 | 16-bit check of the JSON text (FNV-1a over the bytes, then `(h >>> 16) ^ h` masked to 16 bits), big endian |
+| 4 | 16-bit check of the JSON text (FNV-1a over the bytes, then `(h >>> 16) ^ h` masked to 16 bits), big endian |
 | rest | the arithmetic-coded body (trailing zero bytes are dropped; the decoder reads zeros past the end) |
 
 The body is the JSON text coded one bit at a time by a context-mixing model (the idea behind PAQ and lpaq): hashed order-2/3/4 contexts, order 0 and 1, two

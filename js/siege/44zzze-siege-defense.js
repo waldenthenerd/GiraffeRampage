@@ -6,7 +6,7 @@
    of map the Tower uses to find her) to the nearest building, hit it three times, and move on to the next. A building at 25 points or less is WRECKED: smoking, and left alone by
    every creature. It is never destroyed, and the militia mend 30 points between waves, so nothing is ever lost for good. A wave in which no building was wrecked is HELD, and
    pays a bonus; every wave held at the end earns the chest, and all 25 is the trophy. State lives in SGB (by building key), reset for each run. */
-const SIEGE_BLD = { max: 100, wreck: 25, repair: 30, hitCd: 1.5, reach: 46, hunterHits: 3, hunterCd: 0.9, hunterNear: 300 };
+const SIEGE_BLD = { max: 100, wreck: 25, dmgMul: 2 / 3, repair: 30, hitCd: 1.5, reach: 46, hunterHits: 3, hunterCd: 0.9, hunterNear: 300 };
 const SIEGE_HIT = { hyena: 1.5, grub: 0.5, jackal: 1, cheetah: 2, warthog: 5, vulture: 1, rhino: 4, baboon: 2, honeybadger: 18, mamba: 1.5, ember: 3, termite: 2, lion: 8, matriarch: 3, buffalo: 15, crocodile: 6, wildfire: 10 };
 const SIEGE_HUNTERS = { warthog: 1, honeybadger: 1, termite: 1, buffalo: 1, lion: 1, rhino: 0.8, ember: 0.6, jackal: 0.45, vulture: 0.4, baboon: 0.4, mamba: 0.35, hyena: 0.3, cheetah: 0.35 };
 const SGB = {};
@@ -38,7 +38,7 @@ function siegeRectDist(b, x, y){ const dx = Math.max(b.x - x, 0, x - (b.x + b.w)
 /* ---- hurting a building ---- */
 function siegeHurt(key, amt, src){
   const s = SGB[key]; if (!s || s.wrecked || !(amt > 0)) return;
-  const k = 1 + 0.02 * (chapterWaveOf(G.wave) - 1);                       /* the machines get better at it as the night goes on */
+  const k = (1 + 0.02 * (chapterWaveOf(G.wave) - 1)) * SIEGE_BLD.dmgMul * (typeof sgHas === 'function' && sgHas('walls') ? 0.75 : 1);       /* the machines get better at it as the night goes on, and the town takes two thirds of what it used to */
   s.hp = Math.max(0, s.hp - amt * k); s.flash = 0.2; s.alert = 3; s.hurt = G.time;
   const b = s.b, cx = clamp(src ? src.x : b.x + b.w / 2, b.x, b.x + b.w), cy = clamp(src ? src.y : b.y + b.h / 2, b.y, b.y + b.h);
   burstParticles(cx, cy, 5, '#C8B8A0', 120, 3, {}); sfx('rustle', 0.2, cx, cy);
@@ -136,7 +136,7 @@ function siegeWaveStart(n){
   G.sg.dip = false;
   if (n > SIEGE_FIRST_WAVE){
     let mended = false;
-    for (const key in SGB){ const s = SGB[key]; const was = s.wrecked; s.hp = Math.min(SIEGE_BLD.max, s.hp + SIEGE_BLD.repair); if (s.hp > SIEGE_BLD.wreck) s.wrecked = false; if (was && !s.wrecked) addText(s.b.x + s.b.w / 2, s.b.y - 18, s.name + ' is back on its feet', '#BFF0A0', 16, false); mended = true; }
+    for (const key in SGB){ const s = SGB[key]; const was = s.wrecked; s.hp = Math.min(SIEGE_BLD.max, s.hp + SIEGE_BLD.repair + (typeof sgHas === 'function' && sgHas('repair') ? 15 : 0)); if (s.hp > SIEGE_BLD.wreck) s.wrecked = false; if (was && !s.wrecked) addText(s.b.x + s.b.w / 2, s.b.y - 18, s.name + ' is back on its feet', '#BFF0A0', 16, false); mended = true; }
     if (mended && !G.attract) addText(P.x, P.y - 84, 'The militia mend the town', '#BFF0A0', 15, false);
   }
 }
@@ -189,7 +189,10 @@ drawFeedbackOverlays = function(ctx){
     const s = SGB[keys[i]], x = x0 + i * (pw + 4), pc = clamp(s.hp / SIEGE_BLD.max, 0, 1), hot = s.alert > 0 && Math.sin(G.time * 12) > 0;
     ctx.fillStyle = hot ? 'rgba(120,30,20,.85)' : 'rgba(14,12,16,.72)'; ctx.fillRect(x, y0, pw, ph);
     ctx.fillStyle = s.wrecked ? '#6A2A22' : pc > 0.6 ? '#6AC85A' : pc > 0.4 ? '#D8B83A' : '#E0583A'; ctx.fillRect(x + 2, y0 + ph - 7, (pw - 4) * pc, 5);
-    ctx.fillStyle = s.wrecked ? '#FF8A6A' : '#FFF6D8'; ctx.fillText(SIEGE_SHORT[keys[i]] || keys[i], x + pw / 2, y0 + 12);
+    const stk = G.sg.streak ? G.sg.streak[keys[i]] | 0 : 0, tagged = stk > 0 && pw >= 76;
+    ctx.fillStyle = s.wrecked ? '#FF8A6A' : '#FFF6D8'; if (tagged){ ctx.textAlign = 'left'; ctx.fillText(SIEGE_SHORT[keys[i]] || keys[i], x + 5, y0 + 12); ctx.textAlign = 'center'; } else ctx.fillText(SIEGE_SHORT[keys[i]] || keys[i], x + pw / 2, y0 + 12);
+                                                                                                       /* the waves in a row it has not been wrecked (js/siege/44zzzi-siege-rewards.js) */
+    if (tagged){ ctx.textAlign = 'right'; ctx.fillStyle = '#F2D488'; ctx.fillText('\u2605' + stk, x + pw - 4, y0 + 12); ctx.textAlign = 'center'; }
   }
   for (let i = 0; i < n; i++){                                                                                                                              /* an arrow at the edge for a building out of sight that is under attack */
     const s = SGB[keys[i]]; if (!(s.alert > 0) || s.wrecked) continue;
