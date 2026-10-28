@@ -21,6 +21,7 @@ scen "phone-pass (390x844)" phone-pass --touch --w 390 --h 844
 scen "uni-slides (390x844)" uni-slides --touch --w 390 --h 844
 scen "phone-pass (844x390)" phone-pass --touch --w 844 --h 390
 echo "== website package"
+if out="$(node tools/check-bundle.mjs 2>&1)"; then ok "joined scripts match the separate scripts"; else bad "joined scripts match the separate scripts" "$out"; fi
 zip="$(mktemp -d)/pkg.zip"
 if out="$(bash tools/make-lovable-package.sh "$zip" 2>&1)"; then
   dir="$(mktemp -d)"; unzip -q "$zip" -d "$dir"
