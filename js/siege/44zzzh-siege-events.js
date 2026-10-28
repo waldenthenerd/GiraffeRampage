@@ -90,7 +90,7 @@ waveClearFX = function(){
 const siegeEvBaseDefInit = siegeDefenseInit;
 siegeDefenseInit = function(){
   siegeEvBaseDefInit.apply(this, arguments);
-  const sg = G.sg; sg.scars = []; sg.ev = null; sg.nightA = 0; sg.fast = 0; sg.flood = 0; sg.jam = 0; sg.side = 0; sg.story = []; sg.line = null; sg.tipped = false;
+  G.sgFilm = null; const sg = G.sg; sg.scars = []; sg.ev = null; sg.nightA = 0; sg.fast = 0; sg.flood = 0; sg.jam = 0; sg.side = 0; sg.story = []; sg.line = null; sg.tipped = false;
   sg.caches = SG_CRATES.map(function(c){ const p = towerOpenNear(c.x, c.y); return { id: c.id, x: p.x, y: p.y, name: c.name, col: c.col, tip: c.tip, ready: true, flash: 0 }; });
 };
 
@@ -108,7 +108,7 @@ function sgDrawStory(ctx){
   const words = L.text.slice(0, n).split(' '), full = L.text.split(' ');                                                      /* lay out the whole line first so the panel does not grow as it types */
   const wrap = function(ws){ const out = []; let c = ''; for (let i = 0; i < ws.length; i++){ const t = c ? c + ' ' + ws[i] : ws[i]; if (ctx.measureText(t).width > w - 28 && c){ out.push(c); c = ws[i]; } else c = t; } if (c) out.push(c); return out; };
   const total = wrap(full).length, shown = wrap(words);
-  const h = 30 + total * 20, y = H - h - (portrait ? 210 : 74);
+  const h = 30 + total * 20, y = H - h - (portrait ? 270 : 150);                   /* above the one-time hint, which sits at the foot of the screen */
   ctx.fillStyle = 'rgba(14,12,16,.82)'; ctx.fillRect(x, y, w, h); ctx.fillStyle = who[1]; ctx.fillRect(x, y, 4, h);
   ctx.font = '800 12px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; ctx.fillText(who[0].toUpperCase(), x + 14, y + 17);
   ctx.font = '600 15px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; ctx.fillStyle = '#FFF6D8';
@@ -173,6 +173,12 @@ function sgScar(x, y, r, kind){
   sg.scars.push({ x: x, y: y, r: Math.max(18, Math.min(110, r)), k: kind || 'scorch', a: Math.random() * TAU });
   if (sg.scars.length > SG_SCAR_MAX) sg.scars.shift();
 }
+/* what the morning-after film shows (sgFilmState in js/films/27c-film-siege.js): the keys that stand wrecked and how scarred the ground is, noted as the run ends */
+const siegeEvBaseFinish = siegeFinishSave;
+siegeFinishSave = function(){
+  if (G.sg) G.sgFilm = { wrecked: Object.keys(SGB).filter(function(k){ return SGB[k].wrecked; }), scars: (G.sg.scars || []).length, held: G.sg.held, flawless: G.sg.held >= SIEGE_WAVES };
+  return siegeEvBaseFinish.apply(this, arguments);
+};
 const siegeEvBaseBlast = hostileBlast;
 hostileBlast = function(x, y, r){ if (G.sg && G.chapter === SIEGE_CHAPTER && G.biome === 'siege') sgScar(x, y, r * 0.55, r > 150 ? 'crater' : 'scorch'); return siegeEvBaseBlast.apply(this, arguments); };
 const siegeEvBaseWreck = siegeWreck;

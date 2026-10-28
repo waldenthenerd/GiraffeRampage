@@ -59,7 +59,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 3. Rebuild `public/game/rampage/index.html` as: the ZIP's `index.html` lines 1 to 3 (up to `<head>`), then the bridge script
    (kept from the current hosted file, **updated as described in section 4** if the save format changed), then the rest of the
    ZIP's `index.html` from line 4. Keep every `<script src>` and the stylesheet `<link>` exactly as the ZIP has them, in the same order.
-   Keep the HTML body exactly (the canvas, `#hud`, `#touch`, `#pausebtn`, `#overlay`).
+   Keep the HTML body exactly (the loading screen `#boot` and the `<style>` for it in `<head>`, the canvas, `#hud`, `#touch`, `#pausebtn`, `#overlay`; the game removes `#boot` itself when it has started).
 4. Keep `window.GR` (from `js/core/45-test-exports.js`) and `window.GRSave` (from `js/core/01b-savepack.js`) working: they sit inside the joined files, so keep those files exactly as given.
 5. Run the checks in section 9.
 
