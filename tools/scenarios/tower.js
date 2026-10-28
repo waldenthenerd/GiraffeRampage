@@ -123,7 +123,7 @@
     out.rushStart = startMini(TOWER_CHAPTER, null, 'menu') && G.state === 'mini'; var rm = G.mini; rm.phase = 'play';
     steps(30); var rg = miniGeom(); out.rushLanes = rm.lanes.length === 6 && rm.lives === 3 && rm.lanes.every(function(L){ return L.objs.length >= 2; });
     rm.p.x = rg.W / 2; rm.p.y = rg.H * 0.06; steps(2); out.rushFloor = rm.score === 1 && rm.p.y > rg.H * 0.8;
-    var L0 = rm.lanes[0]; rm.inv = 0; rm.p.x = L0.objs[0].x; rm.p.y = L0.y; var lives0 = rm.lives; steps(1); out.rushHit = rm.lives === lives0 - 1 && rm.p.y > rg.H * 0.8;
+    var L0 = rm.lanes[0]; rm.inv = 0; rm.p.x = (L0.objs.filter(function(o){ return o.x > 60 && o.x < rg.W - 60; })[0] || L0.objs[0]).x; rm.p.y = L0.y; var lives0 = rm.lives; steps(1); out.rushHit = rm.lives === lives0 - 1 && rm.p.y > rg.H * 0.8;
     rm.score = 12; rm.over = true; steps(2); out.rushStars = G.mini && G.mini.won === true && G.mini.stars === 3 || (Save.data.mini.stars[TOWER_CHAPTER] | 0) === 3;
     G.state = 'menu'; G.mini = null; out.rushCoat = WARD[48] && WARD[48].name === 'Brass Button' && wardUnlocked(48) === true;
     out.rushTotals = miniStarTotal() >= 3 && /42/.test(String(MINI_STAR_CHAPTERS.length * 3));

@@ -17,7 +17,7 @@
 3. Hats and boots are separate from gear: no hat or boot controls on the Gear page, `Save.data.equipped` keeps only `cape`, `weapon`, `armor`. The preview draws her current hat and boots as already chosen on the Coat colors screen (read-only), with one button to open that screen.
 4. Saves stay backward compatible: existing keys (`gear`, `equipped`, `equippedTrinkets`, `cratesOpened`) are not renamed or reshaped. New keys default when absent.
 5. `Settings.showGear` still hides gear art in play. Visual effects "off" turns the special-effect particles and the crate sparkle off.
-6. `js/45b-dev-panel.js` stays out of the website build; the Lovable `GR` export/save bridge is untouched.
+6. `js/dev/45b-dev-panel.js` stays out of the website build; the Lovable `GR` export/save bridge is untouched.
 7. No shake-reduction setting. Cutscenes never announce the end of the game.
 8. Edits are exact-match replacements; new behavior goes in new files that wrap old functions.
 9. After every task: update `README.md` (new rows, recount per-file line counts and totals), the script count in `lovable.md`, and `tools/QA-GUIDE.md`; verify visual work with screenshots.
@@ -37,15 +37,15 @@
 
 | File | Status | Responsibility |
 |---|---|---|
-| `js/05a-gear-levels.js` | create (after 05-gear) | Level model, stat preview, pity counters, `GEAR_FX` registry data. No drawing, no HTML. |
-| `js/33a-gear-art-capes.js` | create (after 33-giraffe-art) | 16 cape designs and the `capeDraw` hook used by `drawPlayer`. |
-| `js/33b-gear-art-weapons.js` | create | 16 in-world weapon designs, drawn on the hooves/head during and between kicks. |
-| `js/33c-gear-art-armor.js` | create | Armor pass: audit of the 16 `ARMOR_DESIGNS`, redraws where weak, level pips and rarity glint. |
-| `js/33d-gear-icons.js` | create | `gearIcon(id, size)` canvas icons, silhouettes and rarity frames, cached. |
-| `js/36p-gear-fx.js` | create | The 8 special effects at runtime: hooks on kick, hurt and tick. |
-| `js/41a-gear-page.js` | create (after 41-qol, before 43-input) | The new Gear tab: paper doll, preview canvas, slot picker, compare panel, crate reveal. Overrides `gearTabHTML`. |
+| `js/game/05a-gear-levels.js` | create (after 05-gear) | Level model, stat preview, pity counters, `GEAR_FX` registry data. No drawing, no HTML. |
+| `js/art/33a-gear-art-capes.js` | create (after 33-giraffe-art) | 16 cape designs and the `capeDraw` hook used by `drawPlayer`. |
+| `js/art/33b-gear-art-weapons.js` | create | 16 in-world weapon designs, drawn on the hooves/head during and between kicks. |
+| `js/art/33c-gear-art-armor.js` | create | Armor pass: audit of the 16 `ARMOR_DESIGNS`, redraws where weak, level pips and rarity glint. |
+| `js/art/33d-gear-icons.js` | create | `gearIcon(id, size)` canvas icons, silhouettes and rarity frames, cached. |
+| `js/render/36p-gear-fx.js` | create | The 8 special effects at runtime: hooks on kick, hurt and tick. |
+| `js/ui/41a-gear-page.js` | create (after 41-qol, before 43-input) | The new Gear tab: paper doll, preview canvas, slot picker, compare panel, crate reveal. Overrides `gearTabHTML`. |
 | `css/gearpage.css` | create | Styles for the above (linked from `index.html`). |
-| `js/43-input.js` | modify | Only new `case` lines in `handleAction` for the new `data-a` actions, plus unchanged dataset handlers. |
+| `js/core/43-input.js` | modify | Only new `case` lines in `handleAction` for the new `data-a` actions, plus unchanged dataset handlers. |
 | `index.html` | modify | Script and stylesheet tags in the order above. |
 | `README.md`, `lovable.md`, `tools/QA-GUIDE.md` | modify | Per rule 9. |
 
@@ -56,7 +56,7 @@ Branch: `gear-revamp`, created from `polish-pack` (it holds the neck-stretch hoo
 ### Task 1: Level model, stat preview, pity (data layer)
 
 **Files:**
-- Create: `js/05a-gear-levels.js`
+- Create: `js/game/05a-gear-levels.js`
 - Modify: `index.html` (tag after `05-gear.js`)
 - Test: `tools/scenarios/gear-levels.js` (QA scenario; `QA.done({...})`)
 
@@ -72,21 +72,21 @@ Branch: `gear-revamp`, created from `polish-pack` (it holds the neck-stretch hoo
 
 - [ ] **Step 1: Write the failing scenario** in `tools/scenarios/gear-levels.js` asserting: (a) fresh save, `gearLevel('herdhide:cape') === 1`; (b) after `grantGear` + `gearLevelUp` four times it is 5 and a fifth call returns false; (c) `gearLevelScale(5) === 1.4`; (d) `gearStatsFor({cape:'herdhide:cape'}).stats.maxHpAdd === 10` at level 1 and `14` at level 5; (e) `gearDelta('armor','herdhide:armor')` against an empty armor slot returns one entry for `dr` with `to - from === 0.04`; (f) `JSON.stringify(Save.data.equipped)` is unchanged after `gearStatsFor`.
 - [ ] **Step 2: Run it, expect FAIL** ("gearLevel is not defined"): `node tools/qa-cloud.mjs tools/scenarios/gear-levels.js --wait 20000`
-- [ ] **Step 3: Implement `js/05a-gear-levels.js`.**
+- [ ] **Step 3: Implement `js/game/05a-gear-levels.js`.**
   - `applyGear` is wrapped: after each equipped piece's `apply(s)` the numeric differences against a snapshot are scaled by `gearLevelScale(level)` (additive keys scale the difference; multiplicative keys such as `hasteMul`, `kickKb` scale `(after / before - 1)`). The set bonus is not scaled.
   - Weapon level adds 6% per level to `P.weapon.dmg` through a copied weapon object in `equippedWeapon` (wrapped), never mutating `WEAPONS`.
   - `Save.load` defaults: add the two keys when missing via a wrapper on `Save.load`, same pattern as other save files.
 - [ ] **Step 4: Run the scenario, expect PASS.**
 - [ ] **Step 5: Regression:** `node tools/qa-cloud.mjs tools/scenarios/reg.js --wait 20000` (chapters 1 to 13) must print no errors.
-- [ ] **Step 6: Commit** `git add js/05a-gear-levels.js index.html tools/scenarios/gear-levels.js && git commit -m "Gear levels, stat preview and crate pity counters"`
+- [ ] **Step 6: Commit** `git add js/game/05a-gear-levels.js index.html tools/scenarios/gear-levels.js && git commit -m "Gear levels, stat preview and crate pity counters"`
 
 ---
 
 ### Task 2: New cape art (16 designs)
 
 **Files:**
-- Create: `js/33a-gear-art-capes.js`
-- Modify: `js/33-giraffe-art.js` (the cape block at "cape: sits over the mane", replace the generic sheet with a call to the hook, keep the old drawing as the fallback)
+- Create: `js/art/33a-gear-art-capes.js`
+- Modify: `js/art/33-giraffe-art.js` (the cape block at "cape: sits over the mane", replace the generic sheet with a call to the hook, keep the old drawing as the fallback)
 - Test: `tools/scenarios/gear-art.js`
 
 **Interfaces:**
@@ -108,8 +108,8 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 ### Task 3: In-world weapon art (16 designs)
 
 **Files:**
-- Create: `js/33b-gear-art-weapons.js`
-- Modify: `js/33-giraffe-art.js` (one call after the head is drawn, for the held/worn weapon)
+- Create: `js/art/33b-gear-art-weapons.js`
+- Modify: `js/art/33-giraffe-art.js` (one call after the head is drawn, for the held/worn weapon)
 - Test: `tools/scenarios/gear-art.js` (extend)
 
 **Interfaces:**
@@ -129,7 +129,7 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 ### Task 4: Armor pass
 
 **Files:**
-- Create: `js/33c-gear-art-armor.js`
+- Create: `js/art/33c-gear-art-armor.js`
 - Test: `tools/scenarios/gear-art.js` (extend)
 
 **Interfaces:**
@@ -146,7 +146,7 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 ### Task 5: Piece icons, silhouettes, rarity frames (detail)
 
 **Files:**
-- Create: `js/33d-gear-icons.js`, part of `css/gearpage.css`
+- Create: `js/art/33d-gear-icons.js`, part of `css/gearpage.css`
 - Test: `tools/scenarios/gear-icons.js`
 
 **Interfaces:**
@@ -168,8 +168,8 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 ### Task 6: Paper-doll Gear page (change 1)
 
 **Files:**
-- Create: `js/41a-gear-page.js`, `css/gearpage.css`
-- Modify: `index.html`, `js/43-input.js` (new `case` lines only)
+- Create: `js/ui/41a-gear-page.js`, `css/gearpage.css`
+- Modify: `index.html`, `js/core/43-input.js` (new `case` lines only)
 - Test: `tools/scenarios/gear-page.js`
 
 **Interfaces:**
@@ -195,7 +195,7 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 ### Task 7: Compare before equipping (change 2)
 
 **Files:**
-- Modify: `js/41a-gear-page.js`, `css/gearpage.css`
+- Modify: `js/ui/41a-gear-page.js`, `css/gearpage.css`
 - Test: `tools/scenarios/gear-page.js` (extend)
 
 **Interfaces:**
@@ -213,8 +213,8 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 ### Task 8: Crate moment and pity (change 6)
 
 **Files:**
-- Modify: `js/41a-gear-page.js`, `css/gearpage.css`
-- Create: wrapper in `js/05a-gear-levels.js` for `openCrate`
+- Modify: `js/ui/41a-gear-page.js`, `css/gearpage.css`
+- Create: wrapper in `js/game/05a-gear-levels.js` for `openCrate`
 - Test: `tools/scenarios/gear-crates.js`
 
 **Interfaces:**
@@ -233,7 +233,7 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 ### Task 9: Upgrading gear with duplicates (change 7)
 
 **Files:**
-- Modify: `js/05a-gear-levels.js` (the `openCrate` wrapper), `js/41a-gear-page.js`
+- Modify: `js/game/05a-gear-levels.js` (the `openCrate` wrapper), `js/ui/41a-gear-page.js`
 - Test: `tools/scenarios/gear-levels.js` (extend)
 
 **Interfaces:**
@@ -250,8 +250,8 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 ### Task 10: Gear with a playstyle (change 8)
 
 **Files:**
-- Create: `js/36p-gear-fx.js`
-- Modify: `js/05a-gear-levels.js` (the `GEAR_FX` descriptions), `js/41a-gear-page.js` (an "Effect" line on the piece and compare panel)
+- Create: `js/render/36p-gear-fx.js`
+- Modify: `js/game/05a-gear-levels.js` (the `GEAR_FX` descriptions), `js/ui/41a-gear-page.js` (an "Effect" line on the piece and compare panel)
 - Test: `tools/scenarios/gear-fx.js`
 
 **Interfaces:**
@@ -282,7 +282,7 @@ Herdhide patched hide with stitched seam; Thornweave leafy shawl with thorn tips
 
 - [ ] **Step 1:** README file-map rows for the 7 new JS files and the stylesheet; update the Gear and "Gear, weapons, trinkets" lines; recount per-file line counts and totals (CLAUDE.md rule 3); update the script count in `lovable.md`.
 - [ ] **Step 2:** `tools/QA-GUIDE.md` section "Gear page, gear art, levels, crates, effects" listing the new scenarios and the helpers (`gearPage`, `gearPreview.frames`, `crateReveal.active`).
-- [ ] **Step 3:** Full regression: `all2.js` (65 places, no errors), `u3.js`, `reg.js`, plus all five new scenarios; confirm `js/45b-dev-panel.js` is still excluded from the website build list and the `GR` bridge works with an old-save fixture.
+- [ ] **Step 3:** Full regression: `all2.js` (65 places, no errors), `u3.js`, `reg.js`, plus all five new scenarios; confirm `js/dev/45b-dev-panel.js` is still excluded from the website build list and the `GR` bridge works with an old-save fixture.
 - [ ] **Step 4:** Old-save fixture check: load a saved game from before this branch (use a copy from `tools/` fixtures or generate one on `main`), open the Gear tab, confirm equipped pieces, level 1 everywhere, no errors.
 - [ ] **Step 5:** Commit `"Docs for the gear revamp"`, push `git push -u origin gear-revamp`, and ask whether to merge.
 

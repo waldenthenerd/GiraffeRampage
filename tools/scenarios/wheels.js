@@ -1,4 +1,4 @@
-/* wheels: skateboards and bicycles (js/44zzx-wheels.js). The shop at the far end of the Park and its room, buying, getting on and off, being faster, going indoors, the small chance of a fall,
+/* wheels: skateboards and bicycles (js/ui/44zzx-wheels.js). The shop at the far end of the Park and its room, buying, getting on and off, being faster, going indoors, the small chance of a fall,
    the opinions of the people inside, panels and cars taking her off, the photo studio props (and a photo code that carries them), the Guide topic and the key. */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });

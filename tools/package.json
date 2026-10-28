@@ -4,6 +4,13 @@
   "type": "module",
   "license": "PolyForm-Noncommercial-1.0.0",
   "description": "Headless QA runner for Giraffe Rampage (cloud/Linux friendly). The game itself has no build step.",
-  "scripts": { "setup": "playwright install --with-deps chromium" },
-  "dependencies": { "playwright": "1.56.1" }
+  "scripts": {
+    "setup": "playwright install --with-deps chromium"
+  },
+  "dependencies": {
+    "playwright": "1.56.1"
+  },
+  "devDependencies": {
+    "terser": "^5.31.0"
+  }
 }

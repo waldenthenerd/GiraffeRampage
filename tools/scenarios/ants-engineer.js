@@ -1,4 +1,4 @@
-/* The Engineer Ant (js/44zzr-engineer-ants.js). Run: node tools/qa-cloud.mjs tools/scenarios/ants-engineer.js --wait 90000 [--shot x.png --w 390 --h 1200 --touch --params "view=bay|locked|field"] */
+/* The Engineer Ant (js/game/44zzr-engineer-ants.js). Run: node tools/qa-cloud.mjs tools/scenarios/ants-engineer.js --wait 90000 [--shot x.png --w 390 --h 1200 --touch --params "view=bay|locked|field"] */
 GR.handleAction('splash-go');
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
 function $(s){ return document.querySelector(s); } function $$(s){ return [].slice.call(document.querySelectorAll(s)); }

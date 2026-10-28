@@ -1,4 +1,4 @@
-/* perf-ground: the ground and scenery tiles (js/44ca-ground-cache.js). At full effects the ground is live; at Medium or after the governor's first step
+/* perf-ground: the ground and scenery tiles (js/core/44ca-ground-cache.js). At full effects the ground is live; at Medium or after the governor's first step
    it comes from tiles, with far fewer canvas calls, for every biome, and a change of world makes new tiles. Run: node tools/qa-cloud.mjs tools/scenarios/perf-ground.js --wait 240000 */
 (function(){
   GR.handleAction('splash-go');

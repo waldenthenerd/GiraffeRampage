@@ -1,4 +1,4 @@
-/* NPC voices (js/44zzq-npc-voices.js). The harness has no real timers, so the card is advanced by calling NPCVoice.tick(ms) by hand.
+/* NPC voices (js/audio/44zzq-npc-voices.js). The harness has no real timers, so the card is advanced by calling NPCVoice.tick(ms) by hand.
    Run: node tools/qa-cloud.mjs tools/scenarios/npc-voices.js --wait 60000 [--shot x.png] */
 GR.handleAction('splash-go');
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });

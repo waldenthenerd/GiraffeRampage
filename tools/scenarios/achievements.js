@@ -1,4 +1,4 @@
-/* achievements: the trophies (js/44zzu-achievements.js). Every goal is readable on any save, a fresh save earns nothing, a goal pays its gems once, a save that has done
+/* achievements: the trophies (js/ui/44zzu-achievements.js). Every goal is readable on any save, a fresh save earns nothing, a goal pays its gems once, a save that has done
    a lot earns it all at once with one message, an odd value in the save is tidied on load, the wall lists every goal, and nothing is counted while two giraffes play. */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });

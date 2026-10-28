@@ -4,10 +4,10 @@ Baseline: main at 4f918b3. The parser inventory regenerated 25 duplicated global
 
 | Name | Earlier declaration removed | Live declaration retained | Intervening captures / assignments |
 |---|---|---|---|
-| openCrate | js/05-gear.js:633 | js/05a-gear-levels.js:146 | None |
-| gearTabHTML | js/41-qol.js:514 | js/41a-gear-page.js:169 | None |
-| buyCrate | js/43-input.js:347 | js/41a-gear-page.js:284 | None |
-| wheelTabHTML | js/11-ants.js:324 | js/41c-wheel-page.js:180 | None |
+| openCrate | js/game/05-gear.js:633 | js/game/05a-gear-levels.js:146 | None |
+| gearTabHTML | js/ui/41-qol.js:514 | js/ui/41a-gear-page.js:169 | None |
+| buyCrate | js/core/43-input.js:347 | js/ui/41a-gear-page.js:284 | None |
+| wheelTabHTML | js/game/11-ants.js:324 | js/ui/41c-wheel-page.js:180 | None |
 
 Reproduce the inventory with `npm ci --prefix tools`, then `node tools/duplicate-functions.mjs`. It parses the QA dependency's Babel AST, inspects Program-level declarations, and includes captures and assignments between declarations. The complete baseline has these names:
 

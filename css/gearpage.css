@@ -1,4 +1,4 @@
-/* The Gear page (js/41a-gear-page.js): paper doll, piece picker, side panel, sets view. */
+/* The Gear page (js/ui/41a-gear-page.js): paper doll, piece picker, side panel, sets view. */
 #overlay .panel.slab:has(.gdoll),#overlay .panel.slab:has(.gset2){max-width:980px}
 .gviews{display:flex;gap:6px;margin:8px 0 12px}
 .gview-b{background:rgba(36,27,21,.72);border:1px solid var(--bark2);border-radius:4px;color:var(--dust);padding:7px 14px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
@@ -138,7 +138,7 @@
 }
 .gcolR.more::after{content:'';position:absolute;left:1px;right:1px;bottom:1px;height:36px;pointer-events:none;border-radius:0 0 6px 6px;background:linear-gradient(rgba(36,27,21,0),rgba(36,27,21,.97))}
 
-/* ---------- trinkets (js/41b-trinket-page.js) ---------- */
+/* ---------- trinkets (js/ui/41b-trinket-page.js) ---------- */
 .trwrap{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:12px;align-items:start;margin-bottom:12px}
 .trgrid{grid-column:1;grid-row:1}
 .trside{grid-column:2;grid-row:1;position:relative;height:280px;background:rgba(36,27,21,.72);border:1px solid var(--bark2);border-radius:6px}

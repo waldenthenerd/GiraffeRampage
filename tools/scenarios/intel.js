@@ -1,4 +1,4 @@
-/* intel: the Intelligence stat (intel() in js/44zz-campus.js), the average faculty level. A raw read, fewer falls, less shake, a kinder fishing bar, the journal line and the Guide topic. */
+/* intel: the Intelligence stat (intel() in js/campus/44zz-campus.js), the average faculty level. A raw read, fewer falls, less shake, a kinder fishing bar, the journal line and the Guide topic. */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };

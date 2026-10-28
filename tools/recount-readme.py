@@ -7,10 +7,10 @@ root = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); os.chdir(roo
 def rd(p): return open(p, encoding='utf-8').read()
 def cnt(p):
     b = open(p, 'rb').read(); return b.count(b'\n') + (0 if b.endswith(b'\n') or not b else 1), len(b)
-js, css = sorted(glob.glob('js/*.js')), sorted(glob.glob('css/*.css'))
+js, css = sorted(glob.glob('js/*/*.js')), sorted(glob.glob('css/*.css'))
 jl, jb = sum(cnt(p)[0] for p in js), sum(cnt(p)[1] for p in js)
 cl, cb = sum(cnt(p)[0] for p in css), sum(cnt(p)[1] for p in css)
-il, ib = cnt('index.html'); dl, db = cnt('js/45b-dev-panel.js')
+il, ib = cnt('index.html'); dl, db = cnt('js/dev/45b-dev-panel.js')
 mib = lambda b: '%.2f MiB (%s bytes)' % (b / 1048576, format(b, ','))
 kib = lambda b: ('%.0f KiB' % (b / 1024) if b >= 102400 else '%.1f KiB' % (b / 1024)) + ' (%s bytes)' % format(b, ',')
 s0 = s = rd('README.md')

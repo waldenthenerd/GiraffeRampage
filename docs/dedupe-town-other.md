@@ -4,9 +4,9 @@ Baseline: main at 4f918b3. The parser inventory regenerated 25 duplicated global
 
 | Name | Earlier declaration removed | Live declaration retained | Intervening captures / assignments |
 |---|---|---|---|
-| townRainNow | js/44w-town-engine.js:22 | js/44zi-town-atmosphere.js:139 | None |
-| townDrawRide | js/44zc-town-life.js:119 | js/44zp-tram-ride.js:18 | None |
-| townNpcSlot | js/44zi-town-atmosphere.js:100 | js/44zzk-town-routines.js:29 | None |
+| townRainNow | js/town/44w-town-engine.js:22 | js/town/44zi-town-atmosphere.js:139 | None |
+| townDrawRide | js/town/44zc-town-life.js:119 | js/town/44zp-tram-ride.js:18 | None |
+| townNpcSlot | js/town/44zi-town-atmosphere.js:100 | js/town/44zzk-town-routines.js:29 | None |
 
 Reproduce the inventory with `npm ci --prefix tools`, then `node tools/duplicate-functions.mjs`. It parses the QA dependency's Babel AST, inspects Program-level declarations, and includes captures and assignments between declarations. The complete baseline has these names:
 

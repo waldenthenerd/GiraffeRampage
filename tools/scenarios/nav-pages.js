@@ -1,4 +1,4 @@
-/* Keyboard and gamepad on the shop pages (Nav in js/41-qol.js, the focus handlers in 41a/41b, the labels in 41d/41e). Run: node tools/qa-cloud.mjs tools/scenarios/nav-pages.js --wait 60000 [--shot x.png --params "view=upgrades|wheel|ants|trinkets|gear"] */
+/* Keyboard and gamepad on the shop pages (Nav in js/ui/41-qol.js, the focus handlers in 41a/41b, the labels in 41d/41e). Run: node tools/qa-cloud.mjs tools/scenarios/nav-pages.js --wait 60000 [--shot x.png --params "view=upgrades|wheel|ants|trinkets|gear"] */
 GR.handleAction('splash-go');
 var out = { errs: [], reach: {} }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
 function $(s){ return document.querySelector(s); } function $$(s){ return [].slice.call(document.querySelectorAll(s)); }

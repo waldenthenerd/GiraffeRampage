@@ -195,7 +195,7 @@
     Save.data.runSave = snap; startRun(16, 370, snap); steps(3); out.restoreHeld = G.sg.held === 7;
     var old = JSON.parse(JSON.stringify(snap)); delete old.sgHeld; startRun(16, 370, old); steps(3); out.restoreOld = G.sg.held === 0;
     freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();
-    /* events, crates, scars, boss attacks and the radio (js/44zzzh-siege-events.js) */
+    /* events, crates, scars, boss attacks and the radio (js/siege/44zzzh-siege-events.js) */
     out.evTable = [6, 8, 12, 14, 17, 19, 21, 23].every(function(k){ return !!SIEGE_EVENTS[k] && k % 5 !== 0 && SIEGE_EVENTS[k].say.length > 0; }) && Object.keys(SG_STORY).every(function(k){ return SG_STORY[k].every(function(l){ return !!SG_WHO[l[0]]; }); });
     var qf = buildSiegeWave(372, false), qh = buildSiegeWave(368, false), qn = buildSiegeWave(366, false);
     out.evMix = qf.length > 10 && qf.every(function(q){ return q.type === 'jackal' || q.type === 'vulture'; }) && qh.filter(function(q){ return q.type === 'grub'; }).length > qh.length * 0.25 && qn.filter(function(q){ return q.type === 'vulture'; }).length > 0;
@@ -238,7 +238,7 @@
     G.sg.ev = null; G.sg.nightA = 0; G.sg.story.length = 0; G.sg.line = null; G.waveState = 'idle'; G.markers.length = 0; G.hzones.length = 0; G.enemies.length = 0; G.eproj.length = 0; G.sg.scars.length = 0; G.wave = 361;
     for (var k2 in SGB){ SGB[k2].hp = 100; SGB[k2].wrecked = false; }
 
-    /* rewards (js/44zzzi-siege-rewards.js): damage, streaks and gifts, ranks, boons, reinforced crates, the saved run */
+    /* rewards (js/siege/44zzzi-siege-rewards.js): damage, streaks and gifts, ranks, boons, reinforced crates, the saved run */
     G.state = 'playing'; G.attract = false; G.waveState = 'intro'; G.waveTimer = 9999; G.wave = 361; G.markers.length = 0; G.enemies.length = 0;
     var fx0 = Settings.fxLevel; Settings.fxLevel = 1; out.rwNoCache = G.biome === 'siege' && groundCacheOn() === false; Settings.fxLevel = fx0;
     for (var rk0 in SGB){ SGB[rk0].hp = 100; SGB[rk0].wrecked = false; } SGB.hall.hp = 100; siegeHurt('hall', 30); out.rwDmg = SIEGE_BLD.dmgMul === 2 / 3 && Math.abs(SGB.hall.hp - 80) < 0.01;

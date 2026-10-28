@@ -1,4 +1,4 @@
-/* Trinket UI (js/41b-trinket-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/trinket-ui.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --params "show=pick|worn|none|locked|helmet"] */
+/* Trinket UI (js/ui/41b-trinket-page.js). Run: node tools/qa-cloud.mjs tools/scenarios/trinket-ui.js --wait 60000 [--shot x.png --w 390 --h 844 --scale 2 --params "show=pick|worn|none|locked|helmet"] */
 GR.handleAction('splash-go');
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
 try {
