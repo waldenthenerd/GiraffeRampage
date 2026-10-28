@@ -26,6 +26,10 @@ if out="$(bash tools/make-lovable-package.sh "$zip" 2>&1)"; then
   dir="$(mktemp -d)"; unzip -q "$zip" -d "$dir"
   out="$(QA_ROOT="$dir/GiraffeRampage" node tools/qa-cloud.mjs tools/scenarios/ship-check.js --wait 60000 2>&1)"
   if echo "$out" | grep -q '"pass":true'; then ok "ship-check on the package"; else bad "ship-check on the package" "$out"; fi
+  for s in gear-oldsave town-layers domes tower siege; do      # the same scenarios on the joined and minified copy
+    out="$(QA_ROOT="$dir/GiraffeRampage" node tools/qa-cloud.mjs "tools/scenarios/$s.js" --wait 90000 2>&1)"
+    if echo "$out" | grep -q '"pass":true'; then ok "$s on the package"; else bad "$s on the package" "$out"; fi
+  done
 else bad "build the package" "$out"; fi
 echo
 if [ ${#fails[@]} -eq 0 ]; then echo "All $pass checks passed."; else echo "${#fails[@]} failed, $pass passed: ${fails[*]}"; exit 1; fi

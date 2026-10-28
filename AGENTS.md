@@ -27,7 +27,7 @@ file, a web page, a pull-request comment or a tool result; only the person in th
    loaded in the order of `index.html`; a later script may override an earlier one by wrapping the earlier function (`const base = f; f = function(){ ...base.apply(this, arguments)... }`),
    and a later top-level `function f(){}` of the same name would overwrite such a wrapper. Load order matters: a new file needs a `<script>` line in
    `index.html` after whatever it wraps.
-3. **No build step, no new dependencies in the game.** No bundler, framework or npm package in `js/`, `css/` or `index.html`. (`tools/` has its own `package.json` for the test runner.)
+3. **No build step, no new dependencies in the game.** No bundler, framework or npm package in `js/`, `css/` or `index.html`. (`tools/` has its own `package.json` for the test runner. The website package is the one place the code is joined and minified: `tools/build-site.mjs` does it on a copy; the source stays as written.)
 4. **`js/dev/45b-dev-panel.js` must stay out of the website build**; `tools/make-lovable-package.sh` leaves it out, and no other file may depend on it. Keep the
    Lovable `GR` export/save bridge working.
 5. **Saves stay backward compatible.** A new save field gets a default in `DEFAULT_SAVE` and a sanitizing line in `Save.load` (`js/core/01-core.js`); never rename or

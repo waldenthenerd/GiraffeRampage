@@ -4,7 +4,7 @@
 (`LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md` is now only a pointer to this file). When this file and anything you remember disagree,
 this file wins.
 
-The game is developed locally by its owner, in a folder of separate files. You (Lovable) host a copy of it. Your job is to
+The game is developed locally by its owner, in a folder of separate source files (`js/` has one folder per area); the ZIP you receive is a built copy of it. You (Lovable) host a copy of it. Your job is to
 keep the hosted copy in step with the files you are given, keep the website around it working, and **not to redesign, refactor
 or "improve" the game's own code**. If something in the game looks odd, leave it and say so; do not fix it silently.
 
@@ -20,7 +20,9 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
    `giraffe_rampage_save_v1`. A player's old save must still load.
 4. **Scripts are classic scripts in one shared global scope, and their order matters** (section 3). Do not turn them into ES
    modules, do not wrap them in functions, do not reorder them, and do not rename globals.
-5. **The game files you are given are the source of truth.** Copy them in as they are. Do not reformat, minify, or "tidy" them.
+5. **The game files you are given are the source of truth.** Copy them in as they are. The ZIP already carries the scripts joined into a few
+   files and minified by the owner's build (`tools/build-site.mjs`); do not unpack, reformat, re-minify, split or "tidy" them. Their file names
+   contain a hash of the contents, so a changed file is always a new name.
 6. **Do not add features, settings, buttons or text to the game** unless the owner asked for exactly that in the same message.
    In particular there is deliberately **no screen-shake-reduction setting**. Do not add one.
 7. **Never reveal locked content.** The in-game Guide only lists what a save has unlocked. Do not write marketing text, tooltips
@@ -34,8 +36,8 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 ## 2. What is hosted and how
 
-- The Lovable project is "Giraffe Rampage Cloud". The game is a **folder of separate files**, `public/game/rampage/`
-  (`index.html`, `css/`, `js/`), shown in an iframe on the `/play` route (`src="/game/rampage/index.html"`).
+- The Lovable project is "Giraffe Rampage Cloud". The game is a **folder of built files**, `public/game/rampage/`
+  (`index.html`, `css/` with one stylesheet, `js/` with about seven script files), shown in an iframe on the `/play` route (`src="/game/rampage/index.html"`).
 - A small **bridge script** sits right after `<head>` in the hosted `index.html`. It posts the player's save (the value of
   localStorage key `giraffe_rampage_save_v1`) up to the page, which stores it in the Supabase table `game_saves`; the page
   seeds localStorage from the cloud copy before the iframe loads. The bridge is **not** in the owner's `index.html`: you add
@@ -51,20 +53,22 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
    for you to read: it describes every file. It also documents the developer panel for people who clone the repository, so the
    panel's words appear in it; that is expected, because it is not part of the shipped game.)
 2. Replace `public/game/rampage/css/` and `public/game/rampage/js/` with the ZIP's (delete the old folders first, so removed
-   files go away). There are six stylesheets, in this order: `style.css`, `polish.css`, `campus.css`, `townlife.css`,
-   `gearpage.css`, `phone.css`; `index.html` links them.
+   files go away). The ZIP holds one stylesheet, `css/game-<hash>.css` (the six source stylesheets joined in order), and the scripts as
+   `js/game-1-<hash>.js` and so on; `index.html` links them in order. Serve them with gzip or brotli, and they may be cached for a long time
+   (a new version has new names); do not cache `index.html` for long.
 3. Rebuild `public/game/rampage/index.html` as: the ZIP's `index.html` lines 1 to 3 (up to `<head>`), then the bridge script
    (kept from the current hosted file, **updated as described in section 4** if the save format changed), then the rest of the
-   ZIP's `index.html` from line 4. Keep every `<script src>` as a separate, ordered tag (section 3); never concatenate them.
+   ZIP's `index.html` from line 4. Keep every `<script src>` and the stylesheet `<link>` exactly as the ZIP has them, in the same order.
    Keep the HTML body exactly (the canvas, `#hud`, `#touch`, `#pausebtn`, `#overlay`).
-4. Keep `js/core/45-test-exports.js` (`window.GR`) and `js/core/01b-savepack.js` (`window.GRSave`) exactly as given.
+4. Keep `window.GR` (from `js/core/45-test-exports.js`) and `window.GRSave` (from `js/core/01b-savepack.js`) working: they sit inside the joined files, so keep those files exactly as given.
 5. Run the checks in section 9.
 
 ---
 
 ## 3. The files, in load order
 
-The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
+This list is of the **source** files, which the ZIP no longer contains one by one (the build joins them into a few files in exactly this order and
+minifies them; the folder names are only for finding things). The scripts are loaded in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/core/46-main.js`, which starts the
 game. This is the complete list for this version (192 scripts; the developer panel is the one you must skip).
 
