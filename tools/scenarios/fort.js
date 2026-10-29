@@ -197,13 +197,20 @@
     begin(); fortChaos(12500, P.x, P.y, ''); G.ft.wrecked = 3; var rep = runReport(0, 0); var rh = runReportHTML({ report: rep }, false); out.report = rep.ftChaos === 12500 && rep.ftTier === 2 && /Chaos <b[^>]*>(12,?500|12\.5k)<\/b>/.test(rh) && /Mayhem/.test(rh) && /3 things wrecked/.test(rh);
     /* a run saved part-way keeps the chaos */
     begin(); fortChaos(777, P.x, P.y, ''); var snap = runSnapshot(); out.snapChaos = snap.ftChaos === 777 && validRunSave(snap); startRun(COUNTER_CHAPTER, snap.wave, snap); steps(2); out.snapRestore = !!G.ft && G.ft.chaos === 777 && G.ft.tier === ftTierOf(777) && FT.all.length === FT_PLAN.length;
+    /* the detail layer: every kind draws its small parts, a ruin and the ground draw theirs, and none of it throws */
+    begin(); var dtOk = typeof ftDetail === 'function' && typeof ftGroundDetail === 'function' && typeof ftRuinDetail === 'function', dcv = document.createElement('canvas'); dcv.width = 400; dcv.height = 300; var dc = dcv.getContext('2d'), kindsSeen = {};
+    FT.all.forEach(function(b){ kindsSeen[b.kind] = 1; try { dc.setTransform(1, 0, 0, 1, -b.x, -b.y); ftDetail(dc, b, 1); } catch (e) { dtOk = false; out.detailErr = b.kind + ': ' + e.message; } });
+    var rb = bk('barracks', 0); kill(rb); try { dc.setTransform(1, 0, 0, 1, -rb.x, -rb.y); ftRuinDetail(dc, rb, 1); ftGroundDetail(dc, 0, 0, 1600, 900); } catch (e2) { dtOk = false; out.detailErr = 'ruin: ' + e2.message; }
+    out.detail = dtOk && Object.keys(kindsSeen).length >= 15 && typeof FD_KIND === 'object' && Object.keys(FD_KIND).length >= 18;
+    out.detailLooks = FORT_KIT_LOOKS_OK();
     /* an old save, with none of the new fields, still loads */
     freshSave(); delete Save.data.chapter17Complete; delete Save.data.fortBadges; delete Save.data.fortChaosBest; delete Save.data.fortBestWave; Save.write(); Save.load(); out.oldSave = Save.data.chapter17Complete === false && Save.data.fortBadges === 0;
   } catch (e) { out.err = String(e && e.stack || e); }
+  function FORT_KIT_LOOKS_OK(){ var n = 0; for (var k in FORT_DRAW) if (/^ft_/.test(k)) n++; return n >= 17 && (typeof dt_wrap === 'function'); }
   var need = ['table', 'bossWaves', 'harder', 'cast', 'bestiary', 'uniqueLooks', 'flyers', 'saveDefault', 'saveSane', 'ward', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'menuFilm', 'starts', 'spawns', 'hud',
     'bld', 'kinds', 'inside', 'noClash', 'reachAll', 'gatesOpen', 'startOpen', 'turretsOpen', 'fell', 'combo', 'comboEnds', 'score', 'hurt', 'shotDown', 'kickDown', 'tiers', 'tier3', 'tierTop', 'badgeOnce',
     'squadA', 'squadB', 'full', 'fullBonus', 'decay', 'relax', 'caps', 'fuse', 'boom', 'chain', 'safe', 'rubbleFire', 'turretAims', 'turretFires', 'hacking', 'hacked', 'allyShoots', 'burnsOut', 'mended', 'turretShotDown',
-    'lightOn', 'spotted', 'dark', 'noSpot', 'backAgain', 'allAgain', 'notTrapped', 'payout', 'aiOk', 'bossOk', 'films', 'noEndCard', 'finish', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'lastWave', 'endFilm', 'endVictory', 'victoryText2', 'gallery', 'report', 'snapChaos', 'snapRestore', 'oldSave'];
+    'lightOn', 'spotted', 'dark', 'noSpot', 'backAgain', 'allAgain', 'notTrapped', 'payout', 'aiOk', 'bossOk', 'films', 'noEndCard', 'detail', 'detailLooks', 'finish', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'lastWave', 'endFilm', 'endVictory', 'victoryText2', 'gallery', 'report', 'snapChaos', 'snapRestore', 'oldSave'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);

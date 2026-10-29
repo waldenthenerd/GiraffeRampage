@@ -125,6 +125,7 @@ function drawGroundFort(ctx, cx, cy, vw, vh){
     ctx.fillStyle = 'rgba(20,18,12,.4)'; ctx.fillRect(L[0] - 6, L[1] - 6, L[2] + 12, L[3] + 12); ctx.fillStyle = ftPattern(L[4]); ctx.fillRect(L[0], L[1], L[2], L[3]);
   }
   ftDecor(ctx, x0, y0, x1, y1, t);
+  ftGroundDetail(ctx, x0, y0, x1, y1);
   ftDrawWall(ctx, x0, y0, x1, y1, t);
 }
 /* what changes (the buildings, the guns, the beams) is drawn live over the ground every frame: the ground itself, which holds still, may be kept in tiles (js/core/44ca-ground-cache.js) */
@@ -328,6 +329,7 @@ function ftDrawBuilding(ctx, b, t){
     ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.arc(x + w / 2 + 6, y + h / 2 + 8, 22, 0, TAU); ctx.fill(); ctx.fillStyle = '#6A6E5A'; ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, 22, 0, TAU); ctx.fill(); ctx.fillStyle = '#C8CCD4'; ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, 7, 0, TAU); ctx.fill();
     ctx.fillStyle = '#C8402A'; ctx.beginPath(); ctx.moveTo(x + w / 2, y + h / 2 - 3); for (let i = 0; i <= 8; i++) ctx.lineTo(x + w / 2 + i * 6, y + h / 2 - 3 + Math.sin(t * 4 + i * 0.8) * 4); for (let i = 8; i >= 0; i--) ctx.lineTo(x + w / 2 + i * 6, y + h / 2 + 12 + Math.sin(t * 4 + i * 0.8) * 4); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#F2EEDC'; ctx.fillRect(x + w / 2 + 8, y + h / 2 + 2, 28, 4);
   }
+  ftDetail(ctx, b, t);
   ftDamage(ctx, b, t);
   if (b.hp < b.maxHp * 0.99) ftBar(ctx, b);
 }
@@ -357,6 +359,7 @@ function ftDrawRuin(ctx, b, t){
   for (let i = 0; i < b.rubble.length; i++){ const r = b.rubble[i]; ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(r.rot); ctx.fillStyle = r.c; ctx.fillRect(-r.s / 2, -r.s / 3, r.s, r.s * 0.66); ctx.restore(); }
   ctx.strokeStyle = 'rgba(120,70,40,.8)'; ctx.lineWidth = 1.6; ctx.beginPath(); for (let i = 0; i < 4; i++){ const r = b.rubble[i * 3 % b.rubble.length]; ctx.moveTo(r.x, r.y); ctx.quadraticCurveTo(r.x + 10, r.y - 8, r.x + 18, r.y + 4); } ctx.stroke();
   if (b.fire > 0 && b.expl){ const fl = 0.6 + 0.4 * Math.sin(t * 10 + b.idx); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = 'rgba(255,130,40,' + (0.4 * fl * Math.min(1, b.fire)).toFixed(2) + ')'; ctx.beginPath(); ctx.arc(b.x + b.w / 2, b.y + b.h / 2, Math.min(b.w, b.h) * 0.4, 0, TAU); ctx.fill(); ctx.globalCompositeOperation = 'source-over'; }
+  ftRuinDetail(ctx, b, t);
 }
 
 /* the colour of a building on the minimap (js/ui/44zzzj-minimap.js): rubble is dark, things that blow up are orange, the guns red until hacked, the lights yellow while they have power */
