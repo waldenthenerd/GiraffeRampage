@@ -296,7 +296,7 @@ const Save = {
   reset(){
     /* erasing progress keeps the player's own settings: volumes, controls, accessibility */
     const keep = {}, old = this.data || {};
-    ['muted', 'autoKick', 'aimMode', 'showGear', 'hitFlash', 'musicVol', 'sfxVol', 'ambVol', 'levelGap', 'autoPerf', 'autoPause', 'touchLeft', 'touchScale', 'fxLevel', 'keys', 'speedMode', 'speedLevel', 'calmFlash', 'npcVoice', 'textScale', 'autoBread', 'inputMode'].forEach(function(k){ if (old[k] !== undefined) keep[k] = old[k]; });
+    ['muted', 'autoKick', 'aimMode', 'showGear', 'hitFlash', 'musicVol', 'sfxVol', 'ambVol', 'levelGap', 'autoPerf', 'autoPause', 'touchLeft', 'touchScale', 'fxLevel', 'keys', 'speedMode', 'speedLevel', 'calmFlash', 'npcVoice', 'textScale', 'autoBread', 'inputMode', 'minimap', 'mmSize', 'mmZoom'].forEach(function(k){ if (old[k] !== undefined) keep[k] = old[k]; });
     this.data = Object.assign(freshSave(), { meta: {}, gear: {}, equipped: { cape: null, weapon: null, armor: null }, equippedTrinkets: [], ants: { soldier: 0, distractor: 0, shooter: 0 }, bestiary: { creatures: {}, cards: {} }, venusUp: {}, hintsSeen: {} }, keep);
     this.write();
   }

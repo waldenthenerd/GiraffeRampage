@@ -182,6 +182,7 @@ function showSettings(){
         sliderRowHTML('setFlash', 'Hit flash', 'How white enemies flash when struck.', pct(s.hitFlash)) +
         toggleRowHTML('s-calm', 'Reduce flashes', 'Softens full-screen flashes, lightning and bright bursts.', !!s.calmFlash) +
         toggleRowHTML('s-text', 'Text size', 'Makes menus and the HUD larger.', (s.textScale | 0) > 0, ['Normal', 'Large', 'Larger'][s.textScale | 0], 'Normal') +
+        (typeof mmSettingsHTML === 'function' ? mmSettingsHTML() : '') +
         '<div class="sub" style="margin:14px 0 2px;font-weight:700;color:var(--sun)">Controls</div>' +
         toggleRowHTML('s-input', 'How you play', 'Touch screen, or keyboard and mouse. The tips and buttons on screen follow this.', !!Input.hasTouch, 'Touch', 'Keyboard & mouse') +
         '<div class="sub" style="margin:14px 0 2px;font-weight:700;color:var(--sun)">Touch controls</div>' +
@@ -213,6 +214,7 @@ function showSettings(){
   }
   wireSlider('setFlash', function(v){ s.hitFlash = v; });
   wireSlider('setTouch', function(v){ s.touchScale = v; applyTouchLayout(); }, 0.5);
+  if (typeof mmWireSettings === 'function') mmWireSettings();
 }
 function applyTouchLayout(){
   const sc = clamp(Settings.touchScale, 0.5, 1) * 1.0;

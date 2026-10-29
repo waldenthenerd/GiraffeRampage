@@ -262,6 +262,7 @@ function handleAction(a){
     case 's-npcvoice': Settings.npcVoice = Settings.npcVoice === false; Settings.save(); SFX.click(); if (Settings.npcVoice && typeof NPCVoice !== 'undefined') NPCVoice.demo('mayor'); showSettings(); break;
     case 's-calm': Settings.calmFlash = !Settings.calmFlash; Settings.save(); SFX.click(); showSettings(); break;
     case 's-text': Settings.textScale = ((Settings.textScale | 0) + 1) % 3; applyTextScale(); Settings.save(); SFX.click(); showSettings(); break;
+    case 's-minimap': Settings.minimap = mmOn() ? 'off' : 'on'; Settings.save(); SFX.click(); showSettings(); break;
     case 's-bread': Settings.autoBread = Settings.autoBread === false; Settings.save(); SFX.click(); showSettings(); break;
     case 's-autopause': Settings.autoPause = !Settings.autoPause; Settings.save(); SFX.click(); showSettings(); break;
     case 's-input': Settings.inputMode = Input.hasTouch ? 'mouse' : 'touch'; applyInputMode(); Settings.save(); SFX.click(); showSettings(); break;
