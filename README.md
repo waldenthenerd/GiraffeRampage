@@ -54,16 +54,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 193 | 61,078 | 4.80 MiB (5,035,253 bytes) |
+| JavaScript (`js/`) | 195 | 61,804 | 4.91 MiB (5,145,996 bytes) |
 | Styles (`css/`) | 6 | 1,763 | 161 KiB (164,378 bytes) |
-| Page (`index.html`) | 1 | 243 | 12.3 KiB (12,620 bytes) |
-| **Whole game** | **200** | **63,084** | **4.97 MiB (5,212,251 bytes)** |
+| Page (`index.html`) | 1 | 245 | 12.4 KiB (12,726 bytes) |
+| **Whole game** | **202** | **63,812** | **5.08 MiB (5,323,100 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **62,485 lines, 4.93 MiB (5,165,451 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 193 | 61,078 | 4.80 MiB (5,035,253 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **63,213 lines, 5.03 MiB (5,276,300 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 195 | 61,804 | 4.91 MiB (5,145,996 bytes) |
 | Styles (`css/`) | 6 | 1,763 | 161 KiB (164,378 bytes) |
-| Page (`index.html`) | 1 | 243 | 12.3 KiB (12,620 bytes) |
-| **Whole game** | **200** | **63,084** | **4.97 MiB (5,212,251 bytes)** |
+| Page (`index.html`) | 1 | 245 | 12.4 KiB (12,726 bytes) |
+| **Whole game** | **202** | **63,812** | **5.08 MiB (5,323,100 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -149,6 +149,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/art/35i-art-domes.js` | 95 | Enemy art, Chapter 13.5 (`DOME_DRAW`): The Thawed, a polar bear half way through melting, and The Ice Heart, a crystal giant round a glowing heart of cold. |
 | `js/art/35j-art-tower.js` | 279 | Enemy art, Chapter 14 (`TOWER_DRAW`): a lab rat with plates screwed on and a cable tail, a walking staple, a parcel drone, an office chair with a rocket, a copier on legs, a safe on fists, a mutated intern in a tie, a shredder with toothed rollers, a camera orb with a red lens, a plug-headed cable, a rack with a nest of mites, a swollen battery; and the five bosses (a reception desk on spider legs with a headset and a bell, a manager in a navy suit with a clipboard, a bank-vault door with a wheel that opens on gold, a lab coat with syringe arms, and an executive with a golden pen and a glowing vial in his pocket). |
 | `js/art/35k-art-siege.js` | 163 | **Enemy art, Chapter 15** (`SIEGE_DRAW`): twelve ordinary kinds (Patrol Bot, Glimmer Maggot, Skitter Drone, Raptor Bot, Dozer Bot, Spotter Drone, Glimmerhorn, Rockhurler, Sapper Bot, Glassfang, Torch Bot, Gnawer) and five bosses (the Scrap Walker, Brood Queen, Battering Ram, Hive Carrier, Warden), drawn from above facing +x with the Tower art's helpers. |
+| `js/art/35l-art-detail.js` | 562 | **Enemy art, detail layer** (Chapters 13.5, 14, 15): wraps each creature's drawing (`dt_wrap`) with many small extra parts, drawn under and over the original: bolts and seams, vents, lamps, jointed legs, toes and claws, cables, fur and frost. The Domes' ordinary creatures get frost only when they are the glimmered `d.dome` kinds, so the Arctic stays as it was. Ordinary creatures stay in the sprite cache. |
+| `js/art/35m-art-detail-classic.js` | 164 | **Enemy art, detail layer for Chapters 1 to 13**: wraps `drawEnemyBody` and adds many small parts to every creature of the first thirteen chapters, from ten families (fur, feathers, scales, amphibian skin, insect plates, fish, machines, troopers, ember and dust creatures). `DT_SPEC` says where each creature's body is; each creature's own drawing is read once into a small mask so parts sit on the creature and its real outline. Ordinary creatures stay in the sprite cache. |
 | `js/scenery/36a-scenery-core.js` | 186 | Scenery system: large ground patches, themed props and landmarks, ground decals, ambient life and light gameplay terrain, per chapter. |
 | `js/render/36-atmosphere.js` | 296 | Light, weather and depth: per-chapter base weather, time of day, night, fog, the intro card. |
 | `js/render/36i-lighting.js` | 253 | Lighting: per-chapter color grade (GRADE), the sun and soft shadows (`softShadow`), light pools around bright things (PROP_LIGHT, PICKUP_LIGHT), sun shafts, ocean caustics. |
