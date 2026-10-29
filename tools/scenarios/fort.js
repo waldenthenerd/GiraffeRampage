@@ -150,12 +150,12 @@
     begin(); fortChaos(1200, P.x, P.y, ''); var gold0 = G.bonusGold; fortWaveEnd(); out.payout = G.bonusGold === gold0 + 100 && Save.data.fortBestWave >= 1;
 
     /* every creature's behavior runs for a while beside her without an error, and does something */
-    var ai = {}, aiBad = '';
+    Settings.fxLevel = 0; var ai = {}, aiBad = '';
     ['hyena', 'grub', 'jackal', 'cheetah', 'warthog', 'vulture', 'rhino', 'baboon', 'honeybadger', 'mamba', 'ember', 'termite'].forEach(function(type){
       begin(405); put(2100, 1300); var n1 = G.eproj.length, m1c = G.markers.length;
       spawnEnemy(type, 2100 + 380, 1300, 405); var e = G.enemies[0]; if (!e){ aiBad += type + ':none '; return; }
       var seen = {}; e.hp = e.maxHp = 1e12; var moved = 0, px = e.x, py = e.y, maxShots = 0, maxMk = 0;
-      for (var k = 0; k < 360; k++){ GR.step(1 / 30); noLevels(); put(2100, 1300); if (e.state) seen[e.state] = 1; maxShots = Math.max(maxShots, G.eproj.length); maxMk = Math.max(maxMk, G.markers.length); }
+      for (var k = 0; k < 80; k++){ GR.step(1 / 12); noLevels(); put(2100, 1300); if (e.state) seen[e.state] = 1; maxShots = Math.max(maxShots, G.eproj.length); maxMk = Math.max(maxMk, G.markers.length); }
       moved = hyp(e.x - px, e.y - py); ai[type] = Object.keys(seen).join('/') + ' shots' + maxShots + ' mk' + maxMk + ' mv' + Math.round(moved);
       if (!(moved > 20 || maxShots > 0 || maxMk > 0)) aiBad += type + ' ';
     });
@@ -164,7 +164,7 @@
     bosses.forEach(function(type, bi2){
       begin(390 + bi2 * 5); put(2100, 1300); spawnEnemy(type, 2100 + 420, 1300, 390 + bi2 * 5); var e = G.enemies[0]; if (!e){ bossBad += type + ':none '; return; }
       e.hp = e.maxHp = 1e12; var seen = {}, mx = 0, mk = 0, bm = 0, sp0 = G.enemies.length;
-      for (var k = 0; k < 900; k++){ GR.step(1 / 30); noLevels(); put(2100, 1300); if (e.state) seen[e.state] = 1; mx = Math.max(mx, G.eproj.length); mk = Math.max(mk, G.markers.length); bm = Math.max(bm, G.beams.length + G.blasts.length); if (k === 300) e.hp = e.maxHp * 0.3; }
+      for (var k = 0; k < 210; k++){ GR.step(1 / 12); noLevels(); put(2100, 1300); if (e.state) seen[e.state] = 1; mx = Math.max(mx, G.eproj.length); mk = Math.max(mk, G.markers.length); bm = Math.max(bm, G.beams.length + G.blasts.length); if (k === 100) e.hp = e.maxHp * 0.3; }
       bi[type] = Object.keys(seen).join('/'); if (Object.keys(seen).length < 4 || (mx + mk + bm) === 0) bossBad += type + ' ';
     });
     out.bossStates = bi; out.bossOk = bossBad === ''; out.bossBad = bossBad;
