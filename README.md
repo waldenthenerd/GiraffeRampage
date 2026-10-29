@@ -54,16 +54,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 198 | 62,276 | 4.95 MiB (5,189,876 bytes) |
+| JavaScript (`js/`) | 198 | 62,304 | 4.95 MiB (5,193,685 bytes) |
 | Styles (`css/`) | 6 | 1,763 | 161 KiB (164,378 bytes) |
 | Page (`index.html`) | 1 | 248 | 12.6 KiB (12,885 bytes) |
-| **Whole game** | **205** | **64,287** | **5.12 MiB (5,367,139 bytes)** |
+| **Whole game** | **205** | **64,315** | **5.12 MiB (5,370,948 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **63,688 lines, 5.07 MiB (5,320,339 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 198 | 62,276 | 4.95 MiB (5,189,876 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **63,716 lines, 5.08 MiB (5,324,148 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 198 | 62,304 | 4.95 MiB (5,193,685 bytes) |
 | Styles (`css/`) | 6 | 1,763 | 161 KiB (164,378 bytes) |
 | Page (`index.html`) | 1 | 248 | 12.6 KiB (12,885 bytes) |
-| **Whole game** | **205** | **64,287** | **5.12 MiB (5,367,139 bytes)** |
+| **Whole game** | **205** | **64,315** | **5.12 MiB (5,370,948 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -278,7 +278,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/siege/44zzzg-siege-ai.js` | 197 | **The Siege's behaviors**: `SIEGE_AI_COMMON` (the Patrol Bot and Glassfang lunge, the Raptor Bot sprints, the Glimmerhorn charges, the Skitter Drone circles and dives, the Spotter Drone and Rockhurler shoot from a distance, the Torch Bot breathes fire) and `SIEGE_BOSS_AI` (the Scrap Walker stamps, fires and sweeps beams; the Brood Queen lays maggots, spits and pools acid; the Battering Ram winds up and charges, stunned by a wall; the Hive Carrier launches drones and drops bombs; the Warden has three phases of barrage, beams and stamps). |
 | `js/siege/44zzzh-siege-events.js` | 302 | **The Siege's set pieces and story**: eight ordinary waves are events (`SIEGE_EVENTS`: Blackout with a dark ring and searchlights, the Hatch, Drones, Two fronts, which reshape the wave and move where it arrives), a supply crate in each district (`SG_CRATES`: sandbags, ammunition, a medic, floodlights, a missile strike), the scars (craters, scorch, soot, cracks and fires) the town collects, the bosses' attacks on the buildings (`sgCollateral`, `sgAcidOn`, `sgBombRun`, the Warden's `siegeJam`) and the radio (`sgSay`). `siegeFinishSave` is wrapped to note the wrecked keys and scars for the morning-after film (`G.sgFilm`). |
 | `js/siege/44zzzi-siege-rewards.js` | 184 | **What holding the town pays**: each key building's unbroken streak and the gifts at ten and twenty-five waves (`SG_REWARD`: the coat color Hall Crimson, a card reroll, 5% off Upgrades, gems, more health), the twenty named militia giraffes who keep kills and ranks between runs (`SG_RANKS`: faster fire, tougher, a second chance), and the two boon crates after waves 10 and 20 (`SG_BOONS`). |
-| `js/ui/44zzzj-minimap.js` | 105 | **The minimap.** A small map of the arena in the bottom-right corner (on a computer; on a phone it is an opt-in in Settings, above the buttons). Follows the chapter: its ground colour, mud / ice / drift / heat patches, waterhole, landmarks, buildings (the Tower redraws per floor, the Siege colours key buildings by health and marks wrecked ones), the Space Center rocket. Creatures are faint dots, bosses bigger and pulsing, and a boss off the zoomed map gets an arrow on the edge. Settings: `minimap` ('auto' / 'on' / 'off'), `mmSize` and `mmZoom` (0 to 1; 120 to 400 px, 1x to 4x), with rows added to `showSettings`. |
+| `js/ui/44zzzj-minimap.js` | 133 | **The minimap.** A small map of the arena in the bottom-right corner (on a computer; on a phone it is an opt-in in Settings, above the buttons). Follows the chapter: its ground colour and the soft ground patches it is painted with, a faint grid, mud / ice / drift / heat patches, waterhole, props and landmarks (each in the colour of its own drawing), buildings (the Tower redraws per floor, the Siege colours key buildings by health and marks wrecked ones), the Space Center rocket. Creatures are bright dots on a dark halo (elites gold squares), bosses a red target with a white ring, and a boss off the zoomed map gets an arrow on the edge. Settings: `minimap` ('auto' / 'on' / 'off'), `mmSize` and `mmZoom` (0 to 1; 120 to 400 px, 1x to 4x), with rows added to `showSettings`. |
 | `js/core/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/dev/45b-dev-panel.js` | 599 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/core/46-main.js` | 5 | Starts the game. |
