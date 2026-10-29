@@ -1,4 +1,4 @@
-/* enemy-detail: the detail layer (js/art/35l-art-detail.js) on the creatures of Chapters 13.5, 14 and 15.
+/* enemy-detail: the detail layers (js/art/35l-art-detail.js for Chapters 13.5, 14 and 15, js/art/35m-art-detail-classic.js for Chapters 1 to 13) on every creature.
    Every creature draws without an error in each of its states; the ordinary ones are still taken by the sprite cache (so the extra parts cost nothing per frame), and no creature's live
    drawing is slower than a generous budget. The gallery (tools/enemy-gallery.html?ch=14|15|16) shows the pictures. */
 (function(){
@@ -8,7 +8,7 @@
   var cv = document.createElement('canvas'); cv.width = cv.height = 400; var c = cv.getContext('2d');
   var states = ['idle', 'wind', 'dash', 'lunge', 'slam', 'charge', 'chargewind', 'launch', 'bombwind', 'lobwind', 'burn', 'stompwind', 'cannonwind', 'barragewind', 'roar', 'shardwind', 'novawind', 'slump', 'ring', 'meeting'];
   var ordinary = 0, cached = 0, total = 0;
-  [14, 15, 16].forEach(function(ch){
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].forEach(function(ch){
     var table = GR.bestiaryTable(ch), names = Object.keys(table), n = 0;
     names.forEach(function(type){
       var def = table[type], e = { portrait: false, def: def, type: type, x: 0, y: 0, r: def.r, ang: 0, flash: 0, state: 'idle', anim: 1.2, hp: 1, maxHp: 1, big: def.big, kx: 0, ky: 0, stunT: 0, burnT: 0, slowT: 0, slowMul: 1, p2: true, glow: 0.5, phase: 1, open: 0.5 };
@@ -32,5 +32,5 @@
   var rep = EnemySprite.report(), bad = [];
   for (var key in rep) if (/(^|\W)(tw_|sg_)/.test(key) && !/boss/.test(key)) bad.push(key + ': ' + JSON.stringify(rep[key]));
   res.total = total; res.errors = errs.slice(0, 5); res.slow = slow; res.cacheWhy = bad.slice(0, 6);
-  QA.done({ res: res, pass: total === 14 + 17 + 17 && errs.length === 0 && slow.length === 0 });
+  QA.done({ res: res, pass: total === 276 && errs.length === 0 && slow.length === 0 });
 })();
