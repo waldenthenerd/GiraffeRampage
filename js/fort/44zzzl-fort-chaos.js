@@ -141,7 +141,7 @@ function fortHack(b){
 }
 function ftTrace(x1, y1, x2, y2, c){ G.ft.tracers.push({ x1: x1, y1: y1, x2: x2, y2: y2, t: 0.12, c: c }); }
 function fortTurretTick(b, dt){
-  const cx = b.x + b.w / 2, cy = b.y + b.h / 2, st = b.tState;
+  const ft = G.ft, cx = b.x + b.w / 2, cy = b.y + b.h / 2, st = b.tState;
   if (b.muzzle > 0) b.muzzle -= dt;
   if (st === 'hostile'){
     const dx = P.x - cx, dy = P.y - cy, d = Math.sqrt(dx * dx + dy * dy);
@@ -150,6 +150,7 @@ function fortTurretTick(b, dt){
       if (b.cd <= 0){ b.burst = 3; b.bt = 0.35; b.cd = 2.6 + Math.random() * 0.8; addMarker(cx, cy, 14, 0.35, '#FF5A4A', null); }
     } else b.cd = Math.max(b.cd, 0.8);
     if (b.burst > 0){ b.bt -= dt; if (b.bt <= 0){ b.bt = 0.16; b.burst--; b.muzzle = 0.08; const a = b.ang || 0; addEProj(cx + Math.cos(a) * 42, cy + Math.sin(a) * 42, Math.cos(a) * 470, Math.sin(a) * 470, 4, ftTurretDmg(), '#FF9A6A', { tracer: true, life: 2.2 }); sfx('spit', 0.06, cx, cy); } }
+    if (d < 300 && !ft.hackTip && !G.attract){ ft.hackTip = true; addText(cx, cy - 74, 'Stand beside a gun to hack it', '#9AF0C8', 15, false); }
     if (d < FT_HACK.reach && !G.attract){ b.hack = Math.min(1, b.hack + dt / FT_HACK.time); if (b.hack >= 1) fortHack(b); } else b.hack = Math.max(0, b.hack - dt * 0.8);
   } else if (st === 'ally'){
     b.allyT -= dt; b.cd2 -= dt;
@@ -218,6 +219,7 @@ function fortWaveStart(n){
     if (buildingAt(P.x, P.y)){ const p = towerOpenNear(P.x, P.y); P.x = p.x; P.y = p.y; }
     if (!G.attract && cw > 1) addText(P.x, P.y - 84, all ? 'The fort is rebuilt' : 'Fresh vehicles and guns roll in', '#FFE49A', 16, false);
   }
+  if (cw === 1 && !G.attract && !ft.tip1){ ft.tip1 = true; addText(P.x, P.y - 130, 'Wreck everything: every building is chaos', '#FFE49A', 17, true); }
 }
 const fortBaseStartWave = startWave;
 startWave = function(n){ const r = fortBaseStartWave.apply(this, arguments); if (chapterOf(n) === COUNTER_CHAPTER) fortWaveStart(n); return r; };
@@ -277,4 +279,20 @@ drawFeedbackOverlays = function(ctx){
     ctx.textAlign = 'center'; ctx.font = '800 11px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; ctx.fillStyle = '#FFF6D8'; ctx.fillText(best.name, clamp(ex, 56, W - 56), clamp(ey + 24, y0 + 112, G.H - 10));
   }
   ctx.restore();
+};
+
+/* ---- the run report says how much she wrecked, and at what level ---- */
+const fortBaseRunReport = runReport;
+runReport = function(){
+  const r = fortBaseRunReport.apply(this, arguments);
+  if (G.ft && G.chapter === COUNTER_CHAPTER){ r.ftChaos = G.ft.chaos | 0; r.ftTier = G.ft.tier; r.ftWrecked = G.ft.wrecked | 0; }
+  return r;
+};
+const fortBaseReportHTML = runReportHTML;
+runReportHTML = function(r, died){
+  const h = fortBaseReportHTML.apply(this, arguments), R = r && r.report;
+  if (!R || R.ftChaos === undefined) return h;
+  const T = R.ftTier >= 0 && FT_TIERS[R.ftTier] ? FT_TIERS[R.ftTier] : null;
+  const line = '<div class="rr-line">Chaos <b style="color:' + (T ? T.c : '#FFE49A') + '">' + fmt(R.ftChaos) + '</b>' + (T ? ' \u00b7 level <b style="color:' + T.c + '">' + T.n + '</b>' : '') + ' \u00b7 ' + R.ftWrecked + ' things wrecked.</div>';
+  return h.replace('<div class="rr-sub">', line + '<div class="rr-sub">').replace(/<\/div>$/, function(m){ return h.indexOf('<div class="rr-sub">') >= 0 ? m : line + m; });
 };

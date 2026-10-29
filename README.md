@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 204 | 63,703 | 5.10 MiB (5,352,785 bytes) |
+| JavaScript (`js/`) | 204 | 63,721 | 5.11 MiB (5,354,220 bytes) |
 | Styles (`css/`) | 6 | 1,764 | 161 KiB (164,407 bytes) |
 | Page (`index.html`) | 1 | 254 | 12.9 KiB (13,188 bytes) |
-| **Whole game** | **211** | **65,721** | **5.27 MiB (5,530,380 bytes)** |
+| **Whole game** | **211** | **65,739** | **5.28 MiB (5,531,815 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **65,120 lines, 5.23 MiB (5,483,398 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 204 | 63,703 | 5.10 MiB (5,352,785 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **65,138 lines, 5.23 MiB (5,484,833 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 204 | 63,721 | 5.11 MiB (5,354,220 bytes) |
 | Styles (`css/`) | 6 | 1,764 | 161 KiB (164,407 bytes) |
 | Page (`index.html`) | 1 | 254 | 12.9 KiB (13,188 bytes) |
-| **Whole game** | **211** | **65,721** | **5.27 MiB (5,530,380 bytes)** |
+| **Whole game** | **211** | **65,739** | **5.28 MiB (5,531,815 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -284,7 +284,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/siege/44zzzi-siege-rewards.js` | 184 | **What holding the town pays**: each key building's unbroken streak and the gifts at ten and twenty-five waves (`SG_REWARD`: the coat color Hall Crimson, a card reroll, 5% off Upgrades, gems, more health), the twenty named militia giraffes who keep kills and ranks between runs (`SG_RANKS`: faster fire, tougher, a second chance), and the two boon crates after waves 10 and 20 (`SG_BOONS`). |
 | `js/ui/44zzzj-minimap.js` | 134 | **The minimap.** A small map of the arena in the bottom-right corner (on a computer; on a phone it is an opt-in in Settings, above the buttons). Follows the chapter: its ground colour and the soft ground patches it is painted with, a faint grid, mud / ice / drift / heat patches, waterhole, props and landmarks (each in the colour of its own drawing), buildings (the Tower redraws per floor, the Siege colours key buildings by health and marks wrecked ones), the Space Center rocket. Creatures are bright dots on a dark halo (elites gold squares), bosses a red target with a white ring, and a boss off the zoomed map gets an arrow on the edge. Settings: `minimap` ('auto' / 'on' / 'off'), `mmSize` and `mmZoom` (0 to 1; 120 to 400 px, 1x to 4x), with rows added to `showSettings`. |
 | `js/fort/44zzzk-fort-map.js` | 370 | **Fort Shortneck in play**: the compound as the arena (`FT_PLAN`: hangar, radar, command bunker, helipad, armoury, fuel depot, ammo bunkers, barracks, mess, motor pool, gatehouses, glimmer plant, generators, searchlight towers and ten gun emplacements). Every one is a destructible building of Houston's kind with its own health and chaos value (`FT_KINDS`), solid for everyone until it falls (the nav maps are made again), drawn with the ground with scorch, cracks and flames as it is hurt and rubble when it is down. The perimeter wall, floodlights and the closed south gate. `ftMmColor` colors them on the minimap. |
-| `js/fort/44zzzl-fort-chaos.js` | 280 | **Chaos, the alarm and the fort's mechanics**: chaos and its combo (`FT_COMBO`), the eight chaos levels with their colors and gem badges (`FT_TIERS`, kept in `Save.data.fortBadges`), the alarm and its three squads (`FT_ALARM`), explosions and chain reactions (`fortExplode`), the hackable gun emplacements (`FT_HACK`), the searchlights and their generators (`FT_LIGHT`), the rebuild between waves, the wave payout, the chaos panel at the top of the screen and the arrow to the nearest big target. |
+| `js/fort/44zzzl-fort-chaos.js` | 298 | **Chaos, the alarm and the fort's mechanics**: chaos and its combo (`FT_COMBO`), the eight chaos levels with their colors and gem badges (`FT_TIERS`, kept in `Save.data.fortBadges`), the alarm and its three squads (`FT_ALARM`), explosions and chain reactions (`fortExplode`), the hackable gun emplacements (`FT_HACK`), the searchlights and their generators (`FT_LIGHT`), the rebuild between waves, the wave payout, the chaos panel at the top of the screen and the arrow to the nearest big target. |
 | `js/fort/44zzzm-fort-ai.js` | 254 | **The fort's behaviors** (`FORT_AI`): the twelve soldiers and machines (burst-firing guard, panicking cadet, lunging hound, ramming jeep and APC, shield-bashing riot trooper, bombing copter, mortar and grenade lobbers with marked patches, the sniper's laser, the pyro's flame, the medic's heal) and the five bosses with their phases. |
 | `js/core/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/dev/45b-dev-panel.js` | 601 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |

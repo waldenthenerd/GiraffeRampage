@@ -30,6 +30,7 @@
       else if (V === 'badge'){ fortChaos(+QA.params.chaos || 7200, P.x, P.y, ''); steps(+QA.params.steps || 20); }
       else if (V === 'ruins'){ ['hangar', 'radar', 'bunker', 'barracks', 'mess', 'garage', 'plant', 'armoury'].forEach(function(k){ FT.all.filter(function(b){ return b.kind === k; }).forEach(function(b){ damageBuilding(b, b.maxHp * (k === 'plant' ? 0.55 : 0.8), 'kick'); }); }); FT.all.filter(function(b){ return b.kind === 'garage' || b.kind === 'mess'; }).forEach(kill); G.ft.quiet = 99; steps(+QA.params.steps || 40); }
       else if (V === 'menu'){ G.state = 'menu'; Save.data.chapter16Complete = true; setMenuChapter(17); showMenu(); for (var mm = 0; mm < 4; mm++) GR.step(1 / 30); drawMenuPreview(); }
+      else if (V === 'bestiary'){ G.state = 'menu'; Object.keys(ETYPES_FORT).forEach(function(k){ recordBestiaryKill({ type: k, def: ETYPES_FORT[k], waveRef: 390, big: !!ETYPES_FORT[k].big }); }); showBestiary(17); for (var bb = 0; bb < 4; bb++) GR.step(1 / 30); }
       else if (V === 'film'){ G.state = 'playing'; startCutscene(function(){}, false, QA.params.kind || 'fortflight'); for (var fs = 0; fs < 90; fs++){ G.cut.t = 1; GR.step(1 / 30); } G.cut.t = +QA.params.t || 1; GR.step(1 / 600); }
       out.view = V; QA.done(out); return;
     }
@@ -182,8 +183,18 @@
     out.ach0 = !!ach('ch16') && ach('ch16').val() === 0 && ach('fortchaos').val() === 0 && ach('fortall').val() === 0;
     Save.data.chapter17Complete = true; Save.data.fortBadges = 255; out.ach = out.ach0 && ach('ch16').val() === 1 && ach('fortchaos').val() === 6 && ach('fortall').val() === 1;
     Save.reset(); out.coLocked = coChapters().indexOf(17) < 0 && CO_CHAPTERS.length === 17; Save.data.chapter16Complete = true; out.coOpen = coChapters().indexOf(17) >= 0;
-    coStart('arena', 17); steps(40); out.together = Co.on && G.chapter === COUNTER_CHAPTER && G.biome === 'fort' && G.tower === true && G.buildings.length === FT_PLAN.length && !!G.ft;
+    coStart('arena', 17); steps(40); out.together = Co.on && G.chapter === COUNTER_CHAPTER && G.biome === 'fort' && G.tower === true && G.buildings.length === FT_PLAN.length && !!G.ft; coEnd(true); steps(2);
 
+    /* the last wave: the flag is saved, the film plays, and the victory report says what she wrecked; the film is in the gallery and says nothing about the end of the game */
+    freshSave(); startRun(COUNTER_CHAPTER, 410); steps(10); G.introFX = null; G.banner = null; godMode(); fortChaos(5000, P.x, P.y, '');
+    out.lastWave = G.wave === 410 && isChapterFinaleWave(410) && isRunEnd(410) === true;
+    G.spawnQueue = []; G.enemies.length = 0; G.bossAlive = false; G.waveState = 'clear'; G.waveTimer = 0.01; steps(3);
+    out.endFilm = G.state === 'cutscene' && !!G.cut && G.cut.kind === 'fortout' && Save.data.chapter17Complete === true;
+    G.cut.t = FT_OUT_T.END - 0.01; steps(60);
+    out.endVictory = G.state === 'victory' && Save.data.chapter17Complete === true && Save.data.chapter16Complete === true && wardUnlocked(51) === true;
+    G.chapter = COUNTER_CHAPTER; out.victoryText2 = /maker of the Warden/.test(victoryText(3, 4)) && !/the end|thanks for playing/i.test(victoryText(3, 4));
+    out.gallery = filmList().filter(function(x){ return x.kind === 'fortflight' || x.kind === 'fortout'; }).length === 2;
+    begin(); fortChaos(7200, P.x, P.y, ''); G.ft.wrecked = 3; var rep = runReport(0, 0); var rh = runReportHTML({ report: rep }, false); out.report = rep.ftChaos === 7200 && rep.ftTier === 2 && /Chaos <b[^>]*>7,?200<\/b>/.test(rh) && /Mayhem/.test(rh) && /3 things wrecked/.test(rh);
     /* a run saved part-way keeps the chaos */
     begin(); fortChaos(777, P.x, P.y, ''); var snap = runSnapshot(); out.snapChaos = snap.ftChaos === 777 && validRunSave(snap); startRun(COUNTER_CHAPTER, snap.wave, snap); steps(2); out.snapRestore = !!G.ft && G.ft.chaos === 777 && G.ft.tier === ftTierOf(777) && FT.all.length === FT_PLAN.length;
     /* an old save, with none of the new fields, still loads */
@@ -192,7 +203,7 @@
   var need = ['table', 'bossWaves', 'harder', 'cast', 'bestiary', 'uniqueLooks', 'flyers', 'saveDefault', 'saveSane', 'ward', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'menuFilm', 'starts', 'spawns', 'hud',
     'bld', 'kinds', 'inside', 'noClash', 'reachAll', 'gatesOpen', 'startOpen', 'turretsOpen', 'fell', 'combo', 'comboEnds', 'score', 'hurt', 'shotDown', 'kickDown', 'tiers', 'tier3', 'tierTop', 'badgeOnce',
     'squadA', 'squadB', 'full', 'fullBonus', 'decay', 'relax', 'caps', 'fuse', 'boom', 'chain', 'safe', 'rubbleFire', 'turretAims', 'turretFires', 'hacking', 'hacked', 'allyShoots', 'burnsOut', 'mended', 'turretShotDown',
-    'lightOn', 'spotted', 'dark', 'noSpot', 'backAgain', 'allAgain', 'notTrapped', 'payout', 'aiOk', 'bossOk', 'films', 'noEndCard', 'finish', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'snapChaos', 'snapRestore', 'oldSave'];
+    'lightOn', 'spotted', 'dark', 'noSpot', 'backAgain', 'allAgain', 'notTrapped', 'payout', 'aiOk', 'bossOk', 'films', 'noEndCard', 'finish', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'lastWave', 'endFilm', 'endVictory', 'victoryText2', 'gallery', 'report', 'snapChaos', 'snapRestore', 'oldSave'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);
