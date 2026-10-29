@@ -109,6 +109,7 @@ function showDebugPanel(){
           '<button class="btn ghost" data-a="debug-play14">Start Chapter 13.5 \u2014 the Domes</button>' +
           '<button class="btn ghost" data-a="debug-play15">Start Chapter 14 \u2014 the Tower</button>' +
           '<button class="btn ghost" data-a="debug-play16">Start Chapter 15 \u2014 the Siege</button>' +
+          '<button class="btn ghost" data-a="debug-play17">Start Chapter 16 \u2014 Fort Shortneck</button>' +
           '<button class="btn ghost" data-a="debug-cutscene-siegeflight">Play the siege arrival film<small>The helicopter brings her home to a town under attack. Keys 1\u20133 jump between its scenes</small></button>' +
           '<button class="btn ghost" data-a="debug-cutscene-siegeout">Play the morning after film<small>The end of Chapter 15: the wreck, the hatch, the drone. Keys 1\u20133 jump between its scenes</small></button>' +
           '<button class="btn ghost" data-a="debug-cutscene-towerflight">Play the tower arrival film<small>The helicopter comes in over New York. Keys 1\u20134 jump between its scenes</small></button>' +
@@ -202,6 +203,7 @@ function handleDebugAction(a){
     case 'debug-play14': SFX.click(); startRun(DOME_CHAPTER); break;
     case 'debug-play15': SFX.click(); startRun(TOWER_CHAPTER); break;
     case 'debug-play16': SFX.click(); startRun(SIEGE_CHAPTER); break;
+    case 'debug-play17': SFX.click(); startRun(COUNTER_CHAPTER); break;
     case 'debug-cutscene-towerflight': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'towerflight'); break;
     case 'debug-cutscene-towerout': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'towerout'); break;
     case 'debug-cutscene-siegeflight': SFX.click(); startCutscene(function(){ showDebugPanel(); }, true, 'siegeflight'); break;

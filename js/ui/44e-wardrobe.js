@@ -30,11 +30,13 @@ const WARD_TOWN = [['Brickwork', '#B5543C', 'pk_sw'], ['Sea Glass', '#7FD1C0', '
 /* 36 to 41: found out at sea, in the air and in the two villages (js/town/44zs-explore-rewards.js) */
 WARD_TOWN.push(['Jet Stream', '#8ED0F0', 'fl_sw'], ['Seafoam', '#6FD8B8', 'sea_sw1'], ['Coral Reef', '#F0707A', 'sea_sw2'], ['Cornfield', '#E8C44A', 'fm_sw1'], ['Harvest Orange', '#E8862A', 'fm_sw2'], ['Shell Pink', '#F4C4D0', 'is_sw1'], ['Gold Medal', '#E8B830', 'gym_gold']);
 WARD_TOWN.forEach(function(w){ WARD.push({ name: w[0], c: w[1] }); });
-const WARD_MAX = 50;                                    /* 43 to 45: the university ranks Graduate, Professor and Chancellor (js/campus/44zz-campus.js); 46: Frost Mylar, for finishing Chapter 13.5; 47: Executive Navy, for finishing Chapter 14; 48: Brass Button, for three stars in Rush Hour, the Tower's minigame */
+const WARD_MAX = 52;                                    /* 43 to 45: the university ranks Graduate, Professor and Chancellor (js/campus/44zz-campus.js); 46: Frost Mylar, for finishing Chapter 13.5; 47: Executive Navy, for finishing Chapter 14; 48: Brass Button, for three stars in Rush Hour, the Tower's minigame */
 function wardStarOf(n){ const s = Save.data && Save.data.mini && Save.data.mini.stars; return s ? (s[n === 48 ? TOWER_CHAPTER : n - 13] | 0) : 0; }
 function miniWardOf(ch){ return ch === TOWER_CHAPTER ? 48 : 13 + ch; }                 /* the coat color three stars in a chapter's minigame earn */
 function wardUnlocked(n){
   if (n === 0) return true;
+  if (n === 52) return !!(Save.data && (Save.data.fortBadges & 128));                                                       /* Calamity Gold: the top chaos badge in Fort Shortneck */
+  if (n === 51) return !!(Save.data && Save.data.chapter17Complete);                                                            /* Fort Camo: Chapter 16, the counter attack */
   if (n === 50) return !!(Save.data && Save.data.siegeBld && Save.data.siegeBld.hall && Save.data.siegeBld.hall.t >= 1);                    /* Hall Crimson: the Herd Hall held ten waves running in the Siege */
   if (n === 49) return !!(Save.data && Save.data.chapter16Complete);                                                            /* Town Watch: Chapter 15, the Siege */
   if (n === 48) return wardStarOf(48) >= 3;

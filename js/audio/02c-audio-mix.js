@@ -22,7 +22,8 @@ const MIX_ENV = {
   13: [0.08, 4200],     /* Mars: thin air */
   14: [0.30, 5200],     /* a dome: a big cold hall */
   15: [0.18, 6200],     /* an office tower: carpet and glass */
-  16: [0.22, 5600]      /* a town street under attack: stone, open sky */
+  16: [0.22, 5600],     /* a town street under attack: stone, open sky */
+  17: [0.20, 5200]      /* a fort: concrete, open yard */
 };
 const MIX_FOOT_BIOME = ['savanna', 'snow', 'swamp', 'ocean', 'jungle', 'city', 'space', 'moon', 'venus', 'area51', 'mars'];
 
@@ -297,7 +298,7 @@ Object.assign(SFX, {
     const b = this.abilityGain, v = (0.5 + 0.5 * Mix.fv) * (Mix.lr ? 1.06 : 0.94), bio = G.biome;
     const L = function(x){ return x * v; };
     switch (bio){
-      case 'snow': case 'dome': case 'tower': case 'siege':   this.burst(0.07, L(0.10), 3000 * v, 1500, 1, 0, 'bandpass', b); break;
+      case 'snow': case 'dome': case 'tower': case 'siege': case 'fort':   this.burst(0.07, L(0.10), 3000 * v, 1500, 1, 0, 'bandpass', b); break;
       case 'swamp':  this.burst(0.1, L(0.10), 500, 180, 0.9, 0, 'lowpass', b); this.tone('sine', 200 * v, 110, 0.08, L(0.04), 0, 0, b); break;
       case 'ocean':  this.burst(0.12, L(0.08), 1200, 400, 0.8, 0, 'lowpass', b); break;
       case 'jungle': this.burst(0.08, L(0.08), 2200, 900, 0.8, 0, 'bandpass', b); this.tone('sine', 120 * v, 70, 0.06, L(0.04), 0, 0, b); break;

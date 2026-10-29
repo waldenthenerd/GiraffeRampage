@@ -19,9 +19,10 @@ const ATMOS = {
   13: { base: [255, 120, 60, 0.10],               accent: '#FF9A5A', fog: [220, 120, 70],  fogA: 0.12, weather: 'storm' },
   14: { base: [150, 214, 255, 0.10],              accent: '#9FE8FF', fog: [200, 236, 255], fogA: 0.12, weather: 'snow' },          /* inside a dome: cold, still, a little snow that should not be there */
   15: { base: [255, 236, 190, 0.07],              accent: '#FFE49A', fog: [200, 200, 220], fogA: 0.05, weather: 'glints' },         /* an office tower at night: warm lamps, cool air, a few motes in the light */
-  16: { base: [255, 150, 90, 0.10],               accent: '#FFB070', fog: [150, 120, 110], fogA: 0.10, weather: 'embers' }          /* smoke and embers drifting over a town at dusk */
+  16: { base: [255, 150, 90, 0.10],               accent: '#FFB070', fog: [150, 120, 110], fogA: 0.10, weather: 'embers' },         /* smoke and embers drifting over a town at dusk */
+  17: { base: [255, 190, 110, 0.12],              accent: '#FFC866', fog: [120, 110, 100], fogA: 0.12, weather: 'embers' }          /* a fort at night under floodlights, smoke from what you have wrecked */
 };
-const BIOME_CHAPTER = { savanna: 1, snow: 2, swamp: 3, ocean: 4, jungle: 5, city: 6, space: 7, moon: 8, venus: 9, area51: 12, mars: 13, dome: 14, tower: 15, siege: 16 };
+const BIOME_CHAPTER = { savanna: 1, snow: 2, swamp: 3, ocean: 4, jungle: 5, city: 6, space: 7, moon: 8, venus: 9, area51: 12, mars: 13, dome: 14, tower: 15, siege: 16, fort: 17 };
 /* type: streak (a line along its motion), dot, glow (soft additive point) */
 const WEATHER_KINDS = {
   dust:     { n: 34,  type: 'streak', vx: 90,   vy: 6,    len: [14, 34], col: '230,210,160', a: 0.20 },

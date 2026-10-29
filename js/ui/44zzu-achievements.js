@@ -61,6 +61,9 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   add('ch15', R, 'Hold the Line', 'Clear Chapter 15, the Siege', 1, 50, function(){ return D().chapter16Complete ? 1 : 0; });
   add('siegeheld', R, 'A Town Worth Holding', 'Hold the town through 10 waves of the Siege', 10, 40, function(){ return Math.min(10, D().siegeHeldBest | 0); });
   add('siegeflaw', R, 'Not a Scratch', 'Hold the town through all 25 waves of the Siege, with no building wrecked', 1, 80, function(){ return D().siegeFlawless ? 1 : 0; });
+  add('ch16', R, 'Over the Wall', 'Clear Chapter 16, Fort Shortneck', 1, 60, function(){ return D().chapter17Complete ? 1 : 0; });
+  add('fortchaos', R, 'Disorderly Conduct', 'Reach the Havoc chaos level in Fort Shortneck', 6, 40, function(){ const b = D().fortBadges | 0; let n = 0; for (let i = 0; i < 8; i++) if (b & (1 << i)) n = i + 1; return Math.min(6, n); });
+  add('fortall', R, 'Calamity', 'Reach the top chaos level in Fort Shortneck', 1, 100, function(){ return (D().fortBadges | 0) & 128 ? 1 : 0; });
   add('home', R, 'Home Again', 'Fly the spaceplane home', 1, 20, function(){ return D().homecoming ? 1 : 0; });
   add('gold1m', R, 'Gold Hoarder', 'Hold 1,000,000 gold at once', 1e6, 10, function(){ return goldInt(D().gold); });
   add('gems500', R, 'Gem Cache', 'Hold 500 gems at once', 500, 10, function(){ return scoreInt(D().gems); });

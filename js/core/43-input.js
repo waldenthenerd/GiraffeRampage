@@ -280,6 +280,7 @@ function handleAction(a){
     case 'play11': SFX.click(); tryFullscreen(); startRun(11); break;
     case 'play12': SFX.click(); tryFullscreen(); startRun(12); break;
     case 'play13': SFX.click(); tryFullscreen(); startRun(13); break;
+    case 'play17': SFX.click(); tryFullscreen(); startCutscene(function(){ startRun(COUNTER_CHAPTER); }, false, 'fortflight'); break;        /* Chapter 16 opens with the climb over the wall */
     case 'play16': SFX.click(); tryFullscreen(); startCutscene(function(){ startRun(SIEGE_CHAPTER); }, false, 'siegeflight'); break;        /* Chapter 15 opens with the flight home, over the smoke */
     case 'play15': SFX.click(); tryFullscreen(); startCutscene(function(){ startRun(TOWER_CHAPTER); }, false, 'towerflight'); break;        /* Chapter 14 opens with the arrival at the tower */
     case 'play14': SFX.click(); tryFullscreen(); startCutscene(function(){ startRun(DOME_CHAPTER); }, false, 'domeflight'); break;        /* Chapter 13.5 opens with the helicopter film */

@@ -57,6 +57,7 @@ function startRun(startChapter, waveOverride, snap){
     else if (G.biome === 'dome') buildDomeWorld();
     else if (G.biome === 'tower') buildTowerWorld();
     else if (G.biome === 'siege') buildSiegeWorld();
+    else if (G.biome === 'fort') buildFortWorld();
   buildScenery();
   G.state = 'playing';
   if (forcedWave && chapterOf(forcedWave) === 13 && chapterWaveOf(forcedWave) > MARS_SWITCH_WAVE) G.marsShipsSeen = true;
@@ -208,8 +209,8 @@ function updateHUD(){
   hudTxt('hpTxt', Math.max(0, Math.ceil(P.hp)) + ' / ' + Math.round(P.maxHp));
   hudTxt('xpTxt', 'Level ' + P.level + (G.pendingLevels > 0 && G.levelGate > 0 ? ' \u00b7 ' + G.pendingLevels + ' to pick in ' + Math.ceil(G.levelGate) + 's' : ''));
   hudTxt('hWave', String(G.wave));
-  hudTxt('hChapter', G.chapter === SIEGE_CHAPTER ? 'CH.15 THE SIEGE' : G.chapter === TOWER_CHAPTER ? 'CH.14 THE TOWER' : G.chapter === DOME_CHAPTER ? 'CH.13.5 THE DOMES' : G.chapter === 13 ? 'CH.13 MARS' : G.chapter === 12 ? 'CH.12 AREA 51' : G.chapter === 11 ? 'CH.11 GLIMMER' : G.chapter === 10 ? 'CH.10 INFERNO' : G.chapter === 9 ? 'CH.9 VENUS' : G.chapter === 8 ? 'CH.8 THE MOON' : G.chapter === 7 ? 'CH.7 SPACE CENTER' : G.chapter === 6 ? 'CH.6 HOUSTON' : G.chapter === 5 ? 'CH.5 THE CANOPY' : G.chapter === 4 ? 'CH.4 THE DEEP' : G.chapter === 3 ? 'CH.3 MURKFEN' : G.chapter === 2 ? 'CH.2 FROSTREACH' : '');
-  hudCls('hChapter', 'chaptag' + (G.chapter === SIEGE_CHAPTER ? ' siege' : G.chapter === TOWER_CHAPTER ? ' tower' : G.chapter === DOME_CHAPTER ? ' dome' : G.chapter === 13 ? ' mars' : G.chapter === 12 ? ' a51' : G.chapter === 11 ? ' glim' : G.chapter === 10 ? ' inferno' : G.chapter === 9 ? ' venus' : G.chapter === 8 ? ' moon' : G.chapter === 7 ? ' space' : G.chapter === 6 ? ' city' : G.chapter === 5 ? ' jungle' : G.chapter === 4 ? ' ocean' : G.chapter === 3 ? ' swamp' : G.chapter === 2 ? ' snow' : ''));
+  hudTxt('hChapter', G.chapter === COUNTER_CHAPTER ? 'CH.16 FORT SHORTNECK' : G.chapter === SIEGE_CHAPTER ? 'CH.15 THE SIEGE' : G.chapter === TOWER_CHAPTER ? 'CH.14 THE TOWER' : G.chapter === DOME_CHAPTER ? 'CH.13.5 THE DOMES' : G.chapter === 13 ? 'CH.13 MARS' : G.chapter === 12 ? 'CH.12 AREA 51' : G.chapter === 11 ? 'CH.11 GLIMMER' : G.chapter === 10 ? 'CH.10 INFERNO' : G.chapter === 9 ? 'CH.9 VENUS' : G.chapter === 8 ? 'CH.8 THE MOON' : G.chapter === 7 ? 'CH.7 SPACE CENTER' : G.chapter === 6 ? 'CH.6 HOUSTON' : G.chapter === 5 ? 'CH.5 THE CANOPY' : G.chapter === 4 ? 'CH.4 THE DEEP' : G.chapter === 3 ? 'CH.3 MURKFEN' : G.chapter === 2 ? 'CH.2 FROSTREACH' : '');
+  hudCls('hChapter', 'chaptag' + (G.chapter === COUNTER_CHAPTER ? ' fort' : G.chapter === SIEGE_CHAPTER ? ' siege' : G.chapter === TOWER_CHAPTER ? ' tower' : G.chapter === DOME_CHAPTER ? ' dome' : G.chapter === 13 ? ' mars' : G.chapter === 12 ? ' a51' : G.chapter === 11 ? ' glim' : G.chapter === 10 ? ' inferno' : G.chapter === 9 ? ' venus' : G.chapter === 8 ? ' moon' : G.chapter === 7 ? ' space' : G.chapter === 6 ? ' city' : G.chapter === 5 ? ' jungle' : G.chapter === 4 ? ' ocean' : G.chapter === 3 ? ' swamp' : G.chapter === 2 ? ' snow' : ''));
   hudTxt('hSpeed', G.runSpeed ? '\u00d7' + runSpeedMul() + (G.runSpeedLevel === 3 ? ' ULTRAFAST' : G.runSpeedLevel === 2 ? ' HYPERSPEED' : ' SPEED') : '');
   /* the score and kill counters roll up to their new value instead of jumping */
   const sc = G._dispScore === undefined || G.score < G._dispScore ? G.score : G._dispScore + (G.score - G._dispScore) * 0.25;
