@@ -80,7 +80,7 @@ function giraffeFxUpdate(dt){
 
 /* a dark soft rim around her silhouette, strongest on the grounds she tends to blend into (gray snow, olive swamp, green
    jungle, ochre Venus, and the orange Inferno and Mars); drawPlayer() sets it as a canvas shadow for the length of her drawing. Returns [color, blur] or null. */
-const GIRAFFE_RIM = { 1: 0.3, 2: 0.75, 3: 0.65, 4: 0.4, 5: 0.7, 6: 0.3, 7: 0.3, 8: 0.3, 9: 0.6, 10: 0.9, 11: 0.4, 12: 0.3, 13: 0.9, 14: 0.8, 15: 0.5, 16: 0.7 };
+const GIRAFFE_RIM = { 1: 0.3, 2: 0.75, 3: 0.65, 4: 0.4, 5: 0.7, 6: 0.3, 7: 0.3, 8: 0.3, 9: 0.6, 10: 0.9, 11: 0.4, 12: 0.3, 13: 0.9, 14: 0.8, 15: 0.5, 16: 0.7, 17: 0.6 };
 function giraffeRim(){
   if (fxLevelNow() <= 0) return null;
   const k = GIRAFFE_RIM[G.chapter | 0] || 0.3;

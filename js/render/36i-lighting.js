@@ -23,7 +23,8 @@ const GRADE = {
   13: { tint: [255, 116, 66, 0.36],  vig: [66, 16, 4, 0.32],   shadow: [44, 12, 4],  sun: -2.4,  glow: 1.0 },
   14: { tint: [120, 200, 255, 0.34], vig: [6, 24, 48, 0.30],   shadow: [14, 34, 58], sun: -2.3,  shafts: [255, 246, 200, 0.07], glow: 1.1 },
   15: { tint: [255, 224, 170, 0.20], vig: [10, 8, 24, 0.34],   shadow: [16, 12, 30], sun: -1.9,  glow: 1.0 },
-  16: { tint: [255, 150, 90, 0.22],  vig: [24, 8, 4, 0.36],    shadow: [30, 14, 10], sun: -2.6,  glow: 1.2 }
+  16: { tint: [255, 150, 90, 0.22],  vig: [24, 8, 4, 0.36],    shadow: [30, 14, 10], sun: -2.6,  glow: 1.2 },
+  17: { tint: [120, 170, 200, 0.26], vig: [4, 10, 18, 0.38],   shadow: [8, 14, 22],  sun: -1.7,  glow: 1.3 }
 };
 
 /* things that give off light: color, radius and where on the prop the light sits */
