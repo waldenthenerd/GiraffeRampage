@@ -60,6 +60,10 @@ killEnemy = function(e, opts){
   const a = e.hitA !== undefined ? e.hitA : Math.atan2(e.y - P.y, e.x - P.x);
   EM.corpses.push({ e: f, st: deathStyle(e), t: 0, life: e.big ? 0.95 : 0.42, hx: Math.cos(a), hy: Math.sin(a), tilt: Math.sin((e.ph || e.x) * 12.9898) > 0 ? 1 : -1, t0: G.time });
 };
+const EM_M = [1, 0, 0, 1, 0, 0];
+function emT(M, x, y){ M[4] += M[0] * x + M[2] * y; M[5] += M[1] * x + M[3] * y; }
+function emR(M, a){ const c = Math.cos(a), s = Math.sin(a), a0 = M[0], b0 = M[1], c0 = M[2], d0 = M[3]; M[0] = a0 * c + c0 * s; M[1] = b0 * c + d0 * s; M[2] = c0 * c - a0 * s; M[3] = d0 * c - b0 * s; }
+function emS(M, x, y){ M[0] *= x; M[1] *= x; M[2] *= y; M[3] *= y; }
 const em_draw = drawEnemy;                                                          /* the drawing before this file (it already knows size variety and elite crowns) */
 drawEnemy = function(ctx, e){
   if (e.portrait || e.dead || e._va === undefined || e._f === undefined || fxLevelNow() <= 0) return em_draw(ctx, e);
@@ -80,13 +84,13 @@ drawEnemy = function(ctx, e){
     const p = 1 - Math.min(1, e._stt / 0.35);
     fwd += r * 0.12 * p * big; sx *= 1 + 0.14 * p * big; sy *= 1 - 0.08 * p * big;
   }
-  const h = e.hitT > 0 ? e.hitT / EM.hitTime : 0, ha = e.hitA || 0;
+  const h = e.hitT > 0 ? e.hitT / EM.hitTime : 0, ha = e.hitA || 0, M = EM_M;
+  M[0] = 1; M[1] = 0; M[2] = 0; M[3] = 1; M[4] = e.x; M[5] = e.y;                  /* the whole bend is worked out as one matrix, then applied once */
+  if (h > 0){ const hs = e.hitS === undefined ? 1 : e.hitS; emT(M, Math.cos(ha) * r * 0.18 * h * hs, Math.sin(ha) * r * 0.18 * h * hs); emR(M, ha); emS(M, 1 - 0.2 * h * hs, 1 + 0.12 * h * hs); emR(M, -ha); }
+  emR(M, va); emT(M, fwd + tx - r * 0.3, ty); emR(M, roll); emT(M, r * 0.3, 0);
+  emS(M, sx, sy); emR(M, -va); emT(M, -e.x, -e.y);
   ctx.save();
-  ctx.translate(e.x, e.y);
-  if (h > 0){ const hs = e.hitS === undefined ? 1 : e.hitS; ctx.translate(Math.cos(ha) * r * 0.18 * h * hs, Math.sin(ha) * r * 0.18 * h * hs); ctx.rotate(ha); ctx.scale(1 - 0.2 * h * hs, 1 + 0.12 * h * hs); ctx.rotate(-ha); }
-  ctx.rotate(va); ctx.translate(fwd + tx, ty);
-  ctx.translate(-r * 0.3, 0); ctx.rotate(roll); ctx.translate(r * 0.3, 0);
-  ctx.scale(sx, sy); ctx.rotate(-va); ctx.translate(-e.x, -e.y);
+  ctx.transform(M[0], M[1], M[2], M[3], M[4], M[5]);
   const ang = e.ang; e.ang = va;
   em_draw(ctx, e);
   e.ang = ang;

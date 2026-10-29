@@ -54,8 +54,12 @@
     /* the time: 300 creatures drawn */
     G.enemies.length = 0; var many = []; for (i2 = 0; i2 < 300; i2++){ var m = mk(['hyena', 'jackal', 'cheetah'][i2 % 3], 100 + (i2 % 20) * 8, 100 + Math.floor(i2 / 20) * 8); if (!m) continue; m._f = 1; m._va = 0.2; m._lag = 0.1; m.ph = i2; m._stt = 1; m.anim = i2 * 0.3; many.push(m); }
     for (i2 = 0; i2 < 30; i2++) many.forEach(function(m){ drawEnemy(c, m); });               /* warm the cache */
-    var t0 = performance.now(); for (i2 = 0; i2 < 20; i2++) many.forEach(function(m){ drawEnemy(c, m); }); out.msPerFrame300 = +((performance.now() - t0) / 20).toFixed(2);
-    t0 = performance.now(); for (i2 = 0; i2 < 20; i2++) many.forEach(function(m){ em_draw(c, m); }); out.msPerFrame300Plain = +((performance.now() - t0) / 20).toFixed(2); out.cacheLive = JSON.stringify(EnemySprite.stats.liveBy);
+    var best = 1e9, bestPlain = 1e9, t0;
+    for (var rep = 0; rep < 5; rep++){
+      t0 = performance.now(); for (i2 = 0; i2 < 10; i2++) many.forEach(function(m){ drawEnemy(c, m); }); best = Math.min(best, (performance.now() - t0) / 10);
+      t0 = performance.now(); for (i2 = 0; i2 < 10; i2++) many.forEach(function(m){ em_draw(c, m); }); bestPlain = Math.min(bestPlain, (performance.now() - t0) / 10);
+    }
+    out.msPerFrame300 = +best.toFixed(2); out.msPerFrame300Plain = +bestPlain.toFixed(2); out.cacheLive = JSON.stringify(EnemySprite.stats.liveBy);
   } catch (err){ out.err = String(err && err.stack || err); }
   out.pass = out.errs.length === 0 && !out.err && out.gaitOk && out.hit && out.hitEnds && out.turn && out.drawBad.length === 0 && out.portraitSame && out.corpse && out.styleBad.length === 0 && out.corpseGone && out.cap && out.cacheDrawn >= 10 && out.msPerFrame300 - out.msPerFrame300Plain < 8;
   QA.done(out);
