@@ -17,6 +17,7 @@
 
     /* the numbers: the first wave sits where the Tower's last one was, and it only rises */
     var t25 = towerScale(25), s1 = siegeScale(1), s25 = siegeScale(25);
+    out.harder15 = SIEGE_TUNE.hpX === 1.5 && SIEGE_TUNE.dmgX === 1.5 && Math.abs(s1.hp / (enemyScale(WAVES_PER_CHAPTER).hp * SIEGE_TUNE.hp0 * 1.5) - 1) < 1e-9;
     out.tune = s1.hp >= t25.hp * 0.9 && s25.hp > s1.hp && s25.dmg > s1.dmg && SIEGE_TUNE.hard === 1;
 
     /* the kit: twelve kinds and five bosses in the Bestiary's slots, none of them borrowed from another chapter */

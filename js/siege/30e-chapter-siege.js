@@ -6,13 +6,13 @@
    and the creatures the glimmer has changed: no humans appear, and the town's own herd is hiding in the Burrows.
    The twelve ordinary kinds and five bosses sit in the Bestiary's usual slots (SIEGE_KIT, like TOWER_KIT). The numbers are tuned by hand and are the ones to change
    if it is too hard or too easy: SIEGE_MUL is the strength of the table, siegeScale takes it from SIEGE_TUNE.hp0 to hp1 (and the same for damage) times Chapter 13's last
-   wave, which puts the first wave where the Tower's last one was. SIEGE_TUNE.hard scales both together, split evenly between health and damage like the Domes. */
+   wave, which puts the first wave where the Tower's last one was. SIEGE_TUNE.hard scales both together, split evenly between health and damage like the Domes; hpX and dmgX are a further plain multiplier on each (1.5 and 1.5 since the owners asked for a harder Siege). */
 const SIEGE_MUL = { common: { hp: 30, dmg: 7.0, spd: 1.6, val: 20 }, boss: { hp: 24, dmg: 5.8, spd: 1.4, val: 16 } };
-const SIEGE_TUNE = { hp0: 3.2, hp1: 5.0, dmg0: 1.9, dmg1: 3.0, count0: 100, countStep: 4.2, hard: 1, player: 1.5 };        /* player: how much harder the creatures hit her than they did (the buildings take less: SIEGE_BLD.dmgMul) */
+const SIEGE_TUNE = { hp0: 3.2, hp1: 5.0, dmg0: 1.9, dmg1: 3.0, count0: 100, countStep: 4.2, hard: 1, hpX: 1.5, dmgX: 1.5, player: 1.5 };        /* player: how much harder the creatures hit her than they did (the buildings take less: SIEGE_BLD.dmgMul) */
 const SIEGE_HARD = Math.sqrt(SIEGE_TUNE.hard);
 function siegeScale(cw){
   const k = clamp((cw - 1) / (SIEGE_WAVES - 1), 0, 1), b = enemyScale(WAVES_PER_CHAPTER);
-  return { hp: b.hp * SIEGE_HARD * (SIEGE_TUNE.hp0 + (SIEGE_TUNE.hp1 - SIEGE_TUNE.hp0) * k), dmg: b.dmg * SIEGE_HARD * SIEGE_TUNE.player * (SIEGE_TUNE.dmg0 + (SIEGE_TUNE.dmg1 - SIEGE_TUNE.dmg0) * k), spd: b.spd };
+  return { hp: b.hp * SIEGE_HARD * SIEGE_TUNE.hpX * (SIEGE_TUNE.hp0 + (SIEGE_TUNE.hp1 - SIEGE_TUNE.hp0) * k), dmg: b.dmg * SIEGE_HARD * SIEGE_TUNE.dmgX * SIEGE_TUNE.player * (SIEGE_TUNE.dmg0 + (SIEGE_TUNE.dmg1 - SIEGE_TUNE.dmg0) * k), spd: b.spd };
 }
 /* Which kinds are machines and which are mutants: a machine is bolted together out of what the humans had (scrap panels, lenses, a red eye), a mutant is an animal with
    the glimmer grown through it. The art is in js/art/35k-art-siege.js. hpMul, spdMul and rMul trim each kind against the Savanna cast it stands in for. */
