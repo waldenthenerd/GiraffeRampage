@@ -9,27 +9,27 @@
    why the fort is put in TW.floor like a floor of walls; when a building falls it is taken out of the walls and the nav maps are made again, and when it is rebuilt it goes back in.
    FT_PLAN is the plan as data (kind, x, y, w, h in arena pixels); ftDraw paints every kind. */
 const FT_KINDS = {
-  hangar:   { name: 'Hangar',            hp: 900,  chaos: 500,  expl: 0 },
-  radar:    { name: 'Radar Dome',        hp: 520,  chaos: 400,  expl: 0 },
-  comms:    { name: 'Comms Tower',       hp: 380,  chaos: 350,  expl: 0 },
-  bunker:   { name: 'Command Bunker',    hp: 1500, chaos: 900,  expl: 0 },
-  heli:     { name: 'Helicopter',        hp: 260,  chaos: 350,  expl: 150, ex: { dmg: 140, mul: 0.10 } },
-  armoury:  { name: 'Armoury',           hp: 800,  chaos: 700,  expl: 360, ex: { dmg: 520, mul: 0.30 } },
-  tank:     { name: 'Fuel Tank',         hp: 240,  chaos: 250,  expl: 260, ex: { dmg: 280, mul: 0.18 } },
-  ammo:     { name: 'Ammo Bunker',       hp: 440,  chaos: 400,  expl: 300, ex: { dmg: 420, mul: 0.25 } },
-  barracks: { name: 'Barracks',          hp: 520,  chaos: 450,  expl: 0 },
-  mess:     { name: 'Mess Hall',         hp: 480,  chaos: 400,  expl: 0 },
-  garage:   { name: 'Motor Pool',        hp: 520,  chaos: 450,  expl: 0 },
-  jeep:     { name: 'Jeep',              hp: 160,  chaos: 120,  expl: 110, ex: { dmg: 50,  mul: 0.08 }, back: true },
-  truck:    { name: 'Truck',             hp: 220,  chaos: 180,  expl: 140, ex: { dmg: 70,  mul: 0.08 }, back: true },
-  apc:      { name: 'Parked APC',        hp: 300,  chaos: 260,  expl: 160, ex: { dmg: 90,  mul: 0.10 }, back: true },
-  plant:    { name: 'Glimmer Plant',     hp: 1400, chaos: 1200, expl: 480, ex: { dmg: 700, mul: 0.40 } },
-  gen:      { name: 'Generator',         hp: 260,  chaos: 220,  expl: 170, ex: { dmg: 160, mul: 0.12 } },
-  light:    { name: 'Searchlight',       hp: 180,  chaos: 120,  expl: 0 },
-  gate:     { name: 'Gatehouse',         hp: 360,  chaos: 300,  expl: 0 },
-  flag:     { name: 'Flagpole',          hp: 90,   chaos: 60,   expl: 0, back: true },
-  depot:    { name: 'Supply Depot',      hp: 600,  chaos: 500,  expl: 0 },
-  turret:   { name: 'Gun Emplacement',   hp: 220,  chaos: 120,  expl: 0 }
+  hangar:   { name: 'Hangar',            hp: 2250, chaos: 500,  expl: 0 },
+  radar:    { name: 'Radar Dome',        hp: 1300, chaos: 400,  expl: 0 },
+  comms:    { name: 'Comms Tower',       hp: 950, chaos: 350,  expl: 0 },
+  bunker:   { name: 'Command Bunker',    hp: 3750, chaos: 900,  expl: 0 },
+  heli:     { name: 'Helicopter',        hp: 390, chaos: 350,  expl: 150, ex: { dmg: 140, mul: 0.10 } },
+  armoury:  { name: 'Armoury',           hp: 1200, chaos: 700,  expl: 360, ex: { dmg: 520, mul: 0.30 } },
+  tank:     { name: 'Fuel Tank',         hp: 360, chaos: 250,  expl: 260, ex: { dmg: 280, mul: 0.18 } },
+  ammo:     { name: 'Ammo Bunker',       hp: 660, chaos: 400,  expl: 300, ex: { dmg: 420, mul: 0.25 } },
+  barracks: { name: 'Barracks',          hp: 1300, chaos: 450,  expl: 0 },
+  mess:     { name: 'Mess Hall',         hp: 1200, chaos: 400,  expl: 0 },
+  garage:   { name: 'Motor Pool',        hp: 1300, chaos: 450,  expl: 0 },
+  jeep:     { name: 'Jeep',              hp: 240, chaos: 120,  expl: 110, ex: { dmg: 50,  mul: 0.08 }, back: true },
+  truck:    { name: 'Truck',             hp: 330, chaos: 180,  expl: 140, ex: { dmg: 70,  mul: 0.08 }, back: true },
+  apc:      { name: 'Parked APC',        hp: 450, chaos: 260,  expl: 160, ex: { dmg: 90,  mul: 0.10 }, back: true },
+  plant:    { name: 'Glimmer Plant',     hp: 2100, chaos: 1200, expl: 480, ex: { dmg: 700, mul: 0.40 } },
+  gen:      { name: 'Generator',         hp: 390, chaos: 220,  expl: 170, ex: { dmg: 160, mul: 0.12 } },
+  light:    { name: 'Searchlight',       hp: 450, chaos: 120,  expl: 0 },
+  gate:     { name: 'Gatehouse',         hp: 900, chaos: 300,  expl: 0 },
+  flag:     { name: 'Flagpole',          hp: 220, chaos: 60,   expl: 0, back: true },
+  depot:    { name: 'Supply Depot',      hp: 1500, chaos: 500,  expl: 0 },
+  turret:   { name: 'Gun Emplacement',   hp: 550, chaos: 120,  expl: 0 }
 };
 /* [kind, x, y, w, h, extra]: gen is the generator a searchlight is wired to (by index into the generators, in order) */
 const FT_PLAN = [
