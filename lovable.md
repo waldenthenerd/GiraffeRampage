@@ -70,7 +70,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 This list is of the **source** files, which the ZIP no longer contains one by one (the build joins them into a few files in exactly this order and
 minifies them; the folder names are only for finding things). The scripts are loaded in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/core/46-main.js`, which starts the
-game. This is the complete list for this version (197 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (198 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -268,9 +268,10 @@ game. This is the complete list for this version (197 scripts; the developer pan
 | 192 | `js/siege/44zzzg-siege-ai.js` | How Chapter 15's machines, mutants and bosses move and attack. |
 | 193 | `js/siege/44zzzh-siege-events.js` | Chapter 15's set-piece waves, supply crates, scars on the town, boss attacks on the buildings and the radio story lines. |
 | 194 | `js/siege/44zzzi-siege-rewards.js` | Chapter 15's rewards: building streaks and gifts, named militia with ranks, and the two boon crates. |
-| 194 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
-| 195 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
-| 196 | `js/core/46-main.js` | Starts the game. |
+| 195 | `js/ui/44zzzj-minimap.js` | The corner minimap and its Settings rows (on a computer by default, an opt-in on a phone; size and zoom). |
+| 195 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
+| 196 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| 197 | `js/core/46-main.js` | Starts the game. |
 
 CSS, in the order `index.html` links it: `css/style.css` (all the base styles), `css/polish.css` (layered on top: cards, buttons, HUD, menu, and every screen
 added later: minigames, the album book, the guide, photo studio, collection, wide panels on big screens), `css/campus.css` (the university), `css/townlife.css` (Longneck Town panels),
