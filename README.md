@@ -37,13 +37,14 @@ If you serve the site yourself and do not want the panel there, remove the `js/d
   3. `js/game/`: combat, cards, gear, the player, enemies and their AI, ants, bestiary, foraging, wave plumbing, fusion, the two-giraffe mode.
   4. `js/chapters/`: the space, Mars, lab and city outposts, chapters 9 to 14 and the Tower floors.
   5. `js/siege/`: Chapter 15, the Siege (chapter, town, defence, militia, boss AI, events).
-  6. `js/films/`: every cutscene.
-  7. `js/art/`: the giraffe, gear art and one enemy-art file per chapter.
-  8. `js/scenery/` and `js/render/`: chapter maps and props; the renderer, lighting, weather, water and effects.
-  9. `js/ui/`: menu, overlays, run report, the Gear, Trinket, Wheel, Ants and Upgrades pages, HUD, wardrobe, Guide, achievements.
-  10. `js/town/`, `js/campus/`, `js/sea/`: Longneck Town, the university, and the sea with fishing.
-  11. `js/minigames/` and `js/photo/`: the minigames and the photo studio.
-  12. `js/dev/`: the developer panel, which is never shipped.
+  6. `js/fort/`: Chapter 16, Fort Shortneck (chapter, the fort and its buildings, chaos and the alarm, behaviors).
+  7. `js/films/`: every cutscene.
+  8. `js/art/`: the giraffe, gear art and one enemy-art file per chapter.
+  9. `js/scenery/` and `js/render/`: chapter maps and props; the renderer, lighting, weather, water and effects.
+  10. `js/ui/`: menu, overlays, run report, the Gear, Trinket, Wheel, Ants and Upgrades pages, HUD, wardrobe, Guide, achievements.
+  11. `js/town/`, `js/campus/`, `js/sea/`: Longneck Town, the university, and the sea with fishing.
+  12. `js/minigames/` and `js/photo/`: the minigames and the photo studio.
+  13. `js/dev/`: the developer panel, which is never shipped.
 - `tools/` holds the test runner, scenarios, the three developer pages and the package script; `docs/` holds design notes; `dist/` is build output (not committed).
 - `tools/make-lovable-package.sh` builds the website copy: the same code, joined into a few files and minified (see `lovable.md`). The source in `js/` is never bundled or minified.
 - `AGENTS.md` is the guide for AI coding agents (Codex, Claude Code): who is in charge, the branch-and-pull-request workflow, the rules for the code, how to test and how to keep these docs true. `CLAUDE.md` loads it and adds the few Claude-only notes.
@@ -54,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 204 | 63,694 | 5.10 MiB (5,352,023 bytes) |
+| JavaScript (`js/`) | 204 | 63,703 | 5.10 MiB (5,352,751 bytes) |
 | Styles (`css/`) | 6 | 1,764 | 161 KiB (164,407 bytes) |
 | Page (`index.html`) | 1 | 254 | 12.9 KiB (13,188 bytes) |
-| **Whole game** | **211** | **65,712** | **5.27 MiB (5,529,618 bytes)** |
+| **Whole game** | **211** | **65,721** | **5.27 MiB (5,530,346 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **65,111 lines, 5.23 MiB (5,482,636 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 204 | 63,694 | 5.10 MiB (5,352,023 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **65,120 lines, 5.23 MiB (5,483,364 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 204 | 63,703 | 5.10 MiB (5,352,751 bytes) |
 | Styles (`css/`) | 6 | 1,764 | 161 KiB (164,407 bytes) |
 | Page (`index.html`) | 1 | 254 | 12.9 KiB (13,188 bytes) |
-| **Whole game** | **211** | **65,712** | **5.27 MiB (5,529,618 bytes)** |
+| **Whole game** | **211** | **65,721** | **5.27 MiB (5,530,346 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -84,7 +85,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 |---|---|---|
 | `js/core/00-icons.js` | 98 | The icon table (41 outlined icons drawn for this game) and the icon helpers. Runs outside strict mode, as it always did. |
 | `js/core/00b-icons-custom.js` | 153 | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
-| `js/core/01-core.js` | 373 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. Save fields `chapter14Complete` (13.5, the Domes), `chapter15Complete` (14, the Tower) and `chapter16Complete` (15, the Siege), and `siegeHeldBest` and `siegeFlawless` (how many waves of the Siege she held, and whether all 25). |
+| `js/core/01-core.js` | 373 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. Save fields `chapter14Complete` (13.5, the Domes), `chapter15Complete` (14, the Tower) and `chapter16Complete` (15, the Siege), and `siegeHeldBest` and `siegeFlawless` (how many waves of the Siege she held, and whether all 25); `chapter17Complete` (16, Fort Shortneck), `fortChaosBest`, `fortBadges` (a bit for each of the eight chaos levels reached, for good) and `fortBestWave`. |
 | `js/core/01b-savepack.js` | 522 | Save compression: the save is stored as a JSON string holding `GR3:` + base 91 text of a context-mixing / arithmetic-coded copy of its JSON, primed with a frozen sample save (roughly a quarter of the GR2 size); each write is stored as `GR2:` (Base64 of LZW) at once and repacked as GR3 a few seconds later. GR2 and old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `flush`, `stats`). Format in the file header and in `lovable.md`. |
 | `js/audio/02-music.js` | 349 | Procedural background music: themes, the 16-bar sequencer (A, A, B, A), key climb through a chapter, boss second phase, theme fade-in, stingers. |
 | `js/audio/02b-ambience.js` | 134 | Extra sounds (card pick, wave clear, heartbeat, heavy thump), the per-chapter ambient bed that follows the weather, gamepad rumble. |
@@ -99,7 +100,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/game/09-enemy-ai.js` | 354 | Enemy update and movement. In the Tower (`G.tower`) `updateEnemies` first refreshes the flow field (`towerFlow`) and a creature that cannot see its target heads the way `towerSteer` says, flyers are blocked by walls too, and `TOWER_AI` and `SIEGE_AI` are looked up with the other behavior tables; the Siege reuses the same flow field for its town. |
 | `js/core/10-settings.js` | 62 | Settings object (volumes, speed, layout, keys) and `applyInputMode`: touch or keyboard and mouse, asked once after the title splash (`showInputChoice` in `js/core/44b-feedback.js`), kept in `Save.data.inputMode`, changed under Settings > Controls; `Input.hasTouch` follows it, so every control tip does, and "mouse" makes the touch handlers step aside. |
 | `js/game/11-ants.js` | 367 | The ant colony. |
-| `js/game/12-bestiary.js` | 221 | Bestiary. Sixteen chapters now; the Tower's and the Siege's creatures sit in the old slots (`ETYPES_TOWER`, `ETYPES_SIEGE`). |
+| `js/game/12-bestiary.js` | 221 | Bestiary. Seventeen chapters now; the Tower's, the Siege's and the Fort's creatures sit in the old slots (`ETYPES_TOWER`, `ETYPES_SIEGE`, `ETYPES_FORT`). |
 | `js/game/13-forage.js` | 205 | Foraging minigame. |
 | `js/ui/14-menu.js` | 173 | Main menu chapter selector and the speed slider. |
 | `js/chapters/15-buildings-space.js` | 533 | Buildings (chapter 6) and the Space Center (chapter 7). |
@@ -282,7 +283,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/siege/44zzzh-siege-events.js` | 302 | **The Siege's set pieces and story**: eight ordinary waves are events (`SIEGE_EVENTS`: Blackout with a dark ring and searchlights, the Hatch, Drones, Two fronts, which reshape the wave and move where it arrives), a supply crate in each district (`SG_CRATES`: sandbags, ammunition, a medic, floodlights, a missile strike), the scars (craters, scorch, soot, cracks and fires) the town collects, the bosses' attacks on the buildings (`sgCollateral`, `sgAcidOn`, `sgBombRun`, the Warden's `siegeJam`) and the radio (`sgSay`). `siegeFinishSave` is wrapped to note the wrecked keys and scars for the morning-after film (`G.sgFilm`). |
 | `js/siege/44zzzi-siege-rewards.js` | 184 | **What holding the town pays**: each key building's unbroken streak and the gifts at ten and twenty-five waves (`SG_REWARD`: the coat color Hall Crimson, a card reroll, 5% off Upgrades, gems, more health), the twenty named militia giraffes who keep kills and ranks between runs (`SG_RANKS`: faster fire, tougher, a second chance), and the two boon crates after waves 10 and 20 (`SG_BOONS`). |
 | `js/ui/44zzzj-minimap.js` | 134 | **The minimap.** A small map of the arena in the bottom-right corner (on a computer; on a phone it is an opt-in in Settings, above the buttons). Follows the chapter: its ground colour and the soft ground patches it is painted with, a faint grid, mud / ice / drift / heat patches, waterhole, props and landmarks (each in the colour of its own drawing), buildings (the Tower redraws per floor, the Siege colours key buildings by health and marks wrecked ones), the Space Center rocket. Creatures are bright dots on a dark halo (elites gold squares), bosses a red target with a white ring, and a boss off the zoomed map gets an arrow on the edge. Settings: `minimap` ('auto' / 'on' / 'off'), `mmSize` and `mmZoom` (0 to 1; 120 to 400 px, 1x to 4x), with rows added to `showSettings`. |
-| `js/fort/44zzzk-fort-map.js` | 361 | **Fort Shortneck in play**: the compound as the arena (`FT_PLAN`: hangar, radar, command bunker, helipad, armoury, fuel depot, ammo bunkers, barracks, mess, motor pool, gatehouses, glimmer plant, generators, searchlight towers and ten gun emplacements). Every one is a destructible building of Houston's kind with its own health and chaos value (`FT_KINDS`), solid for everyone until it falls (the nav maps are made again), drawn with the ground with scorch, cracks and flames as it is hurt and rubble when it is down. The perimeter wall, floodlights and the closed south gate. `ftMmColor` colors them on the minimap. |
+| `js/fort/44zzzk-fort-map.js` | 370 | **Fort Shortneck in play**: the compound as the arena (`FT_PLAN`: hangar, radar, command bunker, helipad, armoury, fuel depot, ammo bunkers, barracks, mess, motor pool, gatehouses, glimmer plant, generators, searchlight towers and ten gun emplacements). Every one is a destructible building of Houston's kind with its own health and chaos value (`FT_KINDS`), solid for everyone until it falls (the nav maps are made again), drawn with the ground with scorch, cracks and flames as it is hurt and rubble when it is down. The perimeter wall, floodlights and the closed south gate. `ftMmColor` colors them on the minimap. |
 | `js/fort/44zzzl-fort-chaos.js` | 280 | **Chaos, the alarm and the fort's mechanics**: chaos and its combo (`FT_COMBO`), the eight chaos levels with their colors and gem badges (`FT_TIERS`, kept in `Save.data.fortBadges`), the alarm and its three squads (`FT_ALARM`), explosions and chain reactions (`fortExplode`), the hackable gun emplacements (`FT_HACK`), the searchlights and their generators (`FT_LIGHT`), the rebuild between waves, the wave payout, the chaos panel at the top of the screen and the arrow to the nearest big target. |
 | `js/fort/44zzzm-fort-ai.js` | 254 | **The fort's behaviors** (`FORT_AI`): the twelve soldiers and machines (burst-firing guard, panicking cadet, lunging hound, ramming jeep and APC, shield-bashing riot trooper, bombing copter, mortar and grenade lobbers with marked patches, the sniper's laser, the pyro's flame, the medic's heal) and the five bosses with their phases. |
 | `js/core/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |

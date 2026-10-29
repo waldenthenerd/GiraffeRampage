@@ -56,8 +56,8 @@ function fortClimbScene(ctx, t){
     ftWallFace(ctx, gy, top, t); sgGround(ctx, gy, '#10201C', '#1E3430', 0);
     const sweep = -0.7 + Math.sin(t * 0.8) * 0.9; ftSearch(ctx, 80, top - 60, 0.3 + sweep * 0.2, 900, 90, 0.22);
     const reach = csSm(0.8, 3.6, u), up = csSm(3.8, 9, u), gx = 620, gyy = csLerp(gy + 20, top + 74, up);
-    csGiraffe(ctx, { x: gx, y: gyy, s: 0.66, face: 1, walk: u * 5, moving: up > 0.02 && up < 0.98, neck: csLerp(0.3, 1.0, reach), head: csLerp(0.1, -0.3, reach), tuck: up * 0.8, bare: true, boots: false });
-    ctx.save(); ctx.globalAlpha = 0.5; ctx.fillStyle = '#0A0C10'; ctx.fillRect(gx - 40, top - 4, 130, 22); ctx.restore();
+    const rot = -1.32 * (csSm(3.2, 4.6, u) - csSm(8.2, 9, u));                                                      /* she tips back and goes up it on all fours, then rights herself on top */
+    ctx.save(); ctx.translate(gx, gyy); ctx.rotate(rot); csGiraffe(ctx, { x: 0, y: 0, s: 0.66, face: 1, walk: u * 7, moving: up > 0.02 && up < 0.98, neck: csLerp(0.3, 1.0, reach), head: csLerp(0.1, -0.3, reach), tuck: 0, bare: true, boots: false }); ctx.restore();
   } else {                                                                           /* on the wall: the whole fort below her, and she jumps */
     const u = t - T.C, gy = 640, k = csLerp(1.0, 1.4, csSm(0, 4, u)); ftNight(ctx, t, 0.5);
     ctx.fillStyle = '#10161E'; ctx.fillRect(0, gy - 120, CS_W, 200); ftSkyline(ctx, gy - 70, k, t, true, true);

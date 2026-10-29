@@ -13,18 +13,18 @@ const FT_KINDS = {
   radar:    { name: 'Radar Dome',        hp: 520,  chaos: 400,  expl: 0 },
   comms:    { name: 'Comms Tower',       hp: 380,  chaos: 350,  expl: 0 },
   bunker:   { name: 'Command Bunker',    hp: 1500, chaos: 900,  expl: 0 },
-  heli:     { name: 'Helicopter',        hp: 260,  chaos: 350,  expl: 150, ex: { dmg: 80,  mul: 0.10 } },
-  armoury:  { name: 'Armoury',           hp: 800,  chaos: 700,  expl: 360, ex: { dmg: 260, mul: 0.30 } },
-  tank:     { name: 'Fuel Tank',         hp: 360,  chaos: 250,  expl: 260, ex: { dmg: 180, mul: 0.18 } },
-  ammo:     { name: 'Ammo Bunker',       hp: 520,  chaos: 400,  expl: 300, ex: { dmg: 220, mul: 0.25 } },
+  heli:     { name: 'Helicopter',        hp: 260,  chaos: 350,  expl: 150, ex: { dmg: 140, mul: 0.10 } },
+  armoury:  { name: 'Armoury',           hp: 800,  chaos: 700,  expl: 360, ex: { dmg: 520, mul: 0.30 } },
+  tank:     { name: 'Fuel Tank',         hp: 240,  chaos: 250,  expl: 260, ex: { dmg: 280, mul: 0.18 } },
+  ammo:     { name: 'Ammo Bunker',       hp: 440,  chaos: 400,  expl: 300, ex: { dmg: 420, mul: 0.25 } },
   barracks: { name: 'Barracks',          hp: 520,  chaos: 450,  expl: 0 },
   mess:     { name: 'Mess Hall',         hp: 480,  chaos: 400,  expl: 0 },
   garage:   { name: 'Motor Pool',        hp: 520,  chaos: 450,  expl: 0 },
   jeep:     { name: 'Jeep',              hp: 160,  chaos: 120,  expl: 110, ex: { dmg: 50,  mul: 0.08 }, back: true },
   truck:    { name: 'Truck',             hp: 220,  chaos: 180,  expl: 140, ex: { dmg: 70,  mul: 0.08 }, back: true },
   apc:      { name: 'Parked APC',        hp: 300,  chaos: 260,  expl: 160, ex: { dmg: 90,  mul: 0.10 }, back: true },
-  plant:    { name: 'Glimmer Plant',     hp: 1400, chaos: 1200, expl: 480, ex: { dmg: 320, mul: 0.40 } },
-  gen:      { name: 'Generator',         hp: 260,  chaos: 220,  expl: 170, ex: { dmg: 90,  mul: 0.12 } },
+  plant:    { name: 'Glimmer Plant',     hp: 1400, chaos: 1200, expl: 480, ex: { dmg: 700, mul: 0.40 } },
+  gen:      { name: 'Generator',         hp: 260,  chaos: 220,  expl: 170, ex: { dmg: 160, mul: 0.12 } },
   light:    { name: 'Searchlight',       hp: 180,  chaos: 120,  expl: 0 },
   gate:     { name: 'Gatehouse',         hp: 360,  chaos: 300,  expl: 0 },
   flag:     { name: 'Flagpole',          hp: 90,   chaos: 60,   expl: 0, back: true },
@@ -119,18 +119,27 @@ const FT_LOTS = [
 function ftHit(o, x0, y0, x1, y1, m){ return o.x + (o.w || 0) + (m || 0) < x0 || o.x - (m || 0) > x1 || o.y + (o.h || 0) + (m || 0) < y0 || o.y - (m || 0) > y1; }
 function drawGroundFort(ctx, cx, cy, vw, vh){
   const x0 = cx - vw / 2, y0 = cy - vh / 2, x1 = x0 + vw, y1 = y0 + vh, t = G.time;
-  if (!FT.all.length) FT.all = FT_PLAN.map(ftMake);                                                              /* the menu's picture of the fort, before any run has built it */
   ctx.fillStyle = ftPattern('gravel'); ctx.fillRect(x0 - 40, y0 - 40, vw + 80, vh + 80);
   for (let i = 0; i < FT_LOTS.length; i++){
     const L = FT_LOTS[i]; if (ftHit({ x: L[0], y: L[1], w: L[2], h: L[3] }, x0, y0, x1, y1, 30)) continue;
     ctx.fillStyle = 'rgba(20,18,12,.4)'; ctx.fillRect(L[0] - 6, L[1] - 6, L[2] + 12, L[3] + 12); ctx.fillStyle = ftPattern(L[4]); ctx.fillRect(L[0], L[1], L[2], L[3]);
   }
   ftDecor(ctx, x0, y0, x1, y1, t);
-  const bs = FT.all;                                                                                              /* back things first (a flag, the parked vehicles), then everything else */
-  for (let pass = 0; pass < 2; pass++) for (let i = 0; i < bs.length; i++){ const b = bs[i]; if (b.back !== (pass === 0) || ftHit(b, x0, y0, x1, y1, 140)) continue; ftDrawBuilding(ctx, b, t); }
-  if (typeof ftDrawMech === 'function') ftDrawMech(ctx, x0, y0, x1, y1, t);                                       /* the turrets and the searchlight beams */
   ftDrawWall(ctx, x0, y0, x1, y1, t);
 }
+/* what changes (the buildings, the guns, the beams) is drawn live over the ground every frame: the ground itself, which holds still, may be kept in tiles (js/core/44ca-ground-cache.js) */
+function ftDrawLive(ctx, x0, y0, x1, y1, t){
+  const bs = FT.all;                                                                                              /* back things first (a flag, the parked vehicles), then everything else */
+  for (let pass = 0; pass < 2; pass++) for (let i = 0; i < bs.length; i++){ const b = bs[i]; if (b.back !== (pass === 0) || ftHit(b, x0, y0, x1, y1, 140)) continue; ftDrawBuilding(ctx, b, t); }
+  if (typeof ftDrawMech === 'function') ftDrawMech(ctx, x0, y0, x1, y1, t);                                       /* the searchlight beams and the gun tracers */
+}
+const fortBaseDrawGround = drawGround;
+drawGround = function(ctx, cx, cy, vw, vh){
+  fortBaseDrawGround.apply(this, arguments);
+  if (G.biome !== 'fort') return;
+  if (!FT.all.length) FT.all = FT_PLAN.map(ftMake);                                                                /* the menu's picture of the fort, before any run has built it */
+  ftDrawLive(ctx, cx - vw / 2, cy - vh / 2, cx + vw / 2, cy + vh / 2, G.time);
+};
 function ftDecor(ctx, x0, y0, x1, y1, t){
   const on = function(x, y, m){ return x > x0 - m && x < x1 + m && y > y0 - m && y < y1 + m; };
   /* the parade ground: a painted ring and a compass star in the middle, the drill lines */

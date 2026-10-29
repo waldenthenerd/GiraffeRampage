@@ -11,14 +11,14 @@
    and a squad; each runs from a generator, and a light or a generator that falls leaves the dark behind it. After every boss the fort is rebuilt, and its vehicles, tanks and guns come back
    every wave, so there is always more to break. */
 const FT_TIERS = [
-  { n: 'Scuffle',   at: 500,   c: '#8FD6F2', gems: 0 },
-  { n: 'Ruckus',    at: 1500,  c: '#6AE08A', gems: 0 },
-  { n: 'Mayhem',    at: 3500,  c: '#F2E04A', gems: 60 },
-  { n: 'Uproar',    at: 6500,  c: '#F2A83A', gems: 80 },
-  { n: 'Rampage',   at: 10000, c: '#EE5A3A', gems: 100 },
-  { n: 'Havoc',     at: 15000, c: '#E04ABE', gems: 100 },
-  { n: 'Cataclysm', at: 22000, c: '#9A6AF2', gems: 120 },
-  { n: 'Calamity',  at: 32000, c: '#FFD24A', gems: 150 }
+  { n: 'Scuffle',   at: 1000,  c: '#8FD6F2', gems: 0 },
+  { n: 'Ruckus',    at: 3000,  c: '#6AE08A', gems: 0 },
+  { n: 'Mayhem',    at: 7000,  c: '#F2E04A', gems: 60 },
+  { n: 'Uproar',    at: 13000, c: '#F2A83A', gems: 80 },
+  { n: 'Rampage',   at: 20000, c: '#EE5A3A', gems: 100 },
+  { n: 'Havoc',     at: 30000, c: '#E04ABE', gems: 100 },
+  { n: 'Cataclysm', at: 45000, c: '#9A6AF2', gems: 120 },
+  { n: 'Calamity',  at: 70000, c: '#FFD24A', gems: 150 }
 ];
 const FT_COMBO = { window: 5, step: 0.1, cap: 20 };
 const FT_ALARM = { a: 35, b: 70, full: 100, decay: 3, quiet: 4, cap: { a: 2, b: 2, c: 3 } };
@@ -117,7 +117,7 @@ function fortExplode(b){
   for (let i = 0; i < bs.length; i++){
     const o = bs[i]; if (o === b || o.collapsed) continue;
     const dx = Math.max(o.x - cx, 0, cx - (o.x + o.w)), dy = Math.max(o.y - cy, 0, cy - (o.y + o.h)), d = Math.sqrt(dx * dx + dy * dy);
-    if (d < r) damageBuilding(o, sp.dmg * (1 - d / r * 0.6), 'blast');
+    if (d < r) damageBuilding(o, sp.dmg * (d < r * 0.6 ? 1 : (1 - d / r) / 0.4), 'blast');       /* full damage close in, fading to nothing at the edge: what is next to it goes too */
   }
   const near = enemiesNear(cx, cy, r + 60, []), prev = dmgSrc; dmgSrc = 'fort';
   for (let i = 0; i < near.length; i++){
@@ -250,7 +250,7 @@ const fortBaseOverlays = drawFeedbackOverlays;
 drawFeedbackOverlays = function(ctx){
   fortBaseOverlays.apply(this, arguments);
   const ft = G.ft; if (G.chapter !== COUNTER_CHAPTER || G.biome !== 'fort' || !ft || G.attract || G.state === 'levelup') return;
-  const W = G.W, pw = clamp(W * 0.46, 250, 400), x0 = W / 2 - pw / 2; let y0 = W < 700 && G.H > W ? 96 : 64; if (G.bossAlive && G.boss && !G.boss.dead) y0 = W < 700 && G.H > W ? 146 : 108;
+  const W = G.W, pw = clamp(W * 0.46, 250, 400), x0 = W / 2 - pw / 2; let y0 = W < 700 && G.H > W ? 122 : 64; if (G.bossAlive && G.boss && !G.boss.dead) y0 = W < 700 && G.H > W ? 172 : 108;
   const T = ft.tier >= 0 ? FT_TIERS[ft.tier] : null, nx = FT_TIERS[Math.min(FT_TIERS.length - 1, ft.tier + 1)], col = T ? T.c : '#FFE49A', prog = ft.tier + 1 >= FT_TIERS.length ? 1 : clamp((ft.chaos - (T ? T.at : 0)) / (nx.at - (T ? T.at : 0)), 0, 1);
   ctx.save(); ctx.textAlign = 'left';
   ctx.fillStyle = 'rgba(14,12,16,.78)'; ctx.fillRect(x0, y0, pw, 78); ctx.fillStyle = col; ctx.fillRect(x0, y0, 4, 78);

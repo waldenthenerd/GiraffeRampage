@@ -11,7 +11,7 @@
     /* the chapter table: the old chapters are exactly as they were, the Domes are ten waves after Chapter 13 */
     out.table = chapterOf(1) === 1 && chapterOf(25) === 1 && chapterOf(26) === 2 && chapterOf(300) === 12 && chapterOf(301) === 13 && chapterOf(325) === 13 && chapterOf(326) === DOME_CHAPTER && chapterOf(335) === DOME_CHAPTER &&
       chapterWaveOf(325) === 25 && chapterWaveOf(326) === 1 && chapterWaveOf(335) === 10 && isChapterFinaleWave(325) && !isChapterFinaleWave(330) && isChapterFinaleWave(335) && !isChapterFinaleWave(326) &&
-      DOME_LAST_WAVE === 335 && chapterFirstWave(14) === 326 && chapterFirstWave(13) === 301 && chapterFirstWave(2) === 26 && chapterLen(14) === 10 && chapterLabel(14) === '13.5' && chapterLabel(13) === '13' && TOTAL_CHAPTERS === 16;
+      DOME_LAST_WAVE === 335 && chapterFirstWave(14) === 326 && chapterFirstWave(13) === 301 && chapterFirstWave(2) === 26 && chapterLen(14) === 10 && chapterLabel(14) === '13.5' && chapterLabel(13) === '13' && TOTAL_CHAPTERS === 17;
     out.bossWaves = bossForWave(330) === 'thawed' && bossForWave(335) === 'iceheart' && bossForWave(25) === 'wildfire' && bossForWave(5) === 'lion';
     var s1 = enemyScale(25), d1 = domeScale(1), d10 = domeScale(10);
     var hd = DOME_TUNE.hard;           /* the 1.35x harder setting: health and damage each by its square root */
@@ -19,7 +19,7 @@
 
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter14Complete === false;
-    out.wardLen = WARD.length; out.wardLocked = wardUnlocked(46) === false && WARD[46] && WARD[46].name === 'Frost Mylar' && WARD.length === 51;
+    out.wardLen = WARD.length; out.wardLocked = wardUnlocked(46) === false && WARD[46] && WARD[46].name === 'Frost Mylar' && WARD.length === 53;
     Save.data.chapter14Complete = 'junk'; out.saveSane = typeof (Save.data.chapter14Complete = !!Save.data.chapter14Complete) === 'boolean';
     Save.data.chapter14Complete = true; out.wardOpen = wardUnlocked(46) === true && wardChoice('skinCol') === 0;
     Save.data.skinCol = 46; out.wardChoice = wardChoice('skinCol') === 46; Save.data.skinCol = 0;
@@ -32,7 +32,7 @@
     out.menuOpen = /data-a="play14"/.test(html) && /Start Chapter 13\.5/.test(html) && /Straight to wave 326/.test(html);
     out.menuOld = /Waves 301–325 · 5 bosses/.test((setMenuChapter(13), chapterSelectorHTML()));
     setMenuChapter(14); out.arrowEnd = !/ch-next" aria-label="Next chapter" disabled/.test(chapterSelectorHTML());      /* the Tower comes after it now */
-    out.dotsN = (chapterSelectorHTML().match(/class="chdot[ "]/g) || []).length; out.dots = out.dotsN === 16;
+    out.dotsN = (chapterSelectorHTML().match(/class="chdot[ "]/g) || []).length; out.dots = out.dotsN === 17;
     handleAction('play14'); out.menuFilm = G.state === 'cutscene' && G.cut && G.cut.kind === 'domeflight';
     var cu = G.cut; cu.t = DOME_FLIGHT_T.END - 0.01; steps(3); out.menuStarts = G.state === 'playing' && G.wave === 326 && G.chapter === 14 && G.biome === 'dome';
 
@@ -104,14 +104,14 @@
 
     /* the Bestiary */
     freshSave(); var b = bestiaryData();
-    out.bestTotal = BESTIARY_TOTAL_CREATURES === 17 * 13 + 14 + 17 + 17 && bestiaryCounts().totalCreatures === BESTIARY_TOTAL_CREATURES;
+    out.bestTotal = BESTIARY_TOTAL_CREATURES === 17 * 13 + 14 + 17 + 17 + 17 && bestiaryCounts().totalCreatures === BESTIARY_TOTAL_CREATURES;
     out.bestName = bestiaryName(14, 'thawed').title === 'The Thawed' && bestiaryName(14, 'iceheart').title === 'The Ice Heart' && /Changed Arctic Wolf/.test(bestiaryName(14, 'hyena').title) && bestiaryName(1, 'hyena').title === 'Spotted Hyena';
     var ee = { type: 'thawed', waveRef: 330, x: 0, y: 0, r: 40, def: ETYPES_DOME.thawed }; recordBestiaryKill(ee);
     out.bestKill = b.creatures['14:thawed'] === 1 && !b.creatures['14:lion'];
     showBestiary('creatures'); out.bestHtml = /Chapter 13\.5/.test(OV.innerHTML) && /1 \/ 14/.test(OV.innerHTML) && /Chapter 13 — Mars/.test(OV.innerHTML) && /0 \/ 17/.test(OV.innerHTML);
 
     /* Play together */
-    freshSave(); out.coLocked = coChapters().indexOf(14) < 0; var real = coRealSave; Save.data.chapter13Complete = true; out.coOpen = coChapters().indexOf(14) >= 0 && CO_CHAPTERS.length === 16;
+    freshSave(); out.coLocked = coChapters().indexOf(14) < 0; var real = coRealSave; Save.data.chapter13Complete = true; out.coOpen = coChapters().indexOf(14) >= 0 && CO_CHAPTERS.length === 17;
 
     /* the other lists that count chapters */
     freshSave(); Save.data.chapter14Complete = true; Save.data.chapter13Complete = true;
