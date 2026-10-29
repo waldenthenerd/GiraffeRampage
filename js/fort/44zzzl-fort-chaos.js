@@ -11,14 +11,14 @@
    and a squad; each runs from a generator, and a light or a generator that falls leaves the dark behind it. After every boss the fort is rebuilt, and its vehicles, tanks and guns come back
    every wave, so there is always more to break. */
 const FT_TIERS = [
-  { n: 'Scuffle',   at: 1000,  c: '#8FD6F2', gems: 0 },
-  { n: 'Ruckus',    at: 3000,  c: '#6AE08A', gems: 0 },
-  { n: 'Mayhem',    at: 7000,  c: '#F2E04A', gems: 60 },
-  { n: 'Uproar',    at: 13000, c: '#F2A83A', gems: 80 },
-  { n: 'Rampage',   at: 20000, c: '#EE5A3A', gems: 100 },
-  { n: 'Havoc',     at: 30000, c: '#E04ABE', gems: 100 },
-  { n: 'Cataclysm', at: 45000, c: '#9A6AF2', gems: 120 },
-  { n: 'Calamity',  at: 70000, c: '#FFD24A', gems: 150 }
+  { n: 'Scuffle',   at: 1500,  c: '#8FD6F2', gems: 0 },
+  { n: 'Ruckus',    at: 5000,  c: '#6AE08A', gems: 0 },
+  { n: 'Mayhem',    at: 12000, c: '#F2E04A', gems: 60 },
+  { n: 'Uproar',    at: 25000, c: '#F2A83A', gems: 80 },
+  { n: 'Rampage',   at: 45000, c: '#EE5A3A', gems: 100 },
+  { n: 'Havoc',     at: 75000, c: '#E04ABE', gems: 100 },
+  { n: 'Cataclysm', at: 110000, c: '#9A6AF2', gems: 120 },
+  { n: 'Calamity',  at: 150000, c: '#FFD24A', gems: 150 }
 ];
 const FT_COMBO = { window: 5, step: 0.1, cap: 20 };
 const FT_ALARM = { a: 35, b: 70, full: 100, decay: 3, quiet: 4, cap: { a: 2, b: 2, c: 3 } };

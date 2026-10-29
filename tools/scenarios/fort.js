@@ -21,13 +21,13 @@
       Settings.fxLevel = 1; freshSave(); startRun(COUNTER_CHAPTER, wv); steps(3); godMode(); G.introFX = null; G.banner = null; G.bannerHold = null; clear(); G.waveState = 'idle'; G.waveTimer = 9999;
       put(at[0], at[1]);
       var spawnSome = function(types, n, r){ types.forEach(function(t, i){ for (var k = 0; k < n; k++){ var a = (i * 5 + k) * 0.9, e = spawnEnemy(t, at[0] + Math.cos(a) * (r || 300), at[1] + Math.sin(a) * (r || 300), wv); if (e){ e.hp = e.maxHp = 1e12; } } }); };
-      if (V === 'hud'){ fortChaos(+QA.params.chaos || 14000, P.x, P.y, ''); steps(2); G.ft.combo = 7; G.ft.comboT = 3; fortAlarm(+QA.params.alarm || 55); G.ft.quiet = 99; spawnSome(['hyena', 'grub'], 3); steps(40); }
+      if (V === 'hud'){ fortChaos(+QA.params.chaos || 26000, P.x, P.y, ''); steps(2); G.ft.combo = 7; G.ft.comboT = 3; fortAlarm(+QA.params.alarm || 55); G.ft.quiet = 99; spawnSome(['hyena', 'grub'], 3); steps(40); }
       else if (V === 'play'){ spawnSome((QA.params.types || 'hyena,cheetah,warthog,vulture').split(','), 2, +QA.params.r || 330); steps(+QA.params.steps || 70); }
       else if (V === 'chain'){ var tt = bk('tank', 0), tm2 = mid(tt); put(tm2.x - 380, tm2.y + 150); G.ft.quiet = 99; spawnSome(['hyena', 'cheetah', 'warthog'], 2, 150); G.enemies.forEach(function(e){ e.x = tm2.x + rand(-150, 150); e.y = tm2.y + rand(60, 220); e.spd = 0; }); kill(tt); steps(+QA.params.steps || 14); }
       else if (V === 'turret'){ var tu0 = FT.turrets[+QA.params.n || 1], um0 = mid(tu0); put(um0.x + 120, um0.y + 20); steps(+QA.params.steps || 24); if (QA.params.ally){ fortHack(tu0); spawnSome(['hyena'], 3, 300); G.enemies.forEach(function(e){ e.x = um0.x + rand(150, 450); e.y = um0.y + rand(-200, 200); e.spd = 0; }); steps(12); out.tState = tu0.tState; out.allyT = tu0.allyT; } }
       else if (V === 'light'){ var li0 = FT.lights[+QA.params.n || 2], lm0 = mid(li0); put(lm0.x + 120, lm0.y + 300); steps(+QA.params.steps || 40); }
       else if (V === 'boss'){ var bt = QA.params.boss || 'lion'; clear(); put(at[0], at[1]); spawnEnemy(bt, at[0] + 430, at[1] - 40, wv); G.bossAlive = true; steps(+QA.params.steps || 120); }
-      else if (V === 'badge'){ fortChaos(+QA.params.chaos || 7200, P.x, P.y, ''); steps(+QA.params.steps || 20); }
+      else if (V === 'badge'){ fortChaos(+QA.params.chaos || 12500, P.x, P.y, ''); steps(+QA.params.steps || 20); }
       else if (V === 'ruins'){ ['hangar', 'radar', 'bunker', 'barracks', 'mess', 'garage', 'plant', 'armoury'].forEach(function(k){ FT.all.filter(function(b){ return b.kind === k; }).forEach(function(b){ damageBuilding(b, b.maxHp * (k === 'plant' ? 0.55 : 0.8), 'kick'); }); }); FT.all.filter(function(b){ return b.kind === 'garage' || b.kind === 'mess'; }).forEach(kill); G.ft.quiet = 99; steps(+QA.params.steps || 40); }
       else if (V === 'menu'){ G.state = 'menu'; Save.data.chapter16Complete = true; setMenuChapter(17); showMenu(); for (var mm = 0; mm < 4; mm++) GR.step(1 / 30); drawMenuPreview(); }
       else if (V === 'bestiary'){ G.state = 'menu'; Object.keys(ETYPES_FORT).forEach(function(k){ recordBestiaryKill({ type: k, def: ETYPES_FORT[k], waveRef: 390, big: !!ETYPES_FORT[k].big }); }); showBestiary(17); for (var bb = 0; bb < 4; bb++) GR.step(1 / 30); }
@@ -105,9 +105,9 @@
       FT_TIERS.filter(function(t){ return t.gems > 0; }).every(function(t){ return t.gems >= 60 && t.gems <= 150; }) && FT_TIERS[2].gems + FT_TIERS[3].gems + FT_TIERS[4].gems + FT_TIERS[5].gems + FT_TIERS[6].gems + FT_TIERS[7].gems >= 500 &&
       FT_TIERS.slice(2).reduce(function(s, t){ return s + t.gems; }, 0) / 6 >= 90 && FT_TIERS.slice(2).reduce(function(s, t){ return s + t.gems; }, 0) / 6 <= 115;
     begin(); var g0 = Save.data.gems | 0, banners = []; var bn = banner; banner = function(t, s, c, d){ banners.push(t + '|' + s); return bn.apply(this, arguments); };
-    fortChaos(7200, P.x, P.y, ''); steps(2); out.tier3 = G.ft.tier >= 2 && (Save.data.gems | 0) === g0 + 60 + 0 && (Save.data.fortBadges & 7) === 7 && banners.some(function(s){ return /MAYHEM/.test(s) && /60 gems/.test(s); });
-    fortChaos(80000, P.x, P.y, ''); steps(2); out.tierTop = G.ft.tier === 7 && (Save.data.gems | 0) === g0 + FT_TIERS.slice(2).reduce(function(s, t){ return s + t.gems; }, 0) && Save.data.fortBadges === 255 && wardUnlocked(52) === true && Save.data.fortChaosBest >= 80000;
-    var g1 = 1234, b1 = Save.data.fortBadges; begin(); Save.data.fortBadges = b1; Save.data.gems = g1; fortChaos(80000, P.x, P.y, ''); out.badgeOnce = (Save.data.gems | 0) === g1 && G.ft.tier === 7;
+    fortChaos(12500, P.x, P.y, ''); steps(2); out.tier3 = G.ft.tier >= 2 && (Save.data.gems | 0) === g0 + 60 + 0 && (Save.data.fortBadges & 7) === 7 && banners.some(function(s){ return /MAYHEM/.test(s) && /60 gems/.test(s); });
+    fortChaos(160000, P.x, P.y, ''); steps(2); out.tierTop = G.ft.tier === 7 && (Save.data.gems | 0) === g0 + FT_TIERS.slice(2).reduce(function(s, t){ return s + t.gems; }, 0) && Save.data.fortBadges === 255 && wardUnlocked(52) === true && Save.data.fortChaosBest >= 160000;
+    var g1 = 1234, b1 = Save.data.fortBadges; begin(); Save.data.fortBadges = b1; Save.data.gems = g1; fortChaos(160000, P.x, P.y, ''); out.badgeOnce = (Save.data.gems | 0) === g1 && G.ft.tier === 7;
     banner = bn;
 
     /* the alarm: a squad at 35, a heavier one at 70, a full alarm at 100 (chaos worth half again); capped; it sinks when she lies low */
@@ -194,7 +194,7 @@
     out.endVictory = G.state === 'victory' && Save.data.chapter17Complete === true && Save.data.chapter16Complete === true && wardUnlocked(51) === true;
     G.chapter = COUNTER_CHAPTER; out.victoryText2 = /maker of the Warden/.test(victoryText(3, 4)) && !/the end|thanks for playing/i.test(victoryText(3, 4));
     out.gallery = filmList().filter(function(x){ return x.kind === 'fortflight' || x.kind === 'fortout'; }).length === 2;
-    begin(); fortChaos(7200, P.x, P.y, ''); G.ft.wrecked = 3; var rep = runReport(0, 0); var rh = runReportHTML({ report: rep }, false); out.report = rep.ftChaos === 7200 && rep.ftTier === 2 && /Chaos <b[^>]*>7,?200<\/b>/.test(rh) && /Mayhem/.test(rh) && /3 things wrecked/.test(rh);
+    begin(); fortChaos(12500, P.x, P.y, ''); G.ft.wrecked = 3; var rep = runReport(0, 0); var rh = runReportHTML({ report: rep }, false); out.report = rep.ftChaos === 12500 && rep.ftTier === 2 && /Chaos <b[^>]*>(12,?500|12\.5k)<\/b>/.test(rh) && /Mayhem/.test(rh) && /3 things wrecked/.test(rh);
     /* a run saved part-way keeps the chaos */
     begin(); fortChaos(777, P.x, P.y, ''); var snap = runSnapshot(); out.snapChaos = snap.ftChaos === 777 && validRunSave(snap); startRun(COUNTER_CHAPTER, snap.wave, snap); steps(2); out.snapRestore = !!G.ft && G.ft.chaos === 777 && G.ft.tier === ftTierOf(777) && FT.all.length === FT_PLAN.length;
     /* an old save, with none of the new fields, still loads */
