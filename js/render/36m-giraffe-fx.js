@@ -11,7 +11,7 @@ const GF = {
 /* the dust a hoof kicks up, by ground: rgb prefix (alpha is added) */
 const STEP_DUST = {
   savanna: '190,164,112', snow: '240,248,252', swamp: '70,84,44', jungle: '90,110,60', city: '150,150,150', space: '190,190,190',
-  moon: '200,200,205', venus: '220,170,96', area51: '196,170,120', mars: '190,100,74', dome: '236,246,252', tower: '255,232,180', siege: '255,170,110'
+  moon: '200,200,205', venus: '220,170,96', area51: '196,170,120', mars: '190,100,74', dome: '236,246,252', tower: '255,232,180', siege: '255,170,110', fort: '206,190,150'
 };
 
 function giraffeFxUpdate(dt){

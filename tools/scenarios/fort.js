@@ -185,14 +185,14 @@
     coStart('arena', 17); steps(40); out.together = Co.on && G.chapter === COUNTER_CHAPTER && G.biome === 'fort' && G.tower === true && G.buildings.length === FT_PLAN.length && !!G.ft;
 
     /* a run saved part-way keeps the chaos */
-    begin(); fortChaos(777, P.x, P.y, ''); var snap = runSnapshot(); out.snapChaos = snap.ftChaos === 777 && validRunSave(snap);
+    begin(); fortChaos(777, P.x, P.y, ''); var snap = runSnapshot(); out.snapChaos = snap.ftChaos === 777 && validRunSave(snap); startRun(COUNTER_CHAPTER, snap.wave, snap); steps(2); out.snapRestore = !!G.ft && G.ft.chaos === 777 && G.ft.tier === ftTierOf(777) && FT.all.length === FT_PLAN.length;
     /* an old save, with none of the new fields, still loads */
     freshSave(); delete Save.data.chapter17Complete; delete Save.data.fortBadges; delete Save.data.fortChaosBest; delete Save.data.fortBestWave; Save.write(); Save.load(); out.oldSave = Save.data.chapter17Complete === false && Save.data.fortBadges === 0;
   } catch (e) { out.err = String(e && e.stack || e); }
   var need = ['table', 'bossWaves', 'harder', 'cast', 'bestiary', 'uniqueLooks', 'flyers', 'saveDefault', 'saveSane', 'ward', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'menuFilm', 'starts', 'spawns', 'hud',
     'bld', 'kinds', 'inside', 'noClash', 'reachAll', 'gatesOpen', 'startOpen', 'turretsOpen', 'fell', 'combo', 'comboEnds', 'score', 'hurt', 'shotDown', 'kickDown', 'tiers', 'tier3', 'tierTop', 'badgeOnce',
     'squadA', 'squadB', 'full', 'fullBonus', 'decay', 'relax', 'caps', 'fuse', 'boom', 'chain', 'safe', 'rubbleFire', 'turretAims', 'turretFires', 'hacking', 'hacked', 'allyShoots', 'burnsOut', 'mended', 'turretShotDown',
-    'lightOn', 'spotted', 'dark', 'noSpot', 'backAgain', 'allAgain', 'notTrapped', 'payout', 'aiOk', 'bossOk', 'films', 'noEndCard', 'finish', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'snapChaos', 'oldSave'];
+    'lightOn', 'spotted', 'dark', 'noSpot', 'backAgain', 'allAgain', 'notTrapped', 'payout', 'aiOk', 'bossOk', 'films', 'noEndCard', 'finish', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'snapChaos', 'snapRestore', 'oldSave'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);

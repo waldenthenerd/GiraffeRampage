@@ -21,7 +21,7 @@ function fxP(x, y, vx, vy, r, life, color, opts){
 }
 
 /* ---- what a creature is made of decides how it falls apart ---- */
-const DEATH_METAL = /drone|bot\b|mech|turret|tank|walker|copter|gunship|rover|bomber|fortress|hover|abrams|colossus|titan|sentry|crawler|droppod|a51_(drone|turret|walker|sledge)|a10|plasmaorb|reaper|swarmcarrier/;
+const DEATH_METAL = /drone|bot\b|mech|turret|tank|walker|copter|gunship|rover|bomber|fortress|hover|abrams|colossus|titan|sentry|crawler|droppod|a51_(drone|turret|walker|sledge)|a10|plasmaorb|reaper|swarmcarrier|ft_(jeep|apc|hound|colonel|maker)/;
 const DEATH_FIRE = /magma|cinder|ember|flare|pyr|inferno|forge|slag|obsidian|firewisp|soot|smoke/;
 const DEATH_ICHOR = /^dust_|glim|spore|a51_(pod|ghost|blade|jumper)|alien|venom|mosquito|blastbeetle|jellyfish|jellylet/;
 function deathStyle(e){
