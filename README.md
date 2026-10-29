@@ -54,16 +54,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 196 | 61,931 | 4.92 MiB (5,155,452 bytes) |
+| JavaScript (`js/`) | 197 | 62,165 | 4.94 MiB (5,179,080 bytes) |
 | Styles (`css/`) | 6 | 1,763 | 161 KiB (164,378 bytes) |
-| Page (`index.html`) | 1 | 246 | 12.5 KiB (12,780 bytes) |
-| **Whole game** | **203** | **63,940** | **5.09 MiB (5,332,610 bytes)** |
+| Page (`index.html`) | 1 | 247 | 12.5 KiB (12,837 bytes) |
+| **Whole game** | **204** | **64,175** | **5.11 MiB (5,356,295 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **63,341 lines, 5.04 MiB (5,285,810 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 196 | 61,931 | 4.92 MiB (5,155,452 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **63,576 lines, 5.06 MiB (5,309,495 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 197 | 62,165 | 4.94 MiB (5,179,080 bytes) |
 | Styles (`css/`) | 6 | 1,763 | 161 KiB (164,378 bytes) |
-| Page (`index.html`) | 1 | 246 | 12.5 KiB (12,780 bytes) |
-| **Whole game** | **203** | **63,940** | **5.09 MiB (5,332,610 bytes)** |
+| Page (`index.html`) | 1 | 247 | 12.5 KiB (12,837 bytes) |
+| **Whole game** | **204** | **64,175** | **5.11 MiB (5,356,295 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -165,6 +165,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/scenery/36g-scenery-moon-venus-inferno.js` | 542 | Scenery definitions: moon-venus-inferno (see js/scenery/36a-scenery-core.js for the format). |
 | `js/scenery/36h-scenery-area51-mars.js` | 424 | Scenery definitions: area51-mars (see js/scenery/36a-scenery-core.js for the format). Chapter 12 Area 51 and chapter 13 Mars; everything is inside one function so it adds no globals, and the runway, hangars, hatch and Mars base are kept clear of scenery. |
 | `js/scenery/36n-scenery-domes.js` | 137 | Scenery and the floor of the Domes (chapter 14): frosted steel plates, veins of glowing crystal root, frozen crates, seed pods, grow-lamps, vents breathing fog, falling flakes, and the dome's own rim of mylar panels. `drawGroundDome`, `buildGroundDome`, `buildDomeWorld`. |
+| `js/scenery/36o-scenery-detail.js` | 234 | **Scenery detail.** Wraps the `draw` of every prop, landmark, ground decal and terrain patch of every chapter with a layer of many small parts, from nine families chosen by the object's id (foliage rings and grass blades, rock and ice facets, bark and growth rings, panel seams and rivets, strata and grains, glowing cracks, reef polyps). Each object's own drawing is read once into a mask (shape, colours, centre, axis, foot), the parts are laid out once per object (seeded by its seed, a few ms a frame at most) as a display list, and a frame replays the list. Off when effects are off (`SD.off` switches it off in tests). |
 | `js/core/37-frame-transitions.js` | 409 | Frame composition, transform sequence, chapter transitions. |
 | `js/ui/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
 | `js/ui/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
