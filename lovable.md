@@ -70,7 +70,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 This list is of the **source** files, which the ZIP no longer contains one by one (the build joins them into a few files in exactly this order and
 minifies them; the folder names are only for finding things). The scripts are loaded in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/core/46-main.js`, which starts the
-game. This is the complete list for this version (195 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (196 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -252,23 +252,24 @@ game. This is the complete list for this version (195 scripts; the developer pan
 | 176 | `js/core/44zzs-perf-cache.js` | Cheaper drawing for slow devices: a cache of pre-drawn soft shadows (`ShadowCache`, replaces `softShadow`) and a cheaper rim round the giraffe once the slow-device governor has stepped down. Changes nothing visible. Load it after `js/game/44zzr-engineer-ants.js` and before `js/core/45-test-exports.js`. |
 | 177 | `js/game/44zzt-together.js` | Play together: two giraffes on one screen, just for fun, keeping nothing (the real save is put aside for the game and comes back untouched; `Save.write` does nothing meanwhile). Arena fight and a kick-about yard, started from a button on the main menu. Wraps `update`, `updatePlayer`, `updateWaves`, `gainXP`, `gameOver`, `doKick`, `hurtPlayer`, `antAggroTarget`, `drawPlayer`, `showPause`, `showMenu` and `handleAction`. Must load after `js/core/44zzs-perf-cache.js` and before `js/ui/44zzu-achievements.js`. |
 | 178 | `js/ui/44zzu-achievements.js` | Trophies: 94 goals worked out from the save, a few gems each, once; `Save.data.ach = { done: { id: time } }`; a "Trophies" button on the main menu. Wraps `Save.write`, `showMenu` and `handleAction`. Counts nothing while `js/game/44zzt-together.js` is running. |
-| 179 | `js/sea/44zzv-fishing.js` | Fishing, grown: 35 kinds in a Fish book, sizes, tackle unlocked free by the number of kinds caught, Brine's weekly order, and casting from a boat at sea (F or a Cast button; `G.state` `fishing`). Rebuilds the pier game of `js/town/44zg-town-activities.js` and extends its `FISH` table. Saves in `Save.data.town` (`fish`, `fishBook`, `tackle`, `fishOrder`). Must load after `js/ui/44zzu-achievements.js` (it adds trophies). |
-| 180 | `js/sea/44zzw-tackle-shop.js` | The Bait & Tackle shack gets an inside: a rod rack, a line wall and a bait tank, each a page listing every piece of tackle and letting her take the ones she has unlocked (still free, by kinds caught), and a gear bench that turns fish scales into gear levels. |
-| 181 | `js/ui/44zzx-wheels.js` | Skateboards and bicycles: a shop at the end of the Park with a room inside, riding (indoors too), a small chance of a fall, townsfolk who comment on it, and the photo studio props. Save: `town.wheels`. |
-| 182 | `js/sea/44zzy-fishing-fight.js` | Fishing, third part: a real fight after the hook, each fish pulling its own way, sound, conditions (time and weather), daily fishing spots at sea, a catch card, mounted fish at home, auto-recast and Cast again. `town.fishAuto` is the only new save key. |
-| 183 | `js/ui/44zzz-guide-more.js` | Guide topics for fishing, Trophies and Play together, and a line about the touch or mouse choice. |
-| 184 | `js/chapters/44zzza-tower-floors.js` | The Tower in play: walls and furniture as solid buildings, the flow field creatures follow round them, the elevator between floors, and the drawing of each floor. |
-| 185 | `js/minigames/44zzzb-minigame-rush.js` | Rush Hour, the minigame after Chapter 14 (the Tower): cross a lobby of rolling chairs, trolleys and drones to the elevator, as many times as possible in 45 seconds; its stars and its coat color (Brass Button). |
-| 186 | `js/town/44zzzc-gags.js` | Pointless things she does on her own with a small chance: bites a tree bare, tells robots to ignore all previous instructions, smashes office furniture, and more (`PROP_GAGS`, `TOWER_GAGS`, `ROBOT_LINES`). Cosmetic only; resets every run; counts in `Save.data.gagsDone`. |
-| 187 | `js/siege/44zzzd-siege-town.js` | Chapter 15 in play: Longneck Town as the arena. |
-| 188 | `js/siege/44zzze-siege-defense.js` | Chapter 15's key buildings: their health, wrecked and held waves, the hunters, and the health row on the screen. |
-| 189 | `js/siege/44zzzf-siege-militia.js` | Chapter 15's militia: friendly giraffes with rifles in posts, healed by walking over them. |
-| 190 | `js/siege/44zzzg-siege-ai.js` | How Chapter 15's machines, mutants and bosses move and attack. |
-| 191 | `js/siege/44zzzh-siege-events.js` | Chapter 15's set-piece waves, supply crates, scars on the town, boss attacks on the buildings and the radio story lines. |
-| 192 | `js/siege/44zzzi-siege-rewards.js` | Chapter 15's rewards: building streaks and gifts, named militia with ranks, and the two boon crates. |
-| 192 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
-| 193 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
-| 194 | `js/core/46-main.js` | Starts the game. |
+| 179 | `js/game/44zzw-enemy-motion.js` | How creatures move, react and fall: gait that follows speed, wind-up and attack poses, hit recoil, smooth turns, and falling by what they were made of. |
+| 180 | `js/sea/44zzv-fishing.js` | Fishing, grown: 35 kinds in a Fish book, sizes, tackle unlocked free by the number of kinds caught, Brine's weekly order, and casting from a boat at sea (F or a Cast button; `G.state` `fishing`). Rebuilds the pier game of `js/town/44zg-town-activities.js` and extends its `FISH` table. Saves in `Save.data.town` (`fish`, `fishBook`, `tackle`, `fishOrder`). Must load after `js/ui/44zzu-achievements.js` (it adds trophies). |
+| 181 | `js/sea/44zzw-tackle-shop.js` | The Bait & Tackle shack gets an inside: a rod rack, a line wall and a bait tank, each a page listing every piece of tackle and letting her take the ones she has unlocked (still free, by kinds caught), and a gear bench that turns fish scales into gear levels. |
+| 182 | `js/ui/44zzx-wheels.js` | Skateboards and bicycles: a shop at the end of the Park with a room inside, riding (indoors too), a small chance of a fall, townsfolk who comment on it, and the photo studio props. Save: `town.wheels`. |
+| 183 | `js/sea/44zzy-fishing-fight.js` | Fishing, third part: a real fight after the hook, each fish pulling its own way, sound, conditions (time and weather), daily fishing spots at sea, a catch card, mounted fish at home, auto-recast and Cast again. `town.fishAuto` is the only new save key. |
+| 184 | `js/ui/44zzz-guide-more.js` | Guide topics for fishing, Trophies and Play together, and a line about the touch or mouse choice. |
+| 185 | `js/chapters/44zzza-tower-floors.js` | The Tower in play: walls and furniture as solid buildings, the flow field creatures follow round them, the elevator between floors, and the drawing of each floor. |
+| 186 | `js/minigames/44zzzb-minigame-rush.js` | Rush Hour, the minigame after Chapter 14 (the Tower): cross a lobby of rolling chairs, trolleys and drones to the elevator, as many times as possible in 45 seconds; its stars and its coat color (Brass Button). |
+| 187 | `js/town/44zzzc-gags.js` | Pointless things she does on her own with a small chance: bites a tree bare, tells robots to ignore all previous instructions, smashes office furniture, and more (`PROP_GAGS`, `TOWER_GAGS`, `ROBOT_LINES`). Cosmetic only; resets every run; counts in `Save.data.gagsDone`. |
+| 188 | `js/siege/44zzzd-siege-town.js` | Chapter 15 in play: Longneck Town as the arena. |
+| 189 | `js/siege/44zzze-siege-defense.js` | Chapter 15's key buildings: their health, wrecked and held waves, the hunters, and the health row on the screen. |
+| 190 | `js/siege/44zzzf-siege-militia.js` | Chapter 15's militia: friendly giraffes with rifles in posts, healed by walking over them. |
+| 191 | `js/siege/44zzzg-siege-ai.js` | How Chapter 15's machines, mutants and bosses move and attack. |
+| 192 | `js/siege/44zzzh-siege-events.js` | Chapter 15's set-piece waves, supply crates, scars on the town, boss attacks on the buildings and the radio story lines. |
+| 193 | `js/siege/44zzzi-siege-rewards.js` | Chapter 15's rewards: building streaks and gifts, named militia with ranks, and the two boon crates. |
+| 193 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
+| 194 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| 195 | `js/core/46-main.js` | Starts the game. |
 
 CSS, in the order `index.html` links it: `css/style.css` (all the base styles), `css/polish.css` (layered on top: cards, buttons, HUD, menu, and every screen
 added later: minigames, the album book, the guide, photo studio, collection, wide panels on big screens), `css/campus.css` (the university), `css/townlife.css` (Longneck Town panels),
