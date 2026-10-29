@@ -220,7 +220,7 @@ showHelp = function(){
         musicRowHTML() +
         hitFlashRowHTML() +
       '</div>' +
-      '<div class="row" style="margin-top:22px"><button class="btn sm" data-a="menu">Back to menu</button></div>' +
+      '<div class="row stickyback" style="margin-top:22px"><button class="btn sm" data-a="menu">Back to menu</button></div>' +
     '</div>');
   wireHitFlashSlider(); wireMusicSlider();
   /* the toggles above redraw this page; keep the folds the player had open */

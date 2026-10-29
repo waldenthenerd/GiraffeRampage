@@ -110,7 +110,7 @@ function drawScreenFX(ctx){
   }
 
   /* wave banner */
-  if (G.banner){
+  if (G.banner && G.state !== 'levelup'){                                        /* not under the level-up cards, where it ran into their title */
     const b = G.banner;
     const k = b.t / b.dur;
     const a = k < 0.12 ? k / 0.12 : k > 0.78 ? (1 - k) / 0.22 : 1;

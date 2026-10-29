@@ -77,9 +77,15 @@ function antsDeepHTML(){
   return '<div class="aptuns one"><i></i></div><div class="apdeep"><h4>The dust alliance</h4><p class="sub" style="margin:0 0 8px">Up to five dust aliens join the squad. In a run, ' + (Input.hasTouch ? 'tap them in the squad strip on the right edge' : 'keys <b>1–5</b>') +
     ' call them in; each has ten times your health (armor does not help it) and needs ' + SQUAD_CD + ' seconds before it can be called again if it falls.</p><div class="aprooms sq5">' + rooms + '</div></div>';
 }
-const _antsLockedHTML = antsTabHTML;
+function antsLockedHTML(){                                                 /* before the colony: how far her best score is from the 100,000,000 that opens it */
+  const best = Math.max(0, +Save.data.best || 0), pct = Math.min(100, best / ANT_UNLOCK_SCORE * 100);
+  return '<div class="antlock"><div class="alh">The colony is still underground</div>' +
+    '<p class="sub">Score <b>' + ANT_UNLOCK_SCORE.toLocaleString('en-US') + '</b> in a single run and an anthill will appear at the center of the arena.</p>' +
+    '<i class="upbar big"><u style="width:' + pct.toFixed(1) + '%"></u></i>' +
+    '<div class="alp"><span>Your best run: <b>' + fmt(best) + '</b></span><span>' + (pct < 1 && best > 0 ? '<1' : Math.floor(pct)) + '%</span></div></div>';
+}
 antsTabHTML = function(){
-  if (!Save.data.antsUnlocked) return _antsLockedHTML.apply(this, arguments);
+  if (!Save.data.antsUnlocked) return antsLockedHTML();
   return '<div class="antpg"><div class="apsurf"><canvas id="antSurface"></canvas><div class="apsl"><b>The colony</b><small>Hired ants are permanent. Each kind comes out of the anthill every ' + Math.round(antRespawnTime() * 10) / 10 + ' seconds until all you own are out.</small></div></div>' +
     '<div class="apsoil"><div class="aptuns one"><i></i></div>' + antsFoodHTML() + '<div class="aptuns"><i></i><i></i><i></i></div>' +
     '<div class="aprooms">' + antsPageOrder().map(antsRoomHTML).join('') + '</div>' + antsDeepHTML() + '</div></div>';

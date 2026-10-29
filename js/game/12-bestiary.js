@@ -122,7 +122,7 @@ function showBestiary(tab){
         '<button class="tab' + (bestiaryTab === 'cards' ? ' on' : '') + '" data-a="bst-cards">Cards</button>' +
       '</div>' +
       content +
-      '<div class="row" style="margin-top:20px"><button class="btn sm" data-a="menu">Back to menu</button></div>' +
+      '<div class="row stickyback" style="margin-top:20px"><button class="btn sm" data-a="menu">Back to menu</button></div>' +
     '</div>');
   if (bestiaryTab === 'creatures') paintBestiaryPortraits();
 }
@@ -137,16 +137,20 @@ function bestiaryCreaturesHTML(){
       shown++;
       const kills = b.creatures[ch + ':' + type] | 0, known = kills > 0;
       if (known) found++;
+      if (!known) continue;                                                     /* an unseen creature is not drawn at all: a strip below counts them, so a fresh page is short and shows nothing of what is coming */
       const nm = bestiaryName(ch, type);
       cells +=
-        '<div class="bst-entry' + (known ? '' : ' unknown') + (def.big ? ' boss' : '') + '">' +
-          '<canvas class="bst-pic" width="160" height="160" data-bch="' + ch + '" data-btype="' + type + '" data-bknown="' + (known ? 1 : 0) + '"></canvas>' +
-          '<div class="bst-name">' + (known ? nm.title : '???') + '</div>' +
-          '<div class="bst-sub">' + (known
-            ? (nm.species ? nm.species + ' \u00b7 ' : '') + (def.big ? 'Boss \u00b7 ' : '') + 'Defeated ' + fmt(kills)
-            : (def.big ? 'Undiscovered boss' : 'Undiscovered')) + '</div>' +
+        '<div class="bst-entry' + (def.big ? ' boss' : '') + '">' +
+          '<canvas class="bst-pic" width="160" height="160" data-bch="' + ch + '" data-btype="' + type + '" data-bknown="1"></canvas>' +
+          '<div class="bst-name">' + nm.title + '</div>' +
+          '<div class="bst-sub">' + (nm.species ? nm.species + ' \u00b7 ' : '') + (def.big ? 'Boss \u00b7 ' : '') + 'Defeated ' + fmt(kills) + '</div>' +
         '</div>';
     }
+    if (!found){                                                               /* a chapter with nothing found is one line, so a fresh page does not run on for sixteen empty blocks */
+      out += '<div class="bst-none"><b>Chapter ' + chapterLabel(ch) + ' \u2014 ' + BESTIARY_CHAPTERS[ch - 1] + '</b><span>0 / ' + shown + '</span></div>';
+      continue;
+    }
+    if (shown > found) cells += '<div class="bst-more">' + (shown - found) + ' undiscovered</div>';
     out += '<h3 class="gh">Chapter ' + chapterLabel(ch) + ' \u2014 ' + BESTIARY_CHAPTERS[ch - 1] +
       '<small style="font-weight:400;color:var(--dust);font-size:12px"> \u2014 ' + found + ' / ' + shown + '</small></h3>' +
       '<div class="bst-grid">' + cells + '</div>';
@@ -155,9 +159,10 @@ function bestiaryCreaturesHTML(){
 }
 function bestiaryCardsHTML(){
   const b = bestiaryData();
-  let cells = '';
+  let cells = '', unseen = 0;
   for (let i = 0; i < CARDS.length; i++){
     const def = CARDS[i], best = b.cards[def.id] | 0, known = best > 0;
+    if (!known){ unseen++; continue; }                                        /* cards not yet taken are only counted, in one strip at the end */
     let forms = '';
     if (known){
       for (let k = 0; k < def.forms.length; k++){
@@ -178,6 +183,7 @@ function bestiaryCardsHTML(){
         forms +
       '</div>';
   }
+  if (unseen) cells += '<div class="bst-more">' + unseen + ' undiscovered' + (unseen === CARDS.length ? ' \u2014 take a card in a run to record it' : '') + '</div>';
   return '<div class="bst-cards">' + cells + '</div>';
 }
 /* Each portrait is the creature's real in-game drawing, facing right,

@@ -182,8 +182,8 @@ function sgDrawKeyStatus(ctx, b, t){
 const siegeBaseOverlays = drawFeedbackOverlays;
 drawFeedbackOverlays = function(ctx){
   siegeBaseOverlays.apply(this, arguments);
-  if (G.chapter !== SIEGE_CHAPTER || G.biome !== 'siege' || !G.sg || G.attract) return;
-  let keys = Object.keys(SGB), n = keys.length, W = G.W, pw = clamp((W - 24) / n - 4, 56, 104), ph = 22, x0 = W / 2 - (pw + 4) * n / 2 + 2, y0 = W < 700 && G.H > W ? 120 : 64; if (G.bossAlive && G.boss && !G.boss.dead) y0 = W < 700 && G.H > W ? 170 : 108;       /* below the health bars on a phone held upright, and below the boss's bar while it is up */
+  if (G.chapter !== SIEGE_CHAPTER || G.biome !== 'siege' || !G.sg || G.attract || G.state === 'levelup') return;       /* the key-building row waits while the level-up cards are open */
+  let keys = Object.keys(SGB), n = keys.length, W = G.W, pw = clamp((W - 24) / n - 4, 56, 104), ph = 22, x0 = W / 2 - (pw + 4) * n / 2 + 2, y0 = W < 700 && G.H > W ? 96 : 64; if (G.bossAlive && G.boss && !G.boss.dead) y0 = W < 700 && G.H > W ? 146 : 108;       /* below the health bars on a phone held upright, and below the boss's bar while it is up */
   ctx.save(); ctx.textAlign = 'center'; ctx.font = '800 11px ui-sans-serif, "Segoe UI", Roboto, sans-serif';
   for (let i = 0; i < n; i++){
     const s = SGB[keys[i]], x = x0 + i * (pw + 4), pc = clamp(s.hp / SIEGE_BLD.max, 0, 1), hot = s.alert > 0 && Math.sin(G.time * 12) > 0;

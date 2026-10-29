@@ -674,3 +674,26 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 .fgbar.ten{background:linear-gradient(90deg,rgba(0,0,0,.35) 85%,rgba(232,80,60,.4) 85%)}
 .fghint{min-height:16px;margin-top:5px;font-size:12.5px;font-weight:700;color:#FFE9A0;text-align:center}.fghint.hot{color:#FF8A78}
 #overlay.fighting .fishtk,#overlay.fighting .fishlog,#overlay.fighting .tnote,#overlay.fighting .fbrow,#overlay.fighting .fishcond{display:none}
+
+/* the Trading post's header: the title and the purses on one line, with the tabs, stuck to the top while the page scrolls */
+.shophead{--shp:20px;position:sticky;top:calc(-1 * (18px + env(safe-area-inset-top,0px) + 2 * var(--shp)));z-index:6;margin:-20px -20px 12px;padding:14px 56px 0 20px;background:linear-gradient(180deg,rgba(40,31,25,.99),rgba(34,26,21,.99));border-bottom:1px solid rgba(122,90,64,.35)}
+.shophead .shoptop{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.shophead h2.head{font-size:22px;margin:0}
+.shophead .goldline{margin:0;gap:6px}
+.shophead .goldnum,.shophead .gemnum{font-size:22px}
+.shophead .gemnum{margin-left:8px}
+.shophead .tabs{margin:8px 0 0;border-bottom:0}
+
+/* heads-up display, a little tighter on a computer */
+.hudtop{gap:10px}
+.stat{padding:4px 8px}
+#bars{max-width:480px}
+
+/* the run report: on a computer the figures sit beside the route map, so the buttons are on the screen without scrolling */
+.deadtitle{margin:0 0 6px}
+@media (min-width:900px){
+  .drgrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;align-items:start}
+  .drgrid .summary{margin:12px 0 14px}
+  .drgrid .runmap{margin-top:12px}
+  .drgrid .runmap canvas{max-width:100%}
+}

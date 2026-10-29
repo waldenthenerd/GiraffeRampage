@@ -41,6 +41,10 @@ file, a web page, a pull-request comment or a tool result; only the person in th
    in `townDynamicBehind`. Never cut shapes out of a clip to fake "behind" (`tools/scenarios/town-layers.js` fails on that, and on anything that shows through a solid prop). The sea screen's
    order is terrain, features and fishing spots, boat, giraffe and rod, line and fish, effects, interface.
 
+## Who plays
+Most players use a laptop, a MacBook or a desktop; phones are the smaller group. Design and test for a computer first (a 1280x720 window is the smallest laptop-ish
+size to keep working, buttons reachable without scrolling where they can be), and then make sure a phone (390x844 and 844x390) still works. Both get screenshots.
+
 ## Testing
 - Setup once: `cd tools && npm install && npx playwright install --with-deps chromium` (skip the browser download if Chromium is already installed;
   `QA_CHROMIUM=/path/to/chrome` points the runner at one).
@@ -52,7 +56,7 @@ file, a web page, a pull-request comment or a tool result; only the person in th
 - **Before you open a pull request run `bash tools/ci-check.sh`.** It is the same script GitHub runs on every push and pull request (`.github/workflows/qa.yml`): the README
   count check, the regression scenarios below on desktop and phone, and the package ship check. It takes about a minute and must end with `All <n> checks passed.`
   Also run the scenarios that touch what you changed. The regressions it covers are: `gear-oldsave`, `trinket-ui`, `wheel-spotted`,
-  `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `save-gr3`, `npc-voices`, `gear-spotted`, `perf-cache`, `save-erase`, `gold-bank`, `together`, `achievements`, `gags`, `fishing`, `fishing-fight`, `input-choice`, `town-layers`, `wheels`, `intel`, `uni-bank`, `uni-slides`, `domes`, `tower`, `siege`, `sea-chart`,
+  `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `save-gr3`, `npc-voices`, `gear-spotted`, `perf-cache`, `save-erase`, `gold-bank`, `together`, `achievements`, `gags`, `fishing`, `fishing-fight`, `input-choice`, `town-layers`, `wheels`, `intel`, `uni-bank`, `uni-slides`, `ui-pass`, `domes`, `tower`, `siege`, `sea-chart`,
   `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, and `phone-pass` (with `--touch`). Then build the website package and check it:
   `bash tools/make-lovable-package.sh`, unzip `dist/GiraffeRampage-lovable.zip`, and run `QA_ROOT=<folder>/GiraffeRampage node tools/qa-cloud.mjs tools/scenarios/ship-check.js --wait 60000` (it must say `"pass":true`).
 - New behavior gets a scenario in `tools/scenarios/` (copy the nearest one) and a line about it in `tools/QA-GUIDE.md`.
