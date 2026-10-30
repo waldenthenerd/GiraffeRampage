@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 208 | 64,474 | 5.21 MiB (5,464,950 bytes) |
-| Styles (`css/`) | 6 | 1,782 | 162 KiB (165,959 bytes) |
-| Page (`index.html`) | 1 | 258 | 13.1 KiB (13,393 bytes) |
-| **Whole game** | **215** | **66,514** | **5.38 MiB (5,644,302 bytes)** |
+| JavaScript (`js/`) | 209 | 64,643 | 5.23 MiB (5,482,480 bytes) |
+| Styles (`css/`) | 6 | 1,780 | 162 KiB (165,785 bytes) |
+| Page (`index.html`) | 1 | 259 | 13.1 KiB (13,444 bytes) |
+| **Whole game** | **216** | **66,682** | **5.40 MiB (5,661,709 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **65,913 lines, 5.34 MiB (5,597,320 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 208 | 64,474 | 5.21 MiB (5,464,950 bytes) |
-| Styles (`css/`) | 6 | 1,782 | 162 KiB (165,959 bytes) |
-| Page (`index.html`) | 1 | 258 | 13.1 KiB (13,393 bytes) |
-| **Whole game** | **215** | **66,514** | **5.38 MiB (5,644,302 bytes)** |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **66,081 lines, 5.35 MiB (5,614,727 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 209 | 64,643 | 5.23 MiB (5,482,480 bytes) |
+| Styles (`css/`) | 6 | 1,780 | 162 KiB (165,785 bytes) |
+| Page (`index.html`) | 1 | 259 | 13.1 KiB (13,444 bytes) |
+| **Whole game** | **216** | **66,682** | **5.40 MiB (5,661,709 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -289,7 +289,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/fort/44zzzm-fort-ai.js` | 254 | **The fort's behaviors** (`FORT_AI`): the twelve soldiers and machines (burst-firing guard, panicking cadet, lunging hound, ramming jeep and APC, shield-bashing riot trooper, bombing copter, mortar and grenade lobbers with marked patches, the sniper's laser, the pyro's flame, the medic's heal) and the five bosses with their phases. |
 | `js/fort/44zzzn-fort-detail.js` | 272 | **The fort's detail layer**: `ftDetail` (per-kind small parts on every building and vehicle: panels, rivets, vents, fans, pipes, hatches, windows, doors, lamps, sandbags, crates, stencils, stains), `ftGroundDetail` (tracks, stains, cracks, drains, drums, tank traps, tents, cable runs, weeds) and `ftRuinDetail` (charred beams, glass, ash). |
 | `js/game/44zzzo-camp.js` | 104 | **The Camp, the logic**: the clock (`campHours`, `campCollect`), the rate and cap, the two gem upgrades opened by chapters, the Camp Crate (`CRATES.camp`, `campOpen`) and the Camp Hearth trinket. |
-| `js/ui/44zzzp-camp-page.js` | 105 | **The Camp tab** of the trading post: the scene, what is stored, Collect, the crates in store, the upgrade rows, the menu line and the tab dot. |
+| `js/ui/44zzzp-camp-page.js` | 95 | **The Camp tab** of the trading post: the scene, what is stored, Collect, the crates in store, the upgrade rows, the menu line and the tab dot. |
+| `js/ui/44zzzq-camp-scene.js` | 179 | **The Camp's picture**: an animated night camp drawn in code from the time alone (`campSceneAt`, `campSceneDraw`): the giraffe chops wood, walks to the fire and sits by it, then fights what comes out of the dark with a sword, and with a bow the round after. |
 | `js/core/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/dev/45b-dev-panel.js` | 601 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/core/46-main.js` | 5 | Starts the game. |

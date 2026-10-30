@@ -90,18 +90,24 @@
     Save.data.campLast = Date.now() - 2 * H; out.menuNote = /Camp: 2h 00m stored/.test(campMenuNote()) && campTabDot().indexOf('updot') > 0;
     Save.data.campLast = Date.now(); Save.data.campCrates = 0; out.menuQuiet = campMenuNote() === '' && campTabDot() === '';
 
+    /* the animated scene: every moment of the thirty-second round (and the bow round after it) draws without error, and she is where the timeline says */
+    var sc = document.createElement('canvas'); sc.width = CAMP_SCENE.W; sc.height = CAMP_SCENE.H; var sx = sc.getContext('2d'), bad = 0;
+    for (var tt = 0; tt < 60; tt += 0.25){ try { campSceneDraw(sx, tt, 0.5); } catch (e3){ bad++; out.sceneErr = e3.message; } }
+    out.scene = bad === 0 && campSceneAt(4).mode === 'chop' && campSceneAt(9).mode === 'walk' && campSceneAt(14).mode === 'sit' && campSceneAt(22).mode === 'fight' && campSceneAt(30).mode === 'chop' && Math.abs(campSceneAt(30).x - 100) < 1;
+    out.sceneLoop = (function(){ var ok = true; for (var u = 0; u < 30; u += 0.5){ var a0 = campSceneAt(u).x, a1 = campSceneAt(u + 0.5).x; if (Math.abs(a1 - a0) > 70) ok = false; } return ok; })();
+    var px0 = sx.getImageData(0, 0, 1, 1).data[3]; out.sceneDrawn = px0 === 255;
     /* the pictures */
     if (V === 'page' || V === 'full' || V === 'reveal' || V === 'menu'){
       fresh(); Save.data.gems = 1500; Save.data.chapter3Complete = true; Save.data.chapter4Complete = true; Save.data.campRate = 1; campStart();
       Save.data.campLast = Date.now() - (V === 'full' ? 20 : 2.4) * H; Save.data.campCrates = 4; Save.data.campProg = 0.6; campPage.note = '';
       if (V === 'menu'){ showMenu(); }
-      else { GR.handleAction('tab-camp'); if (V === 'reveal'){ GR.handleAction('camp-open-5'); for (var i = 0; i < 30; i++) GR.step(1 / 30); } }
+      else { GR.handleAction('tab-camp'); if (QA.params.ct){ CAMP_SCENE.fixT = +QA.params.ct; campSceneFrame(0); } if (V === 'reveal'){ GR.handleAction('camp-open-5'); for (var i = 0; i < 30; i++) GR.step(1 / 30); } }
       out.view = V;
     }
   } catch (e) { out.err = String(e && e.stack || e); }
   var need = ['locked', 'noTab', 'open', 'tab', 'starts', 'rate', 'minRate', 'rateLv', 'oneHour', 'cap3', 'cap6', 'back', 'collect', 'again', 'crateMade', 'fastCrates', 'upLocked', 'upBuy', 'upNext', 'upPoor', 'upMax', 'upTriple',
     'openOne', 'odds', 'openAll', 'pity', 'hearthDrop', 'hearthOnce', 'hearthRare', 'hearthStats', 'hearthCamp', 'hearthOff', 'sane', 'defaults', 'oldSave', 'shop', 'collectBtn', 'tick', 'pageCollect', 'pageOpen', 'revealClosed', 'pageMany',
-    'pageBuy', 'lockedRow', 'timerStops', 'menuNote', 'menuQuiet'];
+    'pageBuy', 'lockedRow', 'timerStops', 'menuNote', 'menuQuiet', 'scene', 'sceneLoop', 'sceneDrawn'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);

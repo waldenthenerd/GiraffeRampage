@@ -334,9 +334,7 @@
 
 /* the Camp tab (js/ui/44zzzp-camp-page.js) */
 .tab{position:relative}.tab .updot{--ac:#6FD0F0;right:4px;top:3px}
-.campscene{display:block;width:100%;height:150px;border-radius:10px;border:1px solid var(--bark)}
-.campfire path:first-of-type+path{transform-origin:0 0;animation:campflick 1.1s ease-in-out infinite alternate}
-@keyframes campflick{from{transform:scale(1,1)}to{transform:scale(.92,1.08)}}
+.campscene{display:block;width:100%;height:auto;aspect-ratio:8/3;border-radius:10px;border:1px solid var(--bark)}
 .campstore{padding:10px 12px;border-radius:8px;background:rgba(74,55,42,.42);border:1px solid var(--bark)}
 .campbar{display:block;height:14px;border-radius:7px;background:rgba(0,0,0,.45);overflow:hidden;margin-bottom:6px}
 .campbar.sm{display:inline-block;width:110px;height:8px;margin:0 4px;vertical-align:middle}

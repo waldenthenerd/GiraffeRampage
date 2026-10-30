@@ -1,7 +1,7 @@
 'use strict';
 /* =============================================================================================================================
-   44zzzp-camp-page.js  --  THE CAMP TAB of the trading post (the logic is js/game/44zzzo-camp.js). A little scene of the camp (a tent, a fire and
-   a lantern, with the fire burning higher the fuller the store), what is stored (hours of the cap, gold, the crate being worked toward) with
+   44zzzp-camp-page.js  --  THE CAMP TAB of the trading post (the logic is js/game/44zzzo-camp.js). A little animated scene of the camp (js/ui/44zzzq-camp-scene.js: the giraffe chops wood, sits by the fire and fights off
+   what comes out of the dark, and the fire burns higher the fuller the store), what is stored (hours of the cap, gold, the crate being worked toward) with
    Collect, the Camp Crates in store with Open 1, 5 or all (the reveal is the gear page's), and the two upgrades in the same rows as the permanent upgrades.
    Until Chapter 2 is cleared the tab is not there. While it is showing, the numbers tick once a second without redrawing the page.
    ============================================================================================================================= */
@@ -16,17 +16,7 @@ function campMenuNote(){                                                        
   return h >= 1 || c > 0 ? ' · Camp: ' + (h >= 1 ? campTime(h) + ' stored' : '') + (h >= 1 && c > 0 ? ', ' : '') + (c > 0 ? c + (c === 1 ? ' crate' : ' crates') : '') : '';
 }
 function campTabDot(){ return campUnlocked() && (campHours() >= 1 || (Save.data.campCrates | 0) > 0) ? '<i class="updot" title="Something is waiting in the camp"></i>' : ''; }
-function campSceneHTML(fill){
-  const f = Math.max(0.15, Math.min(1, fill)), h = 14 + 22 * f;
-  return '<svg class="campscene" viewBox="0 0 320 120" preserveAspectRatio="xMidYMid slice" role="img" aria-label="A tent and a campfire">' +
-    '<rect width="320" height="120" fill="#1E2A33"/><circle cx="262" cy="22" r="9" fill="#F4E8B8" opacity=".9"/><circle cx="40" cy="18" r="1.2" fill="#fff"/><circle cx="96" cy="30" r="1" fill="#fff"/><circle cx="150" cy="12" r="1.3" fill="#fff"/><circle cx="214" cy="34" r="1" fill="#fff"/>' +
-    '<path d="M0 96 L70 70 L130 90 L200 62 L260 86 L320 72 V120 H0Z" fill="#26343C"/><rect y="98" width="320" height="22" fill="#3C3226"/>' +
-    '<path d="M62 98 L104 48 L146 98Z" fill="#B4864A"/><path d="M104 48 L120 98 H146Z" fill="#8E6736"/><path d="M92 98 L104 76 L116 98Z" fill="#2A1E12"/><path d="M104 48 V40 M104 40 L116 44 L104 46" stroke="#D8C8A0" fill="#C8402A" stroke-width="1.5"/>' +
-    '<g class="campfire" transform="translate(200 98)"><ellipse rx="26" ry="5" cy="4" fill="rgba(0,0,0,.35)"/><path d="M-16 2 L16 -4 M-16 -4 L16 2" stroke="#5A3A1C" stroke-width="5" stroke-linecap="round"/>' +
-    '<path d="M0 ' + (-h).toFixed(1) + ' C10 ' + (-h * 0.55).toFixed(1) + ' 13 -8 0 -2 C-13 -8 -10 ' + (-h * 0.55).toFixed(1) + ' 0 ' + (-h).toFixed(1) + 'Z" fill="#FF8A2A"/>' +
-    '<path d="M0 ' + (-h * 0.62).toFixed(1) + ' C6 ' + (-h * 0.35).toFixed(1) + ' 7 -6 0 -3 C-7 -6 -6 ' + (-h * 0.35).toFixed(1) + ' 0 ' + (-h * 0.62).toFixed(1) + 'Z" fill="#FFD66A"/></g>' +
-    '<g transform="translate(262 98)"><path d="M0 0 V-30 M0 -30 H10" stroke="#6A4A2A" stroke-width="3"/><rect x="6" y="-28" width="9" height="12" rx="2" fill="#FFC870"/><circle cx="10.5" cy="-22" r="14" fill="#FFC870" opacity=".15"/></g></svg>';
-}
+function campSceneHTML(){ return '<canvas id="campCanvas" class="campscene" width="' + CAMP_SCENE.W + '" height="' + CAMP_SCENE.H + '" role="img" aria-label="The giraffe at her camp: chopping wood, sitting by the fire and fighting off what comes out of the dark"></canvas>'; }
 function campUpRowHTML(id){
   const U = CAMP_UP[id], nx = campUpNext(id), lv = nx.lv, pct = lv / 5 * 100, maxed = nx.maxed;
   const cls = 'uprow' + (!maxed && !nx.open ? ' locked' : '') + (maxed ? ' ismax' : '') + (!maxed && nx.can ? ' can' : '');
@@ -45,7 +35,7 @@ function campTabHTML(){
   const dayTrip = p.hours < cap ? 'Full in ' + campTime(cap - p.hours) : 'Full. It has stopped working until you collect.';
   const crate = CRATES.camp;
   const resNote = campPage.note ? '<p class="campnote">' + campPage.note + '</p>' : '';
-  return '<div class="uppg camppg">' + campSceneHTML(p.hours / cap) +
+  return '<div class="uppg camppg">' + campSceneHTML() +
     '<p class="sub" style="margin:8px 0">While she is away the camp works at a fixed rate, up to ' + campTime(cap) + ' of it, and keeps the gold and the crates for you.</p>' +
     '<div class="campstore"><div class="campbar" role="progressbar" aria-valuemin="0" aria-valuemax="' + cap + '" aria-valuenow="' + p.hours.toFixed(2) + '"><i id="campBarFill" class="' + (full ? 'full' : '') + '" style="width:' + Math.min(100, p.hours / cap * 100).toFixed(1) + '%"></i></div>' +
     '<div class="campline"><b id="campHrs">' + campTime(p.hours) + '</b> of ' + campTime(cap) + ' <span id="campFull" class="sub">' + dayTrip + '</span></div>' +
@@ -76,7 +66,7 @@ function campTick(){
   const s = showShop;
   showShop = function(tab){
     const r = s.apply(this, arguments);
-    if (shopTab === 'camp' && G.state === 'shop' && campUnlocked()){ if (!campPage.timer) campPage.timer = setInterval(campTick, 1000); }
+    if (shopTab === 'camp' && G.state === 'shop' && campUnlocked()){ if (!campPage.timer) campPage.timer = setInterval(campTick, 1000); campSceneMount(Math.min(1, campHours() / campCapHours())); }
     return r;
   };
   const h = handleAction;
