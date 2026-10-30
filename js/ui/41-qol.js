@@ -245,6 +245,8 @@ function filmList(){
   L.push({ kind: 'towerout', title: 'Out the Top', sub: 'The vial, the paraglider, and a second helicopter.', un: !!d.chapter15Complete });
   L.push({ kind: 'siegeflight', title: 'Smoke Over Longneck Town', sub: 'The helicopter brings her home, and the militia hold the edge of town.', un: !!d.chapter15Complete });
   L.push({ kind: 'siegeout', title: 'The Morning After', sub: 'The Warden, the hatch in the Square, and one small drone going east.', un: !!d.chapter16Complete });
+  L.push({ kind: 'fortflight', title: 'Over the Wall', sub: 'Night on the ridge, a floodlit wall, and a very long neck.', un: !!d.chapter16Complete });
+  L.push({ kind: 'fortout', title: 'A Circle in Red', sub: 'The fort smoking, a cracked screen in the bunker, and the sun coming up.', un: !!d.chapter17Complete });
   return L;
 }
 function galleryButtonHTML(){
@@ -277,7 +279,7 @@ function runSnapshot(){
   return { v: 1, wave: G.wave, chapter: G.chapter, score: scoreInt(G.score), kills: G.kills | 0, bonusGold: G.bonusGold || 0, runTime: G.runTime || 0,
     speedLevel: G.runSpeedLevel | 0, rerolls: G.rerolls | 0, revives: G.revives | 0, pending: G.pendingLevels | 0,
     gems: G.runGems | 0, sulfur: G.runSulfur | 0, basalt: G.runBasalt | 0, grubs: G.runGrubs | 0, iron: G.runIron | 0, argon: G.runArgon | 0,
-    level: P.level | 0, xp: P.xp || 0, xpNext: P.xpNext || 50, hp: P.hp || 1, marsShips: !!G.marsShipsSeen, sgHeld: G.sg ? G.sg.held | 0 : 0, sgBoons: G.sg && G.sg.boons ? G.sg.boons.slice() : [], sgStreak: G.sg && G.sg.streak ? Object.assign({}, G.sg.streak) : {}, cards: cards };
+    level: P.level | 0, xp: P.xp || 0, xpNext: P.xpNext || 50, hp: P.hp || 1, marsShips: !!G.marsShipsSeen, sgHeld: G.sg ? G.sg.held | 0 : 0, sgBoons: G.sg && G.sg.boons ? G.sg.boons.slice() : [], sgStreak: G.sg && G.sg.streak ? Object.assign({}, G.sg.streak) : {}, ftChaos: G.ft ? G.ft.chaos | 0 : 0, cards: cards };
 }
 function saveRunNow(){
   if (G.attract || G.state !== 'playing' || P.dead || G.noSnap) return;
@@ -307,7 +309,7 @@ function restoreRun(r){
     if (!ownedCard(id) && visibleCards().length >= maxCards()) continue;           /* a damaged save cannot hold more cards than the slots allow */
     for (let k = 0; k < lv; k++) takeCard(id);
   }
-  G.score = r.score; G.kills = r.kills; G.bonusGold = r.bonusGold; G.runTime = r.runTime; G.sgHeldRestore = clamp(r.sgHeld | 0, 0, 24); G.sgBoonsRestore = Array.isArray(r.sgBoons) ? r.sgBoons.filter(function(b){ return typeof SG_BOONS !== 'undefined' && SG_BOONS[b]; }).slice(0, 2) : []; G.sgStreakRestore = r.sgStreak && typeof r.sgStreak === 'object' ? r.sgStreak : {};        /* the Siege: how many waves she has held so far (the world is built after this) */
+  G.score = r.score; G.kills = r.kills; G.bonusGold = r.bonusGold; G.runTime = r.runTime; G.sgHeldRestore = clamp(r.sgHeld | 0, 0, 24); G.sgBoonsRestore = Array.isArray(r.sgBoons) ? r.sgBoons.filter(function(b){ return typeof SG_BOONS !== 'undefined' && SG_BOONS[b]; }).slice(0, 2) : []; G.sgStreakRestore = r.sgStreak && typeof r.sgStreak === 'object' ? r.sgStreak : {}; G.ftChaosRestore = clamp(r.ftChaos | 0, 0, 9999999);        /* the Siege: how many waves she has held so far (the world is built after this) */
   G.runSpeedLevel = r.speedLevel | 0; G.runSpeed = G.runSpeedLevel > 0;
   G.rerolls = r.rerolls; G.revives = r.revives; G.pendingLevels = r.pending | 0;
   G.runGems = r.gems; G.runSulfur = r.sulfur; G.runBasalt = r.basalt; G.runGrubs = r.grubs; G.runIron = r.iron; G.runArgon = r.argon;
@@ -717,6 +719,7 @@ function showDeath(){
 
 function victoryText(mins, secs){
   const tm = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's';
+  if (G.chapter >= COUNTER_CHAPTER) return 'The maker of the Warden folds up in the ruins of its own command bunker, and the sirens of Fort Shortneck wind down one by one. You tore the fort apart in ' + tm + ' and left ' + fmt((G.ft && G.ft.chaos) | 0) + ' points of chaos behind you. Smoke is rolling off the ridge. In the wreckage of the glimmer plant, a map is still glowing on a cracked screen, and one line of it is circled in red.';
   if (G.chapter >= SIEGE_CHAPTER) return 'The Warden goes down at the edge of Longneck Town, and the siren on the Hall winds to silence. You held the town for ' + tm + ', and ' + ((G.sg && G.sg.held) | 0) + ' of its twenty-five waves without losing a building. The militia are sitting on their sandbags, and the hatch in the Square is lifting a crack. Out on the grass, one small drone with a green light on its belly is slipping away east, toward the waterhole.';
   if (G.chapter >= TOWER_CHAPTER) return 'The Chief Executive folds into the chair behind the desk, and the whole top floor goes quiet except for the elevator chiming somewhere far below. You climbed twenty-five floors in ' + tm + '. In the glass case on the wall, a vial of something green was still turning slowly in the light, and it is in your harness now. There is a window, a paraglider on a rack, and the lights of another building across the dark.';
   if (G.chapter >= DOME_CHAPTER) return 'The Ice Heart breaks apart in a rain of cold light, and the glowing root under the dome goes dark. You held the glass for ' + tm + ' while the mylar rang like a bell all round you. The helicopter is still turning on its pad. Among the wreckage was a shipping label, stamped with a city: New York.';

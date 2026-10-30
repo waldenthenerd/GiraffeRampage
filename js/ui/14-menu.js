@@ -37,7 +37,9 @@ const CHAPTER_INFO = [
   { name: 'The Tower', biome: 'tower', cast: ['hyena', 'cheetah', 'vulture', 'lion'],            /* Chapter 14: twenty-five floors, one wave each */
     desc: 'New York. The domes were paid for from the top floor of a glass tower. Take the elevator, one floor at a time.' },
   { name: 'The Siege', biome: 'siege', cast: ['hyena', 'cheetah', 'vulture', 'lion'],            /* Chapter 15: the machines come for Longneck Town */
-    desc: 'Smoke over Longneck Town. The humans know she is looking, and their machines are coming for her home. Hold the town.' }
+    desc: 'Smoke over Longneck Town. The humans know she is looking, and their machines are coming for her home. Hold the town.' },
+  { name: 'Fort Shortneck', biome: 'fort', cast: ['hyena', 'cheetah', 'vulture', 'lion'],            /* Chapter 16: the counter attack */
+    desc: 'The signal comes from a fort on the ridge. Scale the wall and tear it apart: every building, vehicle and fuel tank is a point of chaos.' }
 ];
 const MENU_PREVIEW_CAST = ['hyena', 'cheetah', 'vulture', 'lion'];
 function chapterUnlocked(ch){ if (ch === 11) return !!(Save.data && Save.data.homecoming); return ch <= 1 || !!(Save.data && Save.data['chapter' + (ch - 1) + 'Complete']); }       /* Chapter 11 opens when she has flown home */
@@ -76,7 +78,7 @@ function drawMenuPreview(){  const cv = document.getElementById('chPreview');
     else if (info.biome === 'space'){ G.buildings = []; G.rocket = { x: cx + 64, y: cy - 22, s: 0.4 }; }
     else if (info.biome === 'moon'){ G.buildings = []; G.rocket = null; }
     else if (info.biome === 'venus'){ G.buildings = []; G.rocket = null; }
-    else if (info.biome === 'area51' || info.biome === 'mars' || info.biome === 'dome' || info.biome === 'tower' || info.biome === 'siege'){ G.buildings = []; G.rocket = null; }
+    else if (info.biome === 'area51' || info.biome === 'mars' || info.biome === 'dome' || info.biome === 'tower' || info.biome === 'siege' || info.biome === 'fort'){ G.buildings = []; G.rocket = null; }
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.clearRect(0, 0, W, H);
     c.translate(W / 2, H / 2); c.scale(z, z); c.translate(-cx, -cy);

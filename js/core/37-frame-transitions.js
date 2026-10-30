@@ -199,7 +199,9 @@ const CHAPTER_TRANSITIONS = {
   14: { title: 'CHAPTER 13.5 COMPLETE', sub: 'The trail ends in New York, at the foot of a tower.',
        color: '#E8C84A', flashColor: '#FFF6D8', burstColor: '#E8C84A', biome: 'tower', saveFlag: 'chapter14Complete' },
   15: { title: 'CHAPTER 14 COMPLETE', sub: 'Smoke over Longneck Town. The machines have found her home.',
-       color: '#E8723A', flashColor: '#FFE0C8', burstColor: '#E8723A', biome: 'siege', saveFlag: 'chapter15Complete' }
+       color: '#E8723A', flashColor: '#FFE0C8', burstColor: '#E8723A', biome: 'siege', saveFlag: 'chapter15Complete' },
+  16: { title: 'CHAPTER 15 COMPLETE', sub: 'The signal comes from a fort on the ridge above the waterhole. Fort Shortneck.',
+       color: '#E8B83A', flashColor: '#FFF2C8', burstColor: '#E8B83A', biome: 'fort', saveFlag: 'chapter16Complete' }
 };
 /* Chapter 1 is always the savanna; every later chapter's biome comes from
    the transition that leads into it, so this is the one place that mapping
@@ -210,7 +212,7 @@ function biomeForChapter(ch){
 /* Chapter 7's ending is the Moon landing film. The run carries straight on to the Marines afterwards, and the
    completion flag is written first so quitting during the film loses nothing. */
 /* a run ends at the last chapter that exists, or at Chapter 10 until she has been home (that is where the engine part is found); after she has been home it runs straight on into Chapter 11 */
-function isRunEnd(w){ return w === DOME_LAST_WAVE || w === TOWER_LAST_WAVE || w >= CHAPTER_LAST_WAVE || (w === 250 && !(Save.data && Save.data.homecoming)); }
+function isRunEnd(w){ return w === DOME_LAST_WAVE || w === TOWER_LAST_WAVE || w === SIEGE_LAST_WAVE || w >= CHAPTER_LAST_WAVE || (w === 250 && !(Save.data && Save.data.homecoming)); }
 function finishChapter(){
   saveRunAtBoundary();                           /* quitting during the film continues from the next chapter, not the boss again */
   if (chapterOf(G.wave) === 7){

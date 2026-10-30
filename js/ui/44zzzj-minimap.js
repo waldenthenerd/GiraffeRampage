@@ -6,7 +6,7 @@
    ones), the rocket in the Space Center. Creatures are faint dots; bosses are bigger, pulsing, and when they are off the zoomed map an arrow at its edge points to them. A white
    frame shows what the screen is looking at. Size and zoom are sliders in Settings. It is drawn on top of the world, after the screen effects, and is one pass over the arena's
    objects, with no pictures kept. */
-const MM_GROUND = { 1: '#8A7448', 2: '#C9D9E3', 3: '#4A5732', 4: '#14425E', 5: '#2E4220', 6: '#6E6C68', 7: '#6A8A44', 8: '#8F8E8A', 9: '#8E5630', 10: '#4F2C1C', 11: '#8A7448', 12: '#C5A877', 13: '#B65A33', 14: '#C6DCE6', 15: '#B9BCC2', 16: '#8A8478' };
+const MM_GROUND = { 1: '#8A7448', 2: '#C9D9E3', 3: '#4A5732', 4: '#14425E', 5: '#2E4220', 6: '#6E6C68', 7: '#6A8A44', 8: '#8F8E8A', 9: '#8E5630', 10: '#4F2C1C', 11: '#8A7448', 12: '#C5A877', 13: '#B65A33', 14: '#C6DCE6', 15: '#B9BCC2', 16: '#8A8478', 17: '#7A745E' };
 const MM_ZONE = { slow: '107,74,42', ice: '190,232,245', push: '255,255,255', hurt: '255,106,58' };
 const MM_STATES = { playing: 1, levelup: 1, paused: 1, bossintro: 1 };
 let MM_LM = { ch: -1, defs: null };
@@ -69,6 +69,7 @@ function mmDraw(ctx){
     let col = b.tower ? (b.kind === 'wall' || b.kind === 'w' ? '#1A1D26' : '#6A7384') : '#8D909C', line = b.tower ? null : 'rgba(0,0,0,.6)';
     const s = sg && b.key ? sg[b.key] : null;
     if (s) col = s.wrecked ? '#5A2E26' : (function(f){ return f > 0.66 ? '#58C84A' : f > 0.33 ? '#F0B83A' : '#F0603A'; })(s.hp / SIEGE_BLD.max);
+    else if (b.fort && typeof ftMmColor === 'function') col = ftMmColor(b);
     else if (!b.tower && b.collapsed) col = 'rgba(80,76,72,.8)';
     else if (!b.tower && b.maxHp > 1 && b.hp < b.maxHp * 0.5) col = '#B0725E';
     const bx = X(b.x), by = Y(b.y), bw = Math.max(1.5, b.w * k), bh = Math.max(1.5, b.h * k);
@@ -106,7 +107,7 @@ function mmDraw(ctx){
   }
   ctx.restore();
   ctx.save(); ctx.translate(mx, my); ctx.strokeStyle = 'rgba(245,236,216,.85)'; ctx.lineWidth = 1.5; mmRound(ctx, 0, 0, mw, mh, 5); ctx.stroke();
-  const label = G.biome === 'siege' ? 'Longneck Town' : G.tower && TW.n ? 'Floor ' + TW.n : '';
+  const label = G.biome === 'fort' ? 'Fort Shortneck' : G.biome === 'siege' ? 'Longneck Town' : G.tower && TW.n ? 'Floor ' + TW.n : '';
   if (label){ ctx.font = '700 10px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; const lw = ctx.measureText(label).width + 10; ctx.fillStyle = 'rgba(8,6,4,.85)'; ctx.fillRect(4, 4, lw, 14); ctx.fillStyle = '#F5ECD8'; ctx.fillText(label, 9, 14.5); }
   ctx.restore();
 }

@@ -12,18 +12,18 @@
   try {
     /* the chapter table: the old chapters, the Domes and the Tower are all as they should be */
     out.table = chapterOf(325) === 13 && chapterOf(326) === 14 && chapterOf(335) === 14 && chapterOf(336) === TOWER_CHAPTER && chapterOf(360) === TOWER_CHAPTER && chapterWaveOf(336) === 1 && chapterWaveOf(360) === 25 &&
-      chapterWaveOf(335) === 10 && TOWER_LAST_WAVE === 360 && CHAPTER_LAST_WAVE === 385 && TOTAL_CHAPTERS === 16 && chapterLabel(15) === '14' && chapterLabel(14) === '13.5' && chapterFirstWave(15) === 336 && chapterFirstWave(14) === 326 &&
+      chapterWaveOf(335) === 10 && TOWER_LAST_WAVE === 360 && SIEGE_LAST_WAVE === 385 && TOTAL_CHAPTERS === 17 && chapterLabel(15) === '14' && chapterLabel(14) === '13.5' && chapterFirstWave(15) === 336 && chapterFirstWave(14) === 326 &&
       chapterLen(15) === 25 && isChapterFinaleWave(360) && !isChapterFinaleWave(355) && isRunEnd(335) === true && isRunEnd(360) === true && isRunEnd(340) === false;
     out.bossWaves = bossForWave(340) === 'lion' && bossForWave(345) === 'matriarch' && bossForWave(350) === 'buffalo' && bossForWave(355) === 'crocodile' && bossForWave(360) === 'wildfire';
     out.harder = TOWER_TUNE.hard === 1.35 && Math.abs(towerScale(1).hp / enemyScale(25).hp / Math.sqrt(1.35) - TOWER_TUNE.hp0) < 1e-9;
     out.tuneRising = towerScale(25).hp > towerScale(1).hp && towerScale(25).dmg > towerScale(1).dmg && towerScale(1).hp > domeScale(DOME_WAVES).hp * 0.5;
     out.cast = Object.keys(ETYPES_TOWER).length === 17 && ETYPES_TOWER.wildfire.title === 'The Chief Executive' && ETYPES_TOWER.hyena.look === 'tw_rat' && !!ENEMY_LOOK_DRAW.tw_ceo && !!TOWER_AI.t_ceo;
-    out.bestiary = BESTIARY_CHAPTERS.length === 16 && bestiaryTable(15) === ETYPES_TOWER && BESTIARY_ORDER.slice(0, 17).every(function(k){ return !!ETYPES_TOWER[k]; });
+    out.bestiary = BESTIARY_CHAPTERS.length === 17 && bestiaryTable(15) === ETYPES_TOWER && BESTIARY_ORDER.slice(0, 17).every(function(k){ return !!ETYPES_TOWER[k]; });
 
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter15Complete === false;
     Save.data.chapter15Complete = 'junk'; Save.load(); out.saveSane = typeof Save.data.chapter15Complete === 'boolean';
-    freshSave(); out.wardLen = WARD.length === 51 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
+    freshSave(); out.wardLen = WARD.length === 53 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
     Save.data.chapter15Complete = true; out.wardOpen = wardUnlocked(47) === true;
 
     /* the floor plans: twenty-five different ones, every room reachable, both elevators joined, vents everywhere, nothing outside the arena */
@@ -132,7 +132,7 @@
     freshSave(); setMenuChapter(15); showMenu(); var html = chapterSelectorHTML();
     out.menuLocked = /disabled/.test(html) && /Clear Chapter 13\.5/.test(html) && /Chapter 14/.test(html) && /The Tower/.test(html) && /Waves 336–360 · 5 bosses/.test(html);
     Save.data.chapter14Complete = true; html = chapterSelectorHTML(); out.menuOpen = /data-a="play15"/.test(html) && /Start Chapter 14/.test(html) && /Straight to wave 336/.test(html);
-    out.arrowEnd = !/ch-next" aria-label="Next chapter" disabled/.test(html); out.dots = (html.match(/class="chdot[ "]/g) || []).length === 16;
+    out.arrowEnd = !/ch-next" aria-label="Next chapter" disabled/.test(html); out.dots = (html.match(/class="chdot[ "]/g) || []).length === 17;
     handleAction('play15'); out.menuFilm = G.state === 'cutscene' && G.cut && G.cut.kind === 'towerflight';
     G.cut.t = TW_FLIGHT_T.END - 0.01; steps(3); out.menuStarts = G.state === 'playing' && G.wave === 336 && G.chapter === TOWER_CHAPTER && G.biome === 'tower' && G.tower === true;
     out.hud = /THE TOWER/.test(document.getElementById('hChapter') ? document.getElementById('hChapter').textContent : 'CH.14 THE TOWER');

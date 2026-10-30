@@ -10,7 +10,7 @@
   function steps(n, dt){ for (var i = 0; i < n; i++){ GR.step(dt || 1 / 30); noLevels(); } }
   try {
     /* the chapter table */
-    out.table = SIEGE_CHAPTER === 16 && SIEGE_FIRST_WAVE === 361 && SIEGE_WAVES === 25 && CHAPTER_LAST_WAVE === 385 && TOTAL_CHAPTERS === 16 && chapterLabel(16) === '15' &&
+    out.table = SIEGE_CHAPTER === 16 && SIEGE_FIRST_WAVE === 361 && SIEGE_WAVES === 25 && SIEGE_LAST_WAVE === 385 && TOTAL_CHAPTERS === 17 && chapterLabel(16) === '15' &&
       chapterOf(360) === TOWER_CHAPTER && chapterOf(361) === SIEGE_CHAPTER && chapterOf(385) === SIEGE_CHAPTER && chapterWaveOf(361) === 1 && chapterWaveOf(385) === 25 &&
       chapterFirstWave(16) === 361 && chapterFirstWave(15) === 336 && chapterLen(16) === 25 && isChapterFinaleWave(385) && !isChapterFinaleWave(380) && isRunEnd(385) === true && isRunEnd(361) === false && isRunEnd(360) === true;
     var bw = [365, 370, 375, 380, 385].map(bossForWave); out.bossWaves = bw.join() === 'lion,matriarch,buffalo,crocodile,wildfire';
@@ -23,14 +23,14 @@
     /* the kit: twelve kinds and five bosses in the Bestiary's slots, none of them borrowed from another chapter */
     var kinds = BESTIARY_ORDER.slice(0, 17);
     out.cast = kinds.every(function(k){ return !!ETYPES_SIEGE[k] && ETYPES_SIEGE[k].siege === true && /^sg_/.test(ETYPES_SIEGE[k].look) && LOOK_NAMES[ETYPES_SIEGE[k].look]; });
-    out.bestiary = BESTIARY_CHAPTERS.length === 16 && bestiaryTable(16) === ETYPES_SIEGE;
+    out.bestiary = BESTIARY_CHAPTERS.length === 17 && bestiaryTable(16) === ETYPES_SIEGE;
     var looks = {}; kinds.forEach(function(k){ looks[ETYPES_SIEGE[k].look] = 1; }); out.uniqueLooks = Object.keys(looks).length === 17;
 
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter16Complete === false;
     Save.data.chapter16Complete = 'junk'; Save.write(); Save.load(); out.saveSane = Save.data.chapter16Complete === true || Save.data.chapter16Complete === false;
-    freshSave(); out.wardLen = WARD.length === 51 && WARD[49].name === 'Town Watch' && wardUnlocked(49) === false;
-    Save.data.chapter16Complete = true; out.wardOpen = wardUnlocked(49) === true && WARD_MAX === 50; Save.data.chapter16Complete = false;
+    freshSave(); out.wardLen = WARD.length === 53 && WARD[49].name === 'Town Watch' && wardUnlocked(49) === false;
+    Save.data.chapter16Complete = true; out.wardOpen = wardUnlocked(49) === true && WARD_MAX === 52; Save.data.chapter16Complete = false;
 
     /* waves: every wave of the chapter builds, the boss waves have their boss, and the pool grows */
     var ok = true, bad = '';
@@ -46,7 +46,7 @@
     freshSave(); setMenuChapter(16); showMenu(); var html = chapterSelectorHTML();
     out.menuLocked = /disabled/.test(html) && /Clear Chapter 14/.test(html) && /Chapter 15/.test(html) && /The Siege/.test(html) && /Waves 361–385 · 5 bosses/.test(html);
     Save.data.chapter15Complete = true; html = chapterSelectorHTML();
-    out.menuOpen = /data-a="play16"/.test(html) && /Start Chapter 15/.test(html) && /Straight to wave 361/.test(html) && /ch-next" aria-label="Next chapter" disabled/.test(html) && (html.match(/class="chdot[ "]/g) || []).length === 16;
+    out.menuOpen = /data-a="play16"/.test(html) && /Start Chapter 15/.test(html) && /Straight to wave 361/.test(html) && !/ch-next" aria-label="Next chapter" disabled/.test(html) && (html.match(/class="chdot[ "]/g) || []).length === 17;
     handleAction('play16'); out.menuFilm = G.state === 'cutscene' && !!G.cut && G.cut.kind === 'siegeflight'; G.cut.t = SG_FLIGHT_T.END - 0.01; steps(3);
     out.starts = G.state === 'playing' && G.wave === 361 && G.chapter === SIEGE_CHAPTER && G.biome === 'siege';
     steps(90);
@@ -192,7 +192,7 @@
     out.ach = !!ach('ch15') && !!ach('siegeheld') && !!ach('siegeflaw') && ach('ch15').val() === 0 && ach('siegeheld').val() === 0 && ach('siegeflaw').val() === 0;
     Save.data.chapter16Complete = true; Save.data.siegeHeldBest = 14; Save.data.siegeFlawless = true; out.ach2 = ach('ch15').val() === 1 && ach('siegeheld').val() === 10 && ach('siegeflaw').val() === 1;
     freshSave(); out.guideLocked = !/Chapter 15: the Siege/.test(guideTopicsHTML()); Save.data.chapter16Complete = true; out.guideOpen = /Chapter 15: the Siege/.test(guideTopicsHTML());
-    freshSave(); out.coLocked = coChapters().indexOf(16) < 0 && CO_CHAPTERS.length === 16; Save.data.chapter15Complete = true; out.coOpen = coChapters().indexOf(16) >= 0;
+    freshSave(); out.coLocked = coChapters().indexOf(16) < 0 && CO_CHAPTERS.length === 17; Save.data.chapter15Complete = true; out.coOpen = coChapters().indexOf(16) >= 0;
     coStart('arena', 16); steps(40); out.together = Co.on && G.chapter === SIEGE_CHAPTER && G.biome === 'siege' && G.tower === true && G.buildings.length > 30 && SGM.men.length === 20 && Co.pl[0].x === Co.pl[0].x;
     var cman = SGM.men[0]; cman.hp = 20; Co.pl[1].x = cman.x + 4; Co.pl[1].y = cman.y; Co.pl[1].down = false; siegeMilitiaTick(0.2); out.togetherHeal = cman.hp > 20; coEnd(true);
     freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();
