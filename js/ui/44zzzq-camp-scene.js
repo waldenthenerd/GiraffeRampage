@@ -23,34 +23,36 @@ function campSceneAt(t){
 function campSceneRay(c, x1, y1, x2, y2, w, col){ c.strokeStyle = col; c.lineWidth = w; c.lineCap = 'round'; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); }
 /* the giraffe, in her own coordinates (feet at the origin, facing +x): neck angle a from straight up (more is forward), the head's own tilt, the walk cycle, and what she holds */
 function campSceneGiraffe(c, x, gy, o){
+  const K = giraffeColours(), pat = giraffePattern(), acc = giraffeAccent() || '#3A2810', cape = typeof equippedCapeColor === 'function' ? equippedCapeColor() : null;     /* her own coat, spots, pattern, accent and cape */
   const sit = o.sit || 0, lift = 22 * sit, bodyY = -50 + lift + (o.dip || 0) * 6;
   c.save(); c.translate(x, gy); c.scale(o.face || 1, 1);
   c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(4, 2, 38, 5, 0, 0, TAU); c.fill();
   const sw = o.walk ? Math.sin(o.ph) : 0;
   const leg = function(lx, ph, far){
     const sx = lx + (o.walk ? Math.sin(o.ph + ph) * 9 : 0), top = bodyY + 6, len = 44 - lift;
-    c.strokeStyle = far ? '#B88A3E' : '#D9A64E'; c.lineWidth = 6; c.lineCap = 'round';
+    c.strokeStyle = far ? K.dark : K.coat; c.lineWidth = 6; c.lineCap = 'round';
     if (sit > 0.5){ c.beginPath(); c.moveTo(lx, top + 6); c.lineTo(lx + 18, -4); c.lineTo(lx + 2, -4); c.stroke(); }
-    else { c.beginPath(); c.moveTo(lx, top); c.lineTo(sx, top + len); c.stroke(); c.fillStyle = '#3A2810'; c.fillRect(sx - 4, top + len - 3, 8, 4); }
+    else { c.beginPath(); c.moveTo(lx, top); c.lineTo(sx, top + len); c.stroke(); c.fillStyle = acc; c.fillRect(sx - 4, top + len - 3, 8, 4); }
   };
   leg(-18, Math.PI, true); leg(18, 0, true);
-  c.strokeStyle = '#8A5E26'; c.lineWidth = 3; c.beginPath(); c.moveTo(-30, bodyY - 2); c.quadraticCurveTo(-44, bodyY + 8 + sw * 4, -40, bodyY + 24); c.stroke();      /* tail */
-  c.fillStyle = '#5A3A14'; c.beginPath(); c.arc(-40, bodyY + 25, 3.5, 0, TAU); c.fill();
-  c.fillStyle = '#E0AA52'; c.beginPath(); c.ellipse(0, bodyY, 32, 16, 0, 0, TAU); c.fill();
-  c.fillStyle = '#9A6428'; [[-14, -3, 6, 4], [4, 4, 7, 5], [18, -5, 5, 4], [-2, -8, 4, 3], [-22, 5, 5, 4]].forEach(function(s){ c.beginPath(); c.ellipse(s[0], bodyY + s[1], s[2], s[3], 0.4, 0, TAU); c.fill(); });
+  c.strokeStyle = K.dark; c.lineWidth = 3; c.beginPath(); c.moveTo(-30, bodyY - 2); c.quadraticCurveTo(-44, bodyY + 8 + sw * 4, -40, bodyY + 24); c.stroke();      /* tail */
+  c.fillStyle = acc; c.beginPath(); c.arc(-40, bodyY + 25, 3.5, 0, TAU); c.fill();
+  c.fillStyle = K.coat; c.beginPath(); c.ellipse(0, bodyY, 32, 16, 0, 0, TAU); c.fill();
+  c.fillStyle = K.spot; [[-14, -3, 6, 4], [4, 4, 7, 5], [18, -5, 5, 4], [-2, -8, 4, 3], [-22, 5, 5, 4]].forEach(function(s){ wardSpot(c, pat, s[0], bodyY + s[1], s[2], s[3], 0.4); });
   leg(-16, 0, false); leg(20, Math.PI, false);
+  if (cape){ c.fillStyle = cape; c.beginPath(); c.moveTo(18, bodyY - 12); c.quadraticCurveTo(-8, bodyY - 20 + sw * 3, -36 - sw * 4, bodyY + 4 + sw * 5); c.lineTo(-30, bodyY + 12); c.quadraticCurveTo(-4, bodyY + 4, 20, bodyY - 2); c.closePath(); c.fill(); }
   /* the neck: a tapered band from the shoulder to the head, with spots down it and a mane behind */
   const bx = 22, by = bodyY - 6, a = o.neck, L = 64, tx = bx + Math.sin(a) * L, ty = by - Math.cos(a) * L;
-  c.strokeStyle = '#7A4E1E'; c.lineWidth = 4; c.beginPath(); c.moveTo(bx - 4, by - 2); c.lineTo(tx - 3, ty + 2); c.stroke();
-  campSceneRay(c, bx, by, tx, ty, 13, '#E0AA52');
-  c.fillStyle = '#9A6428'; for (let i = 1; i <= 4; i++){ const u = i / 5; c.beginPath(); c.ellipse(bx + (tx - bx) * u, by + (ty - by) * u, 3.4, 2.6, a, 0, TAU); c.fill(); }
+  c.strokeStyle = K.dark; c.lineWidth = 4; c.beginPath(); c.moveTo(bx - 4, by - 2); c.lineTo(tx - 3, ty + 2); c.stroke();
+  campSceneRay(c, bx, by, tx, ty, 13, K.coat);
+  c.fillStyle = K.spot; for (let i = 1; i <= 4; i++){ const u = i / 5; wardSpot(c, pat, bx + (tx - bx) * u, by + (ty - by) * u, 3.4, 2.6, a); }
   const hA = a + 1.25 + (o.head || 0);                                               /* the head points forward of the neck */
   c.save(); c.translate(tx, ty); c.rotate(hA - Math.PI / 2);
-  c.fillStyle = '#E8B45A'; c.beginPath(); c.ellipse(5, 0, 13, 6.5, 0, 0, TAU); c.fill();
+  c.fillStyle = K.coat; c.beginPath(); c.ellipse(5, 0, 13, 6.5, 0, 0, TAU); c.fill();
   c.fillStyle = '#3A2810'; c.beginPath(); c.ellipse(15, 1, 3, 2.2, 0, 0, TAU); c.fill();
   c.fillStyle = '#1A1208'; c.beginPath(); c.arc(4, -2, 1.6, 0, TAU); c.fill();
   c.strokeStyle = '#5A3A14'; c.lineWidth = 2; c.beginPath(); c.moveTo(-1, -5); c.lineTo(-3, -12); c.moveTo(3, -5); c.lineTo(3, -12); c.stroke();
-  c.fillStyle = '#5A3A14'; c.beginPath(); c.arc(-3, -12.5, 1.8, 0, TAU); c.arc(3, -12.5, 1.8, 0, TAU); c.fill();
+  c.fillStyle = acc; c.beginPath(); c.arc(-3, -12.5, 1.8, 0, TAU); c.arc(3, -12.5, 1.8, 0, TAU); c.fill();
   c.restore();
   const mx = tx + Math.cos(hA - Math.PI / 2) * 17, my = ty + Math.sin(hA - Math.PI / 2) * 17;          /* the mouth: where the weapon is held */
   if (o.item){ c.save(); c.translate(mx, my); c.rotate(o.itemA || 0); campSceneItem(c, o.item, o); c.restore(); }
