@@ -5,13 +5,14 @@ function $(s){ return document.querySelector(s); } function $$(s){ return [].sli
 function lab(el){ return el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + '[' + (el.getAttribute('data-a') || el.getAttribute('data-buy') || el.getAttribute('data-th') || el.getAttribute('data-gh') || el.className) + ']'; }
 /* every control the pad can focus must be reachable from the first one by arrow moves (Nav.move is what the arrows and the D-pad call) */
 function reachable(){
+  /* controls are told apart by their label, not by the element: focusing a piece of gear draws its side panel again, and the buttons in it are new elements with the same labels */
   var all = Nav.list(); if (!all.length) return { total: 0, missed: [] };
-  var seen = new Set([all[0]]), queue = [all[0]];
+  var labs = all.map(lab), seen = new Set([labs[0]]), queue = [all[0]];
   while (queue.length){
     var el = queue.shift();
-    [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function(d){ el.focus(); Nav.move(d[0], d[1]); var n = document.activeElement; if (n && all.indexOf(n) >= 0 && !seen.has(n)){ seen.add(n); queue.push(n); } });
+    [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function(d){ if (!el.isConnected) el = Nav.list().filter(function(e){ return lab(e) === lab(el); })[0] || el; el.focus(); Nav.move(d[0], d[1]); var n = document.activeElement; if (n && labs.indexOf(lab(n)) >= 0 && !seen.has(lab(n))){ seen.add(lab(n)); queue.push(n); } });
   }
-  return { total: all.length, missed: all.filter(function(e){ return !seen.has(e); }).map(lab) };
+  return { total: all.length, missed: labs.filter(function(l){ return !seen.has(l); }) };
 }
 try {
   var view = (QA.params && QA.params.view) || 'none';
