@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   qa:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04            # pinned: Playwright 1.56 cannot install its browser dependencies on Ubuntu 26, which ubuntu-latest became in October 2026
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
