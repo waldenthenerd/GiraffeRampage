@@ -21,42 +21,13 @@ function campSceneAt(t){
   return { x: lerp(410, 100, (c - 27.4) / 2.6), mode: 'walk', f: c - 27.4, walk: -1 };
 }
 function campSceneRay(c, x1, y1, x2, y2, w, col){ c.strokeStyle = col; c.lineWidth = w; c.lineCap = 'round'; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); }
-/* the giraffe, in her own coordinates (feet at the origin, facing +x): neck angle a from straight up (more is forward), the head's own tilt, the walk cycle, and what she holds */
+/* the giraffe is the town's own (townGiraffe, js/town/44v-town-art.js), so her coat, spots, pattern, hat and boots are the ones she has chosen and she looks as she does everywhere else;
+   o gives the neck (reach, lean, dip), sitting, the walk phase, the way she faces and what she holds in her mouth */
 function campSceneGiraffe(c, x, gy, o){
-  const K = giraffeColours(), pat = giraffePattern(), acc = giraffeAccent() || '#3A2810', cape = typeof equippedCapeColor === 'function' ? equippedCapeColor() : null;     /* her own coat, spots, pattern, accent and cape */
-  const sit = o.sit || 0, lift = 22 * sit, bodyY = -50 + lift + (o.dip || 0) * 6;
-  c.save(); c.translate(x, gy); c.scale(o.face || 1, 1);
-  c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(4, 2, 38, 5, 0, 0, TAU); c.fill();
-  const sw = o.walk ? Math.sin(o.ph) : 0;
-  const leg = function(lx, ph, far){
-    const sx = lx + (o.walk ? Math.sin(o.ph + ph) * 9 : 0), top = bodyY + 6, len = 44 - lift;
-    c.strokeStyle = far ? K.dark : K.coat; c.lineWidth = 6; c.lineCap = 'round';
-    if (sit > 0.5){ c.beginPath(); c.moveTo(lx, top + 6); c.lineTo(lx + 18, -4); c.lineTo(lx + 2, -4); c.stroke(); }
-    else { c.beginPath(); c.moveTo(lx, top); c.lineTo(sx, top + len); c.stroke(); c.fillStyle = acc; c.fillRect(sx - 4, top + len - 3, 8, 4); }
-  };
-  leg(-18, Math.PI, true); leg(18, 0, true);
-  c.strokeStyle = K.dark; c.lineWidth = 3; c.beginPath(); c.moveTo(-30, bodyY - 2); c.quadraticCurveTo(-44, bodyY + 8 + sw * 4, -40, bodyY + 24); c.stroke();      /* tail */
-  c.fillStyle = acc; c.beginPath(); c.arc(-40, bodyY + 25, 3.5, 0, TAU); c.fill();
-  c.fillStyle = K.coat; c.beginPath(); c.ellipse(0, bodyY, 32, 16, 0, 0, TAU); c.fill();
-  c.fillStyle = K.spot; [[-14, -3, 6, 4], [4, 4, 7, 5], [18, -5, 5, 4], [-2, -8, 4, 3], [-22, 5, 5, 4]].forEach(function(s){ wardSpot(c, pat, s[0], bodyY + s[1], s[2], s[3], 0.4); });
-  leg(-16, 0, false); leg(20, Math.PI, false);
-  if (cape){ c.fillStyle = cape; c.beginPath(); c.moveTo(18, bodyY - 12); c.quadraticCurveTo(-8, bodyY - 20 + sw * 3, -36 - sw * 4, bodyY + 4 + sw * 5); c.lineTo(-30, bodyY + 12); c.quadraticCurveTo(-4, bodyY + 4, 20, bodyY - 2); c.closePath(); c.fill(); }
-  /* the neck: a tapered band from the shoulder to the head, with spots down it and a mane behind */
-  const bx = 22, by = bodyY - 6, a = o.neck, L = 64, tx = bx + Math.sin(a) * L, ty = by - Math.cos(a) * L;
-  c.strokeStyle = K.dark; c.lineWidth = 4; c.beginPath(); c.moveTo(bx - 4, by - 2); c.lineTo(tx - 3, ty + 2); c.stroke();
-  campSceneRay(c, bx, by, tx, ty, 13, K.coat);
-  c.fillStyle = K.spot; for (let i = 1; i <= 4; i++){ const u = i / 5; wardSpot(c, pat, bx + (tx - bx) * u, by + (ty - by) * u, 3.4, 2.6, a); }
-  const hA = a + 1.25 + (o.head || 0);                                               /* the head points forward of the neck */
-  c.save(); c.translate(tx, ty); c.rotate(hA - Math.PI / 2);
-  c.fillStyle = K.coat; c.beginPath(); c.ellipse(5, 0, 13, 6.5, 0, 0, TAU); c.fill();
-  c.fillStyle = '#3A2810'; c.beginPath(); c.ellipse(15, 1, 3, 2.2, 0, 0, TAU); c.fill();
-  c.fillStyle = '#1A1208'; c.beginPath(); c.arc(4, -2, 1.6, 0, TAU); c.fill();
-  c.strokeStyle = '#5A3A14'; c.lineWidth = 2; c.beginPath(); c.moveTo(-1, -5); c.lineTo(-3, -12); c.moveTo(3, -5); c.lineTo(3, -12); c.stroke();
-  c.fillStyle = acc; c.beginPath(); c.arc(-3, -12.5, 1.8, 0, TAU); c.arc(3, -12.5, 1.8, 0, TAU); c.fill();
-  c.restore();
-  const mx = tx + Math.cos(hA - Math.PI / 2) * 17, my = ty + Math.sin(hA - Math.PI / 2) * 17;          /* the mouth: where the weapon is held */
-  if (o.item){ c.save(); c.translate(mx, my); c.rotate(o.itemA || 0); campSceneItem(c, o.item, o); c.restore(); }
-  c.restore();
+  const sc = 1.45, dir = o.face || 1;
+  c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(x, gy + 2, o.sit ? 46 : 40, 5, 0, 0, TAU); c.fill();
+  const h = townGiraffe(c, x, gy - 2, { s: sc, t: o.t, flip: dir < 0, moving: !!o.walk, ph: o.ph, sit: !!o.sit, reach: o.reach || 0, lean: o.lean || 0, dip: o.dip || 0 });
+  if (o.item){ c.save(); c.translate(h.x + dir * 8 * sc, h.y + 3 * sc); c.scale(dir, 1); c.rotate(o.itemA || 0); campSceneItem(c, o.item, o); c.restore(); }
 }
 function campSceneItem(c, kind, o){
   if (kind === 'axe'){ campSceneRay(c, 0, 0, 34, 0, 3.5, '#8A5A2A'); c.fillStyle = '#C8CCD4'; c.beginPath(); c.moveTo(28, -3); c.lineTo(38, -12); c.lineTo(40, 6); c.lineTo(28, 3); c.closePath(); c.fill(); c.fillStyle = '#8A8E96'; c.fillRect(37, -10, 3, 14); }
@@ -115,17 +86,17 @@ function campSceneDraw(c, t, fill){
   /* the lantern on its post */
   campSceneRay(c, 590, GY, 590, GY - 52, 3, "#6A4A2A"); campSceneRay(c, 590, GY - 52, 602, GY - 52, 3, '#6A4A2A'); c.fillStyle = 'rgba(255,200,112,.16)'; c.beginPath(); c.arc(602, GY - 42, 26, 0, TAU); c.fill(); c.fillStyle = '#FFC870'; c.fillRect(598, GY - 50, 9, 13); c.fillStyle = "#6A4A2A"; c.fillRect(597, GY - 52, 11, 3);
   /* what she is doing */
-  const g = { neck: 0.12, head: 0, face: 1, ph: S.walk ? (S.walk * t * 7) : 0, walk: S.walk !== 0 ? 1 : 0, sit: 0, item: null, itemA: 0, dip: 0 };
+  const g = { t: tw, reach: 0, lean: 0, face: 1, ph: S.walk ? (S.walk * t * 7) : 0, walk: S.walk !== 0 ? 1 : 0, sit: 0, item: null, itemA: 0, dip: 0 };
   let enemies = [], fx = [];
   if (S.mode === 'chop'){
     const u = hitT / 1.6;
     const s2 = u < 0.5 ? 0 : u > 0.66 && u < 0.82 ? 1 : u >= 0.82 ? 1 - (u - 0.82) / 0.18 : (u - 0.5) / 0.16;
-    g.item = 'axe'; g.neck = 0.55 + 0.95 * s2; g.head = -0.2 + 0.25 * s2; g.itemA = -1.25 + 2.2 * s2 + 0.1 * Math.sin(tw * 2); g.dip = s2 * 1.4;
+    g.item = 'axe'; g.reach = 0.25 - 0.35 * s2; g.lean = 28 * s2; g.dip = 62 * s2; g.itemA = -1.25 + 1.75 * s2 + 0.1 * Math.sin(tw * 2);
     if (hitT > 1.05 && hitT < 1.4){ const v = (hitT - 1.05) / 0.35; for (let i = 0; i < 8; i++) fx.push([179 + (i - 4) * 5 * v, GY - 30 - Math.sin(v * 3 + i) * 18 * v + v * v * 30, 2.2, 'rgba(216,164,88,' + (1 - v).toFixed(2) + ')']); }
   } else if (S.mode === 'walk'){
-    g.neck = 0.12 + Math.sin(g.ph * 2) * 0.03; g.face = S.walk < 0 ? -1 : 1;
+    g.reach = 0.05 + Math.sin(g.ph * 2) * 0.02; g.face = S.walk < 0 ? -1 : 1;
   } else if (S.mode === 'sit'){
-    g.sit = S.sit; g.walk = 0; g.neck = 0.1 - 0.22 * S.sit * (0.5 + 0.5 * Math.sin(tw * 0.5)) + 0.02; g.head = 0.18 * Math.sin(tw * 0.7);
+    g.sit = S.sit > 0.5; g.walk = 0; g.reach = -0.1 + 0.12 * Math.sin(tw * 0.6); g.lean = 4 * Math.sin(tw * 0.7);
   } else if (S.mode === 'fight'){
     const bow = Math.floor(t / 30) % 2 === 1, f = S.f; g.item = bow ? 'bow' : 'sword';
     if (!bow){
@@ -139,7 +110,7 @@ function campSceneDraw(c, t, fill){
       });
       const sl = [1.85, 4.85].reduce(function(b, h){ return f >= h && f < h + 0.55 ? (f - h) / 0.55 : b; }, -1);       /* a slash: raise, cut down, come back */
       const k = sl < 0 ? 0 : sl < 0.35 ? sl / 0.35 : 1 - (sl - 0.35) / 0.65;
-      g.neck = 0.35 + 0.75 * k; g.head = -0.1 + 0.2 * k; g.itemA = -1.7 + 2.5 * k; g.dip = k;
+      g.reach = 0.5 - 0.4 * k; g.lean = 8 + 14 * k; g.dip = 26 * k; g.itemA = -1.7 + 2.5 * k;
       if (sl >= 0.3 && sl < 0.6){ c.save(); c.strokeStyle = 'rgba(255,255,255,' + (0.8 - (sl - 0.3) * 2.4).toFixed(2) + ')'; c.lineWidth = 3; c.beginPath(); c.arc(S.x + 52, GY - 78, 52, -0.9, 0.9); c.stroke(); c.restore(); }
     } else {
       const shots = [1.6, 4.2], starts = [0, 2.6];
@@ -154,7 +125,7 @@ function campSceneDraw(c, t, fill){
         if (f >= sf && f < hitF) fx.push(['arrow', S.x + 62 + (f - sf) * 360, GY - 90]);
       });
       const nxt = shots.find(function(sf){ return f < sf + 0.1; }), draw = nxt == null ? 0 : Math.max(0, Math.min(1, 1 - (nxt - f) / 0.9));
-      g.neck = 0.55; g.head = -0.25; g.itemA = 0.0; g.draw = draw; g.arrow = draw > 0 && (nxt != null);
+      g.reach = 0.3; g.lean = 6; g.itemA = 0.0; g.draw = draw; g.arrow = draw > 0 && (nxt != null);
     }
   }
   campSceneGiraffe(c, S.x, GY, g);
