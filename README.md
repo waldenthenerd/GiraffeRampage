@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 206 | 64,258 | 5.19 MiB (5,445,267 bytes) |
-| Styles (`css/`) | 6 | 1,764 | 161 KiB (164,407 bytes) |
-| Page (`index.html`) | 1 | 256 | 13.0 KiB (13,296 bytes) |
-| **Whole game** | **213** | **66,278** | **5.36 MiB (5,622,970 bytes)** |
+| JavaScript (`js/`) | 208 | 64,474 | 5.21 MiB (5,464,950 bytes) |
+| Styles (`css/`) | 6 | 1,782 | 162 KiB (165,959 bytes) |
+| Page (`index.html`) | 1 | 258 | 13.1 KiB (13,393 bytes) |
+| **Whole game** | **215** | **66,514** | **5.38 MiB (5,644,302 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **65,677 lines, 5.32 MiB (5,575,988 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 206 | 64,258 | 5.19 MiB (5,445,267 bytes) |
-| Styles (`css/`) | 6 | 1,764 | 161 KiB (164,407 bytes) |
-| Page (`index.html`) | 1 | 256 | 13.0 KiB (13,296 bytes) |
-| **Whole game** | **213** | **66,278** | **5.36 MiB (5,622,970 bytes)** |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **65,913 lines, 5.34 MiB (5,597,320 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 208 | 64,474 | 5.21 MiB (5,464,950 bytes) |
+| Styles (`css/`) | 6 | 1,782 | 162 KiB (165,959 bytes) |
+| Page (`index.html`) | 1 | 258 | 13.1 KiB (13,393 bytes) |
+| **Whole game** | **215** | **66,514** | **5.38 MiB (5,644,302 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -84,8 +84,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | File | Lines | What is in it |
 |---|---|---|
 | `js/core/00-icons.js` | 98 | The icon table (41 outlined icons drawn for this game) and the icon helpers. Runs outside strict mode, as it always did. |
-| `js/core/00b-icons-custom.js` | 153 | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
-| `js/core/01-core.js` | 373 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. Save fields `chapter14Complete` (13.5, the Domes), `chapter15Complete` (14, the Tower) and `chapter16Complete` (15, the Siege), and `siegeHeldBest` and `siegeFlawless` (how many waves of the Siege she held, and whether all 25); `chapter17Complete` (16, Fort Shortneck), `fortChaosBest`, `fortBadges` (a bit for each of the eight chaos levels reached, for good) and `fortBestWave`. |
+| `js/core/00b-icons-custom.js` | 154 | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
+| `js/core/01-core.js` | 376 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. Save fields `chapter14Complete` (13.5, the Domes), `chapter15Complete` (14, the Tower) and `chapter16Complete` (15, the Siege), and `siegeHeldBest` and `siegeFlawless` (how many waves of the Siege she held, and whether all 25); `chapter17Complete` (16, Fort Shortneck), `fortChaosBest`, `fortBadges` (a bit for each of the eight chaos levels reached, for good) and `fortBestWave`. |
 | `js/core/01b-savepack.js` | 522 | Save compression: the save is stored as a JSON string holding `GR3:` + base 91 text of a context-mixing / arithmetic-coded copy of its JSON, primed with a frozen sample save (roughly a quarter of the GR2 size); each write is stored as `GR2:` (Base64 of LZW) at once and repacked as GR3 a few seconds later. GR2 and old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `flush`, `stats`). Format in the file header and in `lovable.md`. |
 | `js/audio/02-music.js` | 349 | Procedural background music: themes, the 16-bar sequencer (A, A, B, A), key climb through a chapter, boss second phase, theme fade-in, stingers. |
 | `js/audio/02b-ambience.js` | 134 | Extra sounds (card pick, wave clear, heartbeat, heavy thump), the per-chapter ambient bed that follows the weather, gamepad rumble. |
@@ -94,7 +94,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/game/04-cards.js` | 1149 | The card registry: every card and its forms. |
 | `js/game/05-gear.js` | 633 | Weapons, gear sets (22: 8 common, 7 rare, 4 epic, 2 legendary, 1 mythical), ownership and equipping, trinkets, prize wheel, crates (the mythical Worldspire set drops at 0.02% from Supply Crates, 0.1% from Prime Crates and 2% from Spotted Crates, which cost 1,000 gems and 50 food). |
 | `js/game/05a-gear-levels.js` | 173 | **Gear levels and the crate rules.** A piece goes from level 1 to 5 (`gearLevel`, `gearLevelUp`; each level adds 10% to what the piece gives, a weapon also 6% damage), `gearStatsFor()` and `gearDelta()` say what a loadout or a swap would change without touching the save, crate pity (`CRATE_PITY`: rare or better within 10 Supply Crate opens, epic or better within 8 Prime Crate opens; a mythical roll never turns into something lesser; the Spotted Crate costs food too and has no pity) and `openCrate()` replaced so a duplicate levels the piece up. Save keys `gearLv` and `cratePity` sit beside `gear`. |
-| `js/game/06-player.js` | 277 | Derived player stats and the player. |
+| `js/game/06-player.js` | 278 | Derived player stats and the player. |
 | `js/game/07-enemies.js` | 357 | Enemy types for chapters 1-7 and habitat looks. |
 | `js/game/08-hazards-marines.js` | 786 | Hostile hazards and the Space Marine AI (chapter 8). |
 | `js/game/09-enemy-ai.js` | 354 | Enemy update and movement. In the Tower (`G.tower`) `updateEnemies` first refreshes the flow field (`towerFlow`) and a creature that cannot see its target heads the way `towerSteer` says, flyers are blocked by walls too, and `TOWER_AI` and `SIEGE_AI` are looked up with the other behavior tables; the Siege reuses the same flow field for its town. |
@@ -175,7 +175,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/ui/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
 | `js/ui/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
 | `js/game/40-fusion.js` | 881 | Card fusion: combos, the machine screen, the film. |
-| `js/ui/41-qol.js` | 767 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
+| `js/ui/41-qol.js` | 769 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
 | `js/ui/42-run-hud.js` | 241 | Run lifecycle and the HUD. `startRun` builds the Tower's world (`buildTowerWorld`) for the `tower` biome and the town (`buildSiegeWorld`) for the `siege` biome, and clears `G.tower` for every other; `chapterComplete` also sets `chapter14Complete`, `chapter15Complete` and `chapter16Complete`. |
 | `js/core/43-input.js` | 376 | Input: keyboard, mouse, touch, gamepad. |
 | `js/ui/41a-gear-page.js` | 355 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, the crate reveal (`gearReveal`) and Buy 5 / Buy 10 on every crate (`gearBuyMany`: all the openings play at once, five to a row). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colors screen. |
@@ -288,6 +288,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/fort/44zzzl-fort-chaos.js` | 298 | **Chaos, the alarm and the fort's mechanics**: chaos and its combo (`FT_COMBO`), the eight chaos levels with their colors and gem badges (`FT_TIERS`, kept in `Save.data.fortBadges`), the alarm and its three squads (`FT_ALARM`), explosions and chain reactions (`fortExplode`), the hackable gun emplacements (`FT_HACK`), the searchlights and their generators (`FT_LIGHT`), the rebuild between waves, the wave payout, the chaos panel at the top of the screen and the arrow to the nearest big target. |
 | `js/fort/44zzzm-fort-ai.js` | 254 | **The fort's behaviors** (`FORT_AI`): the twelve soldiers and machines (burst-firing guard, panicking cadet, lunging hound, ramming jeep and APC, shield-bashing riot trooper, bombing copter, mortar and grenade lobbers with marked patches, the sniper's laser, the pyro's flame, the medic's heal) and the five bosses with their phases. |
 | `js/fort/44zzzn-fort-detail.js` | 272 | **The fort's detail layer**: `ftDetail` (per-kind small parts on every building and vehicle: panels, rivets, vents, fans, pipes, hatches, windows, doors, lamps, sandbags, crates, stencils, stains), `ftGroundDetail` (tracks, stains, cracks, drains, drums, tank traps, tents, cable runs, weeds) and `ftRuinDetail` (charred beams, glass, ash). |
+| `js/game/44zzzo-camp.js` | 104 | **The Camp, the logic**: the clock (`campHours`, `campCollect`), the rate and cap, the two gem upgrades opened by chapters, the Camp Crate (`CRATES.camp`, `campOpen`) and the Camp Hearth trinket. |
+| `js/ui/44zzzp-camp-page.js` | 105 | **The Camp tab** of the trading post: the scene, what is stored, Collect, the crates in store, the upgrade rows, the menu line and the tab dot. |
 | `js/core/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/dev/45b-dev-panel.js` | 601 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/core/46-main.js` | 5 | Starts the game. |

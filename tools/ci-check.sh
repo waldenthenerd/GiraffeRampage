@@ -16,7 +16,7 @@ echo "== README and lovable.md counts"
 if out="$(python3 tools/recount-readme.py --check 2>&1)"; then ok "recount-readme"; else bad "recount-readme" "$out"; fi
 echo "== scenarios"
 if out="$(node tools/sync-gallery.mjs --check 2>&1)"; then ok "sync-gallery"; else bad "sync-gallery" "$out"; fi
-for s in gear-oldsave trinket-ui wheel-spotted ants-page ants-engineer upgrades-page nav-pages review-fixes oldsave-deep save-gr3 npc-voices gear-spotted perf-cache save-erase gold-bank together achievements gags fishing fishing-fight input-choice town-layers wheels intel uni-bank uni-slides ui-pass enemy-detail enemy-motion scenery-detail minimap domes tower siege fort sea-chart runreport-gear preview-trail aurora-buff compare-panel-triage; do scen "$s" "$s"; done
+for s in gear-oldsave trinket-ui wheel-spotted ants-page ants-engineer upgrades-page nav-pages review-fixes oldsave-deep save-gr3 npc-voices gear-spotted perf-cache save-erase gold-bank together achievements gags fishing fishing-fight input-choice town-layers wheels intel uni-bank uni-slides ui-pass enemy-detail enemy-motion scenery-detail minimap domes tower siege fort camp sea-chart runreport-gear preview-trail aurora-buff compare-panel-triage; do scen "$s" "$s"; done
 scen "phone-pass (390x844)" phone-pass --touch --w 390 --h 844
 scen "uni-slides (390x844)" uni-slides --touch --w 390 --h 844
 scen "ui-pass (390x844)" ui-pass --touch --w 390 --h 844
@@ -28,7 +28,7 @@ if out="$(bash tools/make-lovable-package.sh "$zip" 2>&1)"; then
   dir="$(mktemp -d)"; unzip -q "$zip" -d "$dir"
   out="$(QA_ROOT="$dir/GiraffeRampage" node tools/qa-cloud.mjs tools/scenarios/ship-check.js --wait 60000 2>&1)"
   if echo "$out" | grep -q '"pass":true'; then ok "ship-check on the package"; else bad "ship-check on the package" "$out"; fi
-  for s in gear-oldsave town-layers domes tower siege fort; do      # the same scenarios on the joined and minified copy
+  for s in gear-oldsave town-layers domes tower siege fort camp; do      # the same scenarios on the joined and minified copy
     out="$(QA_ROOT="$dir/GiraffeRampage" node tools/qa-cloud.mjs "tools/scenarios/$s.js" --wait 90000 2>&1)"
     if echo "$out" | grep -q '"pass":true'; then ok "$s on the package"; else bad "$s on the package" "$out"; fi
   done

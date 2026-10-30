@@ -345,7 +345,7 @@ function showMenu(){
       '<div class="chwrap">' + chapterSelectorHTML() + '</div>' +
       '<div class="menurow">' +
         '<div class="mside l">' +
-        '<button class="btn ghost" data-a="shop">Trading post<small>' + fmt(d.gold) + ' gold banked</small></button>' +
+        '<button class="btn ghost" data-a="shop">Trading post<small>' + fmt(d.gold) + ' gold banked' + campMenuNote() + '</small></button>' +
         venusButtonHTML() +
         marsButtonHTML() +
         labButtonHTML() +
@@ -462,6 +462,7 @@ function showShop(tab){
   HUD.classList.remove('on');
   if (tab) shopTab = tab;
   if (shopTab === 'city' && !cityUnlocked()) shopTab = 'upgrades';
+  if (shopTab === 'camp' && !campUnlocked()) shopTab = 'upgrades';
   setOverlay(
     '<div class="panel slab">' +
       '<div class="shophead">' +
@@ -473,10 +474,11 @@ function showShop(tab){
           '<button class="tab' + (shopTab === 'gear' ? ' on' : '') + '" data-a="tab-gear">Gear</button>' +
           '<button class="tab' + (shopTab === 'ants' ? ' on' : '') + '" data-a="tab-ants">Ants</button>' +
           '<button class="tab' + (shopTab === 'wheel' ? ' on' : '') + '" data-a="tab-wheel">Wheel</button>' +
+          (campUnlocked() ? '<button class="tab' + (shopTab === 'camp' ? ' on' : '') + '" data-a="tab-camp">Camp' + campTabDot() + '</button>' : '') +
           (cityUnlocked() ? '<button class="tab' + (shopTab === 'city' ? ' on' : '') + '" data-a="tab-city">City</button>' : '') +
         '</div>' +
       '</div>' +
-      (shopTab === 'city' ? cityTabHTML() : shopTab === 'upgrades' ? upgradesTabHTML() : shopTab === 'ants' ? antsTabHTML() : shopTab === 'wheel' ? wheelTabHTML() : gearTabHTML()) +
+      (shopTab === 'city' ? cityTabHTML() : shopTab === 'upgrades' ? upgradesTabHTML() : shopTab === 'ants' ? antsTabHTML() : shopTab === 'wheel' ? wheelTabHTML() : shopTab === 'camp' ? campTabHTML() : gearTabHTML()) +
       '<div class="row stickyback" style="margin-top:20px">' +
         '<button class="btn sm" data-a="play">Start a run</button>' +
         '<button class="btn sm ghost" data-a="menu">Back to menu</button>' +

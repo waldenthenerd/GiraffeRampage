@@ -331,3 +331,21 @@
 .upbar.big{height:12px;border-radius:6px;margin-top:0}
 .antlock .alp{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:13px;color:var(--dust)}
 .antlock .alp b{color:var(--sun)}
+
+/* the Camp tab (js/ui/44zzzp-camp-page.js) */
+.tab{position:relative}.tab .updot{--ac:#6FD0F0;right:4px;top:3px}
+.campscene{display:block;width:100%;height:150px;border-radius:10px;border:1px solid var(--bark)}
+.campfire path:first-of-type+path{transform-origin:0 0;animation:campflick 1.1s ease-in-out infinite alternate}
+@keyframes campflick{from{transform:scale(1,1)}to{transform:scale(.92,1.08)}}
+.campstore{padding:10px 12px;border-radius:8px;background:rgba(74,55,42,.42);border:1px solid var(--bark)}
+.campbar{display:block;height:14px;border-radius:7px;background:rgba(0,0,0,.45);overflow:hidden;margin-bottom:6px}
+.campbar.sm{display:inline-block;width:110px;height:8px;margin:0 4px;vertical-align:middle}
+.campbar>i{display:block;height:100%;background:linear-gradient(90deg,#E8A94E,#FFD66A);border-radius:7px;transition:width .6s}
+.campbar>i.full{background:linear-gradient(90deg,#6FD0F0,#B8F0FF)}
+.campline{margin:3px 0;font-size:14px}
+.campnote{margin:8px 0;padding:8px 12px;border-radius:8px;background:rgba(111,208,240,.12);border:1px solid rgba(111,208,240,.4);font-size:13.5px}
+.campcrates{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:start;margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(74,55,42,.42);border:1px solid var(--bark)}
+.campcrates .cratetop{width:54px;height:54px}
+.campcrates .odds{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
+.campcrates .pity{font-size:11.5px;color:var(--dust)}
+@media(max-width:560px){.campcrates{grid-template-columns:1fr}.campbar.sm{width:80px}}

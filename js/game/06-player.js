@@ -39,6 +39,7 @@ function recalcStats(){
   if (trinketEquipped('argonlamp')){ s.pickupMul += 0.2; s.regen += 1.2; }
   if (trinketEquipped('dustveil')){ s.dr += 0.08; s.speedMul += 0.05; s.xpMul += 0.06; }
   if (trinketEquipped('goldenossicone')){ s.maxHpAdd += 20; s.regen += 1; s.xpMul += 0.08; }
+  if (trinketEquipped('campfire')){ s.regen += 1.2; s.xpMul += 0.06; }
   if (trinketEquipped('spottedpaw')){ s.allDmgMul += 0.07; s.crit += 0.03; s.goldMul += 0.10; }
   try { applyMutations(s); } catch (err) {}      /* recalcStats first runs while the file is still loading, before the mutation list exists */
   applyCityStats(s);
