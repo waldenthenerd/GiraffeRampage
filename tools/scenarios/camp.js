@@ -3,7 +3,7 @@
    Run: node tools/qa-cloud.mjs tools/scenarios/camp.js --wait 60000 [--shot x.png --w 1280 --h 720 --params "view=page|full|menu|reveal"] */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
-  GR.handleAction('splash-go'); Ach.check = function(){ return []; };
+  GR.handleAction('splash-go'); var realCheck = Ach.check; Ach.check = function(){ return []; };
   var H = 3600000;
   function fresh(){ Save.reset(); Save.data.chapter2Complete = true; Save.data.best = 1000000; }
   try {
@@ -13,14 +13,14 @@
     fresh(); out.open = campUnlocked(); showShop('upgrades'); out.tab = !!document.querySelector('[data-a="tab-camp"]');
     out.starts = campStart() && Save.data.campLast > 0 && campHours() < 0.01;
 
-    /* the rate: 0.04% of the best score an hour, never under 60, +30% a level */
-    out.rate = campBaseGold() === 400 && campGoldPerHour() === 400;
-    Save.data.best = 10; out.minRate = campBaseGold() === 60; Save.data.best = 1000000;
-    Save.data.campRate = 2; out.rateLv = campGoldPerHour() === 640; Save.data.campRate = 0;
+    /* the rate: 0.025% of the best score an hour, never under 40, +30% a level */
+    out.rate = campBaseGold() === 250 && campGoldPerHour() === 250;
+    Save.data.best = 10; out.minRate = campBaseGold() === 40; Save.data.best = 1000000;
+    Save.data.campRate = 2; out.rateLv = campGoldPerHour() === 400; Save.data.campRate = 0;
 
     /* an hour stored, then the cap (3 hours) and a bigger larder */
     var now = Date.now(); Save.data.campLast = now - 1 * H;
-    out.oneHour = Math.abs(campHours(now) - 1) < 1e-6 && campPending(now).gold === 400;
+    out.oneHour = Math.abs(campHours(now) - 1) < 1e-6 && campPending(now).gold === 250;
     Save.data.campLast = now - 10 * H; out.cap3 = campHours(now) === 3 && campFull(now);
     Save.data.campCap = 2; out.cap6 = campHours(now) === 6; Save.data.campCap = 0;
 
@@ -29,11 +29,12 @@
 
     /* collect: gold in, crate progress kept, the clock restarted, nothing to take a moment later */
     Save.data.campLast = now - 3 * H; Save.data.campProg = 0; var g0 = Save.data.gold, r1 = campCollect(now);
-    out.collect = !!r1 && Save.data.gold === g0 + 1200 && r1.crates === 0 && Math.abs(Save.data.campProg - 0.75) < 1e-9 && Save.data.campLast === now;
+    out.collect = !!r1 && Save.data.gold === g0 + 750 && r1.crates === 0 && Math.abs(Save.data.campProg - 0.75) < 1e-9 && Save.data.campLast === now;
     out.again = campCollect(now) === null;
+    out.counters = Save.data.campCollects === 1 && Save.data.campGoldTotal === 750 && Save.data.campFullOnce === true; realCheck.call(Ach); out.ach = Ach.isDone('camp1') && Ach.isDone('campfull') && !Ach.isDone('campcrates') && !Ach.isDone('camphearth');
     Save.data.campLast = now - 3 * H; var r2 = campCollect(now);
     out.crateMade = r2.crates === 1 && Save.data.campCrates === 1 && Math.abs(Save.data.campProg - 0.5) < 1e-9;
-    Save.data.campRate = 5; Save.data.campLast = now - 3 * H; Save.data.campProg = 0; out.fastCrates = campPending(now).crates === 1 && campPending(now).gold === 3000; Save.data.campRate = 0;
+    Save.data.campRate = 5; Save.data.campLast = now - 3 * H; Save.data.campProg = 0; out.fastCrates = campPending(now).crates === 1 && campPending(now).gold === 1875; Save.data.campRate = 0;
 
     /* the upgrades: gems, and a chapter for each level; what is stored stays stored */
     fresh(); campStart(); Save.data.gems = 5000;
@@ -78,8 +79,8 @@
     GR.handleAction('tab-camp');
     out.shop = shopTab === 'camp' && !!document.querySelector('.camppg .campscene') && /Camp Crates in store: 6/.test(document.querySelector('.campcrates').textContent) && document.querySelectorAll('[data-camp]').length === 2;
     out.collectBtn = !document.getElementById('campCollect').disabled && /2h 30m/.test(document.getElementById('campHrs').textContent);
-    campTick(); out.tick = /1,000|1000/.test(document.getElementById('campGold').textContent);
-    var gold0 = Save.data.gold; GR.handleAction('camp-collect'); out.pageCollect = Save.data.gold >= gold0 + 1000 && /Collected 2h 30m/.test(document.querySelector('.campnote').textContent) && document.getElementById('campCollect').disabled;
+    campTick(); out.tick = /6\d\d/.test(document.getElementById('campGold').textContent);
+    var gold0 = Save.data.gold; GR.handleAction('camp-collect'); out.pageCollect = Save.data.gold >= gold0 + 600 && /Collected 2h 30m/.test(document.querySelector('.campnote').textContent) && document.getElementById('campCollect').disabled;
     var crates0 = Save.data.campCrates; GR.handleAction('camp-open-1'); out.pageOpen = Save.data.campCrates === crates0 - 1 && !!document.getElementById('crateReveal');
     GR.handleAction('gear-reveal-close'); GR.handleAction('gear-reveal-close'); out.revealClosed = !document.getElementById('crateReveal') && shopTab === 'camp';
     GR.handleAction('camp-open-5'); out.pageMany = Save.data.campCrates === crates0 - 6 && !!document.querySelector('#crateReveal .crgrid'); GR.handleAction('gear-reveal-close'); GR.handleAction('gear-reveal-close');
@@ -97,6 +98,10 @@
     out.sceneLoop = (function(){ var ok = true; for (var u = 0; u < 30; u += 0.5){ var a0 = campSceneAt(u).x, a1 = campSceneAt(u + 0.5).x; if (Math.abs(a1 - a0) > 70) ok = false; } return ok; })();
     Save.data.skinCol = 0; var plain = campSceneDraw; Save.data.chapter3Complete = true; Save.data.chapter5Complete = true; Save.data.skinCol = 5; Save.data.spotCol = 3; Save.data.patCol = 5; Save.data.gearCol = 3; var sc2 = document.createElement('canvas'); sc2.width = CAMP_SCENE.W; sc2.height = CAMP_SCENE.H; var sy = sc2.getContext('2d'); campSceneDraw(sy, 4, 0.5); campSceneDraw(sx, 4, 0.5);
     var c1 = sy.getImageData(120, 130, 1, 1).data; out.sceneColours = giraffeColours().coat === WARD[5].c && !!c1[3]; Save.data.skinCol = 0; Save.data.spotCol = 0; Save.data.patCol = 0; Save.data.gearCol = 0;
+    /* the reactions: a full store makes her look up and say so, and the clock at night puts her to sleep; neither changes the picture of an ordinary evening */
+    var sa = document.createElement('canvas'); sa.width = CAMP_SCENE.W; sa.height = CAMP_SCENE.H; var sb = sa.getContext('2d'), sd = document.createElement('canvas'); sd.width = CAMP_SCENE.W; sd.height = CAMP_SCENE.H; var se = sd.getContext('2d');
+    var diff = function(f1, s1, f2, s2){ campSceneDraw(sb, 14, f1, s1); campSceneDraw(se, 14, f2, s2); var A = sb.getImageData(150, 0, 300, 196).data, B = se.getImageData(150, 0, 300, 196).data, n = 0; for (var q = 0; q < A.length; q += 4) if (A[q] !== B[q] || A[q + 1] !== B[q + 1]) n++; return n; };
+    out.reactions = diff(0.5, false, 1, false) > 40 && diff(0.5, false, 0.5, true) > 40 && diff(0.5, false, 0.5, false) === 0 && campLate() === (new Date().getHours() >= 23 || new Date().getHours() < 6);
     var px0 = sx.getImageData(0, 0, 1, 1).data[3]; out.sceneDrawn = px0 === 255;
     /* the pictures */
     if (V === 'page' || V === 'full' || V === 'reveal' || V === 'menu'){
@@ -104,11 +109,11 @@
       Save.data.campLast = Date.now() - (V === 'full' ? 20 : 2.4) * H; Save.data.campCrates = 4; Save.data.campProg = 0.6; campPage.note = '';
       if (V === 'menu'){ showMenu(); }
       else { GR.handleAction('tab-camp'); if (QA.params.col){ for (var cc = 1; cc <= 13; cc++) Save.data['chapter' + cc + 'Complete'] = true; Save.data.skinCol = 6; Save.data.spotCol = 4; Save.data.patCol = 5; Save.data.gearCol = 10; var cp = Object.keys(GEAR_INDEX).filter(function(id){ return GEAR_INDEX[id].slot === 'cape'; })[0]; grantGear(cp); equipGear(cp); }
-      if (QA.params.ct){ CAMP_SCENE.fixT = +QA.params.ct; campSceneFrame(0); } if (V === 'reveal'){ GR.handleAction('camp-open-5'); for (var i = 0; i < 30; i++) GR.step(1 / 30); } }
+      if (QA.params.sleep) CAMP_SCENE.sleepy = true; if (QA.params.ct){ CAMP_SCENE.fixT = +QA.params.ct; campSceneFrame(0); } if (V === 'reveal'){ GR.handleAction('camp-open-5'); for (var i = 0; i < 30; i++) GR.step(1 / 30); } }
       out.view = V;
     }
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['locked', 'noTab', 'open', 'tab', 'starts', 'rate', 'minRate', 'rateLv', 'oneHour', 'cap3', 'cap6', 'back', 'collect', 'again', 'crateMade', 'fastCrates', 'upLocked', 'upBuy', 'upNext', 'upPoor', 'upMax', 'upTriple',
+  var need = ['locked', 'noTab', 'open', 'tab', 'starts', 'rate', 'minRate', 'rateLv', 'oneHour', 'cap3', 'cap6', 'back', 'collect', 'again', 'counters', 'ach', 'reactions', 'crateMade', 'fastCrates', 'upLocked', 'upBuy', 'upNext', 'upPoor', 'upMax', 'upTriple',
     'openOne', 'odds', 'openAll', 'pity', 'hearthDrop', 'hearthOnce', 'hearthRare', 'hearthStats', 'hearthCamp', 'hearthOff', 'sane', 'defaults', 'oldSave', 'shop', 'collectBtn', 'tick', 'pageCollect', 'pageOpen', 'revealClosed', 'pageMany',
     'pageBuy', 'lockedRow', 'timerStops', 'menuNote', 'menuQuiet', 'scene', 'sceneLoop', 'sceneDrawn', 'sceneColours'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
