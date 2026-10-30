@@ -70,7 +70,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 This list is of the **source** files, which the ZIP no longer contains one by one (the build joins them into a few files in exactly this order and
 minifies them; the folder names are only for finding things). The scripts are loaded in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/core/46-main.js`, which starts the
-game. This is the complete list for this version (209 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (211 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -280,6 +280,8 @@ game. This is the complete list for this version (209 scripts; the developer pan
 | 204 | `js/game/44zzzo-camp.js` | The idle Camp: stores gold and crate progress while she is away. |
 | 205 | `js/ui/44zzzp-camp-page.js` | The Camp tab of the trading post. |
 | 206 | `js/ui/44zzzq-camp-scene.js` | The animated picture on the Camp tab. |
+| 207 | `js/photo/44zzzr-photo-scenes-late.js` | Five more photo backdrops: the Domes, the Tower, the Siege, Fort Shortneck and her Camp. |
+| 208 | `js/minigames/44zzzs-minigames-late.js` | Three more minigames: Slide Dome, Sandbag Run and Searchlight Sneak. |
 | 207 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
 | 208 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | 209 | `js/core/46-main.js` | Starts the game. |

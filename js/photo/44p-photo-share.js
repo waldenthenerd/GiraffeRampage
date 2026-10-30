@@ -10,7 +10,7 @@
      byte 1   = a check value over the rest, so a damaged or cut-off code is caught
      then bit fields, no padding between them:
        bg 5 | pose 4 | flip 1 | giraffe x 10 | y 10 | size 8 (x100)
-       look: skin 6 | spots 6 | pattern 4 | gear 6 | hat 6 | boots 6 | hat color 6 | boot color 6   (hat/boots: 0 none, else ACC_ITEMS index + 1; format 2 used 5 bits for each but pattern)
+       look: skin 6 | spots 6 | pattern 4 (15 = escape, 3 more bits follow: patterns 15 and up) | gear 6 | hat 6 | boots 6 | hat color 6 | boot color 6   (hat/boots: 0 none, else ACC_ITEMS index + 1; format 2 used 5 bits for each but pattern)
        item count 5, then per item: kind 1 (0 effect, 1 creature)
          effect:   index in PHOTO_FX 5
          creature: chapter - 1  4 | index in BESTIARY_ORDER 5
@@ -94,7 +94,8 @@ function photoPack(d){
   const accIdx = function(id){ const i = id ? photoIndexOf(ACC_ITEMS.map(function(a){ return a.id; }), id) : -1; return i < 0 ? 0 : i + 1; };
   w.w(d.bg, 5); w.w(d.pose, 4); w.w(d.flip ? 1 : 0, 1);
   w.w(gi.x, 10); w.w(gi.y, 10); w.w(gi.s * 100, 8);
-  w.w(lk.skin, 6); w.w(lk.spots, 6); w.w(lk.pattern, 4); w.w(lk.gear, 6);
+  w.w(lk.skin, 6); w.w(lk.spots, 6); if ((lk.pattern | 0) >= 15){ w.w(15, 4); w.w((lk.pattern | 0) - 15, 3); } else w.w(lk.pattern, 4);          /* 15 is an escape: 3 more bits carry patterns 15 to 22 */
+  w.w(lk.gear, 6);
   w.w(accIdx(lk.hat), 6); w.w(accIdx(lk.boots), 6); w.w(lk.hatColour, 6); w.w(lk.bootColour, 6);
   const items = (d.items || []).slice(0, PHOTO_MAX);
   w.w(items.length, 5);
@@ -118,7 +119,7 @@ function photoUnpack(bytes){
   d.bg = r.r(5); d.pose = r.r(4); d.flip = !!r.r(1);
   d.giraffe = { x: r.r(10), y: r.r(10), s: r.r(8) / 100 };
   const cb = bytes[0] >= 3 ? 6 : 5;                                          /* version 2 used 5 bits for colors and accessories, version 3 uses 6 */
-  const sk = r.r(cb), sp = r.r(cb), pa = r.r(4), ge = r.r(cb), ha = r.r(cb), bo = r.r(cb), hc = r.r(cb), bc = r.r(cb);
+  const sk = r.r(cb), sp = r.r(cb), pa0 = r.r(4), pa = pa0 === 15 ? 15 + r.r(3) : pa0, ge = r.r(cb), ha = r.r(cb), bo = r.r(cb), hc = r.r(cb), bc = r.r(cb);
   d.look = { skin: sk, spots: sp, pattern: pa, gear: ge, hat: ha ? (ACC_ITEMS[ha - 1] || {}).id || '' : '', boots: bo ? (ACC_ITEMS[bo - 1] || {}).id || '' : '', hatColour: hc, bootColour: bc };
   const n = r.r(5); d.items = [];
   for (let i = 0; i < n; i++){
@@ -154,7 +155,7 @@ function photoFromCode(text){
   st.gx = num(gi.x, 0, 960, 480); st.gy = num(gi.y, 140, 540, 453.6); st.gs = num(gi.s, 0.5, 1.7, 1);
   const hat = typeof lk.hat === 'string' && ACC_BY_ID[lk.hat] && ACC_BY_ID[lk.hat].kind === 'hat' ? lk.hat : '';
   const boot = typeof lk.boots === 'string' && ACC_BY_ID[lk.boots] && ACC_BY_ID[lk.boots].kind === 'boot' ? lk.boots : '';
-  st.look = { s: int(lk.skin, 0, WARD_MAX), p: int(lk.spots, 0, WARD_MAX), t: int(lk.pattern, 0, 13), g: int(lk.gear, 0, WARD_MAX), hat: hat, boot: boot,
+  st.look = { s: int(lk.skin, 0, WARD_MAX), p: int(lk.spots, 0, WARD_MAX), t: int(lk.pattern, 0, WARD_PAT_MAX), g: int(lk.gear, 0, WARD_MAX), hat: hat, boot: boot,
     hc: int(lk.hatColour, 0, WARD_MAX), bc: int(lk.bootColour, 0, WARD_MAX) };
   const list = Array.isArray(data.items) ? data.items.slice(0, PHOTO_MAX) : [];
   list.forEach(function(o){

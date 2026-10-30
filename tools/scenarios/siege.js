@@ -29,8 +29,8 @@
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter16Complete === false;
     Save.data.chapter16Complete = 'junk'; Save.write(); Save.load(); out.saveSane = Save.data.chapter16Complete === true || Save.data.chapter16Complete === false;
-    freshSave(); out.wardLen = WARD.length === 53 && WARD[49].name === 'Town Watch' && wardUnlocked(49) === false;
-    Save.data.chapter16Complete = true; out.wardOpen = wardUnlocked(49) === true && WARD_MAX === 52; Save.data.chapter16Complete = false;
+    freshSave(); out.wardLen = WARD.length === 56 && WARD[49].name === 'Town Watch' && wardUnlocked(49) === false;
+    Save.data.chapter16Complete = true; out.wardOpen = wardUnlocked(49) === true && WARD_MAX === 55; Save.data.chapter16Complete = false;
 
     /* waves: every wave of the chapter builds, the boss waves have their boss, and the pool grows */
     var ok = true, bad = '';
@@ -176,6 +176,7 @@
     G.spawnQueue = []; G.enemies.length = 0; G.bossAlive = false; G.waveState = 'clear'; G.waveTimer = 0.01; steps(3);
     out.endFilm = G.state === 'cutscene' && !!G.cut && G.cut.kind === 'siegeout' && Save.data.chapter16Complete === true;
     G.cut.t = SG_OUT_T.END - 0.01; steps(60);
+    out.endMini = G.state === 'miniask'; if (G.state === 'miniask'){ GR.handleAction('mini-skip'); steps(60); }                 /* the minigame's popup comes before the report */
     out.endVictory = G.state === 'victory' && Save.data.chapter16Complete === true && Save.data.chapter15Complete === true && wardUnlocked(49) === true;
     G.chapter = SIEGE_CHAPTER; out.victoryText = /Warden/.test(victoryText(3, 4)) && !/the end|thanks for playing/i.test(victoryText(3, 4));
     freshSave(); Save.data.chapter15Complete = true; startRun(16, 361); steps(3); godMode();

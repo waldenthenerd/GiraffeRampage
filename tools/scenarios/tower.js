@@ -23,7 +23,7 @@
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter15Complete === false;
     Save.data.chapter15Complete = 'junk'; Save.load(); out.saveSane = typeof Save.data.chapter15Complete === 'boolean';
-    freshSave(); out.wardLen = WARD.length === 53 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
+    freshSave(); out.wardLen = WARD.length === 56 && WARD[47].name === 'Executive Navy' && wardUnlocked(47) === false;
     Save.data.chapter15Complete = true; out.wardOpen = wardUnlocked(47) === true;
 
     /* the floor plans: twenty-five different ones, every room reachable, both elevators joined, vents everywhere, nothing outside the arena */
@@ -117,7 +117,7 @@
     G.chapter = TOWER_CHAPTER; out.victoryText = /Chief Executive/.test(victoryText(3, 4));
 
     /* Rush Hour, the minigame after the Tower: the lanes, the elevator, a hit, and the stars and the coat color */
-    freshSave(); out.rushDef = !!MINI[TOWER_CHAPTER] && MINI[TOWER_CHAPTER].name === 'Rush Hour' && typeof MINI[TOWER_CHAPTER].draw === 'function' && MINI_STAR[TOWER_CHAPTER].t[1] === 12 && MINI_STAR_CHAPTERS.length === 14;
+    freshSave(); out.rushDef = !!MINI[TOWER_CHAPTER] && MINI[TOWER_CHAPTER].name === 'Rush Hour' && typeof MINI[TOWER_CHAPTER].draw === 'function' && MINI_STAR[TOWER_CHAPTER].t[1] === 12 && MINI_STAR_CHAPTERS.length === 17;
     out.rushLocked = miniUnlocked(TOWER_CHAPTER) === false; Save.data.chapter15Complete = true; out.rushOpen = miniUnlocked(TOWER_CHAPTER) === true;
     Save.data.mini = { own: {}, best: {}, stars: {}, last: 0, plays: 0, hat: '', boot: '' };
     out.rushStart = startMini(TOWER_CHAPTER, null, 'menu') && G.state === 'mini'; var rm = G.mini; rm.phase = 'play';
@@ -126,7 +126,7 @@
     var L0 = rm.lanes[0]; rm.inv = 0; rm.p.x = (L0.objs.filter(function(o){ return o.x > 60 && o.x < rg.W - 60; })[0] || L0.objs[0]).x; rm.p.y = L0.y; var lives0 = rm.lives; steps(1); out.rushHit = rm.lives === lives0 - 1 && rm.p.y > rg.H * 0.8;
     rm.score = 12; rm.over = true; steps(2); out.rushStars = G.mini && G.mini.won === true && G.mini.stars === 3 || (Save.data.mini.stars[TOWER_CHAPTER] | 0) === 3;
     G.state = 'menu'; G.mini = null; out.rushCoat = WARD[48] && WARD[48].name === 'Brass Button' && wardUnlocked(48) === true;
-    out.rushTotals = miniStarTotal() >= 3 && /42/.test(String(MINI_STAR_CHAPTERS.length * 3));
+    out.rushTotals = miniStarTotal() >= 3 && /51/.test(String(MINI_STAR_CHAPTERS.length * 3));
 
     /* the menu card, and the films from the menu */
     freshSave(); setMenuChapter(15); showMenu(); var html = chapterSelectorHTML();
