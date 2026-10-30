@@ -19,7 +19,7 @@
 
     /* the save */
     freshSave(); out.saveDefault = Save.data.chapter14Complete === false;
-    out.wardLen = WARD.length; out.wardLocked = wardUnlocked(46) === false && WARD[46] && WARD[46].name === 'Frost Mylar' && WARD.length === 53;
+    out.wardLen = WARD.length; out.wardLocked = wardUnlocked(46) === false && WARD[46] && WARD[46].name === 'Frost Mylar' && WARD.length === 56;
     Save.data.chapter14Complete = 'junk'; out.saveSane = typeof (Save.data.chapter14Complete = !!Save.data.chapter14Complete) === 'boolean';
     Save.data.chapter14Complete = true; out.wardOpen = wardUnlocked(46) === true && wardChoice('skinCol') === 0;
     Save.data.skinCol = 46; out.wardChoice = wardChoice('skinCol') === 46; Save.data.skinCol = 0;
@@ -87,6 +87,7 @@
     G.spawnQueue = []; G.enemies.length = 0; G.bossAlive = false; G.waveState = 'clear'; G.waveTimer = 0.01; steps(3);
     out.endFilm = G.state === 'cutscene' && G.cut && G.cut.kind === 'domeout';
     G.cut.t = DOME_OUT_T.END - 0.01; steps(3);
+    out.endMini = G.state === 'miniask'; if (G.state === 'miniask'){ GR.handleAction('mini-skip'); steps(60); }                 /* the minigame's popup comes before the report */
     out.endVictory = G.state === 'victory' && Save.data.chapter14Complete === true && Save.data.chapter13Complete === true && wardUnlocked(46);
     steps(150); out.victoryText = /CHAPTER 13\.5 COMPLETE/.test(OV.innerHTML) && /New York/.test(OV.innerHTML) && !/the end|thanks for playing/i.test(OV.innerHTML);
 

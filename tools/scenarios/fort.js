@@ -52,7 +52,7 @@
     freshSave(); out.saveDefault = Save.data.chapter17Complete === false && Save.data.fortChaosBest === 0 && Save.data.fortBadges === 0 && Save.data.fortBestWave === 0;
     Save.data.chapter17Complete = 'junk'; Save.data.fortChaosBest = -5; Save.data.fortBadges = 9999; Save.data.fortBestWave = 99; Save.write(); Save.load();
     out.saveSane = typeof Save.data.chapter17Complete === 'boolean' && Save.data.fortChaosBest === 0 && Save.data.fortBadges <= 255 && Save.data.fortBestWave <= 25;
-    freshSave(); out.ward = WARD.length === 53 && WARD_MAX === 52 && WARD[51].name === 'Fort Camo' && WARD[52].name === 'Calamity Gold' && wardUnlocked(51) === false && wardUnlocked(52) === false;
+    freshSave(); out.ward = WARD.length === 56 && WARD_MAX === 55 && WARD[51].name === 'Fort Camo' && WARD[52].name === 'Calamity Gold' && wardUnlocked(51) === false && wardUnlocked(52) === false;
     Save.data.chapter17Complete = true; Save.data.fortBadges = 128; out.wardOpen = wardUnlocked(51) === true && wardUnlocked(52) === true;
 
     /* waves: every wave builds, boss waves have their boss, the pool grows */
@@ -191,6 +191,7 @@
     G.spawnQueue = []; G.enemies.length = 0; G.bossAlive = false; G.waveState = 'clear'; G.waveTimer = 0.01; steps(3);
     out.endFilm = G.state === 'cutscene' && !!G.cut && G.cut.kind === 'fortout' && Save.data.chapter17Complete === true;
     G.cut.t = FT_OUT_T.END - 0.01; steps(60);
+    out.endMini = G.state === 'miniask'; if (G.state === 'miniask'){ GR.handleAction('mini-skip'); steps(60); }                 /* the minigame's popup comes before the report */
     out.endVictory = G.state === 'victory' && Save.data.chapter17Complete === true && Save.data.chapter16Complete === true && wardUnlocked(51) === true;
     G.chapter = COUNTER_CHAPTER; out.victoryText2 = /maker of the Warden/.test(victoryText(3, 4)) && !/the end|thanks for playing/i.test(victoryText(3, 4));
     out.gallery = filmList().filter(function(x){ return x.kind === 'fortflight' || x.kind === 'fortout'; }).length === 2;

@@ -6,7 +6,7 @@
    so any moment can be drawn on its own (the scenario does), and the fire burns higher the fuller the store.
    It runs about 24 frames a second, only while the Camp tab is showing; with Visual effects off it draws one still frame, sitting by the fire.
    ============================================================================================================================= */
-const CAMP_SCENE = { W: 640, H: 240, GY: 196, cycle: 30, raf: 0, last: 0, t: 0, fixT: -1, fill: 0.5 };
+const CAMP_SCENE = { W: 640, H: 240, GY: 196, cycle: 30, raf: 0, last: 0, t: 0, fixT: -1, fill: 0.5, sleepy: false };
 /* where she is and what she is doing at second t of a 30-second round: { x, mode, f (seconds into the mode), walk } */
 function campSceneAt(t){
   const c = ((t % 30) + 30) % 30;
@@ -56,7 +56,7 @@ function campScenePoof(c, x, y, u){                                             
   if (u <= 0 || u >= 1) return;
   c.save(); c.globalAlpha = 1 - u; for (let i = 0; i < 7; i++){ const an = i / 7 * TAU, r = 6 + u * 26; c.fillStyle = i % 2 ? '#FFD66A' : '#FFF4C8'; c.beginPath(); c.arc(x + Math.cos(an) * r, y + Math.sin(an) * r * 0.8, 3.4 * (1 - u * 0.5), 0, TAU); c.fill(); } c.restore();
 }
-function campSceneDraw(c, t, fill){
+function campSceneDraw(c, t, fill, sleepy){
   const W = CAMP_SCENE.W, H = CAMP_SCENE.H, GY = CAMP_SCENE.GY, S = campSceneAt(t), tw = fxLevelNow() > 0 ? t : 0;
   const sky = c.createLinearGradient(0, 0, 0, GY); sky.addColorStop(0, '#141C28'); sky.addColorStop(1, '#2C3E4C'); c.fillStyle = sky; c.fillRect(0, 0, W, H);
   for (let i = 0; i < 34; i++){ const sx = (i * 97 + 31) % W, sy = (i * 53 + 11) % 110, tz = 0.5 + 0.5 * Math.sin(tw * 1.6 + i * 1.7); c.fillStyle = 'rgba(255,255,255,' + (0.35 + tz * 0.55).toFixed(2) + ')'; c.fillRect(sx, sy, i % 5 === 0 ? 2 : 1.4, i % 5 === 0 ? 2 : 1.4); }
@@ -97,6 +97,8 @@ function campSceneDraw(c, t, fill){
     g.reach = 0.05 + Math.sin(g.ph * 2) * 0.02; g.face = S.walk < 0 ? -1 : 1;
   } else if (S.mode === 'sit'){
     g.sit = S.sit > 0.5; g.walk = 0; g.reach = -0.1 + 0.12 * Math.sin(tw * 0.6); g.lean = 4 * Math.sin(tw * 0.7);
+    if (sleepy){ g.reach = -0.3 + 0.03 * Math.sin(tw * 1.1); g.lean = 2; if (S.sit >= 1) for (let i = 0; i < 3; i++){ const u = ((tw * 0.35 + i / 3) % 1); fx.push(['say', S.x + 46 + u * 22, GY - 118 - u * 40, 'z', 1 - u, 12 + i * 3]); } }       /* asleep by the fire at night */
+    else if (fill >= 0.999 && S.sit >= 1){ g.reach = 0.15 + 0.2 * Math.abs(Math.sin(tw * 2.6)); fx.push(['say', S.x + 60, GY - 150, 'Full!', 1, 15]); }       /* the store is full: she looks up and says so */
   } else if (S.mode === 'fight'){
     const bow = Math.floor(t / 30) % 2 === 1, f = S.f; g.item = bow ? 'bow' : 'sword';
     if (!bow){
@@ -132,6 +134,7 @@ function campSceneDraw(c, t, fill){
   enemies.forEach(function(e){ campSceneEnemy(c, e.x, GY, e); });
   fx.forEach(function(p){
     if (p[0] === 'poof') campScenePoof(c, p[1], p[2], p[3]);
+    else if (p[0] === 'say'){ c.save(); c.globalAlpha = p[4]; c.font = '700 ' + p[5] + 'px sans-serif'; c.textAlign = 'center'; c.fillStyle = p[3] === 'z' ? '#CFE3FF' : '#FFE9A8'; c.fillText(p[3], p[1], p[2]); c.restore(); }
     else if (p[0] === 'arrow'){ campSceneRay(c, p[1], p[2], p[1] + 30, p[2], 1.8, '#D8C8A0'); c.fillStyle = '#C8CCD4'; c.beginPath(); c.moveTo(p[1] + 30, p[2] - 3); c.lineTo(p[1] + 38, p[2]); c.lineTo(p[1] + 30, p[2] + 3); c.fill(); }
     else { c.fillStyle = p[3]; c.fillRect(p[0], p[1], p[2], p[2]); }
   });
@@ -143,10 +146,11 @@ function campSceneFrame(now){
   if (!cv || !(G.state === 'shop' && shopTab === 'camp')){ CAMP_SCENE.raf = 0; return; }
   const dt = Math.min(0.1, (now - (CAMP_SCENE.last || now)) / 1000); CAMP_SCENE.last = now;
   const still = fxLevelNow() <= 0, t = CAMP_SCENE.fixT >= 0 ? CAMP_SCENE.fixT : still ? 12 : (CAMP_SCENE.t += dt);
-  if (!still || !cv.dataset.drawn || CAMP_SCENE.fixT >= 0){ campSceneDraw(cv.getContext('2d'), t, CAMP_SCENE.fill); cv.dataset.drawn = '1'; }
+  if (!still || !cv.dataset.drawn || CAMP_SCENE.fixT >= 0){ campSceneDraw(cv.getContext('2d'), t, CAMP_SCENE.fill, CAMP_SCENE.sleepy); cv.dataset.drawn = '1'; }
   CAMP_SCENE.raf = still || CAMP_SCENE.fixT >= 0 ? 0 : requestAnimationFrame(campSceneFrame);
 }
+function campLate(){ const h = new Date().getHours(); return h >= 23 || h < 6; }                        /* the device clock says it is the middle of the night */
 function campSceneMount(fill){
-  CAMP_SCENE.fill = fill; if (CAMP_SCENE.raf){ cancelAnimationFrame(CAMP_SCENE.raf); CAMP_SCENE.raf = 0; }
+  CAMP_SCENE.fill = fill; CAMP_SCENE.sleepy = campLate(); if (CAMP_SCENE.raf){ cancelAnimationFrame(CAMP_SCENE.raf); CAMP_SCENE.raf = 0; }
   CAMP_SCENE.last = 0; CAMP_SCENE.raf = requestAnimationFrame(campSceneFrame);
 }

@@ -2,7 +2,7 @@
 /* Coat colors and patterns: every chapter finished gives one color and one spot pattern, and the giraffe's skin, spots,
    spot pattern and gear accent can each be chosen from what she has earned. */
 /* ========================= 44e. WARDROBE ========================= */
-/* Save.data.skinCol, spotCol, patCol and gearCol each hold 0 (her own) or a chapter number 1-13; chapter N's color and pattern are
+/* Save.data.skinCol, spotCol, patCol and gearCol each hold 0 (her own) or a chapter number 1-13 (patterns go on to 17, for the later chapters: WARD_PAT_LATE); chapter N's color and pattern are
    available once Save.data.chapterNComplete is set. drawPlayer() (33-giraffe-art.js) paints with giraffeColours(), giraffePattern()
    and giraffeAccent(); the films' giraffe (csGiraffe, the forage minigame, the pod) uses giraffeCustom() and giraffePattern(). */
 const WARD = [null,
@@ -12,7 +12,12 @@ const WARD = [null,
   { name: 'Rust', c: '#C9603B' }
 ];
 const WARD_PATTERNS = ['Classic blotches', 'Savanna patches', 'Snow flecks', 'Bog stripes', 'Ocean rings', 'Jungle rosettes', 'City dots', 'Starfield',
-  'Craters', 'Venus diamonds', 'Flames', 'Glimmer sparkles', 'Hex grid', 'Dune ripples'];
+  'Craters', 'Venus diamonds', 'Flames', 'Glimmer sparkles', 'Hex grid', 'Dune ripples',
+  'Frost crystals', 'Window grid', 'Shield crests', 'Fort camo'];
+const WARD_PAT_MAX = 17;
+/* patterns 14 to 17 come with the later chapters (their colors are 46, 47, 49 and 51): the Domes, the Tower, the Siege and Fort Shortneck */
+const WARD_PAT_LATE = [null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+  { ch: 14, name: 'Chapter 13.5, The Domes', col: 46 }, { ch: 15, name: 'Chapter 14, The Tower', col: 47 }, { ch: 16, name: 'Chapter 15, The Siege', col: 49 }, { ch: 17, name: 'Chapter 16, Fort Shortneck', col: 51 }];
 const WARD_CLASSIC = { name: 'Her own', coat: '#D6A44F', spot: '#8A5A24', dark: '#A8762F' };
 
 /* Thirteen more colors, one for each minigame, earned by getting all three stars in it (js/minigames/44k-minigame-rewards.js). They are
@@ -30,11 +35,13 @@ const WARD_TOWN = [['Brickwork', '#B5543C', 'pk_sw'], ['Sea Glass', '#7FD1C0', '
 /* 36 to 41: found out at sea, in the air and in the two villages (js/town/44zs-explore-rewards.js) */
 WARD_TOWN.push(['Jet Stream', '#8ED0F0', 'fl_sw'], ['Seafoam', '#6FD8B8', 'sea_sw1'], ['Coral Reef', '#F0707A', 'sea_sw2'], ['Cornfield', '#E8C44A', 'fm_sw1'], ['Harvest Orange', '#E8862A', 'fm_sw2'], ['Shell Pink', '#F4C4D0', 'is_sw1'], ['Gold Medal', '#E8B830', 'gym_gold']);
 WARD_TOWN.forEach(function(w){ WARD.push({ name: w[0], c: w[1] }); });
-const WARD_MAX = 52;                                    /* 43 to 45: the university ranks Graduate, Professor and Chancellor (js/campus/44zz-campus.js); 46: Frost Mylar, for finishing Chapter 13.5; 47: Executive Navy, for finishing Chapter 14; 48: Brass Button, for three stars in Rush Hour, the Tower's minigame */
-function wardStarOf(n){ const s = Save.data && Save.data.mini && Save.data.mini.stars; return s ? (s[n === 48 ? TOWER_CHAPTER : n - 13] | 0) : 0; }
-function miniWardOf(ch){ return ch === TOWER_CHAPTER ? 48 : 13 + ch; }                 /* the coat color three stars in a chapter's minigame earn */
+const WARD_MAX = 55;                                    /* 43 to 45: the university ranks Graduate, Professor and Chancellor (js/campus/44zz-campus.js); 46: Frost Mylar, for finishing Chapter 13.5; 47: Executive Navy, for finishing Chapter 14; 48: Brass Button, for three stars in Rush Hour, the Tower's minigame */
+const WARD_MG = { 48: TOWER_CHAPTER, 53: DOME_CHAPTER, 54: SIEGE_CHAPTER, 55: COUNTER_CHAPTER };       /* the colors that three stars in a later chapter's minigame earn */
+function wardStarOf(n){ const s = Save.data && Save.data.mini && Save.data.mini.stars; return s ? (s[WARD_MG[n] || n - 13] | 0) : 0; }
+function miniWardOf(ch){ for (const k in WARD_MG) if (WARD_MG[k] === ch) return +k; return 13 + ch; }                 /* the coat color three stars in a chapter's minigame earn */
 function wardUnlocked(n){
   if (n === 0) return true;
+  if (WARD_MG[n] && n !== 48) return wardStarOf(n) >= 3;                                                                    /* 53 to 55: three stars in the Domes', the Siege's and the Fort's minigames */
   if (n === 52) return !!(Save.data && (Save.data.fortBadges & 128));                                                       /* Calamity Gold: the top chaos badge in Fort Shortneck */
   if (n === 51) return !!(Save.data && Save.data.chapter17Complete);                                                            /* Fort Camo: Chapter 16, the counter attack */
   if (n === 50) return !!(Save.data && Save.data.siegeBld && Save.data.siegeBld.hall && Save.data.siegeBld.hall.t >= 1);                    /* Hall Crimson: the Herd Hall held ten waves running in the Siege */
@@ -46,8 +53,14 @@ function wardUnlocked(n){
   if (n >= 14 && n <= 26) return wardStarOf(n) >= 3;
   return n >= 1 && n <= 13 && !!(Save.data && Save.data['chapter' + n + 'Complete']);
 }
-function wardCount(){ let k = 0; for (let n = 1; n <= 13; n++) if (wardUnlocked(n)) k++; return k; }
-function wardChoice(key){ const n = (Save.data && Save.data[key]) | 0; return n >= 1 && n <= (key === 'patCol' ? 13 : WARD_MAX) && wardUnlocked(n) ? n : 0; }
+function wardPatUnlocked(n){                                                                    /* a pattern: 1 to 13 with chapters 1 to 13, 14 to 17 with the later chapters */
+  if (n === 0) return true;
+  if (n > 13) return n <= WARD_PAT_MAX && !!(Save.data && Save.data['chapter' + WARD_PAT_LATE[n].ch + 'Complete']);
+  return wardUnlocked(n);
+}
+function wardCount(){ let k = 0; for (let n = 1; n <= WARD_MAX; n++) if (wardUnlocked(n)) k++; return k; }
+function wardPatCount(){ let k = 0; for (let n = 1; n <= WARD_PAT_MAX; n++) if (wardPatUnlocked(n)) k++; return k; }
+function wardChoice(key){ const n = (Save.data && Save.data[key]) | 0; return n >= 1 && n <= (key === 'patCol' ? WARD_PAT_MAX : WARD_MAX) && (key === 'patCol' ? wardPatUnlocked(n) : wardUnlocked(n)) ? n : 0; }
 function wardShade(hex, k){ const c = colRGB(hex); return 'rgb(' + Math.round(c[0] * k) + ',' + Math.round(c[1] * k) + ',' + Math.round(c[2] * k) + ')'; }
 let _wardKey = '', _wardVal = WARD_CLASSIC;
 function wardColoursFor(s, p){
@@ -85,26 +98,31 @@ function wardSpot(ctx, pat, x, y, rx, ry, rot){
     case 10: ctx.beginPath(); ctx.moveTo(0, -ry * 1.15); ctx.quadraticCurveTo(rx * 0.95, -ry * 0.1, rx * 0.5, ry * 0.7); ctx.quadraticCurveTo(0, ry * 1.1, -rx * 0.5, ry * 0.7); ctx.quadraticCurveTo(-rx * 0.95, -ry * 0.1, 0, -ry * 1.15); ctx.fill(); break;   /* flames */
     case 11: ctx.lineWidth = Math.max(1, r * 0.28); ctx.beginPath(); ctx.moveTo(-rx, 0); ctx.lineTo(rx, 0); ctx.moveTo(0, -ry); ctx.lineTo(0, ry); ctx.stroke(); break;   /* sparkles */
     case 12: ctx.beginPath(); for (let k = 0; k < 6; k++){ const a = k * Math.PI / 3; ctx.lineTo(Math.cos(a) * rx * 0.95, Math.sin(a) * ry * 0.95); } ctx.closePath(); ctx.fill(); break;   /* hexes */
+    case 14: ctx.lineWidth = Math.max(1, r * 0.2); ctx.beginPath(); for (let k = 0; k < 3; k++){ const a = k * Math.PI / 3 + 0.3; ctx.moveTo(Math.cos(a) * rx, Math.sin(a) * ry); ctx.lineTo(-Math.cos(a) * rx, -Math.sin(a) * ry); } ctx.stroke(); break;   /* frost crystals */
+    case 15: { const q = r * 0.34; ctx.fillRect(-q * 1.25, -q * 1.25, q, q); ctx.fillRect(q * 0.25, -q * 1.25, q, q); ctx.fillRect(-q * 1.25, q * 0.25, q, q); ctx.fillRect(q * 0.25, q * 0.25, q, q); break; }   /* window grid */
+    case 16: ctx.beginPath(); ctx.moveTo(-rx * 0.8, -ry * 0.8); ctx.lineTo(rx * 0.8, -ry * 0.8); ctx.lineTo(rx * 0.8, ry * 0.1); ctx.quadraticCurveTo(rx * 0.6, ry * 0.85, 0, ry * 1.1); ctx.quadraticCurveTo(-rx * 0.6, ry * 0.85, -rx * 0.8, ry * 0.1); ctx.closePath(); ctx.fill(); break;   /* shield crests */
+    case 17: ctx.beginPath(); ctx.moveTo(-rx, -ry * 0.3); ctx.lineTo(-rx * 0.35, -ry); ctx.lineTo(rx * 0.55, -ry * 0.75); ctx.lineTo(rx, ry * 0.1); ctx.lineTo(rx * 0.3, ry); ctx.lineTo(-rx * 0.6, ry * 0.7); ctx.closePath(); ctx.fill(); break;   /* fort camo */
     default: ctx.lineWidth = Math.max(1, ry * 0.3); ctx.beginPath(); ctx.arc(-rx * 0.2, 0, r * 0.45, -1.2, 1.2); ctx.stroke(); ctx.beginPath(); ctx.arc(rx * 0.25, 0, r * 0.8, -1.2, 1.2); ctx.stroke();   /* ripples */
   }
   ctx.restore();
 }
 
 function wardrobeButtonHTML(){
-  return '<button class="btn ghost" data-a="wardrobe">Coat colors<small>' + wardCount() + ' of 13 colors and patterns unlocked</small></button>';
+  return '<button class="btn ghost" data-a="wardrobe">Coat colors<small>' + wardCount() + ' of ' + WARD_MAX + ' colors and ' + wardPatCount() + ' of ' + WARD_PAT_MAX + ' patterns unlocked</small></button>';
 }
 function wardSwatches(kind, cur){
   let h = '<div class="swatches">';                                       /* one list: her own, the chapter colors, then the minigame colors */
-  const last = kind === 'pat' ? 13 : WARD_MAX;
+  const last = kind === 'pat' ? WARD_PAT_MAX : WARD_MAX;
   for (let n = 0; n <= last; n++){
-    const un = wardUnlocked(n), on = n === cur, col = n ? WARD[n].c : WARD_CLASSIC.coat;
+    const un = (kind === 'pat' ? wardPatUnlocked(n) : wardUnlocked(n)), on = n === cur, col = n ? WARD[n].c : WARD_CLASSIC.coat;
     const chap = typeof BESTIARY_CHAPTERS !== 'undefined' ? BESTIARY_CHAPTERS[n - 1] : '';
-    const mg = n === 48 ? (typeof MINI !== 'undefined' && MINI[TOWER_CHAPTER] ? MINI[TOWER_CHAPTER].name : 'the Tower\u2019s minigame') : n > 13 && n <= 26 && typeof MINI !== 'undefined' && MINI[n - 13] ? MINI[n - 13].name : '';
+    const mg = WARD_MG[n] ? (typeof MINI !== 'undefined' && MINI[WARD_MG[n]] ? MINI[WARD_MG[n]].name : 'its minigame') : n > 13 && n <= 26 && typeof MINI !== 'undefined' && MINI[n - 13] ? MINI[n - 13].name : '';
     const nm = kind === 'pat' ? WARD_PATTERNS[n] : n ? WARD[n].name : (kind === 'gear' ? 'Her gear’s own colors' : 'Her own colors');
-    const label = nm + (n === 48 ? ' (three stars in ' + mg + ')' : n === 49 ? ' (Chapter 15, The Siege)' : n === 47 ? ' (Chapter 14, The Tower)' : n === 46 ? ' (Chapter 13.5, The Domes)' : n > 31 ? ' (a best friend\u2019s gift)' : n > 26 ? ' (hidden in Longneck Town)' : n > 13 ? ' (three stars in ' + mg + ')' : n ? ' (Chapter ' + n + ', ' + chap + ')' : '');
+    const late = kind === 'pat' && n > 13 ? WARD_PAT_LATE[n].name : '';
+    const label = nm + (late ? ' (' + late + ')' : WARD_MG[n] ? ' (three stars in ' + mg + ')' : n === 52 ? ' (the top chaos badge in Fort Shortneck)' : n === 51 ? ' (Chapter 16, Fort Shortneck)' : n === 50 ? ' (ten waves held with the Herd Hall, the Siege)' : n === 48 ? ' (three stars in ' + mg + ')' : n === 49 ? ' (Chapter 15, The Siege)' : n === 47 ? ' (Chapter 14, The Tower)' : n === 46 ? ' (Chapter 13.5, The Domes)' : n > 31 ? ' (a best friend\u2019s gift)' : n > 26 ? ' (hidden in Longneck Town)' : n > 13 ? ' (three stars in ' + mg + ')' : n ? ' (Chapter ' + n + ', ' + chap + ')' : '');
     const style = kind === 'pat' ? '' : ' style="background:' + (n ? col : 'linear-gradient(135deg,' + (kind === 'gear' ? '#9A6A38 55%,#C9CDD9 55%' : WARD_CLASSIC.coat + ' 55%,' + WARD_CLASSIC.spot + ' 55%') + ')') + '"';
     h += '<button class="swatch' + (kind === 'pat' ? ' pat' : '') + (on ? ' on' : '') + (un ? '' : ' locked') + '" data-a="ward-' + kind + '-' + n + '"' + (un ? '' : ' disabled') + style +
-      ' title="' + (un ? label : n === 48 ? 'Get three stars in ' + mg + ' to unlock' : n === 49 ? 'Finish Chapter 15 to unlock' : n === 47 ? 'Finish Chapter 14 to unlock' : n === 46 ? 'Finish Chapter 13.5 to unlock' : n > 31 ? 'A gift from a best friend in Longneck Town' : n > 26 ? 'Find this color hidden in Longneck Town' : n > 13 ? 'Get three stars in ' + mg + ' to unlock' : 'Finish Chapter ' + n + ' to unlock') + '" aria-label="' + label + '">' + (kind === 'pat' ? '<canvas width="30" height="30" data-pat="' + n + '"></canvas>' : '') + '</button>';
+      ' title="' + (un ? label : late ? 'Finish ' + late + ' to unlock' : WARD_MG[n] ? 'Get three stars in ' + mg + ' to unlock' : n === 52 ? 'Reach the top chaos level in Fort Shortneck to unlock' : n === 51 ? 'Finish Chapter 16 to unlock' : n === 50 ? 'Hold ten waves in the Siege with the Herd Hall to unlock' : n === 48 ? 'Get three stars in ' + mg + ' to unlock' : n === 49 ? 'Finish Chapter 15 to unlock' : n === 47 ? 'Finish Chapter 14 to unlock' : n === 46 ? 'Finish Chapter 13.5 to unlock' : n > 31 ? 'A gift from a best friend in Longneck Town' : n > 26 ? 'Find this color hidden in Longneck Town' : n > 13 ? 'Get three stars in ' + mg + ' to unlock' : 'Finish Chapter ' + n + ' to unlock') + '" aria-label="' + label + '">' + (kind === 'pat' ? '<canvas width="30" height="30" data-pat="' + n + '"></canvas>' : '') + '</button>';
   }
   return h + '</div>';
 }
@@ -197,7 +215,7 @@ function handleWardAction(a){
   const m = /^ward-(skin|spot|pat|gear)-(\d+)$/.exec(a);
   if (m){
     const n = +m[2], key = { skin: 'skinCol', spot: 'spotCol', pat: 'patCol', gear: 'gearCol' }[m[1]];
-    if (wardUnlocked(n) && (m[1] !== 'pat' || n <= 13)){ Save.data[key] = n; Save.write(); SFX.pick(); } else SFX.deny();
+    if ((m[1] === 'pat' ? wardPatUnlocked(n) : wardUnlocked(n)) && (m[1] !== 'pat' || n <= WARD_PAT_MAX)){ Save.data[key] = n; Save.write(); SFX.pick(); } else SFX.deny();
     showWardrobe();
   }
 }
@@ -212,6 +230,7 @@ let _wardToast = null, _wardToastT = 0;
     if (_wardToastT > 0){ _wardToastT -= dt; if (_wardToastT <= 0 && _wardToast) _wardToast.className = ''; }
     if (!Save.data.wardSeen){                                      /* first time here: what is already earned is not news */
       Save.data.wardSeen = {}; for (let n = 1; n <= 13; n++) if (wardUnlocked(n)) Save.data.wardSeen[n] = 1;
+      for (let pn = 14; pn <= WARD_PAT_MAX; pn++) if (wardPatUnlocked(pn)) Save.data.wardSeen[WARD_PAT_LATE[pn].col] = 1;
       return;
     }
     if (G.splash || G.state === 'cutscene') return;
@@ -223,6 +242,15 @@ let _wardToast = null, _wardToastT = 0;
       _wardToast.className = 'on'; _wardToastT = 6.5;
       try { SFX.level(); } catch (e) {}
       break;
+    }
+    for (let pn = 14; pn <= WARD_PAT_MAX && !_wardToastT; pn++){                     /* the later chapters: a color and a pattern together */
+      const cn = WARD_PAT_LATE[pn].col;
+      if (!wardPatUnlocked(pn) || Save.data.wardSeen[cn]) continue;
+      Save.data.wardSeen[cn] = 1; Save.write();
+      if (!_wardToast){ _wardToast = document.createElement('div'); _wardToast.id = 'wardToast'; document.body.appendChild(_wardToast); }
+      _wardToast.textContent = 'New coat color and pattern: ' + WARD[cn].name + ' and ' + WARD_PATTERNS[pn] + '. Find them under Coat colors in the main menu.';
+      _wardToast.className = 'on'; _wardToastT = 6.5;
+      try { SFX.level(); } catch (e) {}
     }
   };
 })();
@@ -263,7 +291,7 @@ function outfitClean(o){                                   /* only what she has 
   if (!o || typeof o !== 'object') return null;
   const n = function(v, top){ v = v | 0; return v >= 1 && v <= (top || WARD_MAX) && wardUnlocked(v) ? v : 0; };
   const ok = function(id, kind){ return typeof id === 'string' && ACC_BY_ID[id] && ACC_BY_ID[id].kind === kind && accOwned(id) ? id : ''; };
-  return { s: n(o.s), p: n(o.p), t: n(o.t, 13), g: n(o.g), hat: ok(o.hat, 'hat'), boot: ok(o.boot, 'boot'), hc: n(o.hc), bc: n(o.bc) };
+  return { s: n(o.s), p: n(o.p), t: (o.t | 0) >= 1 && (o.t | 0) <= WARD_PAT_MAX && wardPatUnlocked(o.t | 0) ? o.t | 0 : 0, g: n(o.g), hat: ok(o.hat, 'hat'), boot: ok(o.boot, 'boot'), hc: n(o.hc), bc: n(o.bc) };
 }
 function outfitList(){
   let a = Save.data.outfits;

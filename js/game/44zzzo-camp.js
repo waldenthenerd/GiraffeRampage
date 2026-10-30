@@ -6,7 +6,7 @@
    THE CLOCK  The device clock, with Save.data.campLast as the moment it was last emptied. A clock set backwards earns nothing (campLast is pulled
      back to now); a clock set far ahead is still held by the cap, so cheating gains at most one cap's worth per Collect. Nothing runs in the background:
      the amount is worked out from the clock whenever a page asks.
-   THE RATE  Gold an hour is 0.04% of her best score (at least 60), which is a tenth of what a half-hour run at that score pays; each Busier Hands
+   THE RATE  Gold an hour is 0.025% of her best score (at least 40), which is about a sixteenth of what a half-hour run at that score pays; each Busier Hands
      level adds 30% of that. A crate is worked toward at one every 4 hours of storage (at the same rate bonus).
    THE UPGRADES  Two tracks of five levels, bought with gems and opened by chapters: Busier Hands (rate) with Chapters 3, 5, 7, 9 and 11, Bigger Larder
      (cap: 4, 6, 8, 10 and 12 hours) with Chapters 4, 6, 8, 10 and 12. The Camp Hearth trinket, from a Camp Crate, adds an hour and 10%.
@@ -15,8 +15,8 @@
    ============================================================================================================================= */
 const CAMP_CAPS = [3, 4, 6, 8, 10, 12];                                              /* hours stored, by Bigger Larder level */
 const CAMP_RATE_STEP = 0.3;                                                          /* each Busier Hands level adds this to the rate */
-const CAMP_GOLD_PER_BEST = 0.0004;                                                   /* gold an hour per point of best score */
-const CAMP_MIN_GOLD = 60;
+const CAMP_GOLD_PER_BEST = 0.00025;                                                   /* gold an hour per point of best score */
+const CAMP_MIN_GOLD = 40;
 const CAMP_CRATE_HOURS = 4;                                                          /* hours of work for one crate */
 const CAMP_TRINKET_CHANCE = 0.03;                                                    /* per crate opened, until she has the Camp Hearth */
 const CAMP_UP = {
@@ -67,6 +67,8 @@ function campCollect(now){
   Save.data.gold = goldInt(Save.data.gold + p.gold);
   Save.data.campCrates = Math.min(9999, (Save.data.campCrates | 0) + p.crates); Save.data.campProg = Math.min(0.999, p.prog);
   Save.data.campLast = now;
+  Save.data.campCollects = scoreInt((Save.data.campCollects | 0) + 1); Save.data.campGoldTotal = scoreInt(scoreInt(Save.data.campGoldTotal) + p.gold);
+  if (p.hours >= campCapHours() - 1e-9) Save.data.campFullOnce = true;
   Save.write();
   return p;
 }

@@ -64,6 +64,11 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   add('ch16', R, 'Over the Wall', 'Clear Chapter 16, Fort Shortneck', 1, 60, function(){ return D().chapter17Complete ? 1 : 0; });
   add('fortchaos', R, 'Disorderly Conduct', 'Reach the Havoc chaos level in Fort Shortneck', 6, 40, function(){ const b = D().fortBadges | 0; let n = 0; for (let i = 0; i < 8; i++) if (b & (1 << i)) n = i + 1; return Math.min(6, n); });
   add('fortall', R, 'Calamity', 'Reach the top chaos level in Fort Shortneck', 1, 100, function(){ return (D().fortBadges | 0) & 128 ? 1 : 0; });
+  add('camp1', M, 'Home Fire', 'Collect from the Camp', 1, 4, function(){ return D().campCollects | 0; });
+  add('campfull', M, 'Full Larder', 'Collect from the Camp when its store is full', 1, 8, function(){ return D().campFullOnce ? 1 : 0; });
+  add('campgold', M, 'Wages of Waiting', 'Collect 100,000 gold in all from the Camp', 100000, 12, function(){ return scoreInt(D().campGoldTotal); });
+  add('campcrates', M, 'Unpacked', 'Open 25 Camp Crates', 25, 12, function(){ return D().campOpened | 0; });
+  add('camphearth', M, 'Hearth Found', 'Find the Camp Hearth in a Camp Crate', 1, 10, function(){ return typeof trinketOwned === 'function' && trinketOwned('campfire') ? 1 : 0; });
   add('home', R, 'Home Again', 'Fly the spaceplane home', 1, 20, function(){ return D().homecoming ? 1 : 0; });
   add('gold1m', R, 'Gold Hoarder', 'Hold 1,000,000 gold at once', 1e6, 10, function(){ return goldInt(D().gold); });
   add('gems500', R, 'Gem Cache', 'Hold 500 gems at once', 500, 10, function(){ return scoreInt(D().gems); });
