@@ -143,11 +143,12 @@ const ISLE_DRAW = {
     const s = e.r / 16, a = e.anim * 2, ram = e.state === 'ram' || e.state === 'ramwind';
     for (const sd of [-1, 1]){ const w = Math.sin(a + (sd > 0 ? 0 : Math.PI)) * 1.6 * s;                                   /* fore flippers from the shoulders, hind flippers from the hips */
       lkOV(ctx, 2.6 * s + w * 0.6, bob + sd * 14 * s, 3.4 * s, 5.6 * s, dk, sd * 0.3); lkOV(ctx, 2.6 * s + w * 0.6, bob + sd * 14 * s, 2.8 * s, 5 * s, tw_li(b, 0.05), sd * 0.3); for (let q = -1; q <= 1; q++) tw_ln(ctx, [2.6 * s + w * 0.6 + q * 1.2 * s, bob + sd * 16 * s, 2.6 * s + w * 0.6 + q * 1.6 * s, bob + sd * 19 * s], 0.5 * s, tw_sh(b, 0.3));
-      tw_poly(ctx, [-13 * s, bob + sd * 4 * s, -21 * s - w, bob + sd * 9 * s, -22 * s - w, bob + sd * 3 * s, -15 * s, bob + sd * 1.2 * s], dk); tw_poly(ctx, [-13.6 * s, bob + sd * 3.8 * s, -20.4 * s - w, bob + sd * 8 * s, -21 * s - w, bob + sd * 3.4 * s, -15 * s, bob + sd * 1.8 * s], b); }
+      lkOV(ctx, -18 * s - w * 0.6, bob + sd * 5.6 * s, 5.6 * s, 3 * s, dk, sd * 0.5); lkOV(ctx, -18 * s - w * 0.6, bob + sd * 5.6 * s, 5 * s, 2.4 * s, b, sd * 0.5); for (let q = -1; q <= 1; q++) tw_ln(ctx, [-21.5 * s - w * 0.6, bob + sd * (6.6 + q * 1.2) * s, -23.6 * s - w * 0.6, bob + sd * (7.6 + q * 1.6) * s], 0.5 * s, tw_sh(b, 0.3)); }
     lkOV(ctx, -3 * s, bob, 14 * s, 11 * s, dk); lkOV(ctx, -3 * s, bob, 13.2 * s, 10.2 * s, b); lkOV(ctx, -4 * s, bob - 2.6 * s, 9 * s, 5 * s, tw_li(b, 0.12));
     for (let q = 0; q < 4; q++) tw_ln(ctx, [(-12 + q * 5) * s, bob - 8 * s, (-11 + q * 5) * s, bob, (-12 + q * 5) * s, bob + 8 * s], 0.6 * s, tw_sh(b, 0.2));     /* skin folds */
     tw_rect(ctx, -1.4 * s, bob - 10.4 * s, 2.4 * s, 20.8 * s, '#2A2A2E'); tw_rect(ctx, -1 * s, bob - 10.4 * s, 1.6 * s, 20.8 * s, '#4A4A52'); fillCircle(ctx, -0.2 * s, bob, 1.4 * s, IL_STEEL); fillCircle(ctx, -0.2 * s, bob, 0.6 * s, IL_LAB);   /* the harness */
-    for (const [bx, by, br] of [[-10, -4, 2.2], [-7, 3, 1.8], [-12, 2.4, 1.6], [-5, -6, 1.6], [-14, -1, 1.4], [-8, -1, 1.2], [3, 5, 1.4], [4, -5, 1.2]]){ fillCircle(ctx, bx * s, bob + by * s, br * s * 1.2, '#4A443C'); fillCircle(ctx, bx * s, bob + by * s, br * s, '#D8D0BC'); fillCircle(ctx, bx * s, bob + by * s, br * s * 0.4, '#4A443C'); }
+    for (let q = 0; q < 22; q++){ const cl = q % 4, bx = [-10, -6, -13, -3][cl] + Math.cos(q * 2.4) * (1.4 + (q % 3) * 0.8), by = [-4, 3.6, 1.6, -6.2][cl] + Math.sin(q * 2.4) * (1.4 + (q % 3) * 0.7), br = 0.6 + ((q * 7) % 5) * 0.16;      /* barnacles, in clusters */
+      fillCircle(ctx, bx * s, bob + by * s, br * s * 1.35, '#4A443C'); fillCircle(ctx, bx * s, bob + by * s, br * s, '#D8D0BC'); fillCircle(ctx, bx * s, bob + by * s, br * s * 0.42, '#4A443C'); }
     tw_ln(ctx, [-6 * s, bob - 9 * s, -10 * s, bob - 11 * s, -14 * s, bob - 10 * s], 1 * s, '#3A6A2A'); tw_ln(ctx, [-2 * s, bob + 9.4 * s, -6 * s, bob + 11.6 * s, -9 * s, bob + 10.6 * s], 0.8 * s, '#4A7A3A');   /* weed, draped on the back */
     const hx = 10 * s + (ram ? 1.6 * s : 0);
     lkOV(ctx, hx, bob, 7.4 * s, 7 * s, dk); lkOV(ctx, hx, bob, 6.8 * s, 6.4 * s, tw_li(b, 0.06)); lkOV(ctx, hx + 3 * s, bob, 3.4 * s, 4.8 * s, tw_li(b, 0.2));
@@ -346,4 +347,129 @@ const ISLE_DRAW = {
     if (st === 'roar') ringPath(ctx, 0, bob, 104 * s, 5, '#E8FFD8', 0.5);
   }
 };
+/* ---------------------------------------------------------------- the detail pass: small parts drawn over each picture (same geometry as the picture, from the same numbers) */
+const ISLE_DETAIL = {
+  il_hermit(ctx, e, b, dk, bob, s){
+    const a = e.anim * 3;
+    ctx.strokeStyle = 'rgba(138,90,58,.6)'; ctx.lineWidth = 0.9 * s; ctx.lineCap = 'round';                  /* rust round the drum's rim */
+    for (const [a0, a1] of [[0.4, 1.2], [3.3, 3.9], [4.6, 5.0]]){ ctx.beginPath(); ctx.arc(-4.4 * s, bob, 8.3 * s, a0, a1); ctx.stroke(); }
+    ctx.lineCap = 'butt';
+    for (const [ang, rr] of [[2.6, 6.6], [3.5, 7.4], [4.3, 6.2]]){ const x = -4.4 * s + Math.cos(ang) * rr * s, y = bob + Math.sin(ang) * rr * s; fillCircle(ctx, x, y, 1.1 * s, '#4A443C'); fillCircle(ctx, x, y, 0.85 * s, '#D8D0BC'); fillCircle(ctx, x, y, 0.32 * s, '#4A443C'); }
+    tw_rect(ctx, -7.2 * s, bob - 5.4 * s, 1.1 * s, 2.2 * s, '#E8E4D8'); tw_rect(ctx, -5.6 * s, bob - 5.4 * s, 1.1 * s, 2.2 * s, '#E8E4D8');           /* the stencilled "11" */
+    for (let q = 0; q < 3; q++){ const ph = (a * 0.25 + q / 3) % 1; ringPath(ctx, (10.6 + ph * 3) * s, bob + (q - 1) * 1.2 * s, (0.4 + ph * 0.5) * s, 0.35 * s, IL_FOAM, 0.8 * (1 - ph)); }      /* bubbles from the mouth */
+    for (let k = 0; k < 4; k++) fillCircle(ctx, (12.2 + k * 1.1) * s, bob + (5.8 + k * 0.25) * s, 0.42 * s, tw_li(b, 0.35));                   /* bumps on the big claw */
+  },
+  il_shrimp(ctx, e, b, dk, bob, s){
+    const a = e.anim * 4.4, flick = Math.sin(a) * 0.12;
+    const pts = []; for (let i = 0; i < 6; i++) pts.push([6, 3.2, 0.4, -2.4, -5, -7.2][i] * s, bob + Math.sin(i * 0.6 + a * 0.5) * flick * 6 * s);
+    tw_ln(ctx, pts, 0.5 * s, 'rgba(120,40,30,.55)');                                                                      /* the gut, through the shell */
+    for (let i = 0; i < 6; i++) tw_rect(ctx, pts[i * 2] - 0.15 * s, pts[i * 2 + 1] - 1.8 * s, 0.3 * s, 3.6 * s, 'rgba(255,255,255,.18)');
+    tw_rect(ctx, -0.6 * s, bob + 3.1 * s, 2 * s, 0.9 * s, IL_STEEL); fillCircle(ctx, 1.6 * s, bob + 3.55 * s, 0.35 * s, IL_LAB);           /* the band's number tag */
+  },
+  il_eel(ctx, e, b, dk, bob, s){
+    const a = e.anim * 3, P = function(u){ return [6 * s - u * 30 * s, bob + Math.sin(a - u * 4) * u * 6 * s]; };
+    for (let i = 3; i < 19; i++){ const p = P(i / 20), q = P((i + 1) / 20), na = Math.atan2(q[1] - p[1], q[0] - p[0]) - Math.PI / 2, l = (1.6 - i * 0.05) * s;      /* the fin down its back, with its rays */
+      tw_ln(ctx, [p[0], p[1], p[0] + Math.cos(na) * l * 0.2 - (q[0] - p[0]) * 0.4, p[1] + Math.sin(na) * l * 0.2 - (q[1] - p[1]) * 0.4], 0.35 * s, tw_li(b, 0.35)); }
+    for (const sd of [-1, 1]){ tw_ln(ctx, [13.2 * s, bob + sd * 1.8 * s, 14.4 * s, bob + sd * 2.3 * s], 0.6 * s, dk); fillCircle(ctx, 14.4 * s, bob + sd * 2.3 * s, 0.35 * s, '#14100C'); }   /* nostril tubes */
+    for (let k = -1; k <= 1; k++) fillCircle(ctx, 3.8 * s, bob + k * 2.6 * s, 0.38 * s, IL_DKSTEEL);                                           /* collar bolts */
+    for (let k = 0; k < 3; k++) for (const sd of [-1, 1]) tw_ln(ctx, [(5.6 + k * 0.9) * s, bob + sd * 3.4 * s, (5.9 + k * 0.9) * s, bob + sd * 4.3 * s], 0.35 * s, tw_sh(b, 0.4));    /* gill slits */
+  },
+  il_urchin(ctx, e, b, dk, bob, s){
+    const roll = e.state === 'roll', spin = e.anim * (roll ? 2.4 : 0.6), R = 8.6 * s, wind2 = e.state === 'wind';
+    for (let i = 0; i < 26; i += 2){ const aa = i * TAU / 26 + spin, len = (5.6 + ((i * 7) % 5) * 0.7) * s * (wind2 ? 1.15 : 1), m = R + len * 0.45, px = -Math.sin(aa) * 0.75 * s, py = Math.cos(aa) * 0.75 * s;    /* a dark band round every other spine */
+      tw_ln(ctx, [Math.cos(aa) * m - px, bob + Math.sin(aa) * m - py, Math.cos(aa) * m + px, bob + Math.sin(aa) * m + py], 0.6 * s, tw_sh(b, 0.45)); }
+    for (let i = 0; i < 13; i++){ const aa = (i * 2 + 1) * TAU / 26 + spin; fillCircle(ctx, Math.cos(aa) * (R + 0.9 * s), bob + Math.sin(aa) * (R + 0.9 * s), 0.45 * s, '#F0A8C8'); }      /* tube feet, between the spines */
+  },
+  il_crab(ctx, e, b, dk, bob, s){
+    const a = e.anim * 2.4;
+    ctx.strokeStyle = tw_sh(b, 0.35); ctx.lineWidth = 0.6 * s; ctx.beginPath();                                                                /* the grooves in the shell */
+    ctx.moveTo(-9 * s, bob - 5 * s); ctx.quadraticCurveTo(-4 * s, bob - 3.4 * s, 0, bob - 5.6 * s); ctx.moveTo(-9 * s, bob + 5 * s); ctx.quadraticCurveTo(-4 * s, bob + 3.4 * s, 0, bob + 5.6 * s);
+    ctx.moveTo(-5 * s, bob - 3.8 * s); ctx.lineTo(-5 * s, bob + 3.8 * s); ctx.stroke();
+    for (let i = 0; i < 4; i++) for (const sd of [-1, 1]){                                                                                        /* bristles on the lower legs */
+      const w = Math.sin(a + i * 1.6 + (sd > 0 ? 0 : Math.PI)) * 2.4 * s, x0 = (4 - i * 3.4) * s, kx = x0 - 1 * s + w, ky = bob + sd * 15 * s, fx = x0 - 4 * s + w * 1.2, fy = bob + sd * 19 * s;
+      for (let q = 1; q < 3; q++){ const px = kx + (fx - kx) * q / 3, py = ky + (fy - ky) * q / 3; tw_ln(ctx, [px, py, px + 1.2 * s, py + sd * 0.4 * s], 0.35 * s, tw_li(b, 0.3)); }
+    }
+    for (let q = 0; q < 3; q++){ const ph = (a * 0.2 + q / 3) % 1; ringPath(ctx, (10.2 + ph * 2.4) * s, bob + (q - 1) * 1.6 * s, (0.5 + ph * 0.6) * s, 0.35 * s, IL_FOAM, 0.75 * (1 - ph)); }        /* froth at the mouth */
+  },
+  il_jelly(ctx, e, b, dk, bob, s){
+    const a = e.anim * 2.4, R = 9.6 * s * (1 + 0.08 * Math.sin(a));
+    ctx.strokeStyle = tw_li(b, 0.35); ctx.lineWidth = 0.5 * s; ctx.beginPath();                                                                    /* the frilled inner margin */
+    for (let k = 0; k <= 40; k++){ const aa = k * TAU / 40, rr = R * (0.58 + 0.04 * Math.sin(k * 3 + a * 2)); k ? ctx.lineTo(Math.cos(aa) * rr, bob + Math.sin(aa) * rr) : ctx.moveTo(Math.cos(aa) * rr, bob + Math.sin(aa) * rr); } ctx.stroke();
+    ctx.strokeStyle = IL_DKSTEEL; ctx.lineWidth = 0.4 * s; ctx.beginPath(); for (let k = 0; k <= 12; k++){ const u = k / 12, x = 6 * s - u * 10 * s, y = bob - 1.6 * s - u * 3 * s + Math.sin(k * 1.6) * 0.8 * s; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke();    /* the electrode's wire, coiled under the skin */
+  },
+  il_brute(ctx, e, b, dk, bob, s){
+    const hx = 10 * s + (e.state === 'ram' || e.state === 'ramwind' ? 1.6 * s : 0);
+    for (const sd of [-1, 1]) for (let q = 0; q < 6; q++) fillCircle(ctx, hx + (3 + (q % 3) * 1.1) * s, bob + sd * (1.2 + Math.floor(q / 3) * 1.2) * s, 0.32 * s, tw_sh(b, 0.4));    /* whisker pits */
+    for (const sd of [-1, 1]) fillCircle(ctx, hx + 6 * s, bob + sd * 0.8 * s, 0.5 * s, '#14100C');                                                    /* nostrils */
+    tw_rr(ctx, -1.8 * s, bob - 2 * s, 3.2 * s, 4 * s, 0.6 * s, '#8A7A5A'); tw_rect(ctx, -1 * s, bob - 1.4 * s, 1.6 * s, 2.8 * s, '#2A2A2E');                    /* the harness buckle */
+    ctx.strokeStyle = tw_sh(b, 0.4); ctx.lineWidth = 0.5 * s; ctx.beginPath(); ctx.moveTo(-8 * s, bob + 6.4 * s); ctx.lineTo(-4 * s, bob + 8.2 * s); ctx.moveTo(-7 * s, bob + 7.6 * s); ctx.lineTo(-6.4 * s, bob + 6.6 * s); ctx.stroke();    /* an old scar */
+  },
+  il_octo(ctx, e, b, dk, bob, s){
+    for (let q = 0; q < 14; q++){ const x = (-11 + (q % 7) * 2.2) * s, y = bob + ((q < 7 ? -1 : 1) * (2.4 + (q % 3) * 1.2)) * s; fillCircle(ctx, x, y, 0.55 * s, tw_li(b, 0.25)); fillCircle(ctx, x - 0.15 * s, y - 0.15 * s, 0.25 * s, tw_li(b, 0.5)); }   /* skin bumps on the mantle */
+    ctx.strokeStyle = tw_sh(b, 0.3); ctx.lineWidth = 0.5 * s; for (let k = 0; k < 3; k++){ ctx.beginPath(); ctx.arc(-5 * s, bob, (3.6 + k * 1.9) * s, Math.PI * 0.7, Math.PI * 1.3); ctx.stroke(); }     /* the mantle's ridges */
+  },
+  il_mantis(ctx, e, b, dk, bob, s){
+    for (const sd of [-1, 1]){ lkOV(ctx, 9.6 * s, bob + sd * 1.6 * s, 1.4 * s, 0.6 * s, dk, sd * 0.4); lkOV(ctx, 9.6 * s, bob + sd * 1.6 * s, 1.1 * s, 0.4 * s, '#7ACAF0', sd * 0.4); }   /* the antennal scales */
+    for (let k = 0; k < 4; k++) for (const sd of [-1, 1]) il_spine(ctx, -15 * s, bob, 2 * s, sd * (1.9 + k * 0.28), 1.2 * s, 0.35 * s, tw_li(b, 0.2));               /* spines on the tail fan */
+    for (const sd of [-1, 1]) for (let q = 0; q < 3; q++) fillCircle(ctx, (6 + q * 0.9) * s, bob + sd * (3.6 - q * 0.4) * s, 0.3 * s, '#FFD8C8');                    /* the dactyl's teeth, folded */
+  },
+  il_snake(ctx, e, b, dk, bob, s){
+    ctx.strokeStyle = tw_sh(b, 0.35); ctx.lineWidth = 0.35 * s; ctx.beginPath();                                                                   /* scales on its head */
+    ctx.moveTo(6 * s, bob - 1.6 * s); ctx.lineTo(9 * s, bob - 1.2 * s); ctx.moveTo(6 * s, bob + 1.6 * s); ctx.lineTo(9 * s, bob + 1.2 * s); ctx.moveTo(7.6 * s, bob - 1.6 * s); ctx.lineTo(7.6 * s, bob + 1.6 * s); ctx.stroke();
+    for (const sd of [-1, 1]) fillCircle(ctx, 9.8 * s, bob + sd * 0.6 * s, 0.25 * s, '#14141C');
+  },
+  il_puffer(ctx, e, b, dk, bob, s){
+    const puff = e.state === 'puff', R = (puff ? 10.4 : 7.4) * s;
+    lkOV(ctx, -0.6 * s, bob + R * 0.42, R * 0.7, R * 0.32, 'rgba(255,248,224,.55)');                                                                 /* the pale belly */
+    ctx.strokeStyle = tw_sh(b, 0.25); ctx.lineWidth = 0.35 * s; for (let k = -2; k <= 2; k++){ ctx.beginPath(); ctx.moveTo(-R * 0.95, bob); ctx.lineTo(-R - 5.2 * s, bob + k * 1.5 * s); ctx.stroke(); }   /* rays in the tail fin */
+    for (const sd of [-1, 1]){ ctx.strokeStyle = tw_sh(b, 0.45); ctx.lineWidth = 0.5 * s; ctx.beginPath(); ctx.arc(R * 0.55, bob + sd * R * 0.44, 2.3 * s, sd > 0 ? 3.6 : 1.9, sd > 0 ? 4.4 : 2.7); ctx.stroke(); }   /* brows */
+  },
+  il_anemone(ctx, e, b, dk, bob, s){
+    const R = 7.4 * s;
+    for (let i = 0; i < 16; i++){ const aa = i * TAU / 16 + 0.1; fillCircle(ctx, Math.cos(aa) * (R + 1.6 * s), bob + Math.sin(aa) * (R + 1.6 * s), 0.55 * s, tw_li(b, 0.2)); }      /* the warts round the column */
+    for (let i = 0; i < 6; i++){ const aa = i * TAU / 6 + 0.5; tw_ln(ctx, [Math.cos(aa) * R * 0.32, bob + Math.sin(aa) * R * 0.32, Math.cos(aa) * R * 0.5, bob + Math.sin(aa) * R * 0.5], 0.35 * s, tw_li(b, 0.35)); }   /* lines on the oral disc */
+  }
+};
+/* the bosses are never cached, so their detail may read any of their state */
+Object.assign(ISLE_DETAIL, {
+  il_kingclaw(ctx, e, b, dk, bob, s){
+    s = e.r / 62; const st = e.state, swing = st === 'sweepwind' ? -0.5 : st === 'sweep' ? 0.6 : 0;
+    ctx.strokeStyle = tw_sh(b, 0.35); ctx.lineWidth = 1.6 * s; ctx.beginPath();                                                                   /* the grooves in the shell */
+    ctx.moveTo(-30 * s, bob - 16 * s); ctx.quadraticCurveTo(-10 * s, bob - 10 * s, 10 * s, bob - 20 * s); ctx.moveTo(-30 * s, bob + 16 * s); ctx.quadraticCurveTo(-10 * s, bob + 10 * s, 10 * s, bob + 20 * s); ctx.moveTo(-14 * s, bob - 12 * s); ctx.lineTo(-14 * s, bob + 12 * s); ctx.stroke();
+    for (const [x, y, rx, ry] of [[-36, 22, 6, 3.4], [-26, -36, 5, 3], [-2, 38, 4, 2.6]]){ lkOV(ctx, x * s, bob + y * s, rx * s, ry * s, 'rgba(70,120,60,.75)'); lkOV(ctx, (x - 1) * s, bob + (y - 1) * s, rx * 0.5 * s, ry * 0.5 * s, 'rgba(120,170,90,.75)'); }   /* weed on the shell */
+    const hx = 50 * s + swing * 10 * s, hy = bob + 46 * s + swing * 18 * s, ca = 0.4 + swing, sz = 50 * s;                                     /* teeth along the crusher's fixed finger */
+    for (let k = 0; k < 6; k++){ const lx = sz * (0.8 + k * 0.1), ly = sz * 0.04, x = hx + Math.cos(ca) * lx - Math.sin(ca) * ly, y = hy + Math.sin(ca) * lx + Math.cos(ca) * ly; fillCircle(ctx, x, y, 2.2 * s, '#F2E6D0'); fillCircle(ctx, x, y, 1.2 * s, tw_sh(b, 0.3)); }
+    for (let k = 0; k < 8; k++){ const lx = sz * (0.05 + (k % 4) * 0.15), ly = -sz * (0.2 + Math.floor(k / 4) * 0.12), x = hx + Math.cos(ca) * lx - Math.sin(ca) * ly, y = hy + Math.sin(ca) * lx + Math.cos(ca) * ly; fillCircle(ctx, x, y, 1.8 * s, tw_li(b, 0.3)); }   /* knobs on its back */
+  },
+  il_stormjelly(ctx, e, b, dk, bob, s){
+    s = e.r / 64; const a = e.anim * 1.4, R = 46 * s * (1 + 0.06 * Math.sin(a * 1.6));
+    ctx.strokeStyle = tw_li(b, 0.4); ctx.lineWidth = 1.4 * s; ctx.beginPath();
+    for (let k = 0; k <= 60; k++){ const aa = k * TAU / 60, rr = R * (0.62 + 0.035 * Math.sin(k * 4 + a * 2)); k ? ctx.lineTo(Math.cos(aa) * rr, bob + Math.sin(aa) * rr) : ctx.moveTo(Math.cos(aa) * rr, bob + Math.sin(aa) * rr); } ctx.stroke();
+    for (let f = 0; f < 3; f++){ const fx = (-70 - f * 22) * s, fy = bob + (f - 1) * 18 * s + Math.sin(a + f) * 4 * s;                          /* small fish caught in the tentacles */
+      tw_poly(ctx, [fx - 6 * s, fy, fx - 11 * s, fy - 3.4 * s, fx - 11 * s, fy + 3.4 * s], '#3A4A5A'); lkOV(ctx, fx, fy, 6.8 * s, 3.2 * s, '#2A3A4A'); lkOV(ctx, fx, fy - 0.6 * s, 6 * s, 2.2 * s, '#8A9AAA'); fillCircle(ctx, fx + 4 * s, fy - 0.6 * s, 1 * s, '#14141C'); }
+  },
+  il_hammer(ctx, e, b, dk, bob, s){
+    s = e.r / 64; const a = e.anim * 2.2, chg = e.state === 'charge', P = function(u){ return [22 * s - u * 128 * s, bob + Math.sin(a - u * 2.6) * u * (chg ? 6 : 14) * s]; };
+    for (let i = 1; i < 14; i++){ const p = P(i / 16), w = (34 - 26 * i / 16) * s * 0.36; for (const sd of [-1, 1]) fillCircle(ctx, p[0], p[1] + sd * w, 0.9 * s, tw_li(b, 0.3)); }    /* the lateral lines */
+    for (const sd of [-1, 1]){ const p = P(0.32), x = p[0], y = p[1] + sd * 15 * s;                                                              /* a remora stuck to each side */
+      lkOV(ctx, x, y, 9 * s, 2.6 * s, '#2A3238'); lkOV(ctx, x + 1 * s, y, 7.6 * s, 1.8 * s, '#4A5660'); tw_poly(ctx, [x - 8 * s, y, x - 12 * s, y - 2 * s, x - 12 * s, y + 2 * s], '#2A3238'); fillCircle(ctx, x + 6 * s, y - 0.6 * s, 0.7 * s, '#14141C'); }
+    for (let k = 0; k < 9; k++) for (const sd of [-1, 1]) fillCircle(ctx, (40 + (k % 2) * 1.6) * s, bob + sd * (6 + k * 3.6) * s, 0.6 * s, tw_sh(b, 0.4));    /* the sensing pores along the hammer's edge */
+  },
+  il_leviathan(ctx, e, b, dk, bob, s){
+    s = e.r / 58; const tr = e.trail || [], ca = Math.cos(-(e.ang || 0)), sa = Math.sin(-(e.ang || 0)), a = e.anim * 2, pts = [8 * s, bob];
+    for (let i = 0; i < tr.length; i++){ const dx = tr[i][0] - e.x, dy = tr[i][1] - e.y; pts.push(dx * ca - dy * sa, dy * ca + dx * sa + bob); }
+    if (pts.length < 6) for (let i = 1; i <= 14; i++) pts.push(8 * s - i * 22 * s, bob + Math.sin(a - i * 0.5) * 10 * s);
+    const n = pts.length / 2 - 1;
+    for (let i = 1; i < n; i++){ const px = pts[i * 2], py = pts[i * 2 + 1], qx = pts[i * 2 + 2], qy = pts[i * 2 + 3], ta = Math.atan2(qy - py, qx - px), l = (7 - 5 * i / n) * s;     /* the crest down its back, a fin ray to each segment */
+      tw_poly(ctx, [px - Math.sin(ta) * 1.6 * s, py + Math.cos(ta) * 1.6 * s, px + Math.cos(ta) * l, py + Math.sin(ta) * l, px + Math.sin(ta) * 1.6 * s, py - Math.cos(ta) * 1.6 * s], tw_sh(b, 0.25)); }
+  },
+  il_zero(ctx, e, b, dk, bob, s){
+    s = e.r / 70;
+    for (let q = 0; q < 16; q++){ const x = (-44 + (q * 37) % 46) * s, y = bob + (((q * 53) % 40) - 20) * s; fillCircle(ctx, x, y, (1.4 + (q % 3) * 0.6) * s, tw_sh(b, 0.25)); }     /* spots on the mantle */
+    ctx.strokeStyle = '#2A1A2A'; ctx.lineWidth = 1.4 * s; ctx.beginPath(); ctx.moveTo(-34 * s, bob - 14 * s); ctx.quadraticCurveTo(-22 * s, bob - 4 * s, -10 * s, bob - 12 * s); ctx.stroke();       /* a stitched scar, and the staples across it */
+    for (let k = 0; k < 6; k++){ const u = k / 5, x = -34 * s + 24 * s * u, y = bob - 14 * s + (2 * u * (1 - u)) * 10 * s + u * 2 * s; tw_rect(ctx, x - 0.6 * s, y - 3 * s, 1.2 * s, 6 * s, IL_STEEL); }
+    tw_ln(ctx, [-8 * s, bob + 16 * s, -10 * s, bob + 26 * s, -14 * s, bob + 31 * s], 6 * s, dk); tw_ln(ctx, [-8 * s, bob + 16 * s, -10 * s, bob + 26 * s, -14 * s, bob + 31 * s], 4.4 * s, tw_li(b, 0.1)); fillCircle(ctx, -14 * s, bob + 31 * s, 2 * s, '#1A0E1E');   /* the siphon, out of the mantle */
+  }
+});
+Object.keys(ISLE_DETAIL).forEach(function(k){ const base = ISLE_DRAW[k], det = ISLE_DETAIL[k]; ISLE_DRAW[k] = function(ctx, e, b, dk, bob, wind, d){ base.apply(this, arguments); det(ctx, e, b, dk, bob, e.r / (k === 'il_crab' || k === 'il_brute' ? 16 : k === 'il_hermit' || k === 'il_octo' || k === 'il_anemone' ? 13 : k === 'il_shrimp' ? 10 : k === 'il_snake' ? 11 : 12)); }; });
 Object.assign(ENEMY_LOOK_DRAW, ISLE_DRAW);

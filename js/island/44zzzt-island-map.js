@@ -162,6 +162,7 @@ function drawGroundIsle(ctx, cx, cy, vw, vh){
   if (ilOn(x0, y0, x1, y1, ISLE_BASIN.x + 600, ISLE_BASIN.y + 240, 900)) ilBasin(ctx, t);
   ilSea(ctx, x0, y0, x1, y1, t);
   ilDecor(ctx, x0, y0, x1, y1, t);
+  if (typeof ilGroundDetail === 'function') ilGroundDetail(ctx, x0, y0, x1, y1, t);           /* the detail layer (js/island/44zzzw-island-detail.js) */
   for (let i = 0; i < IL.all.length; i++){ const b = IL.all[i]; if (b.kind === 'sea' || b.kind === 'seawall' || !ilHit(b, x0, y0, x1, y1, 160)) continue; ilDrawProp(ctx, b, t); }
 }
 /* the bottom of the shallows: rippled sand, weed, pebbles and the light moving over them (drawn inside the water's clip) */
@@ -199,6 +200,7 @@ function ilSea(ctx, x0, y0, x1, y1, t){
     ctx.stroke();
   }
 }
+const IL_PIPES = [[860, 300, 960, 300], [860, 690, 1180, 690, 1180, 760, 1440, 760, 1440, 560], [1320, 260, 1440, 260], [2760, 300, 2840, 300], [2760, 560, 2840, 640]];      /* pipes along the lab's floor */
 /* the lab's floor: painted walkways, drain grates, pipes from the tank houses to the tank room, and the helipad */
 function ilLabFloor(ctx, x0, y0, x1, y1, t){
   ctx.fillStyle = 'rgba(232,200,74,.55)'; for (const [ax, ay, bx, by] of [[380, 480, 1460, 480], [1320, 300, 1460, 300], [2740, 420, 2840, 420], [2100, 680, 2100, 900], [1190, 480, 1190, 900], [3050, 470, 3050, 560]]){
@@ -207,7 +209,7 @@ function ilLabFloor(ctx, x0, y0, x1, y1, t){
   }
   for (const [gx, gy] of [[900, 470], [1400, 720], [2400, 760], [3100, 480], [3600, 800], [700, 880]]){ if (!ilOn(x0, y0, x1, y1, gx, gy, 40)) continue; ctx.fillStyle = '#4A5254'; ctx.fillRect(gx - 18, gy - 12, 36, 24); ctx.fillStyle = '#22282A'; for (let k = 0; k < 6; k++) ctx.fillRect(gx - 15 + k * 5.4, gy - 9, 2.6, 18); }
   ctx.lineCap = 'round';
-  for (const pts of [[860, 300, 960, 300], [860, 690, 1180, 690, 1180, 760, 1440, 760, 1440, 560], [1320, 260, 1440, 260], [2760, 300, 2840, 300], [2760, 560, 2840, 640]]){
+  for (const pts of IL_PIPES){
     if (!ilHit({ x: Math.min(pts[0], pts[pts.length - 2]) - 10, y: Math.min(pts[1], pts[pts.length - 1]) - 10, w: Math.abs(pts[pts.length - 2] - pts[0]) + 20, h: Math.abs(pts[pts.length - 1] - pts[1]) + 400 }, x0, y0, x1, y1, 40)) continue;
     ctx.strokeStyle = 'rgba(0,0,0,.3)'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(pts[0] + 4, pts[1] + 6); for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i] + 4, pts[i + 1] + 6); ctx.stroke();
     ctx.strokeStyle = '#5E8A84'; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(pts[0], pts[1]); for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]); ctx.stroke();
@@ -440,6 +442,7 @@ function ilDrawProp(ctx, b, t){
     ctx.strokeStyle = '#8A9294'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, y + 2); ctx.lineTo(x + w, y + 2); ctx.moveTo(x, y + h - 2); ctx.lineTo(x + w, y + h - 2); ctx.stroke();
     ctx.fillStyle = '#E8C84A'; ctx.fillRect(x + w / 2 - 22, y - 8, 44, 14); ctx.fillStyle = '#1A2224'; ctx.font = '800 9px ui-sans-serif, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('KEEP OUT', x + w / 2, y + 2);
   }
+  if (typeof ilPropDetail === 'function') ilPropDetail(ctx, b, t);
 }
 
 /* what moves over the ground (drawn live over the cached ground every frame): rings in the water round everything that wades or swims, and the splashes */
@@ -449,6 +452,7 @@ function ilDrawLive(ctx, x0, y0, x1, y1, t){
   const wade = function(o, r, moving){ if (!isleWet(o.x, o.y)) return; const ph = (t * 1.4 + (o.x + o.y) * 0.01) % 1; ring(o.x, o.y + r * 0.2, r * (1 + ph * 0.7), 0.5 * (1 - ph)); ring(o.x, o.y + r * 0.2, r * 1.05, 0.35); if (moving) ring(o.x, o.y + r * 0.2, r * (1 + ((ph + 0.5) % 1) * 0.7), 0.4 * (1 - (ph + 0.5) % 1)); };
   if (!P.dead && ilOn(x0, y0, x1, y1, P.x, P.y, 60)) wade(P, 22, Math.hypot(P.vx, P.vy) > 40);
   for (let i = 0; i < G.enemies.length; i++){ const e = G.enemies[i]; if (e.dead || e.def.flyOver || !ilOn(x0, y0, x1, y1, e.x, e.y, 80)) continue; wade(e, e.r, true); }
+  if (typeof ilLiveDetail === 'function') ilLiveDetail(ctx, x0, y0, x1, y1, t);
   if (typeof ilDrawEffects === 'function') ilDrawEffects(ctx, x0, y0, x1, y1, t);
   for (let i = IL.rip.length - 1; i >= 0; i--){ const r = IL.rip[i]; r.t += 1 / 60; if (r.t > 0.8){ IL.rip.splice(i, 1); continue; } if (ilOn(x0, y0, x1, y1, r.x, r.y, 40)) ring(r.x, r.y, (8 + r.t * 40) * r.s, 0.6 * (1 - r.t / 0.8)); }
 }
