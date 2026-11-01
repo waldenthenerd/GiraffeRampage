@@ -64,6 +64,9 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   add('ch16', R, 'Over the Wall', 'Clear Chapter 16, Fort Shortneck', 1, 60, function(){ return D().chapter17Complete ? 1 : 0; });
   add('fortchaos', R, 'Disorderly Conduct', 'Reach the Havoc chaos level in Fort Shortneck', 6, 40, function(){ const b = D().fortBadges | 0; let n = 0; for (let i = 0; i < 8; i++) if (b & (1 << i)) n = i + 1; return Math.min(6, n); });
   add('fortall', R, 'Calamity', 'Reach the top chaos level in Fort Shortneck', 1, 100, function(){ return (D().fortBadges | 0) & 128 ? 1 : 0; });
+  add('ch17', R, 'Island Hopper', 'Clear Chapter 17, the Island Lab', 1, 60, function(){ return D().chapter18Complete ? 1 : 0; });
+  add('isleclean', R, 'Untouchable', 'Beat each of the Island Lab\u2019s five bosses without being hit', 5, 60, function(){ let n = 0; for (let i = 0; i < 5; i++) if ((D().isleClean | 0) & (1 << i)) n++; return n; });
+  add('isledry', R, 'Dry Hooves', 'Clear Chapter 17 without once stepping into the water', 1, 80, function(){ return D().isleDry ? 1 : 0; });
   add('camp1', M, 'Home Fire', 'Collect from the Camp', 1, 4, function(){ return D().campCollects | 0; });
   add('campfull', M, 'Full Larder', 'Collect from the Camp when its store is full', 1, 8, function(){ return D().campFullOnce ? 1 : 0; });
   add('campgold', M, 'Wages of Waiting', 'Collect 100,000 gold in all from the Camp', 100000, 12, function(){ return scoreInt(D().campGoldTotal); });

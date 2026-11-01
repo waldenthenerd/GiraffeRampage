@@ -68,9 +68,9 @@
 
     /* the pictures */
     var V = QA.params.view || '';
-    if (V === 'pat'){ Save.reset(); for (var c2 = 1; c2 <= 17; c2++) Save.data['chapter' + c2 + 'Complete'] = true; Save.data.skinCol = 6; Save.data.spotCol = 4; Save.data.patCol = +(QA.params.pat || 16); showWardrobe(); }
+    if (V === 'pat'){ Save.reset(); for (var c2 = 1; c2 <= 18; c2++) Save.data['chapter' + c2 + 'Complete'] = true; Save.data.skinCol = 6; Save.data.spotCol = 4; Save.data.patCol = +(QA.params.pat || 16); showWardrobe(); }
     else if (V === 'bg'){ Save.reset(); G.state = 'menu'; PHOTO.bg = +(QA.params.bg || 21); GR.handleAction('ward-photo'); }
-    else if (V === 'dome' || V === 'sandbag' || V === 'sneak'){ Save.reset(); Save.data.mini = { own: {}, best: {}, stars: {}, last: 0, plays: 0, hat: '', boot: '' }; startMini(V === 'dome' ? DOME_CHAPTER : V === 'sandbag' ? SIEGE_CHAPTER : COUNTER_CHAPTER, null, 'menu'); G.mini.phase = 'play'; steps(+(QA.params.n || 70)); }
+    else if (V === 'dome' || V === 'sandbag' || V === 'sneak' || V === 'tide'){ Save.reset(); Save.data.mini = { own: {}, best: {}, stars: {}, last: 0, plays: 0, hat: '', boot: '' }; startMini(V === 'dome' ? DOME_CHAPTER : V === 'sandbag' ? SIEGE_CHAPTER : V === 'tide' ? ISLE_CHAPTER : COUNTER_CHAPTER, null, 'menu'); G.mini.phase = 'play'; steps(+(QA.params.n || 70)); }
   } catch (e) { out.err = String(e && e.stack || e); }
   var need = ['patLocked', 'patOpen', 'patChoice', 'patLockedChoice', 'patSane', 'patDraw', 'patAll', 'patCount', 'btn', 'pageSwatches', 'pick', 'pickLocked', 'outfit', 'outfitLocked', 'codeLate', 'codeOld', 'code14', 'codeItems',
     'bgCount', 'bgDraw', 'miniDefs', 'miniLocked', 'miniOpen', 'endsRun', 'offer', 'domeStart', 'domeSet', 'domeShard', 'domeHit', 'domeStars', 'sandStart', 'sandCracks', 'sandBag', 'sandPlug', 'sandBurst', 'sandStars', 'sneakStart', 'sneakHack', 'sneakSpotted', 'sneakStars', 'starTotals', 'labels'];

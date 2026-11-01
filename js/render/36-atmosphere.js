@@ -20,9 +20,10 @@ const ATMOS = {
   14: { base: [150, 214, 255, 0.10],              accent: '#9FE8FF', fog: [200, 236, 255], fogA: 0.12, weather: 'snow' },          /* inside a dome: cold, still, a little snow that should not be there */
   15: { base: [255, 236, 190, 0.07],              accent: '#FFE49A', fog: [200, 200, 220], fogA: 0.05, weather: 'glints' },         /* an office tower at night: warm lamps, cool air, a few motes in the light */
   16: { base: [255, 150, 90, 0.10],               accent: '#FFB070', fog: [150, 120, 110], fogA: 0.10, weather: 'embers' },         /* smoke and embers drifting over a town at dusk */
-  17: { base: [255, 190, 110, 0.12],              accent: '#FFC866', fog: [120, 110, 100], fogA: 0.12, weather: 'embers' }          /* a fort at night under floodlights, smoke from what you have wrecked */
+  17: { base: [255, 190, 110, 0.12],              accent: '#FFC866', fog: [120, 110, 100], fogA: 0.12, weather: 'embers' },         /* a fort at night under floodlights, smoke from what you have wrecked */
+  18: { base: [120, 220, 230, 0.10],              accent: '#7FE8E0', fog: [170, 220, 226], fogA: 0.08, weather: 'spray' }           /* a bright island morning, salt spray off the surf */
 };
-const BIOME_CHAPTER = { savanna: 1, snow: 2, swamp: 3, ocean: 4, jungle: 5, city: 6, space: 7, moon: 8, venus: 9, area51: 12, mars: 13, dome: 14, tower: 15, siege: 16, fort: 17 };
+const BIOME_CHAPTER = { savanna: 1, snow: 2, swamp: 3, ocean: 4, jungle: 5, city: 6, space: 7, moon: 8, venus: 9, area51: 12, mars: 13, dome: 14, tower: 15, siege: 16, fort: 17, isle: 18 };
 /* type: streak (a line along its motion), dot, glow (soft additive point) */
 const WEATHER_KINDS = {
   dust:     { n: 34,  type: 'streak', vx: 90,   vy: 6,    len: [14, 34], col: '230,210,160', a: 0.20 },
@@ -34,7 +35,8 @@ const WEATHER_KINDS = {
   glints:   { n: 38,  type: 'glow',   vx: 6,    vy: -6,   size: [1, 3],   col: 'accent', a: 0.7, twinkle: true },
   spores:   { n: 52,  type: 'glow',   vx: 14,   vy: -20,  size: [2, 4],   col: '210,230,110', a: 0.45 },
   embers:   { n: 58,  type: 'glow',   vx: 24,   vy: -70,  size: [1.2, 3], col: '255,140,50', a: 0.85 },
-  storm:    { n: 86,  type: 'streak', vx: 520,  vy: 40,   len: [30, 80], col: '230,150,100', a: 0.20 }
+  storm:    { n: 86,  type: 'streak', vx: 520,  vy: 40,   len: [30, 80], col: '230,150,100', a: 0.20 },
+  spray:    { n: 40,  type: 'dot',    vx: -70,  vy: -24,  size: [1, 2.4], col: '230,250,250', a: 0.45 }
 };
 function atmosChapter(){
   if (G.attract || G.state === 'menu' || G.state === 'help' || G.state === 'shop') return BIOME_CHAPTER[G.biome] || 1;
