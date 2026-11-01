@@ -32,10 +32,11 @@ function il_tag(ctx, x, y, s, a){
 }
 /* a tapering body along a list of points (from the head back): rings of the given widths, an outline first */
 function il_body(ctx, pts, w0, w1, c, dk){
-  const n = pts.length / 2 - 1;
+  const n = pts.length / 2 - 1; ctx.lineCap = 'round';                                     /* round ends, so the bends do not show the joins */
   for (let pass = 0; pass < 2; pass++) for (let i = n; i > 0; i--){
     const w = w0 + (w1 - w0) * (i / n); tw_ln(ctx, [pts[i * 2 - 2], pts[i * 2 - 1], pts[i * 2], pts[i * 2 + 1]], pass ? w : w + 2, pass ? c : dk);
   }
+  ctx.lineCap = 'butt';
 }
 /* a spine standing on the skin at angle a of a circle (cx, cy, r): base on the skin, out to its tip */
 function il_spine(ctx, cx, cy, r, a, len, w, c, tip){

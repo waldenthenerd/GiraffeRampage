@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 217 | 66,510 | 5.44 MiB (5,703,515 bytes) |
+| JavaScript (`js/`) | 217 | 66,511 | 5.44 MiB (5,703,651 bytes) |
 | Styles (`css/`) | 6 | 1,781 | 162 KiB (165,814 bytes) |
 | Page (`index.html`) | 1 | 267 | 13.6 KiB (13,891 bytes) |
-| **Whole game** | **224** | **68,558** | **5.61 MiB (5,883,220 bytes)** |
+| **Whole game** | **224** | **68,559** | **5.61 MiB (5,883,356 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **67,957 lines, 5.57 MiB (5,836,238 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 217 | 66,510 | 5.44 MiB (5,703,515 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **67,958 lines, 5.57 MiB (5,836,374 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 217 | 66,511 | 5.44 MiB (5,703,651 bytes) |
 | Styles (`css/`) | 6 | 1,781 | 162 KiB (165,814 bytes) |
 | Page (`index.html`) | 1 | 267 | 13.6 KiB (13,891 bytes) |
-| **Whole game** | **224** | **68,558** | **5.61 MiB (5,883,220 bytes)** |
+| **Whole game** | **224** | **68,559** | **5.61 MiB (5,883,356 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -155,7 +155,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/art/35j-art-tower.js` | 279 | Enemy art, Chapter 14 (`TOWER_DRAW`): a lab rat with plates screwed on and a cable tail, a walking staple, a parcel drone, an office chair with a rocket, a copier on legs, a safe on fists, a mutated intern in a tie, a shredder with toothed rollers, a camera orb with a red lens, a plug-headed cable, a rack with a nest of mites, a swollen battery; and the five bosses (a reception desk on spider legs with a headset and a bell, a manager in a navy suit with a clipboard, a bank-vault door with a wheel that opens on gold, a lab coat with syringe arms, and an executive with a golden pen and a glowing vial in his pocket). |
 | `js/art/35k-art-siege.js` | 163 | **Enemy art, Chapter 15** (`SIEGE_DRAW`): twelve ordinary kinds (Patrol Bot, Glimmer Maggot, Skitter Drone, Raptor Bot, Dozer Bot, Spotter Drone, Glimmerhorn, Rockhurler, Sapper Bot, Glassfang, Torch Bot, Gnawer) and five bosses (the Scrap Walker, Brood Queen, Battering Ram, Hive Carrier, Warden), drawn from above facing +x with the Tower art's helpers. |
 | `js/art/35n-art-fort.js` | 243 | **Enemy art, Chapter 16** (`FORT_DRAW`): twelve ordinary kinds (Base Guard, Cadet, Guard Hound, Scout Jeep, Riot Trooper, Mini Copter, APC, Mortar Crew, Grenadier, Sniper, Pyro Trooper, Field Medic) and five bosses (Sergeant Ironside, The Gunship, Old Thunder, Colonel Mortimer, The Maker), all drawn from above out of many small parts (`ft_man` is the soldier they share). The ordinary ones read only def, type, r, anim and state, so the sprite cache can keep them. |
-| `js/art/35o-art-island.js` | 348 | **Enemy art, Chapter 17** (`ISLE_DRAW`): the twelve mutants and five bosses, each with a lab mark (a steel tag, a clamp, a cable or a green glow), every part drawn from where it joins the body (`il_leg`, `il_claw`, `il_stalkEye`, `il_spine`, `il_body`). The ordinary ones read only what the sprite cache allows. The Leviathan Eel's body follows its trail; Specimen Zero's arms are `ilTentacle`. |
+| `js/art/35o-art-island.js` | 349 | **Enemy art, Chapter 17** (`ISLE_DRAW`): the twelve mutants and five bosses, each with a lab mark (a steel tag, a clamp, a cable or a green glow), every part drawn from where it joins the body (`il_leg`, `il_claw`, `il_stalkEye`, `il_spine`, `il_body`). The ordinary ones read only what the sprite cache allows. The Leviathan Eel's body follows its trail; Specimen Zero's arms are `ilTentacle`. |
 | `js/art/35l-art-detail.js` | 562 | **Enemy art, detail layer** (Chapters 13.5, 14, 15): wraps each creature's drawing (`dt_wrap`) with many small extra parts, drawn under and over the original: bolts and seams, vents, lamps, jointed legs, toes and claws, cables, fur and frost. The Domes' ordinary creatures get frost only when they are the glimmered `d.dome` kinds, so the Arctic stays as it was. Ordinary creatures stay in the sprite cache. |
 | `js/art/35m-art-detail-classic.js` | 164 | **Enemy art, detail layer for Chapters 1 to 13**: wraps `drawEnemyBody` and adds many small parts to every creature of the first thirteen chapters, from ten families (fur, feathers, scales, amphibian skin, insect plates, fish, machines, troopers, ember and dust creatures). `DT_SPEC` says where each creature's body is; each creature's own drawing is read once into a small mask so parts sit on the creature and its real outline. Ordinary creatures stay in the sprite cache. |
 | `js/art/35o-art-detail-fort.js` | 261 | **Enemy art, detail layer for Chapter 16** (`dt_wrap` on every `ft_` look): MOLLE webbing, magazines, rivets, weld seams, hubs, lamps, rotor tip stripes, shark teeth, cables and gears, all still kept by the sprite cache. |
