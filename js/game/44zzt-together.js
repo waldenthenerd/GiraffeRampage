@@ -17,7 +17,7 @@
    Controls: giraffe 1 is WASD (the keys in Settings) with Space, or the mouse button, to kick; giraffe 2 is the arrow keys with Enter. Gamepads:
    with two, the first drives giraffe 1 and the second giraffe 2; with one, it drives giraffe 2. Auto-kick in Settings kicks for both. */
 const CO_SW = ['x', 'y', 'vx', 'vy', 'face', 'aim', 'walk', 'hp', 'maxHp', 'invuln', 'hurtT', 'kickCd', 'kickAnim', 'dead', 'rage', 'regenAcc'];
-const CO_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];       /* every chapter's backdrop and creatures, each opening once the one before it is finished in the real save */
+const CO_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];       /* every chapter's backdrop and creatures, each opening once the one before it is finished in the real save */
 const CO_ROUND_WAVES = [1, 2, 3, 4, 6, 7, 8, 9];     /* the waves of the chapter a round is built from (no boss waves) */
 /* without cards or experience the pair are weaker than a real run's giraffe: a third as many creatures, with a third of the health and a third of the damage */
 const CO_EASE = 3;
@@ -242,6 +242,7 @@ function coArenaStep(dt){
     Co.queue.shift();
     e.hp = e.hp / CO_EASE * (1 + 0.2 * (Co.cyc || 0)); e.maxHp = e.hp; e.dmg /= CO_EASE;
     if (G.chapter === DOME_CHAPTER){ const dk = domeScale(chapterWaveOf(G.wave)), bk = enemyScale(WAVES_PER_CHAPTER); e.hp /= dk.hp / bk.hp; e.maxHp = e.hp; e.dmg /= dk.dmg / bk.dmg; }          /* the Domes' extra strength is for the real run; here they are as strong as Chapter 13's */
+    if (G.chapter === ISLE_CHAPTER){ const ik = isleScale(chapterWaveOf(G.wave)), bk5 = enemyScale(WAVES_PER_CHAPTER); e.hp /= ik.hp / bk5.hp; e.maxHp = e.hp; e.dmg /= ik.dmg / bk5.dmg; }          /* and the island's */
     if (G.chapter === COUNTER_CHAPTER){ const fk = fortScale(chapterWaveOf(G.wave)), bk4 = enemyScale(WAVES_PER_CHAPTER); e.hp /= fk.hp / bk4.hp; e.maxHp = e.hp; e.dmg /= fk.dmg / bk4.dmg; }          /* and the fort's */
     if (G.chapter === SIEGE_CHAPTER){ const sk = siegeScale(chapterWaveOf(G.wave)), bk3 = enemyScale(WAVES_PER_CHAPTER); e.hp /= sk.hp / bk3.hp; e.maxHp = e.hp; e.dmg /= sk.dmg / bk3.dmg; }          /* and the Siege's */
     if (G.chapter === TOWER_CHAPTER){ const tk = towerScale(chapterWaveOf(G.wave)), bk2 = enemyScale(WAVES_PER_CHAPTER); e.hp /= tk.hp / bk2.hp; e.maxHp = e.hp; e.dmg /= tk.dmg / bk2.dmg; }          /* and the Tower's, the same way */

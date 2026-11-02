@@ -47,6 +47,7 @@ body{
 .chaptag.tower{color:#E8C84A}
 .chaptag.siege{color:#E8723A}
 .chaptag.fort{color:#E8B83A}
+.chaptag.isle{color:#5EE8D0}
 .chaptag.swamp{color:#9ACB5E}
 .chaptag.ocean{color:#3EE8D8}
 .chaptag.jungle{color:#7FD65A}
@@ -359,6 +360,8 @@ h2.head{font-size:26px;margin:0 0 4px;font-weight:800;letter-spacing:-.01em}
 .bst-entry.unknown{opacity:.75}
 .bst-none{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:7px 4px;border-bottom:1px solid rgba(122,90,64,.25);font-size:14px;color:var(--dust)}.bst-none b{color:var(--bone);font-weight:700}.bst-none span{font-size:12px}
 .bst-more{grid-column:1/-1;text-align:left;font-size:12px;color:var(--dust);padding:6px 10px;border:1px dashed var(--bark2);border-radius:4px;background:rgba(0,0,0,.12)}
+/* the Island Lab's notes, under the chapters (js/island/44zzzx-island-watch.js): paper cards */
+.bst-notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}.bst-note{background:#F4F0E2;color:#2A3436;border-left:5px solid #3AA87A;border-radius:4px;padding:10px 12px;font-size:13px;line-height:1.4}.bst-note b{display:block;color:#1E2A2C;margin-bottom:4px}.bst-note p{margin:0}
 .bst-pic{width:80px;height:80px;display:block;margin:0 auto 4px}
 .bst-name{font-size:13px;font-weight:700;color:var(--bone);line-height:1.2}
 .bst-sub{font-size:11px;color:var(--dust);margin-top:2px;line-height:1.3}

@@ -35,7 +35,7 @@
       out.view = V; QA.done(out); return;
     }
     /* the chapter table */
-    out.table = COUNTER_CHAPTER === 17 && COUNTER_FIRST_WAVE === 386 && COUNTER_WAVES === 25 && CHAPTER_LAST_WAVE === 410 && SIEGE_LAST_WAVE === 385 && TOTAL_CHAPTERS === 17 && chapterLabel(17) === '16' &&
+    out.table = COUNTER_CHAPTER === 17 && COUNTER_FIRST_WAVE === 386 && COUNTER_WAVES === 25 && COUNTER_LAST_WAVE === 410 && SIEGE_LAST_WAVE === 385 && TOTAL_CHAPTERS === 18 && chapterLabel(17) === '16' &&
       chapterOf(385) === SIEGE_CHAPTER && chapterOf(386) === COUNTER_CHAPTER && chapterOf(410) === COUNTER_CHAPTER && chapterWaveOf(386) === 1 && chapterWaveOf(410) === 25 &&
       chapterFirstWave(17) === 386 && chapterFirstWave(16) === 361 && chapterLen(17) === 25 && isChapterFinaleWave(410) && !isChapterFinaleWave(405) && isRunEnd(410) === true && isRunEnd(385) === true && isRunEnd(386) === false;
     out.bossWaves = [390, 395, 400, 405, 410].map(bossForWave).join() === 'lion,matriarch,buffalo,crocodile,wildfire';
@@ -44,7 +44,7 @@
     /* the kit: twelve kinds and five bosses in the Bestiary's slots, none borrowed from another chapter */
     var kinds = BESTIARY_ORDER.slice(0, 17);
     out.cast = kinds.every(function(k){ return !!ETYPES_FORT[k] && ETYPES_FORT[k].fort === true && /^ft_/.test(ETYPES_FORT[k].look) && LOOK_NAMES[ETYPES_FORT[k].look] && typeof FORT_AI[ETYPES_FORT[k].ai] === 'function' && typeof ENEMY_LOOK_DRAW[ETYPES_FORT[k].look] === 'function'; });
-    out.bestiary = BESTIARY_CHAPTERS.length === 17 && BESTIARY_CHAPTERS[16] === 'Fort Shortneck' && bestiaryTable(17) === ETYPES_FORT;
+    out.bestiary = BESTIARY_CHAPTERS.length === 18 && BESTIARY_CHAPTERS[16] === 'Fort Shortneck' && bestiaryTable(17) === ETYPES_FORT;
     var looks = {}; kinds.forEach(function(k){ looks[ETYPES_FORT[k].look] = 1; }); out.uniqueLooks = Object.keys(looks).length === 17;
     out.flyers = ETYPES_FORT.vulture.flyOver === true && ETYPES_FORT.matriarch.flyOver === true && !ETYPES_FORT.hyena.flyOver;
 
@@ -52,7 +52,7 @@
     freshSave(); out.saveDefault = Save.data.chapter17Complete === false && Save.data.fortChaosBest === 0 && Save.data.fortBadges === 0 && Save.data.fortBestWave === 0;
     Save.data.chapter17Complete = 'junk'; Save.data.fortChaosBest = -5; Save.data.fortBadges = 9999; Save.data.fortBestWave = 99; Save.write(); Save.load();
     out.saveSane = typeof Save.data.chapter17Complete === 'boolean' && Save.data.fortChaosBest === 0 && Save.data.fortBadges <= 255 && Save.data.fortBestWave <= 25;
-    freshSave(); out.ward = WARD.length === 56 && WARD_MAX === 55 && WARD[51].name === 'Fort Camo' && WARD[52].name === 'Calamity Gold' && wardUnlocked(51) === false && wardUnlocked(52) === false;
+    freshSave(); out.ward = WARD.length === 58 && WARD_MAX === 57 && WARD[51].name === 'Fort Camo' && WARD[52].name === 'Calamity Gold' && wardUnlocked(51) === false && wardUnlocked(52) === false;
     Save.data.chapter17Complete = true; Save.data.fortBadges = 128; out.wardOpen = wardUnlocked(51) === true && wardUnlocked(52) === true;
 
     /* waves: every wave builds, boss waves have their boss, the pool grows */
@@ -66,7 +66,7 @@
     freshSave(); Save.data.chapter16Complete = false; setMenuChapter(17); showMenu(); var html = chapterSelectorHTML();
     out.menuLocked = /disabled/.test(html) && /Clear Chapter 15/.test(html) && /Chapter 16/.test(html) && /Fort Shortneck/.test(html) && /Waves 386–410 · 5 bosses/.test(html);
     Save.data.chapter16Complete = true; html = chapterSelectorHTML();
-    out.menuOpen = /data-a="play17"/.test(html) && /Start Chapter 16/.test(html) && /Straight to wave 386/.test(html) && /ch-next" aria-label="Next chapter" disabled/.test(html);
+    out.menuOpen = /data-a="play17"/.test(html) && /Start Chapter 16/.test(html) && /Straight to wave 386/.test(html) && !/ch-next" aria-label="Next chapter" disabled/.test(html);
     handleAction('play17'); out.menuFilm = G.state === 'cutscene' && !!G.cut && G.cut.kind === 'fortflight'; G.cut.t = FT_CLIMB_T.END - 0.01; steps(3);
     out.starts = G.state === 'playing' && G.wave === 386 && G.chapter === COUNTER_CHAPTER && G.biome === 'fort' && Math.abs(P.x - 2100) < 5 && Math.abs(P.y - 2700) < 5;
     godMode(); steps(120);
@@ -182,7 +182,7 @@
     Save.reset(); var ach = function(id){ return ACH.filter(function(x){ return x.id === id; })[0]; };
     out.ach0 = !!ach('ch16') && ach('ch16').val() === 0 && ach('fortchaos').val() === 0 && ach('fortall').val() === 0;
     Save.data.chapter17Complete = true; Save.data.fortBadges = 255; out.ach = out.ach0 && ach('ch16').val() === 1 && ach('fortchaos').val() === 6 && ach('fortall').val() === 1;
-    Save.reset(); out.coLocked = coChapters().indexOf(17) < 0 && CO_CHAPTERS.length === 17; Save.data.chapter16Complete = true; out.coOpen = coChapters().indexOf(17) >= 0;
+    Save.reset(); out.coLocked = coChapters().indexOf(17) < 0 && CO_CHAPTERS.length === 18; Save.data.chapter16Complete = true; out.coOpen = coChapters().indexOf(17) >= 0;
     coStart('arena', 17); steps(40); out.together = Co.on && G.chapter === COUNTER_CHAPTER && G.biome === 'fort' && G.tower === true && G.buildings.length === FT_PLAN.length && !!G.ft; coEnd(true); steps(2);
 
     /* the last wave: the flag is saved, the film plays, and the victory report says what she wrecked; the film is in the gallery and says nothing about the end of the game */

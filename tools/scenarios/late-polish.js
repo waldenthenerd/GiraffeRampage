@@ -13,11 +13,11 @@
     Save.data.patCol = 16; out.patChoice = wardChoice('patCol') === 16 && giraffePattern() === 16; Save.data.patCol = 15; out.patLockedChoice = wardChoice('patCol') === 0; Save.data.patCol = 99; out.patSane = wardChoice('patCol') === 0; Save.data.patCol = 0;
     var cv = document.createElement('canvas'); cv.width = 60; cv.height = 60; var cx = cv.getContext('2d'), inks = 0;
     for (var pt = 1; pt <= WARD_PAT_MAX; pt++){ cx.clearRect(0, 0, 60, 60); cx.fillStyle = '#fff'; wardSpot(cx, pt, 30, 30, 12, 10, 0.3); var d0 = cx.getImageData(0, 0, 60, 60).data, k = 0; for (var q = 3; q < d0.length; q += 4) if (d0[q]) k++; if (k > 20) inks++; }
-    out.patDraw = inks === WARD_PAT_MAX && WARD_PATTERNS.length === 18;
-    ['chapter14Complete', 'chapter15Complete', 'chapter16Complete', 'chapter17Complete'].forEach(function(k){ Save.data[k] = true; }); out.patAll = wardPatCount() === 4 && wardPatUnlocked(17) && wardPatUnlocked(15);
-    for (var cc = 1; cc <= 13; cc++) Save.data['chapter' + cc + 'Complete'] = true; out.patCount = wardPatCount() === 17;
-    out.btn = /of 17 patterns unlocked/.test(wardrobeButtonHTML()) && /colors and /.test(wardrobeButtonHTML()) && !/of 13 colors/.test(wardrobeButtonHTML());
-    Save.data.patCol = 17; showWardrobe(); out.pageSwatches = document.querySelectorAll('[data-a^="ward-pat-"]').length === 18 && !document.querySelector('[data-a="ward-pat-17"]').disabled;
+    out.patDraw = inks === WARD_PAT_MAX && WARD_PATTERNS.length === 19;
+    ['chapter14Complete', 'chapter15Complete', 'chapter16Complete', 'chapter17Complete', 'chapter18Complete'].forEach(function(k){ Save.data[k] = true; }); out.patAll = wardPatCount() === 5 && wardPatUnlocked(18) && wardPatUnlocked(17) && wardPatUnlocked(15);
+    for (var cc = 1; cc <= 13; cc++) Save.data['chapter' + cc + 'Complete'] = true; out.patCount = wardPatCount() === 18;
+    out.btn = /of 18 patterns unlocked/.test(wardrobeButtonHTML()) && /colors and /.test(wardrobeButtonHTML()) && !/of 13 colors/.test(wardrobeButtonHTML());
+    Save.data.patCol = 17; showWardrobe(); out.pageSwatches = document.querySelectorAll('[data-a^="ward-pat-"]').length === 19 && !document.querySelector('[data-a="ward-pat-17"]').disabled;
     GR.handleAction('ward-pat-14'); out.pick = Save.data.patCol === 14; Save.data.chapter14Complete = false; GR.handleAction('ward-pat-14'); GR.handleAction('ward-pat-17'); out.pickLocked = Save.data.patCol === 17; Save.data.chapter14Complete = true;
     var oc = outfitClean({ s: 0, p: 0, t: 15, g: 0, hat: '', boot: '', hc: 0, bc: 0 }); out.outfit = oc && oc.t === 15; Save.data.chapter15Complete = false; oc = outfitClean({ t: 15 }); out.outfitLocked = oc && oc.t === 0; Save.data.chapter15Complete = true;
     hideOverlay(); G.state = 'menu';
@@ -30,7 +30,7 @@
     base.look.pattern = 17; base.items = [{ type: 'fx', id: PHOTO_FX[0][0], x: 10, y: 20, scale: 1, flip: false, tilt: 0 }]; var u4 = photoUnpack(photoPack(base)); out.codeItems = u4.look.pattern === 17 && u4.items.length === 1 && u4.items[0].x === 10;
 
     /* the backdrops: five at the end, all drawn */
-    out.bgCount = PHOTO_BG.length === 26 && PHOTO_BG[21] === 'The Domes' && PHOTO_BG[25] === 'Her Camp' && PHOTO_SUN.length === PHOTO_BG.length && PHOTO_BG[20] === 'Autumn forest';
+    out.bgCount = PHOTO_BG.length === 27 && PHOTO_BG[21] === 'The Domes' && PHOTO_BG[25] === 'Her Camp' && PHOTO_SUN.length === PHOTO_BG.length && PHOTO_BG[20] === 'Autumn forest';
     var bc = document.createElement('canvas'); bc.width = 960; bc.height = 540; var bx = bc.getContext('2d'), bgOk = 0;
     for (var bi = 21; bi <= 25; bi++){ bx.clearRect(0, 0, 960, 540); photoBackdrop(bx, 960, 540, bi); var px = bx.getImageData(480, 270, 1, 1).data, py = bx.getImageData(10, 530, 1, 1).data; if (px[3] === 255 && py[3] === 255) bgOk++; }
     out.bgDraw = bgOk === 5;
@@ -62,15 +62,15 @@
     nm.inv = 0; nm.beam[0].a = Math.atan2(nm.p.y - ng.H * 0.14, nm.p.x - ng.W * 0.08); nm.beam[0].d = 0; var lv2 = nm.lives; steps(1); out.sneakSpotted = nm.lives === lv2 - 1;
     nm.score = 16; nm.over = true; steps(2); out.sneakStars = (Save.data.mini.stars[COUNTER_CHAPTER] | 0) === 3 && wardUnlocked(55) && WARD[55].name === 'Hazard Yellow';
     G.state = 'menu'; G.mini = null;
-    out.starTotals = MINI_STAR_CHAPTERS.length === 17 && miniStarTotal() >= 9;
+    out.starTotals = MINI_STAR_CHAPTERS.length === 18 && miniStarTotal() >= 9;
     var lab = (function(){ Save.reset(); Save.data.chapter14Complete = true; showWardrobe(); var t = (document.querySelector('[data-a="ward-skin-53"]') || {}).title || ''; var t2 = (document.querySelector('[data-a="ward-skin-51"]') || {}).title || ''; hideOverlay(); G.state = 'menu'; return t + '|' + t2; })();
     out.labels = /Get three stars in Slide Dome/.test(lab) && /Finish Chapter 16/.test(lab);
 
     /* the pictures */
     var V = QA.params.view || '';
-    if (V === 'pat'){ Save.reset(); for (var c2 = 1; c2 <= 17; c2++) Save.data['chapter' + c2 + 'Complete'] = true; Save.data.skinCol = 6; Save.data.spotCol = 4; Save.data.patCol = +(QA.params.pat || 16); showWardrobe(); }
+    if (V === 'pat'){ Save.reset(); for (var c2 = 1; c2 <= 18; c2++) Save.data['chapter' + c2 + 'Complete'] = true; Save.data.skinCol = 6; Save.data.spotCol = 4; Save.data.patCol = +(QA.params.pat || 16); showWardrobe(); }
     else if (V === 'bg'){ Save.reset(); G.state = 'menu'; PHOTO.bg = +(QA.params.bg || 21); GR.handleAction('ward-photo'); }
-    else if (V === 'dome' || V === 'sandbag' || V === 'sneak'){ Save.reset(); Save.data.mini = { own: {}, best: {}, stars: {}, last: 0, plays: 0, hat: '', boot: '' }; startMini(V === 'dome' ? DOME_CHAPTER : V === 'sandbag' ? SIEGE_CHAPTER : COUNTER_CHAPTER, null, 'menu'); G.mini.phase = 'play'; steps(+(QA.params.n || 70)); }
+    else if (V === 'dome' || V === 'sandbag' || V === 'sneak' || V === 'tide'){ Save.reset(); Save.data.mini = { own: {}, best: {}, stars: {}, last: 0, plays: 0, hat: '', boot: '' }; startMini(V === 'dome' ? DOME_CHAPTER : V === 'sandbag' ? SIEGE_CHAPTER : V === 'tide' ? ISLE_CHAPTER : COUNTER_CHAPTER, null, 'menu'); G.mini.phase = 'play'; steps(+(QA.params.n || 70)); }
   } catch (e) { out.err = String(e && e.stack || e); }
   var need = ['patLocked', 'patOpen', 'patChoice', 'patLockedChoice', 'patSane', 'patDraw', 'patAll', 'patCount', 'btn', 'pageSwatches', 'pick', 'pickLocked', 'outfit', 'outfitLocked', 'codeLate', 'codeOld', 'code14', 'codeItems',
     'bgCount', 'bgDraw', 'miniDefs', 'miniLocked', 'miniOpen', 'endsRun', 'offer', 'domeStart', 'domeSet', 'domeShard', 'domeHit', 'domeStars', 'sandStart', 'sandCracks', 'sandBag', 'sandPlug', 'sandBurst', 'sandStars', 'sneakStart', 'sneakHack', 'sneakSpotted', 'sneakStars', 'starTotals', 'labels'];

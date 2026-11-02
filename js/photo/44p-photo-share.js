@@ -13,7 +13,7 @@
        look: skin 6 | spots 6 | pattern 4 (15 = escape, 3 more bits follow: patterns 15 and up) | gear 6 | hat 6 | boots 6 | hat color 6 | boot color 6   (hat/boots: 0 none, else ACC_ITEMS index + 1; format 2 used 5 bits for each but pattern)
        item count 5, then per item: kind 1 (0 effect, 1 creature)
          effect:   index in PHOTO_FX 5
-         creature: chapter - 1  4 | index in BESTIARY_ORDER 5
+         creature: chapter - 1  4 (5 in versions 6 and 7, for the chapters after 16) | index in BESTIARY_ORDER 5
          x + 100 (11) | y + 100 (10) | size x50 (8) | flip 1 | tilt as 1/128 of a turn (7)
    Those lists (PHOTO_FX, BESTIARY_ORDER, ACC_ITEMS, the scenes) may only ever be added to at the end, or old codes would change meaning.
    Both versions are read. Her look travels with the photo and is shown as it was shared, even if it is not won on this save.
@@ -100,15 +100,16 @@ function photoPack(d){
   const items = (d.items || []).slice(0, PHOTO_MAX);
   w.w(items.length, 5);
   const fxIds = PHOTO_FX.map(function(f){ return f[0]; });
+  const wide = items.some(function(it){ return it.type === 'creature' && (it.chapter | 0) > 16; });          /* a creature from Chapter 16 on needs 5 bits for its chapter: versions 6 and 7 */
   items.forEach(function(it){
     const foe = it.type === 'creature';
     w.w(foe ? 1 : 0, 1);
-    if (foe){ w.w(it.chapter - 1, 4); w.w(photoIndexOf(BESTIARY_ORDER, it.id), 5); }
+    if (foe){ w.w(it.chapter - 1, wide ? 5 : 4); w.w(photoIndexOf(BESTIARY_ORDER, it.id), 5); }
     else w.w(photoIndexOf(fxIds, it.id), 6);
     w.w(it.x + 100, 11); w.w(it.y + 100, 10); w.w(it.scale * 50, 8); w.w(it.flip ? 1 : 0, 1);
     w.w((((it.tilt % TAU) + TAU) % TAU) / TAU * 128, 7);
   });
-  const gr = d.grade || {}, ext = (gr.filter | 0) || (gr.frame | 0) || (gr.tod >= 0) || gr.freeze, ver = ext ? 5 : 4;                /* version 5 only when a filter, frame, time of day or freeze is used: every older photo keeps its old code */
+  const gr = d.grade || {}, ext = (gr.filter | 0) || (gr.frame | 0) || (gr.tod >= 0) || gr.freeze, ver = (ext ? 5 : 4) + (wide ? 2 : 0);                /* version 5 only when a filter, frame, time of day or freeze is used: every older photo keeps its old code */
   if (ext){ w.w(gr.filter | 0, 3); w.w(gr.frame | 0, 4); w.w(gr.tod >= 0 ? Math.min(47, gr.tod) : 63, 6); w.w(gr.freeze ? 1 : 0, 1); }
   const body = w.done();
   return [ver, photoCheck(body, 0)].concat(body);
@@ -124,11 +125,11 @@ function photoUnpack(bytes){
   const n = r.r(5); d.items = [];
   for (let i = 0; i < n; i++){
     const foe = r.r(1) === 1; let id, ch = 0;
-    if (foe){ ch = r.r(4) + 1; id = BESTIARY_ORDER[r.r(5)]; } else id = (PHOTO_FX[r.r(bytes[0] >= 4 ? 6 : 5)] || [''])[0];
+    if (foe){ ch = r.r(bytes[0] >= 6 ? 5 : 4) + 1; id = BESTIARY_ORDER[r.r(5)]; } else id = (PHOTO_FX[r.r(bytes[0] >= 4 ? 6 : 5)] || [''])[0];
     const x = r.r(11) - 100, y = r.r(10) - 100, s = r.r(8) / 50, f = !!r.r(1), t = r.r(7) / 128 * TAU;
     d.items.push({ type: foe ? 'creature' : 'fx', id: id, chapter: ch, x: x, y: y, scale: s, flip: f, tilt: t });
   }
-  if (bytes[0] >= 5){ const fl = r.r(3), fr = r.r(4), td = r.r(6), fz = r.r(1); d.grade = { filter: fl, frame: fr, tod: td === 63 ? -1 : td, freeze: !!fz }; }
+  if (bytes[0] === 5 || bytes[0] === 7){ const fl = r.r(3), fr = r.r(4), td = r.r(6), fz = r.r(1); d.grade = { filter: fl, frame: fr, tod: td === 63 ? -1 : td, freeze: !!fz }; }
   return d;
 }
 function photoToCode(){ return photoB64(photoPack(photoData())); }
@@ -142,7 +143,7 @@ function photoFromCode(text){
     while (s.length % 4) s += '=';
     const bin = atob(s), bytes = [];
     for (let i = 0; i < bin.length; i++) bytes.push(bin.charCodeAt(i));
-    data = (bytes[0] >= 2 && bytes[0] <= 5) ? photoUnpack(bytes) : JSON.parse(decodeURIComponent(escape(bin)));
+    data = (bytes[0] >= 2 && bytes[0] <= 7) ? photoUnpack(bytes) : JSON.parse(decodeURIComponent(escape(bin)));
   } catch (e) { return { ok: false, why: 'That does not look like a photo code. Check that the whole code was copied.' }; }
   if (!data || typeof data !== 'object' || data.v !== 1) return { ok: false, why: 'This photo code is from a different version of the game.' };
   const num = function(v, lo, hi, d){ v = +v; return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };

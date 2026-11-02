@@ -32,6 +32,7 @@
       case 'inferno': o.g = 'rock'; break;
       case 'area51': o.g = 'sand'; break;
       case 'ocean': o.g = 'shallow'; break;
+      case 'isle': o.g = typeof isleWet === 'function' && isleWet(P.x, P.y) ? 'shallow' : 'sand'; break;
       default: o.g = G.chapter === 10 ? 'rock' : 'dust';
     }
     try {

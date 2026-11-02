@@ -247,6 +247,8 @@ function filmList(){
   L.push({ kind: 'siegeout', title: 'The Morning After', sub: 'The Warden, the hatch in the Square, and one small drone going east.', un: !!d.chapter16Complete });
   L.push({ kind: 'fortflight', title: 'Over the Wall', sub: 'Night on the ridge, a floodlit wall, and a very long neck.', un: !!d.chapter16Complete });
   L.push({ kind: 'fortout', title: 'A Circle in Red', sub: 'The fort smoking, a cracked screen in the bunker, and the sun coming up.', un: !!d.chapter17Complete });
+  L.push({ kind: 'islesail', title: 'A Speck in the Sea', sub: 'The fishing boat, a long morning on the water, and an island coming out of the fog.', un: !!d.chapter17Complete });
+  L.push({ kind: 'isleout', title: 'Two Helicopters', sub: 'The tank room floods, someone runs for the helipad, and an old friend comes in low.', un: !!d.chapter18Complete });
   return L;
 }
 function galleryButtonHTML(){
@@ -721,6 +723,7 @@ function showDeath(){
 
 function victoryText(mins, secs){
   const tm = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's';
+  if (G.chapter >= ISLE_CHAPTER) return 'Specimen Zero sinks back into the flooded tank room, and the island goes quiet but for the surf and the pumps winding down. You waded through the lab in ' + tm + '. On the helipad there is only a rotor wash in the puddles: whoever made all this is in the air, heading west over the water. The town helicopter is coming in low, and its door is open.';
   if (G.chapter >= COUNTER_CHAPTER) return 'The maker of the Warden folds up in the ruins of its own command bunker, and the sirens of Fort Shortneck wind down one by one. You tore the fort apart in ' + tm + ' and left ' + fmt((G.ft && G.ft.chaos) | 0) + ' points of chaos behind you. Smoke is rolling off the ridge. In the wreckage of the glimmer plant, a map is still glowing on a cracked screen, and one line of it is circled in red.';
   if (G.chapter >= SIEGE_CHAPTER) return 'The Warden goes down at the edge of Longneck Town, and the siren on the Hall winds to silence. You held the town for ' + tm + ', and ' + ((G.sg && G.sg.held) | 0) + ' of its twenty-five waves without losing a building. The militia are sitting on their sandbags, and the hatch in the Square is lifting a crack. Out on the grass, one small drone with a green light on its belly is slipping away east, toward the waterhole.';
   if (G.chapter >= TOWER_CHAPTER) return 'The Chief Executive folds into the chair behind the desk, and the whole top floor goes quiet except for the elevator chiming somewhere far below. You climbed twenty-five floors in ' + tm + '. In the glass case on the wall, a vial of something green was still turning slowly in the light, and it is in your harness now. There is a window, a paraglider on a rack, and the lights of another building across the dark.';
