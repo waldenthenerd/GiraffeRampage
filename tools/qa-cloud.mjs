@@ -66,7 +66,7 @@ if (profile) { cdp = await ctx.newCDPSession(pg); await cdp.send('Profiler.enabl
 await pg.goto(url);
 let out = null;
 try {
-  await pg.waitForFunction(() => window.QA && window.QA.result !== null, null, { timeout: waitMs });
+  await pg.waitForFunction(() => window.QA && window.QA.result !== null, null, { timeout: waitMs, polling: 200 });   // polled on a timer: the harness stops requestAnimationFrame, so a scenario that finishes later (an audio render) is still seen
   out = await pg.evaluate(() => JSON.stringify({ done: true, result: QA.result, errors: QA.errors, logs: QA.logs }));
 } catch (e) {
   out = await pg.evaluate(() => window.QA ? JSON.stringify({ done: false, result: null, errors: QA.errors, logs: QA.logs }) : null).catch(() => null);
