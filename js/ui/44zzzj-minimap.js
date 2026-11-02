@@ -4,8 +4,8 @@
    with Settings > Map zoom a window of it that follows the giraffe, and it follows the chapter being played: the ground colour of the chapter, its mud, ice, drift and heat patches,
    the waterhole, its landmarks, its buildings (the Tower redraws with every floor's walls and furniture, the Siege colours each key building by its health and marks the wrecked
    ones), the rocket in the Space Center. Creatures are faint dots; bosses are bigger, pulsing, and when they are off the zoomed map an arrow at its edge points to them. A white
-   frame shows what the screen is looking at. Size and zoom are sliders in Settings. It is drawn on top of the world, after the screen effects, and is one pass over the arena's
-   objects, with no pictures kept. */
+   frame shows what the screen is looking at. Size and zoom are sliders in Settings. It is drawn on top of the world, after the screen effects; what stands still is kept as
+   one picture (MM_CACHE, below) and what moves is drawn over it every frame. */
 const MM_GROUND = { 1: '#8A7448', 2: '#C9D9E3', 3: '#4A5732', 4: '#14425E', 5: '#2E4220', 6: '#6E6C68', 7: '#6A8A44', 8: '#8F8E8A', 9: '#8E5630', 10: '#4F2C1C', 11: '#8A7448', 12: '#C5A877', 13: '#B65A33', 14: '#C6DCE6', 15: '#B9BCC2', 16: '#8A8478', 17: '#7A745E', 18: '#C8B680' };
 const MM_ZONE = { slow: '107,74,42', ice: '190,232,245', push: '255,255,255', hurt: '255,106,58' };
 const MM_STATES = { playing: 1, levelup: 1, paused: 1, bossintro: 1 };
@@ -27,15 +27,36 @@ function mmPropColor(def, kind){
   try { const M = typeof sdMask === 'function' ? sdMask(def, kind) : null; if (M && M.avg) c = 'rgb(' + Math.round(M.avg[0]) + ',' + Math.round(M.avg[1]) + ',' + Math.round(M.avg[2]) + ')'; } catch (err){}
   MM_COL.set(def, c); return c;
 }
-function mmDraw(ctx){
-  const mw = mmSizePx(), mh = Math.round(mw * ARENA_H / ARENA_W), z = mmZoomK(), ww = ARENA_W / z, wh = ARENA_H / z;
-  const wx = clamp(P.x - ww / 2, 0, ARENA_W - ww), wy = clamp(P.y - wh / 2, 0, ARENA_H - wh), k = mw / ww;
-  const mx = G.W - mw - 14, my = G.H - mh - (Input.hasTouch ? 160 : 14), t = G.time;
+/* the colour of a building on the map (the Siege by its health, the Fort and the Island by their own rules, wrecked and damaged ones darker) */
+function mmBldCol(b, sg){
+  const s = sg && b.key ? sg[b.key] : null;
+  if (s) return s.wrecked ? '#5A2E26' : (function(f){ return f > 0.66 ? '#58C84A' : f > 0.33 ? '#F0B83A' : '#F0603A'; })(s.hp / SIEGE_BLD.max);
+  if (b.fort && typeof ftMmColor === 'function') return ftMmColor(b);
+  if (b.isle && typeof ilMmColor === 'function') return ilMmColor(b);
+  if (!b.tower && b.collapsed) return 'rgba(80,76,72,.8)';
+  if (!b.tower && b.maxHp > 1 && b.hp < b.maxHp * 0.5) return '#B0725E';
+  return b.tower ? (b.kind === 'wall' || b.kind === 'w' ? '#1A1D26' : '#6A7384') : '#8D909C';
+}
+/* The still part of the map (ground, patches, grid, zones, water, scenery and buildings) was redrawn every frame: two to five hundred
+   canvas calls, a few milliseconds. It is now kept as a picture (MM_CACHE) and redrawn only when it changes: a new arena, a new map size
+   or zoom, a building that changes colour, or, zoomed in, when the window has moved off the part that
+   was drawn (it is drawn with a margin, so every second or two). The creatures, the view frame, her and the bosses are drawn on top live.
+   MM_CACHE.on = false draws it all live as before (tests compare the two). */
+const MM_CACHE = { on: true, cv: null, key: '', props: null, bld: null, bsig: 0, rx: 0, ry: 0, rw: 0, rh: 0, k: 1, s: 1, builds: 0 };
+const MM_SH = new Map();
+function mmBldSig(sg){                                                                  /* a number for every building's colour, so a change shows at once (no strings made per frame) */
+  let h = G.buildings.length;
+  for (let i = 0; i < G.buildings.length; i++){
+    const c = mmBldCol(G.buildings[i], sg); let v = MM_SH.get(c);
+    if (v === undefined){ v = 0; for (let j = 0; j < c.length; j++) v = (v * 31 + c.charCodeAt(j)) | 0; if (MM_SH.size < 512) MM_SH.set(c, v); }
+    h = (h * 33 + v + i) | 0;
+  }
+  return h;
+}
+/* draw the still part of the window (wx, wy, ww, wh) at k map pixels per arena unit, with (0, 0) at its corner */
+function mmStatic(ctx, wx, wy, ww, wh, k){
+  const mw = ww * k, mh = wh * k;
   const X = function(x){ return (x - wx) * k; }, Y = function(y){ return (y - wy) * k; };
-  ctx.save();
-  ctx.translate(mx, my);
-  ctx.fillStyle = 'rgba(8,6,4,.85)'; mmRound(ctx, -4, -4, mw + 8, mh + 8, 8); ctx.fill();               /* a dark frame, so it reads on snow and on sand alike */
-  mmRound(ctx, 0, 0, mw, mh, 5); ctx.clip();
   const g0 = MM_GROUND[G.chapter] || '#7F6C45';
   ctx.fillStyle = g0; ctx.fillRect(0, 0, mw, mh);
   if (SCEN.ch){                                                                                            /* the soft ground patches the chapter is painted with */
@@ -67,29 +88,63 @@ function mmDraw(ctx){
   const sg = typeof SGB !== 'undefined' && G.biome === 'siege' ? SGB : null;
   for (let i = 0; i < G.buildings.length; i++){
     const b = G.buildings[i]; if (b.x + b.w < wx || b.x > wx + ww || b.y + b.h < wy || b.y > wy + wh) continue;
-    let col = b.tower ? (b.kind === 'wall' || b.kind === 'w' ? '#1A1D26' : '#6A7384') : '#8D909C', line = b.tower ? null : 'rgba(0,0,0,.6)';
-    const s = sg && b.key ? sg[b.key] : null;
-    if (s) col = s.wrecked ? '#5A2E26' : (function(f){ return f > 0.66 ? '#58C84A' : f > 0.33 ? '#F0B83A' : '#F0603A'; })(s.hp / SIEGE_BLD.max);
-    else if (b.fort && typeof ftMmColor === 'function') col = ftMmColor(b);
-    else if (b.isle && typeof ilMmColor === 'function') col = ilMmColor(b);
-    else if (!b.tower && b.collapsed) col = 'rgba(80,76,72,.8)';
-    else if (!b.tower && b.maxHp > 1 && b.hp < b.maxHp * 0.5) col = '#B0725E';
+    const col = mmBldCol(b, sg), line = b.tower ? null : 'rgba(0,0,0,.6)', s = sg && b.key ? sg[b.key] : null;
     const bx = X(b.x), by = Y(b.y), bw = Math.max(1.5, b.w * k), bh = Math.max(1.5, b.h * k);
     ctx.fillStyle = col; ctx.fillRect(bx, by, bw, bh);
     if (!b.tower || b.kind !== 'wall'){ ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.fillRect(bx, by, bw, Math.min(1.5, bh)); }       /* a lit top edge */
     if (s){ ctx.strokeStyle = s.wrecked ? '#FF5A4A' : '#FFFFFF'; ctx.lineWidth = 1.2; ctx.strokeRect(bx + 0.6, by + 0.6, bw - 1.2, bh - 1.2); if (s.wrecked){ ctx.beginPath(); ctx.moveTo(bx + 2, by + 2); ctx.lineTo(bx + bw - 2, by + bh - 2); ctx.moveTo(bx + bw - 2, by + 2); ctx.lineTo(bx + 2, by + bh - 2); ctx.stroke(); } }
     else if (line && bw > 3){ ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1); }
   }
+}
+/* the still part, from the picture when it is up to date (or made again now), else drawn live */
+function mmStill(ctx, wx, wy, ww, wh, k){
+  const C = MM_CACHE, m = ctx.getTransform ? ctx.getTransform() : null, s = m ? Math.hypot(m.a, m.b) || 1 : 1;
+  if (!C.on || !m || typeof document === 'undefined'){ mmStatic(ctx, wx, wy, ww, wh, k); return; }
+  const key = G.chapter + '|' + SCEN.ch + '|' + G.biome + '|' + k.toFixed(4) + '|' + s.toFixed(3) + '|' + SCEN.props.length + '|' + SCEN.patches.length + '|' + SCEN.zones.length + '|' + G.buildings.length +
+    (G.water ? '|' + G.water.x + ',' + G.water.y + ',' + G.water.r : '') + (typeof TW !== 'undefined' && G.tower ? '|f' + TW.n : '');
+  let stale = key !== C.key || C.props !== SCEN.props || C.bld !== G.buildings || wx < C.rx - 0.01 || wy < C.ry - 0.01 || wx + ww > C.rx + C.rw + 0.01 || wy + wh > C.ry + C.rh + 0.01;
+  const bsig = mmBldSig(typeof SGB !== 'undefined' && G.biome === 'siege' ? SGB : null);      /* buildings change colour as they are hit */
+  if (bsig !== C.bsig) stale = true;
+  if (stale){
+    const zoomed = ww < ARENA_W - 1 || wh < ARENA_H - 1, mgx = zoomed ? ww * 0.35 : 0, mgy = zoomed ? wh * 0.35 : 0;
+    const rx = clamp(wx - mgx, 0, Math.max(0, ARENA_W - ww - 2 * mgx)), ry = clamp(wy - mgy, 0, Math.max(0, ARENA_H - wh - 2 * mgy));
+    const rw = Math.min(ARENA_W - rx, ww + 2 * mgx), rh = Math.min(ARENA_H - ry, wh + 2 * mgy);
+    const W = Math.max(1, Math.ceil(rw * k * s)), H = Math.max(1, Math.ceil(rh * k * s));
+    if (!C.cv) C.cv = document.createElement('canvas');
+    if (C.cv.width !== W || C.cv.height !== H){ C.cv.width = W; C.cv.height = H; }
+    const c = C.cv.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, H); c.setTransform(s, 0, 0, s, 0, 0);
+    mmStatic(c, rx, ry, rw, rh, k);
+    C.key = key; C.props = SCEN.props; C.bld = G.buildings; C.rx = rx; C.ry = ry; C.rw = rw; C.rh = rh; C.k = k; C.s = s; C.builds++;
+    C.bsig = bsig;
+  }
+  const sx = Math.round((wx - C.rx) * k * s), sy = Math.round((wy - C.ry) * k * s), sw = Math.min(C.cv.width - sx, Math.round(ww * k * s)), sh = Math.min(C.cv.height - sy, Math.round(wh * k * s));
+  ctx.drawImage(C.cv, sx, sy, sw, sh, 0, 0, sw / s, sh / s);
+}
+function mmDraw(ctx){
+  const mw = mmSizePx(), mh = Math.round(mw * ARENA_H / ARENA_W), z = mmZoomK(), ww = ARENA_W / z, wh = ARENA_H / z;
+  const wx = clamp(P.x - ww / 2, 0, ARENA_W - ww), wy = clamp(P.y - wh / 2, 0, ARENA_H - wh), k = mw / ww;
+  const mx = G.W - mw - 14, my = G.H - mh - (Input.hasTouch ? 160 : 14), t = G.time;
+  const X = function(x){ return (x - wx) * k; }, Y = function(y){ return (y - wy) * k; };
+  ctx.save();
+  ctx.translate(mx, my);
+  ctx.fillStyle = 'rgba(8,6,4,.85)'; mmRound(ctx, -4, -4, mw + 8, mh + 8, 8); ctx.fill();               /* a dark frame, so it reads on snow and on sand alike */
+  mmRound(ctx, 0, 0, mw, mh, 5); ctx.clip();
+  mmStill(ctx, wx, wy, ww, wh, k);
   if (typeof TW !== 'undefined' && G.tower && TW.floor && TW.floor.lift && TW.floor.lift.w){ const l = TW.floor.lift; ctx.fillStyle = '#FFD24A'; ctx.fillRect(X(l.x), Y(l.y), Math.max(4, l.w * k), Math.max(4, l.h * k)); ctx.strokeStyle = '#3A2A10'; ctx.lineWidth = 1; ctx.strokeRect(X(l.x) + 0.5, Y(l.y) + 0.5, Math.max(4, l.w * k) - 1, Math.max(4, l.h * k) - 1); }
   if (G.rocket){ ctx.fillStyle = '#F4F0E8'; ctx.strokeStyle = '#1A1612'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(X(G.rocket.x), Y(G.rocket.y), 3.2, 0, TAU); ctx.fill(); ctx.stroke(); }
   const es = G.enemies, bosses = [];
-  for (let i = 0; i < es.length; i++){                                                                       /* a dark halo under a bright dot, so each reads on any ground */
-    const e = es[i]; if (e.dead) continue;
-    if (e.big){ bosses.push(e); continue; }
-    if (e.x < wx || e.x > wx + ww || e.y < wy || e.y > wy + wh) continue;
-    const ex = X(e.x), ey = Y(e.y);
-    if (e.elite){ ctx.fillStyle = 'rgba(20,10,0,.85)'; ctx.fillRect(ex - 2.6, ey - 2.6, 5.2, 5.2); ctx.fillStyle = '#FFD24A'; ctx.fillRect(ex - 1.7, ey - 1.7, 3.4, 3.4); }
-    else { ctx.fillStyle = 'rgba(12,6,4,.78)'; ctx.fillRect(ex - 1.9, ey - 1.9, 3.8, 3.8); ctx.fillStyle = '#FF5A44'; ctx.fillRect(ex - 1.1, ey - 1.1, 2.2, 2.2); }
+  /* a dark halo under a bright dot, so each reads on any ground; all the halos of a kind are one path and one fill, then all the dots
+     (four fills in all instead of two per creature), the ordinary ones first and the elites over them */
+  for (let pass = 0; pass < 4; pass++){
+    const elite = pass >= 2, dot = pass % 2 === 1, h = elite ? (dot ? 1.7 : 2.6) : (dot ? 1.1 : 1.9);
+    let any = false; ctx.beginPath();
+    for (let i = 0; i < es.length; i++){
+      const e = es[i]; if (e.dead) continue;
+      if (e.big){ if (pass === 0) bosses.push(e); continue; }
+      if (!e.elite !== !elite || e.x < wx || e.x > wx + ww || e.y < wy || e.y > wy + wh) continue;
+      ctx.rect(X(e.x) - h, Y(e.y) - h, h * 2, h * 2); any = true;
+    }
+    if (any){ ctx.fillStyle = elite ? (dot ? '#FFD24A' : 'rgba(20,10,0,.85)') : (dot ? '#FF5A44' : 'rgba(12,6,4,.78)'); ctx.fill(); }
   }
   const vw = G.W / G.zoom, vh = G.H / G.zoom, fx = X(G.camX - vw / 2), fy = Y(G.camY - vh / 2);
   ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 3; ctx.strokeRect(fx, fy, vw * k, vh * k); ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 1.3; ctx.strokeRect(fx, fy, vw * k, vh * k);
