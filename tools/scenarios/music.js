@@ -1,7 +1,10 @@
 /* The band (js/audio/02e-band-voices.js, 02f-band-songs.js, 02g-band-play.js): every song reads and plays sensible notes for
    seventy bars, every place has a song of its own, a run's music follows the fight (verse, chorus with a lead-in, breakdown between
    waves, heartbeat when nearly dead), a boss cuts in on the next beat and its last section comes at half health, the tune varies
-   each time round, the stems follow the enemies, the voice cap holds, and a few songs render to sound without clipping. */
+   each time round, the stems follow the enemies, the voice cap holds, and a few songs render to sound without clipping.
+   And the bigger band: the giraffe's tune in every song, three keys, coloured chords the second time, bars in three, five and seven,
+   a pre-chorus over a pedal, a half-time bridge with threes against fours, solos that trade and build, the hook passed round, a
+   second voice that answers and harmonises, a canon, and the new instruments. */
 (function(){
   var out = { failed: [] }, check = function(k, v){ if (!v) out.failed.push(k); };
   var uniq = function(v, i, a){ return a.indexOf(v) === i; };
@@ -15,17 +18,22 @@
     ['hook', 'verseM', 'bridgeM'].forEach(function(k){ if (!song[k] || song[k].length !== 32 || !song[k].some(Boolean)) bad.push(th + ' ' + k); });
     if (src){
       if (!BAND_GROOVES[src.groove]) bad.push(th + ' groove');
-      [src.lead, src.counter, src.verse, src.pad, src.bass && src.bass[0], src.comp && src.comp[0], src.arp && src.arp[0]].forEach(function(i){ if (i && !BAND_DRAWN[i] && !BAND_LIVE[i]) bad.push(th + ' inst ' + i); });
+      var insts = [src.lead, src.counter, src.verse, src.pad, src.bass && src.bass[0], src.comp && src.comp[0], src.arp && src.arp[0], src.solo, src.trade, src.lead2, src.drone, src.motto].concat(src.hookBy || []);
+      if (src.secs) Object.keys(src.secs).forEach(function(k){ var o = src.secs[k]; insts.push(o.pad, o.lead, o.drone, o.bass && o.bass[0], o.comp && o.comp[0], o.arp && o.arp[0]); if (!BAND_SECTIONS[k]) bad.push(th + ' secs ' + k); });
+      insts.forEach(function(i){ if (i && !BAND_DRAWN[i] && !BAND_LIVE[i]) bad.push(th + ' inst ' + i); });
+      if (src.meter && !BAND_METERS[src.meter]) bad.push(th + ' meter'); if (src.meters) Object.keys(src.meters).forEach(function(k){ if (!BAND_METERS[src.meters[k]]) bad.push(th + ' meter ' + k); });
       if (src.bass && !BAND_BASS[src.bass[1]] && src.bass[1] !== 'walk') bad.push(th + ' bass ' + src.bass[1]);
       if (src.comp && !BAND_COMP[src.comp[1]]) bad.push(th + ' comp ' + src.comp[1]);
       if (src.arp && !BAND_ARP[src.arp[1]]) bad.push(th + ' arp ' + src.arp[1]);
       if (src.hook && bandParseMel(src.hook).filter(Boolean).length < 4) bad.push(th + ' hook');
     }
-    var S = bandState(), seen = {};
-    for (var b = 0; b < 70; b++){
+    var S = bandState(), seen = {}, motto = 0;
+    for (var b = 0; b < 100; b++){
       bandBar(R, S, { theme: th, lvl: 1, tempo: 1, shift: 0 }, { run: false, I: 0.5 }, b * 2);
       seen[S.secName] = 1;
+      if (S.ev.length !== S.n) bad.push(th + ' bar length');
       S.ev.forEach(function(L){ L.forEach(function(e){
+        if (e.p === 'solo' && e.ins === song.mottoInst && S.secName === song.mottoIn) motto++;
         if (e.dk){ if (!BAND_DRUMS[e.dk]) bad.push(th + ' drum ' + e.dk); return; }
         if (e.fx) return;
         if (!BAND_DRAWN[e.ins] && !BAND_LIVE[e.ins]) bad.push(th + ' plays ' + e.ins);
@@ -34,6 +42,7 @@
       }); });
     }
     song.form.forEach(function(sec){ if (!seen[sec]) bad.push(th + ' never plays ' + sec); });
+    if (motto < 6) bad.push(th + ' no giraffe tune');
   });
   out.songs = themes.length; out.bad = bad.filter(uniq).slice(0, 12);
   check('songsRead', !bad.length);
@@ -72,17 +81,58 @@
     if (S3.secName !== 'chorus') continue;
     var k = S3.cnt.chorus + ':' + S3.secBar; lead[k] = S3.ev.map(function(L){ return L.filter(function(e){ return e.p === 'lead'; }).map(function(e){ return e.m; }).join(','); }).join('|');
   }
-  var same0 = lead['1:0'] && lead['1:0'] === lead['2:0'], diff = false;
+  /* the second time the hook is on another instrument (another register), but it is the same tune: the same steps between its notes */
+  var steps = function(str){ var m = str.split(/[|,]/).filter(Boolean).map(Number); return m.slice(1).map(function(v, i){ return v - m[i]; }).join(); };
+  var same0 = lead['1:0'] && lead['2:0'] && steps(lead['1:0']) === steps(lead['2:0']), diff = false;
   for (var bb = 0; bb < 8; bb++) if (lead['1:' + bb] !== lead['2:' + bb]) diff = true;
   check('hookReturns', !!same0); check('variesNextTime', diff);
-  /* the last chorus is a key higher */
-  var S4 = bandState(), keys = {}; for (var b4 = 0; b4 < 60; b4++){ bandBar(R, S4, { theme: 'savanna', lvl: 1, tempo: 1, shift: 0 }, { run: false }, 0); keys[S4.secName] = S4.key; }
-  check('finalKeyUp', keys.final === keys.chorus + 1);
+  /* the form: a pre-chorus, a solo and an outro; the bridge and the last chorus in other keys (three keys in all), the last one higher */
+  var S4 = bandState(), keys = {}, allKeys = {}, hooks = {}, secBars = {};
+  for (var b4 = 0; b4 < 76; b4++){
+    bandBar(R, S4, { theme: 'savanna', lvl: 1, tempo: 1, shift: 0 }, { run: false }, 0);
+    keys[S4.secName] = S4.key; allKeys[S4.key] = 1;
+    var nm = S4.secName + S4.cnt[S4.secName]; (secBars[nm] = secBars[nm] || []).push(S4.ev.map(function(L){ return L.slice(); }));
+    S4.ev.forEach(function(L){ L.forEach(function(e){ if (e.p === 'lead' && S4.secName === 'chorus') hooks[S4.cnt.chorus] = e.ins; }); });
+  }
+  out.keys = keys;
+  check('finalKeyUp', keys.final > keys.chorus);
+  check('threeKeys', Object.keys(allKeys).length >= 3 && keys.bridge !== keys.chorus);
+  check('formParts', !!secBars.pre1 && !!secBars.solo1 && !!secBars.outro1);
+  /* the hook passed round: flute the first chorus, kalimba the second */
+  out.hooks = hooks; check('hookPassed', hooks[1] === 'flute' && hooks[2] === 'kalimba');
+  /* the pre-chorus's bass holds one note while the chords move */
+  var pedalOk = (secBars.pre1 || []).every(function(bar){ var pcs = {}; bar.forEach(function(L){ L.forEach(function(e){ if (e.p === 'bass') pcs[e.m % 12] = 1; }); }); return Object.keys(pcs).length === 1; });
+  check('pedal', !!secBars.pre1 && pedalOk);
+  /* the solo trades between marimba and flute in two-bar turns and gets busier */
+  var soloN = function(bar){ var n = 0, who = {}; bar.forEach(function(L){ L.forEach(function(e){ if (e.p === 'solo'){ n++; who[e.ins] = 1; } }); }); return { n: n, who: Object.keys(who).join() }; };
+  var sb = (secBars.solo1 || []).map(soloN); out.solo = sb.map(function(x){ return x.who + ':' + x.n; }).join(' ');
+  check('soloTrades', sb.length === 8 && sb[0].who === 'marimba' && sb[2].who === 'flute' && sb[5].n + sb[6].n > sb[0].n + sb[1].n);
+  /* the bridge is in three (savanna's bridge is a 6/8 sway): twelve sixteenths to the bar */
+  check('bridgeInThree', (secBars.bridge1 || []).every(function(bar){ return bar.length === 12; }) && (secBars.chorus1 || [[]])[0].length === 16);
+  /* the second voice answers in the first chorus and harmonises in the second */
+  var l2 = function(nm){ var n = 0; (secBars[nm] || []).forEach(function(bar){ bar.forEach(function(L){ L.forEach(function(e){ if (e.p === 'lead2') n++; }); }); }); return n; };
+  out.lead2 = [l2('chorus1'), l2('chorus2')]; check('secondVoice', l2('chorus1') > 0 && l2('chorus2') > l2('chorus1'));
+  /* threes against fours in the solo: the hand drum every third sixteenth, across the bar lines */
+  var polyAt = []; (secBars.solo1 || []).forEach(function(bar, bi){ bar.forEach(function(L, i){ L.forEach(function(e){ if (e.dk === 'bongo') polyAt.push(bi * 16 + i); }); }); });
+  check('polyrhythm', polyAt.length > 30 && polyAt.every(function(v, i){ return !i || (v - polyAt[i - 1]) % 3 === 0; }));
+  /* the chords are coloured the second time round (not in the eight-bit song) */
+  var col = Object.keys(BAND_SONGS).filter(function(t){ var s = bandSong(t); return s.progs2.chorus && JSON.stringify(s.progs2.chorus) !== JSON.stringify(s.progs.chorus); });
+  out.coloured = col.length; check('reharm', col.length >= 40 && !bandSong('minigame').progs2.chorus);
+  /* a calm song's second verse has a canon: the second voice a beat behind */
+  var S5 = bandState(), canon = 0; for (var b5 = 0; b5 < 40; b5++){ bandBar(R, S5, { theme: 'menu', lvl: 0, tempo: 1, shift: 0 }, { run: false }, 0); if (S5.secName === 'verse2') S5.ev.forEach(function(L){ L.forEach(function(e){ if (e.p === 'lead2') canon++; }); }); }
+  check('canon', canon > 4);
+  /* bars in three, seven and five */
+  var lenOf = function(th){ var S6 = bandState(); bandBar(R, S6, { theme: th, lvl: 1, tempo: 1, shift: 0 }, { run: false }, 0); return S6.ev.length; };
+  out.meters = [lenOf('frost'), lenOf('islelab'), lenOf('boss12'), lenOf('city')]; check('meters', out.meters.join() === '12,14,20,16');
+  /* the giraffe's tune: its own song, and between waves in a run (the first break) */
+  check('longneck', !!BAND_SONGS.longneck && BAND_SONGS.longneck.hook === BAND_MOTTO.call && bandSong('longneck').mottoInst === 'soprano');
+  var S7 = bandState(), runMotto = 0; for (var b7 = 0; b7 < 10; b7++){ bandBar(R, S7, { theme: 'jungle', lvl: 1, tempo: 1, shift: 0 }, { run: true, I: b7 < 5 ? 0.45 : 0.2, rest: b7 >= 5 }, 0); S7.ev.forEach(function(L){ L.forEach(function(e){ if (e.p === 'solo' && e.ins === 'soprano') runMotto++; }); }); }
+  check('mottoInRun', runMotto >= 6);
 
   /* a boss cuts in on the next beat with a boom, and at half health its last section comes */
   var M = Music;
   if (M.R){
-    M.S = bandState(); M.cur = null; M.step = 0;
+    M.S = bandState(); M.cur = null; M.step = 0; M.pos = 0;
     M.want = { theme: 'savanna', lvl: 1, tempo: 1, shift: 0, run: true, I: 0.5, dense: false };
     var t = 1; for (var s = 0; s < 21; s++){ M.bandTick(t); t += 0.1; }               /* a bar and five sixteenths of the chapter's song */
     M.want.theme = 'boss1'; M.want.lvl = 2;
@@ -117,7 +167,7 @@
   check('newBossThemes', got.join() === 'boss16,boss17,boss18');
 
   /* a few songs drawn to sound: real sound, no clipping, nothing broken */
-  var jobs = [['savanna', 'chorus'], ['inferno', 'chorus'], ['minigame', 'chorus'], ['boss10', 'chorus'], ['moon', 'verse']], res = {};
+  var jobs = [['savanna', 'chorus'], ['inferno', 'chorus'], ['minigame', 'chorus'], ['boss10', 'chorus'], ['moon', 'verse'], ['longneck', 'chorus'], ['city', 'chorus'], ['swamp', 'solo'], ['venus', 'solo'], ['jungle', 'break'], ['frost', 'bridge']], res = {};
   (function next(i){
     if (i >= jobs.length){
       out.render = res;
@@ -128,7 +178,7 @@
       var pk = 0, s = 0, nan = 0, d;
       for (var c = 0; c < 2; c++){ d = buf.getChannelData(c); for (var j = 0; j < d.length; j++){ var a = Math.abs(d[j]); if (a !== a) nan++; else { if (a > pk) pk = a; s += a * a; } } }
       var rms = Math.sqrt(s / (2 * buf.length));
-      res[jobs[i][0]] = { pk: +pk.toFixed(3), rmsDb: +(20 * Math.log10(rms + 1e-9)).toFixed(1), ok: !nan && pk < 0.98 && rms > 0.001 };
+      res[jobs[i][0]] = { len: +buf.duration.toFixed(1), pk: +pk.toFixed(3), rmsDb: +(20 * Math.log10(rms + 1e-9)).toFixed(1), ok: !nan && pk < 0.98 && rms > 0.001 };
       next(i + 1);
     }, function(e){ res[jobs[i][0]] = { err: String(e) }; next(i + 1); });
   })(0);
