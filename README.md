@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 225 | 69,443 | 5.69 MiB (5,966,139 bytes) |
+| JavaScript (`js/`) | 225 | 69,491 | 5.69 MiB (5,969,107 bytes) |
 | Styles (`css/`) | 6 | 1,801 | 165 KiB (168,749 bytes) |
 | Page (`index.html`) | 1 | 275 | 14.0 KiB (14,322 bytes) |
-| **Whole game** | **232** | **71,519** | **5.86 MiB (6,149,210 bytes)** |
+| **Whole game** | **232** | **71,567** | **5.87 MiB (6,152,178 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **70,918 lines, 5.82 MiB (6,102,228 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 225 | 69,443 | 5.69 MiB (5,966,139 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **70,966 lines, 5.82 MiB (6,105,196 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 225 | 69,491 | 5.69 MiB (5,969,107 bytes) |
 | Styles (`css/`) | 6 | 1,801 | 165 KiB (168,749 bytes) |
 | Page (`index.html`) | 1 | 275 | 14.0 KiB (14,322 bytes) |
-| **Whole game** | **232** | **71,519** | **5.86 MiB (6,149,210 bytes)** |
+| **Whole game** | **232** | **71,567** | **5.87 MiB (6,152,178 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -173,7 +173,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/scenery/36g-scenery-moon-venus-inferno.js` | 542 | Scenery definitions: moon-venus-inferno (see js/scenery/36a-scenery-core.js for the format). |
 | `js/scenery/36h-scenery-area51-mars.js` | 424 | Scenery definitions: area51-mars (see js/scenery/36a-scenery-core.js for the format). Chapter 12 Area 51 and chapter 13 Mars; everything is inside one function so it adds no globals, and the runway, hangars, hatch and Mars base are kept clear of scenery. |
 | `js/scenery/36n-scenery-domes.js` | 137 | Scenery and the floor of the Domes (chapter 14): frosted steel plates, veins of glowing crystal root, frozen crates, seed pods, grow-lamps, vents breathing fog, falling flakes, and the dome's own rim of mylar panels. `drawGroundDome`, `buildGroundDome`, `buildDomeWorld`. |
-| `js/scenery/36o-scenery-detail.js` | 234 | **Scenery detail.** Wraps the `draw` of every prop, landmark, ground decal and terrain patch of every chapter with a layer of many small parts, from nine families chosen by the object's id (foliage rings and grass blades, rock and ice facets, bark and growth rings, panel seams and rivets, strata and grains, glowing cracks, reef polyps). Each object's own drawing is read once into a mask (shape, colours, centre, axis, foot), the parts are laid out once per object (seeded by its seed, a few ms a frame at most) as a display list, and a frame replays the list. Off when effects are off (`SD.off` switches it off in tests). |
+| `js/scenery/36o-scenery-detail.js` | 282 | **Scenery detail.** Wraps the `draw` of every prop, landmark, ground decal and terrain patch of every chapter with a layer of many small parts, from nine families chosen by the object's id (foliage rings and grass blades, rock and ice facets, bark and growth rings, panel seams and rivets, strata and grains, glowing cracks, reef polyps). Each object's own drawing is read once into a mask (shape, colours, centre, axis, foot), the parts are laid out once per object (seeded by its seed, a few ms a frame at most) as a display list, and a frame replays the list. Off when effects are off (`SD.off` switches it off in tests). Each object's still parts are drawn from one picture made at the scale they are seen at (`SDC`, up to 20 megapixels, a few ms a frame to make); the glints and embers are replayed live. |
 | `js/core/37-frame-transitions.js` | 413 | Frame composition, transform sequence, chapter transitions. |
 | `js/ui/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
 | `js/ui/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
