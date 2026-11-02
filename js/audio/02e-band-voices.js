@@ -7,7 +7,7 @@
      note costs one buffer player, which keeps a full band cheap;
    - held ones (pads, strings, choir, brass, organ, flute, synth leads and synth bass) are live oscillators with their own envelope,
      filter and vibrato.
-   Each part of the band (drums, perc, bass, comp, pad, arp, lead, counter, fx) has its own fader, its own place left or right, and
+   Each part of the band (drums, perc, bass, comp, pad, arp, lead, lead2, counter, solo, fx) has its own fader, its own place left or right, and
    sends into one shared room (a reverb) and an echo that follows the tempo, so it sounds like a band in a room instead of beeps.
    The arranger that plays them is 02g-band-play.js. */
 
@@ -48,6 +48,8 @@ function bandKS(f, sr, o, rnd){
     out[n] = body ? cur + o.body[2] * body(cur, 1) : cur;
   }
   if (o.twang){ const tw = bandSvf(o.twang[0], o.twang[1], sr); for (let n = 0; n < N; n++) out[n] += o.twang[2] * tw(out[n], 1); }
+  /* a sitar's buzzing bridge: the string slaps a curved bridge on one side of its swing, which adds a bright, lopsided buzz */
+  if (o.jaw){ const hp = bandSvf(1800, 0.8, sr); for (let n = 0; n < N; n++){ const x = out[n]; out[n] = x + o.jaw * hp(x > 0 ? x * x * 3 : 0, 2); } }
   return out;
 }
 /* a struck bar, tine, pan or bell: a few sine modes, each dying away at its own rate, and a click for the mallet.
@@ -227,6 +229,8 @@ const BAND_DRAWN = {
   clav:     ['ks', { dur: 0.45, bright: 1.0, decay: 0.3, pos: 0.06, twang: [1500, 2, 0.4] }, 0.4],
   pbass:    ['ks', { dur: 1.3, bright: 0.28, decay: 1.4, pos: 0.2, body: [90, 1.0, 0.6], blend: 0.55 }, 0.85],
   upright:  ['ks', { dur: 1.0, bright: 0.18, decay: 0.8, pos: 0.3, body: [110, 1.2, 0.9], blend: 0.58 }, 0.95],
+  sitar:    ['ks', { dur: 2.0, bright: 0.85, decay: 2.0, pos: 0.09, twang: [2300, 4, 0.7], jaw: 0.35 }, 0.95],
+  dulcimer: ['ks', { dur: 1.6, bright: 0.8, decay: 1.5, pos: 0.13, body: [520, 1.2, 0.3], twang: [3000, 2, 0.25] }, 0.45],
   marimba:  ['modal', { dur: 1.0, modes: [[1, 1, 0.5], [3.93, 0.4, 0.16], [9.2, 0.1, 0.06]], click: 0.25 }, 0.6],
   xylo:     ['modal', { dur: 0.6, modes: [[1, 1, 0.28], [3.0, 0.45, 0.12], [6.2, 0.15, 0.05]], click: 0.4 }, 0.5],
   kalimba:  ['modal', { dur: 1.4, modes: [[1, 1, 1.0], [5.9, 0.28, 0.22], [12.1, 0.1, 0.08]], click: 0.3 }, 0.55],
@@ -270,10 +274,21 @@ const BAND_LIVE = {
   pluckSyn: { w: ['sawtooth', 'square'], det: [-6, 6], lpEnv: [300, 4200, 500, 0.12], q: 3, a: 0.003, d: 0.25, s: 0.15, r: 0.12, lv: 0.2 },
   synbass:  { w: ['sawtooth', 'square'], mul: [1, 0.5], amp: [1, 0.6], lpEnv: [180, 1500, 380, 0.09], q: 4, a: 0.004, d: 0.2, s: 0.85, r: 0.06, lv: 0.26 },
   acid:     { w: ['sawtooth'], lpEnv: [200, 2800, 320, 0.14], q: 12, a: 0.003, d: 0.15, s: 0.8, r: 0.05, glide: 0.04, lv: 0.14 },
-  sub:      { w: ['sine', 'triangle'], amp: [1, 0.3], a: 0.012, d: 0.2, s: 0.95, r: 0.1, lv: 0.14 }
+  sub:      { w: ['sine', 'triangle'], amp: [1, 0.3], a: 0.012, d: 0.2, s: 0.95, r: 0.1, lv: 0.14 },
+  /* the giraffe's own instrument: a B-flat soprano saxophone. A conical reed is bright and a little nasal (two vocal bumps in the
+     tone), every note is scooped up from just under the pitch, and the vibrato comes in late, as a player's does */
+  soprano:  { w: ['sawtooth', 'square'], amp: [1, 0.16], bp: [[1150, 1.5, 8], [2700, 2.4, 5]], lp: 5200, q: 0.6, breath: 0.05, scoop: 40, a: 0.03, d: 0.18, s: 0.86, r: 0.12, vib: [5.6, 13, 0.24], glide: 0.035, lv: 0.26 },
+  harmonica:{ w: ['square', 'sawtooth'], amp: [0.7, 0.45], bp: [[1750, 1.3, 9]], lp: 3800, breath: 0.07, scoop: 25, trem: [5.2, 0.28, 0.3], a: 0.025, d: 0.12, s: 0.9, r: 0.08, vib: [5.2, 8, 0.3], glide: 0.03, lv: 0.19 },
+  didge:    { w: ['sawtooth', 'sawtooth'], det: [-5, 5], wah: [0.55, 320, 1250, 5], lp: 1800, breath: 0.04, a: 0.25, d: 0.3, s: 1, r: 0.5, lv: 0.36 },
+  talkbass: { w: ['sawtooth', 'square'], mul: [1, 0.5], amp: [1, 0.5], vowel: [[320, 760, 6, 1], [800, 1250, 7, 0.7]], vt: 0.11, lp: 2200, a: 0.004, d: 0.2, s: 0.85, r: 0.06, glide: 0.03, lv: 0.6 },
+  brassSec: { w: ['sawtooth', 'sawtooth', 'sawtooth'], det: [-13, 0, 12], lpEnv: [450, 3800, 1700, 0.07], q: 1, a: 0.02, d: 0.15, s: 0.8, r: 0.1, vib: [5.5, 6, 0.3], lv: 0.36 },
+  ensemble: { w: ['sawtooth', 'sawtooth', 'sawtooth'], det: [-17, -2, 15], lp: 3000, q: 0.5, a: 0.45, d: 0.6, s: 0.88, r: 0.8, vib: [4.8, 9, 0.35], lv: 0.12 },
+  cello:    { w: ['sawtooth', 'sawtooth'], det: [-3, 3], lp: 1900, q: 1.3, bp: [[320, 1, 5]], a: 0.09, d: 0.3, s: 0.9, r: 0.3, vib: [5.2, 14, 0.2], glide: 0.04, lv: 0.2 },
+  ooh:      { w: ['sawtooth', 'sawtooth'], det: [-8, 8], fm: [[380, 6, 1], [820, 7, 0.45], [2500, 8, 0.1]], a: 0.45, d: 0.5, s: 0.9, r: 0.8, vib: [4.6, 9, 0.3], lv: 0.32 },
+  accordion:{ w: ['sawtooth', 'square', 'sawtooth'], det: [-13, 0, 13], amp: [0.6, 0.35, 0.6], lp: 3400, bp: [[1500, 1, 5]], a: 0.03, d: 0.1, s: 0.95, r: 0.08, lv: 0.24 }
 };
 /* how much each part matters when the band runs out of voices: the drums' kick and snare, the bass and the tune are the last to go */
-const BAND_PRIO = { drums: 2, bass: 2, lead: 2, perc: 0, comp: 1, pad: 1, arp: 0, counter: 1, fx: 0 };
+const BAND_PRIO = { drums: 2, bass: 2, lead: 2, solo: 2, perc: 0, comp: 1, pad: 1, arp: 0, counter: 1, lead2: 1, fx: 0 };
 /* the parts: level, place left (-1) to right (1), how much goes into the room and into the echo */
 const BAND_PARTS = {
   drums:   { lv: 0.42, pan: 0,     rv: 0.12, dl: 0 },
@@ -284,7 +299,9 @@ const BAND_PARTS = {
   arp:     { lv: 0.65, pan: 0.42,  rv: 0.26, dl: 0.22 },
   lead:    { lv: 0.68, pan: 0.06,  rv: 0.28, dl: 0.16 },
   counter: { lv: 0.8,  pan: -0.42, rv: 0.3,  dl: 0.08 },
-  fx:      { lv: 0.6,  pan: 0,     rv: 0.4,  dl: 0 }
+  lead2:   { lv: 0.6,  pan: -0.24, rv: 0.3,  dl: 0.12 },     /* the second tune: an answer, a harmony, a canon, the octave doubling */
+  solo:    { lv: 0.72, pan: 0.14,  rv: 0.34, dl: 0.2 },      /* a solo, and the giraffe's tune */
+  fx:     { lv: 0.6,  pan: 0,     rv: 0.4,  dl: 0 }
 };
 
 /* ---------------------------------------------------------------- the bank of drawn notes */
@@ -424,7 +441,7 @@ function bandNote(R, part, inst, m, t, dur, vel, o){
 }
 /* a held note or chord on a live instrument: oscillators into one envelope and filter chain */
 function bandLive(R, part, L, ms, t, dur, vel, o){
-  const c = R.c, g = c.createGain(), end = t + dur, rel = L.r || 0.1, peak = vel * L.lv;
+  const c = R.c, g = c.createGain(), end = t + dur, rel = L.r || 0.1, peak = vel * L.lv, stop = end + rel * 1.6 + 0.05;
   let head = g;
   if (L.drive){ const ws = c.createWaveShaper(); ws.curve = R.curve; ws.oversample = 'none'; const pre = c.createGain(); pre.gain.value = 2.5; pre.connect(ws); head = pre; ws.connect(g); }
   let into = head;
@@ -433,11 +450,36 @@ function bandLive(R, part, L, ms, t, dur, vel, o){
     if (L.lpEnv){ const e = L.lpEnv, k = (o && o.bright) || 1; f.frequency.setValueAtTime(e[0], t); f.frequency.linearRampToValueAtTime(e[1] * k, t + 0.012); f.frequency.setTargetAtTime(e[2] * k, t + 0.012, e[3]); }
     else f.frequency.value = L.lp * ((o && o.bright) || 1);
   }
-  if (L.bp){ const f = c.createBiquadFilter(); f.type = 'peaking'; f.frequency.value = L.bp[0]; f.Q.value = L.bp[1]; f.gain.value = 9; f.connect(into); into = f; }
-  if (L.fm){
-    const sum = c.createGain(); sum.gain.value = 1;
-    for (let k = 0; k < L.fm.length; k++){ const f = c.createBiquadFilter(), fg = c.createGain(); f.type = 'bandpass'; f.frequency.value = L.fm[k][0]; f.Q.value = L.fm[k][1]; fg.gain.value = L.fm[k][2] * 2.2; sum.connect(f); f.connect(fg); fg.connect(into); }
+  if (L.bp){
+    /* one bump in the tone ([frequency, width]) or several ([[f, width, how much], ...]): a sax's or a harmonica's vowel */
+    const pk = Array.isArray(L.bp[0]) ? L.bp : [[L.bp[0], L.bp[1], 9]];
+    for (let k = pk.length - 1; k >= 0; k--){ const f = c.createBiquadFilter(); f.type = 'peaking'; f.frequency.value = pk[k][0]; f.Q.value = pk[k][1]; f.gain.value = pk[k][2] === undefined ? 9 : pk[k][2]; f.connect(into); into = f; }
+  }
+  if (L.fm || L.vowel){
+    /* vowels: a choir's held ones, or a talking bass whose mouth opens from "oo" to "ah" as each note starts */
+    const sum = c.createGain(), V = L.fm || L.vowel; sum.gain.value = 1;
+    for (let k = 0; k < V.length; k++){
+      const f = c.createBiquadFilter(), fg = c.createGain(); f.type = 'bandpass';
+      if (L.vowel){ f.frequency.setValueAtTime(V[k][0], t); f.frequency.exponentialRampToValueAtTime(V[k][1], t + (L.vt || 0.1)); f.Q.value = V[k][2]; fg.gain.value = V[k][3] * 2.2; }
+      else { f.frequency.value = V[k][0]; f.Q.value = V[k][1]; fg.gain.value = V[k][2] * 2.2; }
+      sum.connect(f); f.connect(fg); fg.connect(into);
+    }
     into = sum;
+  }
+  if (L.wah){
+    /* a didgeridoo's moving mouth: a narrow band sweeps slowly up and down over the drone, with some of the plain drone under it */
+    const w = L.wah, sum = c.createGain(), f = c.createBiquadFilter(), dry = c.createGain(), lfo = c.createOscillator(), dep = c.createGain();
+    f.type = 'bandpass'; f.Q.value = w[3]; f.frequency.value = (w[1] + w[2]) / 2; dry.gain.value = 0.35;
+    lfo.frequency.value = w[0]; dep.gain.value = (w[2] - w[1]) / 2; lfo.connect(dep); dep.connect(f.frequency);
+    sum.connect(f); f.connect(into); sum.connect(dry); dry.connect(into); lfo.start(t); lfo.stop(stop);
+    into = sum;
+  }
+  if (L.trem){
+    /* a harmonica player's hand opening and closing round it: the loudness wobbles, coming in a moment after the note */
+    const tg = c.createGain(), lfo = c.createOscillator(), dep = c.createGain();
+    tg.gain.value = 1; lfo.frequency.value = L.trem[0]; dep.gain.setValueAtTime(0, t); dep.gain.linearRampToValueAtTime(L.trem[1], t + L.trem[2] + 0.15);
+    lfo.connect(dep); dep.connect(tg.gain); tg.connect(into); lfo.start(t); lfo.stop(stop);
+    into = tg;
   }
   g.connect(R.part[part].in);
   /* the envelope: rise, fall to the held level, and let go at the end */
@@ -446,7 +488,6 @@ function bandLive(R, part, L, ms, t, dur, vel, o){
   g.gain.linearRampToValueAtTime(peak, t + a);
   g.gain.setTargetAtTime(peak * (L.s === undefined ? 0.8 : L.s), t + a, d / 3);
   g.gain.setTargetAtTime(0.0001, end, rel / 3);
-  const stop = end + rel * 1.6 + 0.05;
   /* vibrato: one slow oscillator bends every oscillator of the note a few cents, starting a moment after the note does */
   let vib = null;
   if (L.vib && dur > 0.15){
@@ -465,7 +506,9 @@ function bandLive(R, part, L, ms, t, dur, vel, o){
         const from = R.lastF[part] * ((L.mul && L.mul[k]) || 1);
         os.frequency.setValueAtTime(from, t); os.frequency.exponentialRampToValueAtTime(fq, t + L.glide);
       } else os.frequency.setValueAtTime(fq, t);
-      if (L.det) os.detune.value = L.det[k] || 0;
+      const dt = (L.det && L.det[k]) || 0;
+      if (L.scoop){ os.detune.setValueAtTime(dt - L.scoop, t); os.detune.linearRampToValueAtTime(dt, t + 0.07); }   /* a reed player's scoop up into the note */
+      else if (dt) os.detune.value = dt;
       if (vib) vib.connect(os.detune);
       ag.gain.value = ((L.amp && L.amp[k] !== undefined) ? L.amp[k] : 1) / Math.sqrt(ms.length);
       os.connect(ag); ag.connect(into);

@@ -274,9 +274,9 @@ input[type=range]{width:180px}
 (function(){
   var $ = function(id){ return document.getElementById(id); }, timer = null;
   var groups = [['Chapters', MUSIC_BY_CHAPTER.slice(1).concat(['marswar', 'islelab'])], ['Bosses', Object.keys(BAND_SONGS).filter(function(k){ return /^boss/.test(k); })],
-    ['Town', ['town', 'townnight', 'burrow']], ['Screens', ['menu', 'shop', 'lab', 'victory', 'defeat', 'minigame']], ['Films', Object.keys(BAND_SONGS).filter(function(k){ return /^film/.test(k); })]];
+    ['Town', ['town', 'townnight', 'burrow']], ['Screens', ['menu', 'shop', 'lab', 'victory', 'defeat', 'minigame', 'longneck']], ['Films', Object.keys(BAND_SONGS).filter(function(k){ return /^film/.test(k); })]];
   groups.forEach(function(g){ var og = document.createElement('optgroup'); og.label = g[0]; g[1].forEach(function(k){ var o = document.createElement('option'); o.value = k; o.textContent = k + ' - ' + (BAND_SONGS[k] && BAND_SONGS[k].name || ''); og.appendChild(o); }); $('song').appendChild(og); });
-  ['intro', 'verse', 'verse2', 'chorus', 'bridge', 'break', 'final'].forEach(function(s){ var b = document.createElement('button'); b.textContent = s; b.onclick = function(){ Band.jump(s); }; $('secs').appendChild(b); });
+  BAND_SEC_NAMES.forEach(function(s){ var b = document.createElement('button'); b.textContent = s; b.onclick = function(){ Band.jump(s); }; $('secs').appendChild(b); });
   var mute = {};
   Object.keys(BAND_PARTS).forEach(function(p){
     var l = document.createElement('label'), c = document.createElement('input'); c.type = 'checkbox'; c.checked = true; c.onchange = function(){ mute[p] = !c.checked; apply(); };
@@ -294,7 +294,7 @@ input[type=range]{width:180px}
     try { Music.refresh(); if (Music.S){ Music.S.mute = mute; Music.S.solo = $('solo').value || null; } } catch (e) { $('now').textContent = 'error: ' + e.message; return; }
     var S = Music.S, s = S && S.song; if (!s) return;
     $('now').textContent = (s.name || s.theme) + '  (' + S.theme + ')\nsection ' + S.secName + '  bar ' + (S.secBar + 1) + ' of ' + S.secLen + (S.pending ? '  next: ' + S.pending : '') +
-      '\n' + Math.round(s.bpm * (Music.cur && Music.cur.tempo || 1)) + ' bpm  key ' + S.key + '  ' + s.mode + '  drums ' + s.groove + '  voices ' + (Music.R ? Music.R.voices : 0);
+      '\n' + Math.round(s.bpm * (Music.cur && Music.cur.tempo || 1)) + ' bpm  key ' + S.key + '  ' + s.mode + (S.n !== 16 ? '  in ' + ({ 12: '3/4', 14: '7/8', 20: '5/4' })[S.n] : '') + '  drums ' + s.groove + '  voices ' + (Music.R ? Music.R.voices : 0);
   }
   $('play').onclick = function(){
     SFX.init(); SFX.resume(); if (SFX.ctx && SFX.ctx.state === 'suspended') SFX.ctx.resume();
