@@ -72,3 +72,6 @@
   #bars{gap:3px}
   .bar{height:12px}.bar span{line-height:12px}
 }
+/* the song card (js/town/44zzzz-jukebox.js): under the top buttons, which sit lower on a phone */
+@media (max-width: 700px){ #songCard{top:108px;right:10px} }
+@media (max-height: 500px){ #songCard{top:76px;right:10px} }

@@ -260,6 +260,7 @@ function handleAction(a){
     case 's-fx': Settings.fxLevel = (fxLevelSetting() + 1) % 3; if (typeof Perf !== 'undefined') Perf.reset(); Settings.save(); SFX.click(); showSettings(); break;
     case 's-gear': Settings.showGear = !Settings.showGear; Settings.save(); SFX.click(); showSettings(); break;
     case 's-npcvoice': Settings.npcVoice = Settings.npcVoice === false; Settings.save(); SFX.click(); if (Settings.npcVoice && typeof NPCVoice !== 'undefined') NPCVoice.demo('mayor'); showSettings(); break;
+    case 's-songnames': Settings.songNames = Settings.songNames === false; Settings.save(); SFX.click(); showSettings(); break;
     case 's-calm': Settings.calmFlash = !Settings.calmFlash; Settings.save(); SFX.click(); showSettings(); break;
     case 's-text': Settings.textScale = ((Settings.textScale | 0) + 1) % 3; applyTextScale(); Settings.save(); SFX.click(); showSettings(); break;
     case 's-minimap': Settings.minimap = mmOn() ? 'off' : 'on'; Settings.save(); SFX.click(); showSettings(); break;

@@ -166,6 +166,7 @@ function showSettings(){
         sliderRowHTML('setMusic', 'Music volume', 'Background music.', pct(s.musicVol)) +
         sliderRowHTML('setFx', 'Effects volume', 'Kicks, hits, pickups and menus.', pct(s.sfxVol)) +
         sliderRowHTML('setAmb', 'Ambience volume', 'Wind, rain, thunder and the sounds of each place.', pct(s.ambVol)) +
+        toggleRowHTML('s-songnames', 'Song names', 'When the music changes outside a fight, the song\u2019s name shows for a moment in a corner. Every song heard joins the jukebox in Penny\u2019s Caf\u00e9.', s.songNames !== false) +
         toggleRowHTML('s-npcvoice', 'NPC voices', 'Townsfolk babble in short blips as they speak, each with a voice of their own.', s.npcVoice !== false) +
         '<div class="sub" style="margin:14px 0 2px;font-weight:700;color:var(--sun)">Play</div>' +
         toggleRowHTML('s-auto', 'Auto-kick', 'Kick fires on cooldown without holding a button.', s.autoKick) +
