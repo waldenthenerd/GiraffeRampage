@@ -1,4 +1,4 @@
-// Keep the three developer pages in index.html load order, including the optional dev panel.
+// Keep the four developer pages in index.html load order, including the optional dev panel.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,7 +7,7 @@ const check = process.argv.includes('--check');
 const scripts = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8').matchAll(/^[ \t]*<script src="js\/[^"\r\n]+"[^>]*><\/script>[^\r\n]*/gm)].map(m => m[0].trim().replace('src="js/', 'src="../js/'));
 if (!scripts.length) throw new Error('No game scripts in index.html');
 let stale = 0;
-for (const file of ['enemy-gallery.html', 'scenery-preview.html', 'qa.html']) {
+for (const file of ['enemy-gallery.html', 'scenery-preview.html', 'qa.html', 'music-lab.html']) {
   const target = path.join(root, 'tools', file), old = fs.readFileSync(target, 'utf8'), nl = old.includes('\r\n') ? '\r\n' : '\n';
   const block = '<!-- scripts:begin -->' + nl + scripts.join(nl) + nl + '<!-- scripts:end -->';
   let next;
@@ -31,4 +31,4 @@ for (const file of ['enemy-gallery.html', 'scenery-preview.html', 'qa.html']) {
   if (next !== old) { stale++; console.log(file + (check ? ' is out of date' : ' synced')); if (!check) fs.writeFileSync(target, next); }
 }
 if (check && stale) { console.error('Run: node tools/sync-gallery.mjs'); process.exitCode = 1; }
-else console.log('All three tool pages list ' + scripts.length + ' scripts in index.html order.');
+else console.log('All four tool pages list ' + scripts.length + ' scripts in index.html order.');

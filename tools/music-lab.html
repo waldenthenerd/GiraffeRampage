@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Music lab</title>
+<style>
+:root{--bg:#1b1511;--panel:#2a2119;--line:#4a3a2a;--ink:#f1e7d6;--dim:#b8a68c;--hot:#f0b44a}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,sans-serif}
+#hud,#touch,#pausebtn,#overlay,#stage{display:none!important}
+main{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:0 0 4px}p.sub{margin:0 0 14px;color:var(--dim)}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+label{color:var(--dim)}select,input[type=number]{background:#15100c;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px}
+button{background:#3a2d20;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;font:inherit}
+button:hover{border-color:var(--hot)}button.on{background:var(--hot);color:#241a10;border-color:var(--hot)}
+input[type=range]{width:180px}
+#now{font:13px/1.5 ui-monospace,monospace;color:var(--hot);white-space:pre-wrap}
+.parts label{display:inline-flex;gap:4px;align-items:center;margin-right:10px;color:var(--ink)}
+@media (max-width:600px){input[type=range]{width:120px}}
+</style></head><body>
+<canvas id="stage"></canvas><div id="hud"><b id="hWave"></b><em id="hChapter"></em><em id="hSpeed"></em><b id="hScore"></b><b id="hKills"></b><i id="hpfill"></i><span id="hpTxt"></span><i id="xpfill"></i><span id="xpTxt"></span><div id="loadout"></div><div id="tips"></div></div>
+<div id="touch"><div id="joy"><i></i></div><div id="kickbtn"></div><div id="slowbtn"></div><div id="roverbtn"></div></div><div id="pausebtn"></div><div id="overlay"></div>
+<script>/* the lab is not the game: its animation loop stays stopped */ window.requestAnimationFrame = function(){ return 0; };</script>
+<main>
+<h1>Music lab</h1>
+<p class="sub">Every song the band plays (js/audio/02e-02g), with the game's own engine. Pick a song, press Play, and move it the way a run would.</p>
+<div class="box">
+  <div class="row"><label for="song">Song</label><select id="song"></select><button id="play">Play</button><button id="stop">Stop</button></div>
+  <div class="row" id="secs"><label>Go to</label></div>
+  <div id="now">Press Play.</div>
+</div>
+<div class="box">
+  <div class="row"><label><input type="checkbox" id="run"> In a run (the fight picks the sections)</label></div>
+  <div class="row"><label for="I">Fight intensity</label><input type="range" id="I" min="0" max="1" step="0.01" value="0.5"><span id="Iv">0.50</span>
+    <label><input type="checkbox" id="rest"> Between waves</label></div>
+  <div class="row"><label for="low">Nearly dead</label><input type="range" id="low" min="0" max="1" step="0.01" value="0"><span id="lowv">0.00</span>
+    <label for="lvl">Level</label><select id="lvl"><option value="0">0 calm</option><option value="1" selected>1 normal</option><option value="2">2 boss / last seconds</option><option value="3">3 boss at half health</option></select>
+    <label for="shift">Key</label><input type="number" id="shift" value="0" min="-6" max="7" style="width:56px"></div>
+</div>
+<div class="box">
+  <div class="row parts" id="parts"><label>Parts:</label></div>
+  <div class="row"><label for="solo">Solo</label><select id="solo"><option value="">none</option></select></div>
+</div>
+<div class="box">
+  <div class="row"><label for="bars">Bars</label><input type="number" id="bars" value="32" min="1" max="200" style="width:70px"><button id="wav">Download WAV</button><span id="wavmsg" style="color:var(--dim)"></span></div>
+</div>
+</main>
+<!-- scripts:begin -->
+<script src="../js/core/00-icons.js"></script>
+<script src="../js/core/00b-icons-custom.js"></script>
+<script src="../js/core/01-core.js"></script>
+<script src="../js/core/01b-savepack.js"></script>
+<script src="../js/audio/02-music.js"></script>
+<script src="../js/audio/02b-ambience.js"></script>
+<script src="../js/audio/02c-audio-mix.js"></script>
+<script src="../js/audio/02d-ground-sounds.js"></script>
+<script src="../js/audio/02e-band-voices.js"></script>
+<script src="../js/audio/02f-band-songs.js"></script>
+<script src="../js/audio/02g-band-play.js"></script>
+<script src="../js/game/03-combat-core.js"></script>
+<script src="../js/game/04-cards.js"></script>
+<script src="../js/game/05-gear.js"></script>
+<script src="../js/game/05a-gear-levels.js"></script>
+<script src="../js/game/06-player.js"></script>
+<script src="../js/game/07-enemies.js"></script>
+<script src="../js/game/08-hazards-marines.js"></script>
+<script src="../js/game/09-enemy-ai.js"></script>
+<script src="../js/core/10-settings.js"></script>
+<script src="../js/game/11-ants.js"></script>
+<script src="../js/game/12-bestiary.js"></script>
+<script src="../js/game/13-forage.js"></script>
+<script src="../js/ui/14-menu.js"></script>
+<script src="../js/chapters/15-buildings-space.js"></script>
+<script src="../js/films/16-film-moon.js"></script>
+<script src="../js/films/17-film-venus.js"></script>
+<script src="../js/chapters/18-chapter-moon.js"></script>
+<script src="../js/chapters/19-venus-outpost.js"></script>
+<script src="../js/chapters/20-chapters-9-10.js"></script>
+<script src="../js/films/21-film-homecoming.js"></script>
+<script src="../js/films/22-film-area51.js"></script>
+<script src="../js/films/23-film-short.js"></script>
+<script src="../js/chapters/24-mars-outpost.js"></script>
+<script src="../js/chapters/25-lab.js"></script>
+<script src="../js/chapters/26-dust-squad.js"></script>
+<script src="../js/films/27-film-mars.js"></script>
+<script src="../js/films/27a-film-domes.js"></script>
+<script src="../js/films/27b-film-tower.js"></script>
+<script src="../js/films/27c-film-siege.js"></script>
+<script src="../js/films/27d-film-fort.js"></script>
+<script src="../js/films/27e-film-island.js"></script>
+<script src="../js/chapters/28-spaceplane.js"></script>
+<script src="../js/chapters/29-city.js"></script>
+<script src="../js/chapters/30-chapters-11-13.js"></script>
+<script src="../js/chapters/30a-chapter-domes.js"></script>
+<script src="../js/chapters/30d-tower-layouts.js"></script>
+<script src="../js/chapters/30b-chapter-tower.js"></script>
+<script src="../js/siege/30e-chapter-siege.js"></script>
+<script src="../js/fort/30f-chapter-fort.js"></script>
+<script src="../js/island/30g-chapter-island.js"></script>
+<script src="../js/game/31-waves-update.js"></script>
+<script src="../js/render/32-render.js"></script>
+<script src="../js/art/33-giraffe-art.js"></script>
+<script src="../js/art/33a-gear-art-capes.js"></script>
+<script src="../js/art/33b-gear-art-weapons.js"></script>
+<script src="../js/art/33c-gear-art-armor.js"></script>
+<script src="../js/art/33e-gear-art-more.js"></script>
+<script src="../js/art/33d-gear-icons.js"></script>
+<script src="../js/art/34a-art-helpers.js"></script>
+<script src="../js/art/34b-art-arctic.js"></script>
+<script src="../js/art/34c-art-swamp.js"></script>
+<script src="../js/art/34d-art-ocean.js"></script>
+<script src="../js/art/34e-art-jungle.js"></script>
+<script src="../js/art/35a-art-city.js"></script>
+<script src="../js/art/35b-art-space.js"></script>
+<script src="../js/art/35c-art-marines.js"></script>
+<script src="../js/art/35d-art-aliens.js"></script>
+<script src="../js/art/35e-art-inferno.js"></script>
+<script src="../js/art/35f-art-a51.js"></script>
+<script src="../js/art/35g-art-dust.js"></script>
+<script src="../js/art/35h-draw-enemy.js"></script>
+<script src="../js/art/35i-art-domes.js"></script>
+<script src="../js/art/35j-art-tower.js"></script>
+<script src="../js/art/35k-art-siege.js"></script>
+<script src="../js/art/35n-art-fort.js"></script>
+<script src="../js/art/35o-art-island.js"></script>
+<script src="../js/art/35l-art-detail.js"></script>
+<script src="../js/art/35m-art-detail-classic.js"></script>
+<script src="../js/art/35o-art-detail-fort.js"></script>
+<script src="../js/scenery/36a-scenery-core.js"></script>
+<script src="../js/scenery/36c-scenery-savanna.js"></script>
+<script src="../js/scenery/36d-scenery-arctic-swamp.js"></script>
+<script src="../js/scenery/36e-scenery-ocean-jungle.js"></script>
+<script src="../js/scenery/36f-scenery-city-space.js"></script>
+<script src="../js/scenery/36g-scenery-moon-venus-inferno.js"></script>
+<script src="../js/scenery/36h-scenery-area51-mars.js"></script>
+<script src="../js/scenery/36n-scenery-domes.js"></script>
+<script src="../js/scenery/36o-scenery-detail.js"></script>
+<script src="../js/render/36-atmosphere.js"></script>
+<script src="../js/render/36i-lighting.js"></script>
+<script src="../js/render/36j-weather-events.js"></script>
+<script src="../js/render/36k-water-depth.js"></script>
+<script src="../js/render/36l-combat-fx.js"></script>
+<script src="../js/render/36m-giraffe-fx.js"></script>
+<script src="../js/render/36n-neck-stretch.js"></script>
+<script src="../js/render/36o-cloud-fronts.js"></script>
+<script src="../js/render/36p-gear-fx.js"></script>
+<script src="../js/core/37-frame-transitions.js"></script>
+<script src="../js/ui/38-overlays-cards.js"></script>
+<script src="../js/ui/39-run-report.js"></script>
+<script src="../js/game/40-fusion.js"></script>
+<script src="../js/ui/41-qol.js"></script>
+<script src="../js/ui/42-run-hud.js"></script>
+<script src="../js/core/43-input.js"></script>
+<script src="../js/ui/41a-gear-page.js"></script>
+<script src="../js/ui/41b-trinket-page.js"></script>
+<script src="../js/ui/41c-wheel-page.js"></script>
+<script src="../js/ui/41d-ants-page.js"></script>
+<script src="../js/ui/41e-upgrades-page.js"></script>
+<script src="../js/core/44-loop-boot.js"></script>
+<script src="../js/core/44b-feedback.js"></script>
+<script src="../js/core/44c-perf.js"></script>
+<script src="../js/core/44ca-ground-cache.js"></script>
+<script src="../js/ui/44d-visual-extras.js"></script>
+<script src="../js/ui/44e-wardrobe.js"></script>
+<script src="../js/minigames/44f-minigames.js"></script>
+<script src="../js/minigames/44g-minigames-a.js"></script>
+<script src="../js/minigames/44h-minigames-b.js"></script>
+<script src="../js/minigames/44i-minigame-art-a.js"></script>
+<script src="../js/minigames/44j-minigame-art-b.js"></script>
+<script src="../js/minigames/44k-minigame-rewards.js"></script>
+<script src="../js/minigames/44l-minigame-polish.js"></script>
+<script src="../js/town/44y-town-gear.js"></script>
+<script src="../js/ui/44m-accessory-extras.js"></script>
+<script src="../js/photo/44n-photo-studio.js"></script>
+<script src="../js/photo/44o-photo-scenes.js"></script>
+<script src="../js/photo/44p-photo-share.js"></script>
+<script src="../js/photo/44q-photo-book.js"></script>
+<script src="../js/ui/44r-guide.js"></script>
+<script src="../js/core/44s-wave-pace.js"></script>
+<script src="../js/game/44t-enemy-sprites.js"></script>
+<script src="../js/town/44u-town-data.js"></script>
+<script src="../js/town/44v-town-art.js"></script>
+<script src="../js/town/44w-town-engine.js"></script>
+<script src="../js/town/44x-town-ui.js"></script>
+<script src="../js/town/44z-town-bread-car.js"></script>
+<script src="../js/town/44zb-town-interiors.js"></script>
+<script src="../js/town/44zc-town-life.js"></script>
+<script src="../js/town/44zd-town-panels.js"></script>
+<script src="../js/town/44ze-town-runway.js"></script>
+<script src="../js/town/44zf-town-economy.js"></script>
+<script src="../js/town/44zg-town-activities.js"></script>
+<script src="../js/town/44zh-town-qol.js"></script>
+<script src="../js/town/44zi-town-atmosphere.js"></script>
+<script src="../js/town/44zj-town-home.js"></script>
+<script src="../js/town/44zk-town-interiors2.js"></script>
+<script src="../js/photo/44zl-photo-props.js"></script>
+<script src="../js/core/44zm-close-x.js"></script>
+<script src="../js/town/44zn-savanna-flight.js"></script>
+<script src="../js/town/44zo-town-farm.js"></script>
+<script src="../js/town/44zp-tram-ride.js"></script>
+<script src="../js/sea/44zq-sea.js"></script>
+<script src="../js/town/44zr-interiors-farm-isle.js"></script>
+<script src="../js/town/44zs-explore-rewards.js"></script>
+<script src="../js/sea/44zt-sea-deep.js"></script>
+<script src="../js/town/44zu-training-gym.js"></script>
+<script src="../js/town/44zv-gym-art.js"></script>
+<script src="../js/town/44zw-town-detail.js"></script>
+<script src="../js/town/44zx-farm-isle-detail.js"></script>
+<script src="../js/sea/44zy-sea-detail.js"></script>
+<script src="../js/campus/44zz-campus.js"></script>
+<script src="../js/campus/44zza-campus-questions.js"></script>
+<script src="../js/campus/44zzb-campus-questions2.js"></script>
+<script src="../js/campus/44zzb1-campus-questions3.js"></script>
+<script src="../js/campus/44zzb2-campus-questions4.js"></script>
+<script src="../js/campus/44zzb3-campus-questions5.js"></script>
+<script src="../js/campus/44zzb4-campus-questions6.js"></script>
+<script src="../js/campus/44zzc-campus-lectures.js"></script>
+<script src="../js/campus/44zzd-campus-books.js"></script>
+<script src="../js/campus/44zzc1-campus-lectures2.js"></script>
+<script src="../js/campus/44zzd1-campus-books2.js"></script>
+<script src="../js/campus/44zze-campus-town.js"></script>
+<script src="../js/campus/44zzf-campus-study.js"></script>
+<script src="../js/campus/44zzg-campus-art.js"></script>
+<script src="../js/campus/44zzh-campus-rooms.js"></script>
+<script src="../js/campus/44zzi-campus-pics.js"></script>
+<script src="../js/town/44zzj-window-glow.js"></script>
+<script src="../js/town/44zzk-town-routines.js"></script>
+<script src="../js/town/44zzl-town-book.js"></script>
+<script src="../js/town/44zzm-home-trophies.js"></script>
+<script src="../js/town/44zzn-room-detail.js"></script>
+<script src="../js/audio/44zzo-town-sound.js"></script>
+<script src="../js/photo/44zzp-photo-looks.js"></script>
+<script src="../js/audio/44zzq-npc-voices.js"></script>
+<script src="../js/game/44zzr-engineer-ants.js"></script>
+<script src="../js/core/44zzs-perf-cache.js"></script>
+<script src="../js/game/44zzt-together.js"></script>
+<script src="../js/ui/44zzu-achievements.js"></script>
+<script src="../js/game/44zzw-enemy-motion.js"></script>
+<script src="../js/sea/44zzv-fishing.js"></script>
+<script src="../js/sea/44zzw-tackle-shop.js"></script>
+<script src="../js/ui/44zzx-wheels.js"></script>
+<script src="../js/sea/44zzy-fishing-fight.js"></script>
+<script src="../js/ui/44zzz-guide-more.js"></script>
+<script src="../js/chapters/44zzza-tower-floors.js"></script>
+<script src="../js/minigames/44zzzb-minigame-rush.js"></script>
+<script src="../js/town/44zzzc-gags.js"></script>
+<script src="../js/siege/44zzzd-siege-town.js"></script>
+<script src="../js/siege/44zzze-siege-defense.js"></script>
+<script src="../js/siege/44zzzf-siege-militia.js"></script>
+<script src="../js/siege/44zzzg-siege-ai.js"></script>
+<script src="../js/siege/44zzzh-siege-events.js"></script>
+<script src="../js/siege/44zzzi-siege-rewards.js"></script>
+<script src="../js/ui/44zzzj-minimap.js"></script>
+<script src="../js/fort/44zzzk-fort-map.js"></script>
+<script src="../js/fort/44zzzl-fort-chaos.js"></script>
+<script src="../js/fort/44zzzm-fort-ai.js"></script>
+<script src="../js/fort/44zzzn-fort-detail.js"></script>
+<script src="../js/game/44zzzo-camp.js"></script>
+<script src="../js/ui/44zzzp-camp-page.js"></script>
+<script src="../js/ui/44zzzq-camp-scene.js"></script>
+<script src="../js/photo/44zzzr-photo-scenes-late.js"></script>
+<script src="../js/minigames/44zzzs-minigames-late.js"></script>
+<script src="../js/island/44zzzt-island-map.js"></script>
+<script src="../js/island/44zzzu-island-ai.js"></script>
+<script src="../js/island/44zzzv-island-extras.js"></script>
+<script src="../js/island/44zzzw-island-detail.js"></script>
+<script src="../js/island/44zzzx-island-watch.js"></script>
+<script src="../js/island/44zzzy-island-touch.js"></script>
+<script src="../js/core/45-test-exports.js"></script>
+<script src="../js/dev/45b-dev-panel.js"></script>   <!-- developer panel: testing only, never ship to the website (see LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md) -->
+<script src="../js/core/46-main.js"></script>
+<!-- scripts:end -->
+<script>
+/* Music lab: plays any song with the live engine (Music.force holds the song and the run's state), jumps between sections, mutes or
+   solos parts, and draws a song into a WAV file with Band.render. No game runs on this page. */
+(function(){
+  var $ = function(id){ return document.getElementById(id); }, timer = null;
+  var groups = [['Chapters', MUSIC_BY_CHAPTER.slice(1).concat(['marswar', 'islelab'])], ['Bosses', Object.keys(BAND_SONGS).filter(function(k){ return /^boss/.test(k); })],
+    ['Town', ['town', 'townnight', 'burrow']], ['Screens', ['menu', 'shop', 'lab', 'victory', 'defeat', 'minigame']], ['Films', Object.keys(BAND_SONGS).filter(function(k){ return /^film/.test(k); })]];
+  groups.forEach(function(g){ var og = document.createElement('optgroup'); og.label = g[0]; g[1].forEach(function(k){ var o = document.createElement('option'); o.value = k; o.textContent = k + ' - ' + (BAND_SONGS[k] && BAND_SONGS[k].name || ''); og.appendChild(o); }); $('song').appendChild(og); });
+  ['intro', 'verse', 'verse2', 'chorus', 'bridge', 'break', 'final'].forEach(function(s){ var b = document.createElement('button'); b.textContent = s; b.onclick = function(){ Band.jump(s); }; $('secs').appendChild(b); });
+  var mute = {};
+  Object.keys(BAND_PARTS).forEach(function(p){
+    var l = document.createElement('label'), c = document.createElement('input'); c.type = 'checkbox'; c.checked = true; c.onchange = function(){ mute[p] = !c.checked; apply(); };
+    l.appendChild(c); l.appendChild(document.createTextNode(p)); $('parts').appendChild(l);
+    var o = document.createElement('option'); o.value = p; o.textContent = p; $('solo').appendChild(o);
+  });
+  function state(){ return { theme: $('song').value, run: $('run').checked, I: +$('I').value, rest: $('rest').checked, low: +$('low').value, lvl: +$('lvl').value, shift: +$('shift').value || 0 }; }
+  function apply(){
+    $('Iv').textContent = (+$('I').value).toFixed(2); $('lowv').textContent = (+$('low').value).toFixed(2);
+    Music.force = state();
+    if (Music.S){ Music.S.mute = mute; Music.S.solo = $('solo').value || null; }
+  }
+  ['song', 'run', 'I', 'rest', 'low', 'lvl', 'shift', 'solo'].forEach(function(id){ $(id).oninput = apply; $(id).onchange = apply; });
+  function tick(){
+    try { Music.refresh(); if (Music.S){ Music.S.mute = mute; Music.S.solo = $('solo').value || null; } } catch (e) { $('now').textContent = 'error: ' + e.message; return; }
+    var S = Music.S, s = S && S.song; if (!s) return;
+    $('now').textContent = (s.name || s.theme) + '  (' + S.theme + ')\nsection ' + S.secName + '  bar ' + (S.secBar + 1) + ' of ' + S.secLen + (S.pending ? '  next: ' + S.pending : '') +
+      '\n' + Math.round(s.bpm * (Music.cur && Music.cur.tempo || 1)) + ' bpm  key ' + S.key + '  ' + s.mode + '  drums ' + s.groove + '  voices ' + (Music.R ? Music.R.voices : 0);
+  }
+  $('play').onclick = function(){
+    SFX.init(); SFX.resume(); if (SFX.ctx && SFX.ctx.state === 'suspended') SFX.ctx.resume();
+    if (typeof Settings !== 'undefined'){ Settings.muted = false; if (!(Settings.musicVol > 0)) Settings.musicVol = 0.6; }
+    apply(); if (!timer) timer = setInterval(tick, 50); tick();
+  };
+  $('stop').onclick = function(){ if (SFX.ctx) SFX.ctx.suspend(); clearInterval(timer); timer = null; $('now').textContent = 'Stopped.'; };
+  $('wav').onclick = function(){
+    var st = state(), bars = Math.max(1, Math.min(200, +$('bars').value || 32)); $('wavmsg').textContent = 'drawing ' + bars + ' bars...';
+    Band.render(Object.assign(st, { bars: bars, mute: mute, solo: $('solo').value || null, gain: 0.45 })).then(function(buf){
+      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([Band.wav(buf)], { type: 'audio/wav' })); a.download = st.theme + '.wav'; a.click();
+      $('wavmsg').textContent = 'done (' + (buf.length / buf.sampleRate).toFixed(0) + ' s)';
+    }, function(e){ $('wavmsg').textContent = 'failed: ' + e; });
+  };
+  var q = new URLSearchParams(location.search); if (q.get('song')) $('song').value = q.get('song');
+})();
+</script></body></html>
