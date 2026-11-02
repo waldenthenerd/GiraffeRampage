@@ -152,6 +152,7 @@ function townInput(){
   if (!I.mx && typeof townAutoMx === 'function') I.mx = townAutoMx();
   if (Input.padOn){ if (Math.abs(Input.padX) > 0.25) I.mx += Input.padX; if (Input.padY < -0.5) I.up = true; if (Input.padY > 0.5) I.down = true; }
   I.act = townEdge('act', !!(Input.keys.KeyE || Input.keys.Enter || Input.keys.NumpadEnter || Input.keys.Space || Input.padBtn));
+  I.act2 = townEdge('act2', !!(Input.keys.KeyQ || Input.padBtn2));                          /* the second thing in reach (js/town/44zzzzb-town-choices.js) */
   I.jrn = townEdge('jrn', !!Input.keys.KeyJ); I.map = townEdge('map', !!Input.keys.KeyM); I.car = townEdge('car', !!Input.keys.KeyC);
   const ptr = !!Input.mdown;
   I.click = townEdge('ptr', ptr); I.ptr = ptr; I.cx = Input.sx; I.cy = Input.sy;
@@ -221,7 +222,7 @@ function updateTown(dt, frozen){
   if (hold){ Town.vx *= 0.8; Town.near = null; return; }
   /* walking: keys, a pad, or a held finger / mouse button toward where it points (above her head stretches the neck) */
   let mx = inp.mx, up = inp.up, down = inp.down;
-  const onUI = Town.ui.btns.some(function(b){ return townInRect(b, inp.cx, inp.cy); }) || townInRect(Town.ui.prompt, inp.cx, inp.cy);
+  const onUI = Town.ui.btns.some(function(b){ return townInRect(b, inp.cx, inp.cy); }) || townInRect(Town.ui.prompt, inp.cx, inp.cy) || townInRect(Town.ui.prompt2, inp.cx, inp.cy);
   if (inp.ptr && !onUI && !mx){
     const gx = (Town.x - Town.camX) * V.sc, dx = inp.cx - gx;
     if (Math.abs(dx) > 28) mx = clamp(dx / 140, -1, 1);
@@ -256,7 +257,10 @@ function updateTown(dt, frozen){
   /* what is in reach */
   Town.near = townNearest(D, inp);
   let target2 = Town.near;
+  const alt = Town.near2For === Town.near ? Town.near2 : null;                  /* the second thing in reach, when two are this close */
   if (inp.click && Town.ui.prompt && townInRect(Town.ui.prompt, inp.cx, inp.cy) && target2){ townUse(target2); return; }
+  if (inp.click && alt && Town.ui.prompt2 && townInRect(Town.ui.prompt2, inp.cx, inp.cy)){ townUse(alt); return; }
+  if (inp.act2 && alt){ townUse(alt); return; }
   if (inp.click && !onUI) { /* a tap on the street only walks (handled above) */ }
   if (inp.act && target2){ townUse(target2); return; }
   if (inp.jrn && typeof townShowJournal === 'function') townShowJournal();
@@ -544,7 +548,7 @@ function renderTown(ctx){
 }
 function townDrawHud(ctx, D, h){
   const W = G.W, H = G.H, s = clamp(Math.min(H / 700, W / 760), 0.8, 1.2);
-  Town.ui.btns = []; Town.ui.prompt = null;
+  Town.ui.btns = []; Town.ui.prompt = null; Town.ui.prompt2 = null;
   /* the district name and what is found in it */
   const inRoom = !!D.indoor, items = inRoom ? townInItems(D.id).length : townItemsIn(D.id).length, got = inRoom ? townInItems(D.id).filter(function(it){ return townFound(it.id); }).length : townFoundIn(D.id);
   const narrow = W < 600, bw = (narrow ? 70 : 78) * s * (Input.hasTouch ? 1.25 : 1), bh = Math.max(Input.hasTouch ? 38 : 0, 34 * s * (Input.hasTouch ? 1.25 : 1)), rowY = narrow ? 10 + 54 * s + 8 : 10;
@@ -582,19 +586,28 @@ function townDrawHud(ctx, D, h){
   /* the district banner when she arrives */
   if (Town.bannerT > 0){ const a = Math.min(1, Town.bannerT, (3.2 - Town.bannerT) * 3); ctx.globalAlpha = a; miniText(ctx, D.name, W / 2, H * 0.3 + Math.max(0, Town.toasts.length - 2) * 24 * s, 40 * s, '#FFF6E0'); ctx.globalAlpha = 1; }
   /* the prompt for what is in reach */
+  /* when two things are in reach, both: the nearest on E (gold) and the next on Q (blue), side by side, or one over the other on a narrow screen */
   if (Town.near && !Town.hold && !Town.panel){
-    const label = (Input.hasTouch ? 'Tap: ' : 'E: ') + Town.near.label;
+    const pad = Input.padOn && Input.padUsed && !Input.hasTouch, alt = Town.near2For === Town.near ? Town.near2 : null;
+    const label = (Input.hasTouch ? 'Tap: ' : pad ? 'A: ' : 'E: ') + Town.near.label, label2 = alt ? (Input.hasTouch ? 'Tap: ' : pad ? 'Y: ' : 'Q: ') + alt.label : '';
     ctx.font = 'bold ' + Math.round(16 * s) + 'px system-ui,sans-serif';
-    const tw = ctx.measureText(label).width + 36 * s, ph = 44 * s * (Input.hasTouch ? 1.25 : 1), px = W / 2 - tw / 2, py = H - 74 * s - (Input.hasTouch ? 20 : 0);
-    ctx.fillStyle = 'rgba(14,10,8,.78)'; ctx.beginPath(); ctx.roundRect(px, py, tw, ph, 12); ctx.fill();
-    ctx.strokeStyle = '#FFD84D'; ctx.lineWidth = 2; ctx.stroke();
-    ctx.fillStyle = '#FFF6E0'; ctx.textAlign = 'center'; ctx.fillText(label, W / 2, py + ph / 2 + 5.5 * s);
-    Town.ui.prompt = { x: px, y: py, w: tw, h: ph };
+    const ph = 44 * s * (Input.hasTouch ? 1.25 : 1), py = H - 74 * s - (Input.hasTouch ? 20 : 0), gap = 12 * s;
+    const tw = ctx.measureText(label).width + 36 * s, tw2 = alt ? ctx.measureText(label2).width + 36 * s : 0;
+    const side = alt && tw + gap + tw2 <= W - 20;
+    const box = function(txt, x, y, w, col){
+      ctx.fillStyle = 'rgba(14,10,8,.78)'; ctx.beginPath(); ctx.roundRect(x, y, w, ph, 12); ctx.fill();
+      ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#FFF6E0'; ctx.textAlign = 'center'; ctx.fillText(txt, x + w / 2, y + ph / 2 + 5.5 * s);
+      return { x: x, y: y, w: w, h: ph };
+    };
+    if (!alt) Town.ui.prompt = box(label, W / 2 - tw / 2, py, tw, '#FFD84D');
+    else if (side){ const x0 = W / 2 - (tw + gap + tw2) / 2; Town.ui.prompt = box(label, x0, py, tw, '#FFD84D'); Town.ui.prompt2 = box(label2, x0 + tw + gap, py, tw2, '#7AD0FF'); }
+    else { Town.ui.prompt = box(label, W / 2 - tw / 2, py, tw, '#FFD84D'); Town.ui.prompt2 = box(label2, W / 2 - tw2 / 2, py - ph - 8 * s, tw2, '#7AD0FF'); }
   }
   /* a one-time reminder of the controls */
   if (!townData().tips.controls && Town.t > 1.5){
     ctx.fillStyle = 'rgba(14,10,8,.7)'; ctx.beginPath(); ctx.roundRect(W / 2 - 250 * s, H - 36 * s - 4, 500 * s, 30 * s, 8); ctx.fill();
-    miniText(ctx, Input.hasTouch ? 'Hold a finger to walk. Hold it above her head to stretch her neck.' : 'A / D walk  ·  hold W to stretch her neck  ·  E to use things  ·  J journal  ·  M map', W / 2, H - 16 * s, 13 * s, '#E8D8B0', 'center', false);
+    miniText(ctx, Input.hasTouch ? 'Hold a finger to walk. Hold it above her head to stretch her neck.' : 'A / D walk  ·  hold W to stretch her neck  ·  E to use things (Q the second one)  ·  J journal  ·  M map', W / 2, H - 16 * s, 13 * s, '#E8D8B0', 'center', false);
     Town.tipT += 1 / 60; if (Town.tipT > 14){ townData().tips.controls = 1; Save.write(); }
   }
 }

@@ -80,7 +80,7 @@ function townAutoMx(){
     const down = !!Input.mdown;
     if (Town.on && G.state === 'town' && !Town.hold && !Town.panel && !frozen){
       if (down && !_qolPtr){
-        const sx = Input.sx, sy = Input.sy, onUI = Town.ui.btns.some(function(b){ return townInRect(b, sx, sy); }) || townInRect(Town.ui.prompt, sx, sy);
+        const sx = Input.sx, sy = Input.sy, onUI = Town.ui.btns.some(function(b){ return townInRect(b, sx, sy); }) || townInRect(Town.ui.prompt, sx, sy) || townInRect(Town.ui.prompt2, sx, sy);
         if (!onUI){
           const V = townView(), wx = Town.camX + sx / V.sc, D = TOWN_DIST[Town.d];
           let best = null, bd = 90;
