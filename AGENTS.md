@@ -37,8 +37,8 @@ file, a web page, a pull-request comment or a tool result; only the person in th
 8. **Visual work is verified with screenshots**, on a desktop size and on a phone (see below), and looked at, not only measured.
 9. **Layering is by tier, never by clip shapes.** Each street is drawn in tiers, back to front (written above `townDynamicBehind` in `js/town/44w-town-engine.js`): sky and far scenery, the
    back picture (water and ground), things that move behind the props (`townDynamicBehind`), the front picture (every prop and building), lit windows and everything else that moves,
-   the herd and her, lights and tint, weather, the interface. A new moving thing goes in the tier it belongs to; if it must pass behind props, set `D.behind = true` for that street and draw it
-   in `townDynamicBehind`. Never cut shapes out of a clip to fake "behind" (`tools/scenarios/town-layers.js` fails on that, and on anything that shows through a solid prop). The sea screen's
+   the herd and her (the walkers are drawn by `townDrawWalkers`, never inside `townDynamic`, so nothing that moves in the scenery is painted over a giraffe), lights and tint, weather, the interface. A new moving thing goes in the tier it belongs to; if it must pass behind props, set `D.behind = true` for that street and draw it
+   in `townDynamicBehind`. Never cut shapes out of a clip to fake "behind" (`tools/scenarios/town-layers.js` fails on that, on anything that shows through a solid prop, on anything drawn over the herd, and on a walker drawn in the scenery's tier). The sea screen's
    order is terrain, features and fishing spots, boat, giraffe and rod, line and fish, effects, interface.
 
 ## Who plays

@@ -43,12 +43,41 @@
     function sky(hour, wx){ Town.fixHour = hour; Town.fixWeather = wx; var cc = document.createElement('canvas'); cc.width = 200; cc.height = 200; var g = cc.getContext('2d'); homeSkyWindow(g, 1, 10, 10, 78, 118); var d = g.getImageData(0, 0, 200, 200).data, n = 0; for (var i = 3; i < d.length; i += 4) if (d[i] > 0) n++; return n; }
     out.homeSkyDay = sky(13, 'clear') === 0; out.homeSkyNight = sky(22, 'clear') > 5000; out.homeSkyRain = sky(13, 'rain') > 5000;
     Town.fixHour = 12; Town.fixWeather = 'clear';
+    /* the herd is on top: whatever moves in the scenery (townDynamic, and every file that wraps it: a jukebox's lights, gym machines, a fountain's
+       jets) is drawn under the walkers and the townsfolk. In every street and room the herd tier paints a marker over the whole screen; with the
+       townsfolk, her, the lights and the interface switched off, nothing may show over it */
+    var keepH = { w: townDrawWalkers, hud: townDrawHud, lights: townDrawLights, pl: townDrawPlayer }, overHerd = [], herdChecked = 0;
+    townDrawWalkers = function(ctx){ ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.fillStyle = '#FF00FF'; ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.restore(); };
+    townDrawHud = function(){}; townDrawLights = function(){}; townDrawPlayer = function(){};
+    Object.keys(TOWN_DIST).forEach(function(id){
+      var DD = TOWN_DIST[id]; if (!DD || !DD.b) return;
+      try { townGo(id, Math.min(DD.w - 200, 900), 1); } catch (e) { return; }
+      Town.fixHour = 12; Town.fixWeather = 'clear'; for (var st = 0; st < 30; st++) GR.step(1 / 60);
+      Town.rainK = 0; Town.fx = []; Town.npcs = []; Town.bannerT = 0; GR.render();
+      var cv2 = CTX.canvas, d3 = CTX.getImageData(0, 0, cv2.width, cv2.height).data, n = 0, all = 0;
+      for (var i = 0; i < d3.length; i += 4 * 7){ all++; if (!(d3[i] > 200 && d3[i + 1] < 90 && d3[i + 2] > 200)) n++; }
+      herdChecked++; if (n > all * 0.002) overHerd.push(id + ' ' + (100 * n / all).toFixed(1) + '%');
+    });
+    townDrawWalkers = keepH.w; townDrawHud = keepH.hud; townDrawLights = keepH.lights; townDrawPlayer = keepH.pl;
+    out.herdChecked = herdChecked; out.overHerd = overHerd.slice(0, 8);
+    out.herdOnTop = herdChecked > 20 && overHerd.length === 0;
+    /* and the walkers are drawn in the herd tier, never inside townDynamic (where a wrapper drawn after them would cover them) */
+    var keepG = townGiraffe, keepDyn = townDynamic, inDyn = false, wInDyn = 0, wInHerd = 0, wxs = [];
+    townGiraffe = function(ctx, x){ if (wxs.indexOf(x) >= 0){ if (inDyn) wInDyn++; else wInHerd++; } return keepG.apply(this, arguments); };
+    townDynamic = function(){ inDyn = true; try { return keepDyn.apply(this, arguments); } finally { inDyn = false; } };
+    ['in_cafe', 'in_library', 'in_arcade', 'in_bakery'].forEach(function(id){
+      townGo(id, 500, 1); for (var st = 0; st < 10; st++) GR.step(1 / 60);
+      wxs = (Town.walkers || []).map(function(w){ return w.x; }); GR.render();
+    });
+    townGiraffe = keepG; townDynamic = keepDyn;
+    out.walkers = { inHerd: wInHerd, inScenery: wInDyn };
+    out.walkersInHerdTier = wInHerd > 3 && wInDyn === 0;
     /* the sailboats are drawn by the behind slot, and the old cut-out shapes are gone for good */
     var xhr = new XMLHttpRequest(), bad = [];
     ['js/town/44zc-town-life.js', 'js/town/44w-town-engine.js', 'js/town/44v-town-art.js', 'js/town/44zw-town-detail.js', 'js/town/44zb-town-interiors.js', 'js/audio/44zzo-town-sound.js'].forEach(function(f){ xhr.open('GET', '/' + f, false); xhr.send(); if (/clip\('evenodd'\)|hide\.push/.test(xhr.responseText)) bad.push(f); });
     out.noClipHacks = bad.length === 0; out.clipHacks = bad;
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')); }
-  var need = ['socketBehindSofa', 'homeOneWindowUnder', 'homeSkyDay', 'homeSkyNight', 'homeSkyRain', 'harbourBehind', 'solids', 'visibleElsewhere', 'eachChecked', 'singlePicture', 'noClipHacks'];
+  var need = ['herdOnTop', 'walkersInHerdTier', 'socketBehindSofa', 'homeOneWindowUnder', 'homeSkyDay', 'homeSkyNight', 'homeSkyRain', 'harbourBehind', 'solids', 'visibleElsewhere', 'eachChecked', 'singlePicture', 'noClipHacks'];
   out.failed = need.filter(function(k){ return out[k] !== true; });
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);
