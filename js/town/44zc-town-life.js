@@ -269,6 +269,9 @@ function townDynX(ctx, D, t, dark){
   townDynamic = function(ctx, D, t, dark){
     dy(ctx, D, t, dark);
     townDynX(ctx, D, t, dark);
+  };
+  /* the walkers belong to the herd tier, over everything that moves in the scenery (a jukebox's lights, a fountain's jets) */
+  townDrawWalkers = function(ctx, D, t){
     const cam = Town.camX, V = townView();
     (Town.walkers || []).forEach(function(w){
       if (w.hid > 0 || w.x < cam - 140 || w.x > cam + V.vw + 140) return;

@@ -406,9 +406,12 @@ function townNpcProp(ctx, n, hd, t){
      1 sky, far and mid scenery (cached, js 44v)     2 the street's back picture: water and ground (cached, only when D.behind is set)
      3 townDynamicBehind: moving things that live behind the props (sailboats)
      4 the street's front picture: every prop and building (cached)     5 lit windows, then townDynamic: everything else that moves
-     6 the herd, then her     7 the glow of the lights and the evening tint     8 weather     9 the interface
+     6 the herd (townDrawWalkers, the townsfolk), then her     7 the glow of the lights and the evening tint     8 weather     9 the interface
    A street gets tier 2 and 3 by setting D.behind = true (js/town/44zc-town-life.js does this for the harbor). */
 function townDynamicBehind(ctx, D, t, dark){}
+/* tier 6, the herd: the walkers (js/town/44zc-town-life.js fills this in), then the townsfolk, then her. Nothing in tier 5 (townDynamic and
+   its wrappers) may draw a giraffe that walks about, or what moves in the scenery would be painted over her (town-layers.js checks it) */
+function townDrawWalkers(ctx, D, t){}
 function townDynamic(ctx, D, t, dark){
   const h = townHour();
   if (D.id === 'square'){
@@ -503,6 +506,7 @@ function renderTown(ctx){
     ctx.save(); ctx.translate(it.x, TG - it.h - 10); townItemArt(ctx, it, t, i * 1.7); ctx.restore();
   }
   /* the herd, then her */
+  townDrawWalkers(ctx, D, t);
   Town.npcs.forEach(function(n){
     if (n.x < cam - 120 || n.x > cam + V.vw + 120) return;
     const lk = n.def.look, hd = townGiraffe(ctx, n.x, TG, { s: 1.45 * lk.s, look: { coat: lk.coat, spot: lk.spot, pat: lk.pat, hat: lk.hat, boot: lk.boot, hc: lk.hc, bc: lk.bc },
