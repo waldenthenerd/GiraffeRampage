@@ -1,10 +1,11 @@
 /* scenery-detail: the detail layer on the map objects (js/scenery/36o-scenery-detail.js).
    Every definition of every chapter lays out its small parts without an error (a few decals whose drawing has no solid shape are allowed to have none), the parts are a display list laid out once per
    object and then replayed, the drawing is not changed when the layer is switched off, and the cost of a full view of scenery is small: for seven chapters the view is drawn with the layer off and on and the
-   difference must stay under 5 ms. Look at it with a screenshot of any chapter (QA-GUIDE: map-detail pictures). */
+   difference must stay under 5 ms (timed only once the view is fully laid out, however many frames that takes). Look at it with a screenshot of any chapter (QA-GUIDE: map-detail pictures). */
 (function(){
   var out = { errs: [], ch: {} }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
   GR.handleAction('splash-go'); Ach.check = function(){ return []; };
+  var sdLaidOut = function(){ var n = 0; SCEN.props.concat(SCEN.decals).forEach(function(o){ if (o._sd !== undefined) n++; }); return n; };
   try {
     Save.reset(); Save.data.chapter14Complete = true;
     var cv = document.createElement('canvas'); cv.width = 1280; cv.height = 720; var c = cv.getContext('2d');
@@ -13,14 +14,17 @@
       startRun(+ch, first[ch]); for (var i = 0; i < 5; i++) GR.step(1 / 30); P.invuln = 1e9; G.waveState = 'idle'; G.spawnQueue = []; G.enemies.length = 0; G.pendingLevels = 0; G.introFX = null;
       var best = null, bn = -1; SCEN.props.forEach(function(p, k){ if (k % 5) return; var n = 0; SCEN.props.forEach(function(q){ if (Math.abs(q.x - p.x) < 640 && Math.abs(q.y - p.y) < 360) n++; }); if (n > bn){ bn = n; best = p; } });
       var cx = best ? best.x : P.x, cy = best ? best.y : P.y;
-      SD.off = false; for (var w = 0; w < 6; w++){ c.setTransform(1, 0, 0, 1, 640 - cx, 360 - cy); G.time += 0.3; drawScenery(c, cx, cy, 1280, 720); }      /* lays the parts out (a few ms a frame) */
+      /* lay the parts out first: a few ms a frame, so on a slow or busy machine it takes more frames. Draw until three frames in a row lay
+         nothing out, or the layout would be timed as drawing (CI once read 24 ms that way) */
+      SD.off = false; var quiet = 0, warm = 0;
+      for (var w = 0; w < 400 && quiet < 3; w++){ c.setTransform(1, 0, 0, 1, 640 - cx, 360 - cy); G.time += 0.3; SD.frame = G.time; SD.ms = 0; var before = sdLaidOut(); drawScenery(c, cx, cy, 1280, 720); warm++; quiet = sdLaidOut() === before ? quiet + 1 : 0; }
       var bo = 1e9, bn2 = 1e9;
       for (var rep = 0; rep < 4; rep++){
         SD.off = true; var t0 = performance.now(); for (var k2 = 0; k2 < 6; k2++){ c.setTransform(1, 0, 0, 1, 640 - cx, 360 - cy); G.time += 0.05; drawScenery(c, cx, cy, 1280, 720); } bo = Math.min(bo, (performance.now() - t0) / 6);
         SD.off = false; t0 = performance.now(); for (k2 = 0; k2 < 6; k2++){ c.setTransform(1, 0, 0, 1, 640 - cx, 360 - cy); G.time += 0.05; drawScenery(c, cx, cy, 1280, 720); } bn2 = Math.min(bn2, (performance.now() - t0) / 6);
       }
       var lists = 0, nulls = 0; SCEN.props.concat(SCEN.decals).forEach(function(o){ if (o._sd === undefined) return; if (o._sd) lists++; else nulls++; });
-      out.ch[ch] = { off: +bo.toFixed(2), on: +bn2.toFixed(2), plus: +(bn2 - bo).toFixed(2), objs: SCEN.props.length + SCEN.decals.length, lists: lists, nulls: nulls };
+      out.ch[ch] = { warm: warm, off: +bo.toFixed(2), on: +bn2.toFixed(2), plus: +(bn2 - bo).toFixed(2), objs: SCEN.props.length + SCEN.decals.length, lists: lists, nulls: nulls };
       worst = Math.max(worst, bn2 - bo); none += nulls; total += lists + nulls;
     });
     SD.off = false;
