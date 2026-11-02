@@ -57,7 +57,7 @@ const Pad = {
     let gp = null; const gps = navigator.getGamepads();
     for (let i = 0; i < gps.length; i++){ if (gps[i] && gps[i].connected){ gp = gps[i]; break; } }
     if (!gp){
-      if (Input.padOn){ Input.padOn = false; Input.padBtn = false; Input.padX = 0; Input.padY = 0; Input.padAimOn = false; if (this.kickHeld){ this.kickHeld = false; Input.touchKick = false; } }
+      if (Input.padOn){ Input.padOn = false; Input.padBtn = false; Input.padBtn2 = false; Input.padX = 0; Input.padY = 0; Input.padAimOn = false; if (this.kickHeld){ this.kickHeld = false; Input.touchKick = false; } }
       return;
     }
     const prev = this.prev, self = this;
@@ -71,6 +71,7 @@ const Pad = {
     const st = G.state;
     Input.padOn = true;
     Input.padBtn = b(0) || b(2);                                       /* the minigames read the main pad buttons as their one button */
+    Input.padBtn2 = b(3);                                              /* Y: the second thing in reach in Longneck Town */
     Input.padX = ax || dpx; Input.padY = ay || dpy;
     Input.padAimOn = Math.hypot(rx, ry) > 0.35 && st === 'playing';
     if (Input.padAimOn) Input.padAimAng = Math.atan2(ry, rx);
