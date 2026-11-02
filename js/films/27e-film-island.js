@@ -3,10 +3,10 @@
 /* ========================= THE ISLAND FILMS ========================= */
 /* Two films in the same format as the Fort's (MARS_FILMS: end, starts, scene, over, cues): the crossing, at the start of Chapter 17 (the fishing boat on the open sea, a fog bank, the
    island coming out of it with the lab's lights on, and her wading ashore with something swimming under the surface), and, at the end, the escape (the tank room flooding, someone in a
-   white coat running for the helipad and a white helicopter lifting off west over the water, and the town helicopter coming in low to pick her up so they can follow), which closes
-   nothing. Every frame is a pure function of time. */
+   white coat running for the helipad and a white helicopter lifting off west over the water, the town helicopter coming in low to pick her up, and the two of them low over the
+   sea at sundown, the white one still in sight ahead), which closes nothing. Every frame is a pure function of time. */
 const IL_SAIL_T = { B: 7.6, C: 15.2, END: 24 };
-const IL_OUT_T = { B: 7.2, C: 14.2, END: 24.5 };
+const IL_OUT_T = { B: 7.2, C: 14.2, D: 24.5, END: 31 };
 const IL_SAIL_CAPS = [
   [0.8, 'OUT PAST THE REEF', 'Three days of open sea in the fishing boat', 3.2],
   [4.4, 'THE CIRCLE ON THE MAP', 'Nothing out here but water', 2.8],
@@ -22,7 +22,9 @@ const IL_OUT_CAPS = [
   [11.0, 'LAB-1', 'Lifting off, heading west over the water', 2.8],
   [14.6, 'THE SHALLOWS', 'Too late, by a few seconds', 3.0],
   [18.0, 'AN OLD FRIEND', 'The town helicopter, coming in low', 3.0],
-  [21.4, 'AFTER THEM', 'West, over the water', 2.6]
+  [21.4, 'AFTER THEM', 'West, over the water', 2.6],
+  [25.1, 'LOW OVER THE WATER', 'The white helicopter, still in sight', 3.0],
+  [28.4, 'WEST', 'Wherever it lands, they will be right behind it', 2.4]
 ];
 const IL_LAB_HELI = { g: '#E8ECEE', gd: '#AEB8BE', gl: '#FFFFFF', ink: '#26343A', band: '#2A8A7A' };
 function ilMorning(ctx, t){ afSky(ctx, '#4A7AA8', '#9ACAE0', '#F2E2C0'); csGlow(ctx, 1040, 360, 260, '#FFF0C8', 0.4); fillCircle(ctx, 1040, 380, 40, '#FFF6DC'); }
@@ -148,7 +150,7 @@ function isleOutScene(ctx, t){
     if (u < 4) for (let k = 0; k < 12; k++){ const a = (u * 1.2 + k / 12) % 1; ctx.globalAlpha = 0.25 * (1 - a) * spin; ctx.fillStyle = '#C8D0D4'; ctx.beginPath(); ctx.arc(hx + (k - 6) * 30 * (0.4 + a), gy + 4 - a * 14, 12 + a * 24, 0, TAU); ctx.fill(); }
     ctx.globalAlpha = 1;
     const arrive = csSm(4.4, 6.8, u); if (arrive > 0) csGiraffe(ctx, { x: csLerp(1380, 980, arrive), y: gy + 10, s: 0.72, face: -1, walk: u * 8, moving: arrive < 0.98, neck: csLerp(0.3, 0.7, csSm(6.4, 7, u)), head: -0.1, bare: true, boots: false });
-  } else {                                                                           /* the shallows at sundown: the white helicopter a speck in the west, the town helicopter comes in low, she climbs aboard, and they go after it */
+  } else if (t < T.D){                                                               /* the shallows at sundown: the white helicopter a speck in the west, the town helicopter comes in low, she climbs aboard, and they go after it */
     const u = t - T.C, gy = 470, come = csSm(2.4, 5.6, u), board = csSm(5.8, 7.2, u), go = csSm(7.4, 10.3, u);
     ilDusk(ctx, t); ilFilmSea(ctx, gy, t, u * 20, 0);
     const spx = csLerp(360, 120, csSm(0, 10, u)), spy = 230 - u * 2; ctx.save(); ctx.translate(spx, spy); ctx.scale(-0.22, 0.22); domeHeli(ctx, { x: 0, y: 0, s: 1, t: t, pal: IL_LAB_HELI }); ctx.restore();
@@ -158,14 +160,29 @@ function isleOutScene(ctx, t){
     ctx.save(); ctx.translate(tx, ty); ctx.scale(-1, 1); domeHeli(ctx, { x: 0, y: 0, s: csLerp(1, 0.7, go), t: t, rot: -0.04 + 0.08 * go, spin: 1, pilot: true }); ctx.restore();
     if (come > 0.95 && go < 0.02){ ctx.strokeStyle = '#C8A870'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(tx - 10, ty + 40); ctx.lineTo(tx - 10, ty + 130); ctx.moveTo(tx + 10, ty + 40); ctx.lineTo(tx + 10, ty + 130); ctx.stroke(); for (let k = 0; k < 6; k++){ ctx.beginPath(); ctx.moveTo(tx - 10, ty + 52 + k * 14); ctx.lineTo(tx + 10, ty + 52 + k * 14); ctx.stroke(); } }
     for (let k = 0; k < 6; k++){ const a = (t * 1.4 + k / 6) % 1; ctx.strokeStyle = 'rgba(255,255,255,' + (0.4 * (1 - a) * (1 - go)).toFixed(3) + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(tx, gy + 150, 40 + a * 160, 8 + a * 20, 0, 0, TAU); ctx.stroke(); }
+  } else {                                                                           /* the chase: low over the sea at sundown, the water racing under them, the white helicopter ahead, the island falling away behind */
+    const u = t - T.D, gy = 430;
+    ctx.save(); ctx.translate(CS_W / 2 + Math.sin(t * 13) * 1.4, CS_H / 2 + Math.sin(t * 17) * 1.2); ctx.scale(1.01, 1.01); ctx.translate(-CS_W / 2, -CS_H / 2);      /* a little shake, and enough margin that it shows no edge */
+    ilDusk(ctx, t);
+    ilIslandFar(ctx, csLerp(1160, 1420, csSm(0, 6.5, u)), gy, csLerp(0.34, 0.22, csSm(0, 6.5, u)), t, true);
+    ilFilmSea(ctx, gy, t, u * 900, 0);
+    for (let k = 0; k < 7; k++){ const sx = CS_W - ((u * 520 + k * 190) % (CS_W + 200)), sy = gy + 30 + (k * 47) % 220; ctx.strokeStyle = 'rgba(255,236,210,' + (0.18 + (k % 3) * 0.06).toFixed(2) + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + 60 + k * 6, sy); ctx.stroke(); }      /* the sun on the wave tops, streaming past */
+    const wx = 300 + Math.sin(t * 0.8) * 30 - csSm(4.4, 6.5, u) * 40, wy = 250 + Math.sin(t * 1.3) * 8;
+    ctx.fillStyle = 'rgba(20,24,40,.25)'; ctx.beginPath(); ctx.ellipse(wx, gy + 26, 34, 5, 0, 0, TAU); ctx.fill();
+    ctx.save(); ctx.translate(wx, wy); ctx.scale(-0.42, 0.42); domeHeli(ctx, { x: 0, y: 0, s: 1, t: t, rot: 0.12, spin: 1, pal: IL_LAB_HELI }); ctx.restore();
+    const tx = 840 + Math.sin(t * 0.9) * 24, ty = 336 + Math.sin(t * 1.7) * 10, wy2 = gy + 74;
+    for (let k = 0; k < 5; k++){ const a = (t * 2.2 + k / 5) % 1; ctx.strokeStyle = 'rgba(255,255,255,' + (0.5 * (1 - a)).toFixed(3) + ')'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.ellipse(tx + a * 90, wy2, 50 + a * 150, 7 + a * 14, 0, 0, TAU); ctx.stroke(); }      /* the rotor's wash on the water, blown back */
+    for (let k = 0; k < 16; k++){ const a = (t * 1.6 + k / 16) % 1, px = tx - 40 + k * 9 + a * 260, py = wy2 - 4 - Math.sin(a * Math.PI) * 26 - (k % 3) * 4; fillCircle(ctx, px, py, 2.6 * (1 - a) + 0.6, 'rgba(240,252,255,' + (0.55 * (1 - a)).toFixed(3) + ')'); }
+    ctx.save(); ctx.translate(tx, ty); ctx.scale(-1, 1); domeHeli(ctx, { x: 0, y: 0, s: 1.05, t: t, rot: 0.1, spin: 1, pilot: true }); ctx.restore();
+    ctx.restore();
   }
 }
 MARS_FILMS.isleout = {
-  end: IL_OUT_T.END, starts: [0, IL_OUT_T.B, IL_OUT_T.C, 0, 0, 0, 0, 0], scene: isleOutScene,
+  end: IL_OUT_T.END, starts: [0, IL_OUT_T.B, IL_OUT_T.C, IL_OUT_T.D, 0, 0, 0, 0], scene: isleOutScene,
   over(ctx, t){
     const v = ctx.createRadialGradient(640, 360, 300, 640, 360, 780); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(10,8,20,.38)'); ctx.fillStyle = v; ctx.fillRect(0, 0, CS_W, CS_H);
     marsFilmCaps(ctx, IL_OUT_CAPS, t, '#9AF0E0');
-    const f = marsFilmFade([IL_OUT_T.B, IL_OUT_T.C], IL_OUT_T.END, t); if (f > 0.005){ ctx.fillStyle = 'rgba(0,0,0,' + f + ')'; ctx.fillRect(0, 0, CS_W, CS_H); }
+    const f = marsFilmFade([IL_OUT_T.B, IL_OUT_T.C, IL_OUT_T.D], IL_OUT_T.END, t); if (f > 0.005){ ctx.fillStyle = 'rgba(0,0,0,' + f + ')'; ctx.fillRect(0, 0, CS_W, CS_H); }
   },
-  cues: [[0.4, () => SFX.click()], [4.2, () => SFX.whoosh()], [7.8, () => SFX.click()], [10.6, () => SFX.whoosh()], [14.6, () => SFX.click()], [17.8, () => SFX.whoosh()], [21.4, () => SFX.click()]]
+  cues: [[0.4, () => SFX.click()], [4.2, () => SFX.whoosh()], [7.8, () => SFX.click()], [10.6, () => SFX.whoosh()], [14.6, () => SFX.click()], [17.8, () => SFX.whoosh()], [21.4, () => SFX.click()], [24.6, () => SFX.whoosh()], [28.4, () => SFX.click()]]
 };

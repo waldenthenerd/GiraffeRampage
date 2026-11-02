@@ -70,7 +70,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 This list is of the **source** files, which the ZIP no longer contains one by one (the build joins them into a few files in exactly this order and
 minifies them; the folder names are only for finding things). The scripts are loaded in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/core/46-main.js`, which starts the
-game. This is the complete list for this version (218 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (220 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -289,9 +289,11 @@ game. This is the complete list for this version (218 scripts; the developer pan
 | 213 | `js/island/44zzzu-island-ai.js` | The island's creatures' and bosses' behaviors, and the scientist on the boss waves. |
 | 214 | `js/island/44zzzv-island-extras.js` | Chapter 17's coat colors, its minigame Tide Pool Dash, and its photo backdrop. |
 | 215 | `js/island/44zzzw-island-detail.js` | The island's detail layer: small parts on the props, the ground and the water. |
-| 216 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
-| 217 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
-| 218 | `js/core/46-main.js` | Starts the game. |
+| 216 | `js/island/44zzzx-island-watch.js` | The scientist between the bosses, cameras and doors, the lab notes, the bosses' entrances, the swimmers' warnings. |
+| 217 | `js/island/44zzzy-island-touch.js` | Palms and coconuts, buoys, the boat, her wake and wet hoofprints, and the music inside the lab's fence. |
+| 218 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
+| 219 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| 220 | `js/core/46-main.js` | Starts the game. |
 
 CSS, in the order `index.html` links it: `css/style.css` (all the base styles), `css/polish.css` (layered on top: cards, buttons, HUD, menu, and every screen
 added later: minigames, the album book, the guide, photo studio, collection, wide panels on big screens), `css/campus.css` (the university), `css/townlife.css` (Longneck Town panels),

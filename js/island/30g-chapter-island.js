@@ -9,7 +9,7 @@
    the same for damage) times Chapter 13's last wave, hpX and dmgX are a further plain multiplier on each, and player is how much harder the creatures hit her. It starts a little
    above where Fort Shortneck ends and climbs from there. */
 const ISLE_MUL = { common: { hp: 30, dmg: 7.0, spd: 1.6, val: 25 }, boss: { hp: 24, dmg: 5.8, spd: 1.4, val: 20 } };
-const ISLE_TUNE = { hp0: 6.2, hp1: 9.2, dmg0: 3.7, dmg1: 5.4, count0: 108, countStep: 4.6, hpX: 1.65, dmgX: 1.75, player: 1.5 };
+const ISLE_TUNE = { hp0: 6.2, hp1: 9.2, dmg0: 3.7, dmg1: 5.4, count0: 108, countStep: 4.6, hpX: 1.65 * 1.33, dmgX: 1.75 * 1.33, player: 1.5 };      /* hpX and dmgX: a third up on the first tuning, at the owners' word */
 function isleScale(cw){
   const k = clamp((cw - 1) / (ISLE_WAVES - 1), 0, 1), b = enemyScale(WAVES_PER_CHAPTER);
   return { hp: b.hp * ISLE_TUNE.hpX * (ISLE_TUNE.hp0 + (ISLE_TUNE.hp1 - ISLE_TUNE.hp0) * k), dmg: b.dmg * ISLE_TUNE.dmgX * ISLE_TUNE.player * (ISLE_TUNE.dmg0 + (ISLE_TUNE.dmg1 - ISLE_TUNE.dmg0) * k), spd: b.spd };

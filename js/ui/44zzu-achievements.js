@@ -67,6 +67,7 @@ const ACH_CATS = [['run', 'On the run'], ['coll', 'Collections'], ['town', 'Long
   add('ch17', R, 'Island Hopper', 'Clear Chapter 17, the Island Lab', 1, 60, function(){ return D().chapter18Complete ? 1 : 0; });
   add('isleclean', R, 'Untouchable', 'Beat each of the Island Lab\u2019s five bosses without being hit', 5, 60, function(){ let n = 0; for (let i = 0; i < 5; i++) if ((D().isleClean | 0) & (1 << i)) n++; return n; });
   add('isledry', R, 'Dry Hooves', 'Clear Chapter 17 without once stepping into the water', 1, 80, function(){ return D().isleDry ? 1 : 0; });
+  add('islenotes', R, 'Field Notes', 'Find all five lab notes hidden on the island in Chapter 17', 5, 40, function(){ let n = 0; for (let i = 0; i < 5; i++) if ((D().isleNotes | 0) & (1 << i)) n++; return n; });
   add('camp1', M, 'Home Fire', 'Collect from the Camp', 1, 4, function(){ return D().campCollects | 0; });
   add('campfull', M, 'Full Larder', 'Collect from the Camp when its store is full', 1, 8, function(){ return D().campFullOnce ? 1 : 0; });
   add('campgold', M, 'Wages of Waiting', 'Collect 100,000 gold in all from the Camp', 100000, 12, function(){ return scoreInt(D().campGoldTotal); });

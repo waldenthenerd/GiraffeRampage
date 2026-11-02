@@ -60,8 +60,7 @@ function ilPropDetail(ctx, b, t){
     ctx.strokeStyle = '#C8A870'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x - 2, y + h * 0.3); ctx.lineTo(x + w + 2, y + h * 0.3); ctx.moveTo(x + w * 0.7, y - 2); ctx.lineTo(x + w * 0.7, y + h + 2); ctx.stroke(); fillCircle(ctx, x + w * 0.7, y + h * 0.3, 3, '#A8884A');     /* rope, knotted */
     ctx.fillStyle = '#5A3E22'; ctx.beginPath(); ctx.moveTo(x + w, y + h - 14); ctx.lineTo(x + w - 10, y + h); ctx.lineTo(x + w, y + h); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#C8A870'; ctx.fillRect(x + w - 6, y + h - 9, 4, 1.4);       /* a splintered corner */
   } else if (k === 'boat'){
-    const bob = Math.sin(t * 1.6) * 1.5;
-    ctx.save(); ctx.translate(cx, cy + bob);
+    ctx.save(); ilBoatXf(ctx, b, cx, cy, t);
     ctx.strokeStyle = '#C8A870'; ctx.lineWidth = 2; for (let q = 0; q < 4; q++){ ctx.beginPath(); ctx.arc(w * 0.18, h * 0.12, 4 + q * 3, 0, TAU); ctx.stroke(); }            /* a coil of rope */
     ctx.fillStyle = '#4A7A9A'; ctx.fillRect(w * 0.08, -h * 0.34, 34, 20); ctx.fillStyle = '#8ACAE0'; ctx.fillRect(w * 0.08 + 3, -h * 0.34 + 3, 28, 14);                   /* the fish box, with fish */
     for (let q = 0; q < 3; q++){ const fx = w * 0.08 + 8 + q * 9, fy = -h * 0.34 + 8 + (q % 2) * 4; lkOV(ctx, fx, fy, 4.4, 1.6, '#C8D0D4', 0.3); tw_poly(ctx, [fx - 4, fy - 1, fx - 7, fy - 3, fx - 7, fy + 1], '#C8D0D4'); }

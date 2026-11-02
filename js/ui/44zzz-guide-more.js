@@ -72,6 +72,9 @@
       '<li><b>Hiders.</b> Eel hounds and sea snakes go under when they are in the water and still some way off: watch for a dark shape and a wake. They come up to strike.</li>' +
       '<li><b>Mind the front.</b> The Crab Tank has a steel plate on its front: hits there do a tenth. Get round it. Kill the Anemone Nurse early, or it keeps healing the others, and do not stand next to a swelling Puffer Bomber.</li>' +
       '<li>The rocks, coral heads, mangroves, palms and lab buildings are solid. The deep sea down both sides cannot be crossed. On each boss wave the lab\u2019s screens come on, and someone in a white coat has something to say.</li>' +
+      '<li><b>Being watched.</b> Between the bosses the scientist turns up at a window, in a doorway or out on the island, and the cameras on the fence follow you. Get close and they are gone. Five <b>lab notes</b> are hidden on the island: walk over one to keep it (they go in the Bestiary), and find all five for <b>Field Notes</b>.</li>' +
+      '<li><b>Warnings.</b> Bubbles rise from a swimmer under the water, and a fin and a white ring show just before it comes up; once up it waits half a second before it strikes. Each boss makes an entrance first, and cannot be hurt until it is out.</li>' +
+      '<li><b>Knock things about.</b> Walk into or kick a palm and coconuts drop, hard enough to hurt whatever is under them. The buoys and the boat move when you shove them.</li>' +
       '<li>Finish wave 435 and you win the coat color <b>Kraken Violet</b>, the pattern <b>Reef scales</b> and the usual chapter rewards. You can play it from the menu and in Play together.</li></ul>';
   } }, 'fort');
   place({ id: 'intel', title: 'Intelligence', show: function(){ return typeof intel === 'function' && intel() > 0; }, html: function(){

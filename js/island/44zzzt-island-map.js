@@ -56,7 +56,7 @@ const ISLE_PROPS = [
 ];
 /* where the creatures come in: up out of the sea in the shallows all round the island, and out of the lab's tanks */
 const ISLE_VENTS = [{ x: 290, y: 420 }, { x: 290, y: 1100 }, { x: 290, y: 1750 }, { x: 290, y: 2350 }, { x: 290, y: 2850 }, { x: 3910, y: 420 }, { x: 3910, y: 1100 }, { x: 3910, y: 1750 },
-  { x: 3910, y: 2350 }, { x: 3910, y: 2850 }, { x: 600, y: 2940 }, { x: 1300, y: 2940 }, { x: 2800, y: 2940 }, { x: 3400, y: 2940 }, { x: 2100, y: 400 }, { x: 2400, y: 780 }, { x: 2100, y: 770 }];
+  { x: 3910, y: 2350 }, { x: 3910, y: 2850 }, { x: 600, y: 2940 }, { x: 1300, y: 2940 }, { x: 2800, y: 2940 }, { x: 3400, y: 2940 }, { x: 1820, y: 400 }, { x: 2400, y: 780 }, { x: 2100, y: 770 }];
 const IL = { all: [], cache: {}, rip: [] };
 
 function ilProp(row){ return { x: row[1], y: row[2], w: row[3], h: row[4], style: 'tower', tower: true, isle: true, kind: row[0], hp: 1, maxHp: 1, collapsed: false, flash: 0, indestructible: true, units: [], cracks: [], rubble: [] }; }
@@ -233,10 +233,10 @@ function ilBasin(ctx, t){
   ctx.strokeStyle = 'rgba(250,255,250,.18)'; ctx.lineWidth = 2;
   for (let k = 0; k < 8; k++){ ctx.beginPath(); const yy = B.y + 30 + k * 58; for (let x = B.x + 10; x <= B.x + B.w - 10; x += 16) ctx.lineTo(x, yy + Math.sin(x / 22 + t * 1.4 + k) * 4); ctx.stroke(); }
   for (let i = 0; i < 14; i++){ const gx = B.x + 80 + csR(i * 17 + 4) * (B.w - 160), gy = B.y + 60 + csR(i * 29 + 9) * (B.h - 120); ctx.fillStyle = 'rgba(210,250,250,.55)'; ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + 10, gy + 3); ctx.lineTo(gx + 4, gy + 9); ctx.closePath(); ctx.fill(); }
-  ctx.fillStyle = 'rgba(30,40,44,.6)'; ctx.fillRect(B.x + 520, B.y + 300, 70, 18); ctx.fillStyle = 'rgba(210,90,60,.6)'; ctx.fillRect(B.x + 540, B.y + 304, 20, 10);
+  ctx.fillStyle = 'rgba(30,40,44,.6)'; ctx.fillRect(B.x + 700, B.y + 400, 70, 18); ctx.fillStyle = 'rgba(210,90,60,.6)'; ctx.fillRect(B.x + 720, B.y + 404, 20, 10);
   ctx.strokeStyle = 'rgba(30,40,44,.6)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(B.x + 300, B.y + 380); ctx.quadraticCurveTo(B.x + 360, B.y + 340, B.x + 430, B.y + 390); ctx.stroke();
   /* the grates that Specimen Zero's arms come up through */
-  for (const [gx, gy] of [[B.x + 360, B.y + 160], [B.x + 840, B.y + 160], [B.x + 360, B.y + 340], [B.x + 840, B.y + 340], [B.x + 600, B.y + 250]]){
+  for (const [gx, gy] of [[B.x + 360, B.y + 160], [B.x + 840, B.y + 160], [B.x + 360, B.y + 340], [B.x + 840, B.y + 340]]){      /* (the middle of the room is the floor tank, js/island/44zzzx-island-watch.js) */
     ctx.fillStyle = '#2E3A3C'; ctx.fillRect(gx - 34, gy - 24, 68, 48); ctx.fillStyle = '#0E1416'; for (let k = 0; k < 7; k++) ctx.fillRect(gx - 30 + k * 9.4, gy - 20, 4.6, 40); ctx.strokeStyle = '#6A7A7C'; ctx.lineWidth = 2; ctx.strokeRect(gx - 34, gy - 24, 68, 48);
   }
 }
@@ -283,6 +283,8 @@ function ilBlob(ctx, cx, cy, rx, ry, n, seed, c){
   for (let i = 0; i <= n; i++){ const a = i * TAU / n, k = 0.82 + 0.18 * csR(seed + (i % n) * 7); const px = cx + Math.cos(a) * rx * k, py = cy + Math.sin(a) * ry * k; if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
   ctx.closePath(); ctx.fill();
 }
+/* the boat's bob on the swell, and its roll when she has bumped it (b.rock, js/island/44zzzy-island-touch.js); the detail layer uses it too, so its parts move with the hull */
+function ilBoatXf(ctx, b, cx, cy, t){ ctx.translate(cx, cy + Math.sin(t * 1.6) * 1.5); if (b.rock) ctx.rotate(b.rock * Math.sin(t * 9) * 0.045); }
 function ilDrawProp(ctx, b, t){
   const k = b.kind, x = b.x, y = b.y, w = b.w, h = b.h, cx = x + w / 2, cy = y + h / 2, sd = Math.round(x * 3 + y);
   if (k === 'rock'){
@@ -316,7 +318,7 @@ function ilDrawProp(ctx, b, t){
   } else if (k === 'palm'){
     ctx.fillStyle = 'rgba(10,30,40,.22)'; ctx.beginPath(); ctx.ellipse(cx + 26, cy + 30, 96, 80, 0, 0, TAU); ctx.fill();
     ctx.fillStyle = '#8A6A44'; ctx.beginPath(); ctx.arc(cx, cy, w / 2, 0, TAU); ctx.fill(); ctx.strokeStyle = '#6A4E30'; ctx.lineWidth = 2; for (let q = 1; q < 4; q++){ ctx.beginPath(); ctx.arc(cx, cy, w / 2 * q / 4, 0, TAU); ctx.stroke(); }
-    const sway = Math.sin(t * 0.8 + sd) * 0.06;
+    const sway = Math.sin(t * 0.8 + sd) * 0.06 + (b.shake || 0) * Math.sin(t * 24) * 0.16;      /* shaken (js/island/44zzzy-island-touch.js): the fronds thrash for a moment */
     for (let layer = 0; layer < 2; layer++) for (let i = 0; i < 9; i++){                                      /* the fronds, each from the crown at the top of the trunk: a midrib, and leaflets down both sides that droop back */
       const a = i * TAU / 9 + sway + csR(sd + i) * 0.3 + layer * 0.35, L = (layer ? 78 : 100) + csR(sd + i + 7) * 18, bend = (csR(sd + i + 3) - 0.5) * 0.5;
       const mx = cx + Math.cos(a + bend * 0.5) * L * 0.5, my = cy + Math.sin(a + bend * 0.5) * L * 0.5, ex = cx + Math.cos(a + bend) * L, ey = cy + Math.sin(a + bend) * L;
@@ -329,7 +331,7 @@ function ilDrawProp(ctx, b, t){
       }
       ctx.strokeStyle = layer ? '#7AB85A' : '#5A8A3A'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.quadraticCurveTo(mx, my, ex, ey); ctx.stroke();
     }
-    for (let i = 0; i < 4; i++){ const a = i * TAU / 4 + 0.4; fillCircle(ctx, cx + Math.cos(a) * 10, cy + Math.sin(a) * 10, 8, '#5A3A1E'); fillCircle(ctx, cx + Math.cos(a) * 10 - 2, cy + Math.sin(a) * 10 - 2, 3, '#8A6A44'); }
+    for (let i = 0; i < (b.nuts === undefined ? 4 : b.nuts); i++){ const a = i * TAU / 4 + 0.4; fillCircle(ctx, cx + Math.cos(a) * 10, cy + Math.sin(a) * 10, 8, '#5A3A1E'); fillCircle(ctx, cx + Math.cos(a) * 10 - 2, cy + Math.sin(a) * 10 - 2, 3, '#8A6A44'); }
     fillCircle(ctx, cx, cy, 9, '#6A8A3A');
   } else if (k === 'log'){
     ilShadow(ctx, b, 0);
@@ -346,8 +348,7 @@ function ilDrawProp(ctx, b, t){
   } else if (k === 'boat'){
     ilShadow(ctx, b, 1);
     ctx.strokeStyle = 'rgba(240,252,250,.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(cx, cy, w * 0.54 + Math.sin(t * 2) * 3, h * 0.6 + Math.sin(t * 2) * 3, 0, 0, TAU); ctx.stroke();
-    const bob = Math.sin(t * 1.6) * 1.5;
-    ctx.save(); ctx.translate(cx, cy + bob);
+    ctx.save(); ilBoatXf(ctx, b, cx, cy, t);
     ctx.fillStyle = '#2E4A6A'; ctx.beginPath(); ctx.moveTo(-w / 2, -h / 2 + 8); ctx.lineTo(w * 0.28, -h / 2); ctx.quadraticCurveTo(w / 2 + 14, 0, w * 0.28, h / 2); ctx.lineTo(-w / 2, h / 2 - 8); ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#E8E4D8'; ctx.beginPath(); ctx.moveTo(-w / 2 + 6, -h / 2 + 13); ctx.lineTo(w * 0.27, -h / 2 + 6); ctx.quadraticCurveTo(w / 2 + 2, 0, w * 0.27, h / 2 - 6); ctx.lineTo(-w / 2 + 6, h / 2 - 13); ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#A88A5E'; ctx.beginPath(); ctx.moveTo(-w / 2 + 12, -h / 2 + 18); ctx.lineTo(w * 0.25, -h / 2 + 12); ctx.quadraticCurveTo(w / 2 - 10, 0, w * 0.25, h / 2 - 12); ctx.lineTo(-w / 2 + 12, h / 2 - 18); ctx.closePath(); ctx.fill();
