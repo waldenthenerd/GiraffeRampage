@@ -14,12 +14,12 @@
     window.fxLevelNow = realFx;
     out.caps = caps; out.capOk = caps[0] === 420 && caps[1] === 280 && caps[2] === 160;
     /* the pool: dead particles come back and are used again */
-    G.particles.length = 0; PART_POOL.length = 0; fill(200);
+    G.particles.length = 0; PART.pool.length = 0; fill(200);
     var before = G.particles.slice(), alive = before.filter(function(p){ return p.life > 0.25; }).length;
     updateParticles(0.25);
     out.aliveKept = G.particles.length === alive && G.particles.every(function(p){ return p.life > 0; });
-    out.pooled = PART_POOL.length === 200 - alive;
-    var poolSet = new Set(PART_POOL); fill(50); out.reused = G.particles.slice(-50).filter(function(p){ return poolSet.has(p); }).length === Math.min(50, poolSet.size);
+    out.pooled = PART.pool.length === 200 - alive;
+    var poolSet = new Set(PART.pool); fill(50); out.reused = G.particles.slice(-50).filter(function(p){ return poolSet.has(p); }).length === Math.min(50, poolSet.size);
     /* drawing: batched dots against one at a time */
     G.particles.length = 0; fill(400);
     var cv = document.createElement('canvas'); cv.width = 640; cv.height = 360; var c = cv.getContext('2d');

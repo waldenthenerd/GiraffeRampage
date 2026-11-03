@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 225 | 69,529 | 5.70 MiB (5,973,259 bytes) |
+| JavaScript (`js/`) | 225 | 69,529 | 5.70 MiB (5,973,303 bytes) |
 | Styles (`css/`) | 6 | 1,801 | 165 KiB (168,749 bytes) |
 | Page (`index.html`) | 1 | 275 | 14.0 KiB (14,322 bytes) |
-| **Whole game** | **232** | **71,605** | **5.87 MiB (6,156,330 bytes)** |
+| **Whole game** | **232** | **71,605** | **5.87 MiB (6,156,374 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **71,004 lines, 5.83 MiB (6,109,348 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 225 | 69,529 | 5.70 MiB (5,973,259 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **71,004 lines, 5.83 MiB (6,109,392 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 225 | 69,529 | 5.70 MiB (5,973,303 bytes) |
 | Styles (`css/`) | 6 | 1,801 | 165 KiB (168,749 bytes) |
 | Page (`index.html`) | 1 | 275 | 14.0 KiB (14,322 bytes) |
-| **Whole game** | **232** | **71,605** | **5.87 MiB (6,156,330 bytes)** |
+| **Whole game** | **232** | **71,605** | **5.87 MiB (6,156,374 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -90,7 +90,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/audio/02-music.js` | 350 | Which music plays where (`Music.refresh`: the chapter, its boss, a boss at half health, the town by day, night and in the Burrows, the screens, the films, the minigames), the old theme table (`MUSIC_THEMES`, still the list of places), the key climbing through a chapter, the run's tempo, the low-health muffle, the fade between songs and the stingers. The sequencer in it is replaced by the band (`02e`-`02g`). |
 | `js/audio/02b-ambience.js` | 135 | Extra sounds (card pick, wave clear, heartbeat, heavy thump), the per-chapter ambient bed that follows the weather, gamepad rumble. |
 | `js/audio/02c-audio-mix.js` | 334 | Sound design on top of the synth: a reverb that follows the place (`MIX_ENV`), a hit sound per element, a death sound per kind of creature, an attack sound per kind of enemy (`Mix.variant`), boss roar, death and half-health growl, footsteps by ground, the music stingers, and the ambience extras (thunder with a delay, sweeping wind gusts, far-off calls). |
-| `js/game/03-combat-core.js` | 354 | Particles (`addParticle`: the limit follows the effects level, a full list replaces old ones in turn, dead ones come back from `PART_POOL`), zones, shockwaves, projectiles, pickups, damage and death, player damage, draw helpers, targeting. |
+| `js/game/03-combat-core.js` | 354 | Particles (`addParticle`: the limit follows the effects level, a full list replaces old ones in turn, dead ones come back from `PART.pool`), zones, shockwaves, projectiles, pickups, damage and death, player damage, draw helpers, targeting. |
 | `js/game/04-cards.js` | 1149 | The card registry: every card and its forms. |
 | `js/game/05-gear.js` | 633 | Weapons, gear sets (22: 8 common, 7 rare, 4 epic, 2 legendary, 1 mythical), ownership and equipping, trinkets, prize wheel, crates (the mythical Worldspire set drops at 0.02% from Supply Crates, 0.1% from Prime Crates and 2% from Spotted Crates, which cost 1,000 gems and 50 food). |
 | `js/game/05a-gear-levels.js` | 173 | **Gear levels and the crate rules.** A piece goes from level 1 to 5 (`gearLevel`, `gearLevelUp`; each level adds 10% to what the piece gives, a weapon also 6% damage), `gearStatsFor()` and `gearDelta()` say what a loadout or a swap would change without touching the save, crate pity (`CRATE_PITY`: rare or better within 10 Supply Crate opens, epic or better within 8 Prime Crate opens; a mythical roll never turns into something lesser; the Spotted Crate costs food too and has no pity) and `openCrate()` replaced so a duplicate levels the piece up. Save keys `gearLv` and `cratePity` sit beside `gear`. |

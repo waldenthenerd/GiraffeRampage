@@ -3,19 +3,19 @@
 /* ========================= 6. PARTICLES & TEXT ========================= */
 /* How many particles there may be follows the effects level (the slow-device governor lowers it too): all of them at High, fewer at
    Medium and Low. When the limit is reached a new one takes the place of an old one in turn (shifting the whole list along was a
-   copy of every particle). Particles that die go back to a pool (PART_POOL) and are used again, so a busy fight makes no garbage. */
-const PART_CAP = [160, 280, MAX_PARTICLES], PART_POOL = [];
+   copy of every particle). Particles that die go back to a pool (PART.pool; an object, so its shape never changes) and are used again, so a busy fight makes no garbage. */
+const PART_CAP = [160, 280, MAX_PARTICLES], PART = { pool: [] };
 let partNext = 0;
 function addParticle(x, y, vx, vy, r, life, color, opts){
   const ps = G.particles, cap = PART_CAP[typeof fxLevelNow === 'function' ? fxLevelNow() : 2] || MAX_PARTICLES;
-  const p = PART_POOL.length ? PART_POOL.pop() : {};
+  const p = PART.pool.length ? PART.pool.pop() : {};
   p.x = x; p.y = y; p.vx = vx; p.vy = vy; p.r = r; p.life = life; p.max = life; p.color = color;
   p.drag = opts && opts.drag !== undefined ? opts.drag : 2.6;
   p.shape = opts && opts.shape || 'dot'; p.rot = opts && opts.rot || Math.random() * TAU;
   p.spin = opts && opts.spin || rand(-6, 6); p.glow = !!(opts && opts.glow); p.shrink = !opts || opts.shrink !== false;
   if (ps.length >= cap){
     if (ps.length > cap) ps.length = cap;                                     /* the level just went down */
-    partNext = (partNext + 1) % cap; PART_POOL.push(ps[partNext]); ps[partNext] = p;
+    partNext = (partNext + 1) % cap; PART.pool.push(ps[partNext]); ps[partNext] = p;
   } else ps.push(p);
 }
 function burstParticles(x, y, n, color, spd, size, opts){
