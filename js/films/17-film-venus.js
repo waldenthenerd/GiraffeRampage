@@ -49,6 +49,11 @@ function cvShip(ctx, o){
   ctx.fillStyle = cg; ctx.beginPath(); ctx.moveTo(122, 4); ctx.lineTo(96, -14); ctx.lineTo(70, -15); ctx.lineTo(80, 4); ctx.closePath(); ctx.fill(); ctx.strokeStyle = '#121C30'; ctx.lineWidth = 1.6; ctx.stroke();
   ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.beginPath(); ctx.moveTo(96, -11); ctx.lineTo(104, -2); ctx.lineTo(100, -2); ctx.lineTo(92, -11); ctx.closePath(); ctx.fill();
   csText(ctx, 'ESF-07', -30, 16, 11, '#E8ECF2', 'left', '800');
+  fdRivets(ctx, -112, -20, 92, -20, 22, 0.9, 'rgba(10,18,36,.45)'); fdRivets(ctx, -96, 20, 100, 20, 20, 0.9, 'rgba(10,18,36,.45)');
+  ctx.fillStyle = '#121C30'; for (let k = 0; k < 4; k++) ctx.fillRect(-14 + k * 7, -22, 4, 8);                             /* engine intake louvres */
+  ctx.fillStyle = '#E8ECF2'; for (let k = 0; k < 5; k++) ctx.fillRect(-100 + k * 9, -16, 4, 4);                             /* the troop bay's little windows */
+  ctx.strokeStyle = '#8A93A8'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(20, -29); ctx.lineTo(24, -44); ctx.moveTo(18, -40); ctx.lineTo(30, -40); ctx.stroke();   /* an aerial */
+  fdLamp(ctx, -94, -60, 2, '#FF4A3A', Math.sin(t * 5) > 0); fdLamp(ctx, 138, 8, 1.8, '#FFFFFF', Math.sin(t * 5 + 1) > 0); fdLamp(ctx, -60, 28, 1.8, '#4AFF7A', Math.sin(t * 5) > 0);
   if ((o.ramp || 0) > 0.05){ ctx.fillStyle = '#0E1420'; ctx.fillRect(-132, -12, 36, 34); ctx.fillStyle = 'rgba(255,190,80,' + (0.5 + 0.2 * Math.sin(t * 6)) + ')'; ctx.fillRect(-132, -12, 36, 4); ctx.fillStyle = '#FFB040'; ctx.fillRect(-130, 18, 32, 2); }
   if (dmg > 0){
     ctx.fillStyle = 'rgba(20,16,14,' + 0.55 * dmg + ')'; ctx.beginPath(); ctx.ellipse(-84, 18, 34, 12, 0, 0, TAU); ctx.fill();
@@ -126,6 +131,10 @@ function cvGround(ctx, hy, t, camx){
     ctx.strokeStyle = 'rgba(255,220,120,' + 0.3 * f * (0.35 + yy) + ')'; ctx.lineWidth = Math.max(1, yy * 2); ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + L * 0.4, y0 + 8 * Math.sin(k)); ctx.lineTo(x0 + L, y0 - 6 + 12 * csR(k + 7900)); ctx.stroke();
   }
   ctx.lineCap = 'butt';
+  for (let k = 0; k < 4; k++){ const x = fdWrap(csR(29000 + k) * 1500 - camx * (0.7 + k * 0.1), -100, 1500), y = hy + 40 + csR(29010 + k) * 200;   /* sulfur vents, puffing */
+    ctx.fillStyle = '#2A1E18'; ctx.beginPath(); ctx.ellipse(x, y, 16, 5, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#C8B040'; ctx.beginPath(); ctx.ellipse(x, y - 1, 9, 2.5, 0, 0, TAU); ctx.fill();
+    for (let j = 0; j < 4; j++){ const a = (t * 0.4 + j / 4 + k * 0.3) % 1; ctx.globalAlpha = 0.35 * (1 - a); ctx.fillStyle = '#D8C890'; ctx.beginPath(); ctx.arc(x + Math.sin(t + j + k) * 8 * a, y - 6 - a * 70, 5 + a * 16, 0, TAU); ctx.fill(); } ctx.globalAlpha = 1; }
+  fdShimmer(ctx, 640, hy + 4, 1300, 40, t, 0.06);                                                   /* heat wavering over the ground */
   for (let k = 0; k < 16; k++){ const x = ((csR(k + 8000) * 1600 - camx * 1.2) % 1500 + 1500) % 1500 - 100, y = hy + 30 + csR(k + 8100) * 500, r = 8 + csR(k + 8200) * 26 * ((y - hy) / 500 + 0.3);
     ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(x + r * 0.4, y + r * 0.3, r * 1.2, r * 0.45, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#4A362C'; ctx.beginPath(); ctx.ellipse(x, y - r * 0.2, r, r * 0.65, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#7A5A46'; ctx.beginPath(); ctx.ellipse(x - r * 0.25, y - r * 0.4, r * 0.5, r * 0.25, 0, 0, TAU); ctx.fill(); }
 }
@@ -143,6 +152,8 @@ function cvSceneA(ctx, u, t){
   csSurfaceSky(ctx, t); csMoonGround(ctx, 3, 0);
   for (let k = 0; k < 4; k++){ const x = 1000 + k * 70 + 230 * csSm(0, 9, u) * (0.8 + 0.12 * k) + (u < 0.2 ? 0 : 0); if (x < 1320) cvMarine(ctx, x, 470 + k * 6, 0.55, u * 9 + k, false); }      /* the survivors, falling back */
   const ramp = csSm(2.0, 3.2, u) * (1 - csSm(6.6, 7.8, u)), ship = { x: CV_SX, y: CV_SY, s: CV_S, rot: 0, ramp: ramp, legs: 1, thrust: csSm(8.2, 9.2, u) * 0.25, tilt: 0, t: t };
+  fdCrates(ctx, 1080, CV_GY, [[0, 0, 22], [24, 0, 20], [8, 22, 18]], 1, '#5A6474'); fdDrums(ctx, 1150, CV_GY, 2, 1, ['#4A5468', '#7A8294']);   /* the marines' supplies by the ship */
+  ctx.strokeStyle = '#8A93A8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(1230, CV_GY); ctx.lineTo(1230, CV_GY - 70); ctx.stroke(); ctx.fillStyle = '#3B5B92'; ctx.fillRect(1231, CV_GY - 70, 26, 16); ctx.fillStyle = '#FF8A2A'; ctx.fillRect(1231, CV_GY - 64, 26, 3);   /* their flag, stiff in no air */
   cvShip(ctx, ship);
   const rx = CV_SX - 126 * CV_S, rb = CV_SX - 192 * CV_S;                                  /* where the ramp meets the floor, and where it meets the bay */
   let gx, gy, walk = 0, moving = true;
@@ -270,7 +281,7 @@ function cvSceneF(ctx, u, t){
   if (u > 5.2){ const lookUp = csSm(8.2, 9.6, u), gc = { x: gx, y: podY + 30 - (moving ? Math.abs(Math.sin(u * 5)) * 3 : 0), s: 0.78, face: 1, neck: csLerp(0.5, 0.05, lookUp), head: csLerp(0.3, -0.2, lookUp), walk: u * 4.6, moving: moving, blink: (Math.sin(t * 1.3) > 0.96) ? 1 : 0, look: 1.2 * lookUp, tuck: 0, crouch: 0 };
     ctx.save(); if (u < 5.9){ ctx.beginPath(); ctx.rect(podX + 10, 0, 1400, CS_H); ctx.clip(); } csGiraffe(ctx, gc); ctx.restore(); }
   for (let k = 0; k < 26; k++){ const x = ((csR(k + 8800) * 1500 + t * (90 + csR(k + 8900) * 140)) % 1500) - 110, y = 440 + csR(k + 9000) * 280; ctx.globalAlpha = 0.25; ctx.fillStyle = '#E8C898'; ctx.fillRect(x, y, 14 + csR(k + 9100) * 26, 1.6); }
-  ctx.globalAlpha = 1; ctx.restore();
+  ctx.globalAlpha = 1; fdMotes(ctx, { n: 30, seed: 29100, t: t, v: -0.07, r: 1.6, a: 0.65, col: '#FFA040', y0: 200, y1: 720 }); ctx.restore();   /* embers blowing across */
   const card = csSm(9.4, 10.6, u) * (1 - csSm(12.0, 12.5, u) * 0);
   if (card > 0.01){
     ctx.globalAlpha = card * 0.6; ctx.fillStyle = 'rgba(10,4,0,1)'; ctx.fillRect(0, 214, CS_W, 168);

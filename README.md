@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 225 | 69,361 | 5.68 MiB (5,959,494 bytes) |
+| JavaScript (`js/`) | 226 | 69,703 | 5.73 MiB (6,006,610 bytes) |
 | Styles (`css/`) | 6 | 1,801 | 165 KiB (168,749 bytes) |
-| Page (`index.html`) | 1 | 275 | 14.0 KiB (14,322 bytes) |
-| **Whole game** | **232** | **71,437** | **5.86 MiB (6,142,565 bytes)** |
+| Page (`index.html`) | 1 | 276 | 14.0 KiB (14,374 bytes) |
+| **Whole game** | **233** | **71,780** | **5.90 MiB (6,189,733 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **70,836 lines, 5.81 MiB (6,095,583 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 225 | 69,361 | 5.68 MiB (5,959,494 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **71,179 lines, 5.86 MiB (6,142,751 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 226 | 69,703 | 5.73 MiB (6,006,610 bytes) |
 | Styles (`css/`) | 6 | 1,801 | 165 KiB (168,749 bytes) |
-| Page (`index.html`) | 1 | 275 | 14.0 KiB (14,322 bytes) |
-| **Whole game** | **232** | **71,437** | **5.86 MiB (6,142,565 bytes)** |
+| Page (`index.html`) | 1 | 276 | 14.0 KiB (14,374 bytes) |
+| **Whole game** | **233** | **71,780** | **5.90 MiB (6,189,733 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -104,18 +104,19 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/game/13-forage.js` | 205 | Foraging minigame. |
 | `js/ui/14-menu.js` | 175 | Main menu chapter selector and the speed slider. |
 | `js/chapters/15-buildings-space.js` | 533 | Buildings (chapter 6) and the Space Center (chapter 7). |
-| `js/films/16-film-moon.js` | 965 | The ending cutscene (the launch and the Moon landing). |
-| `js/films/17-film-venus.js` | 426 | The Venus film (end of chapter 8). |
+| `js/films/16-film-moon.js` | 973 | The ending cutscene (the launch and the Moon landing). |
+| `js/films/17-film-venus.js` | 437 | The Venus film (end of chapter 8). |
 | `js/chapters/18-chapter-moon.js` | 80 | The Moon (chapter 8). |
 | `js/chapters/19-venus-outpost.js` | 852 | The Venus outpost (shop, scouting, ship). |
 | `js/chapters/20-chapters-9-10.js` | 188 | Chapters 9 and 10, and the Deflector pulse. |
-| `js/films/21-film-homecoming.js` | 349 | The homecoming film. |
-| `js/films/22-film-area51.js` | 295 | The Area 51 film. |
-| `js/films/23-film-short.js` | 148 | The short travel films between chapters. |
+| `js/films/21-film-homecoming.js` | 385 | The homecoming film. |
+| `js/films/22-film-area51.js` | 322 | The Area 51 film. |
+| `js/films/23-film-short.js` | 238 | The short travel films between chapters. Each place's ground has its own small things (`shGround`), what stands on it its own parts (`shFrontDetail`), the sea white caps and a fin (`shSea`); birds, motes and hoof dust; embers and ash over the Inferno. |
+| `js/films/23b-film-detail.js` | 144 | **Film detail.** Small parts the films before Chapter 13.5 are dressed with, each a pure function of its arguments and the time (positions from `csR`): `fdGrass`, `fdStones`, `fdCracks`, `fdBirds`, `fdMotes`, `fdRivets`, `fdSeams`, `fdLamp`, `fdAerial`, `fdDish`, `fdDrums`, `fdCrates`, `fdSkids`, `fdMounds`, `fdWindows`, `fdShimmer`. The scenes call them in the layer each belongs to (ground before the giraffe, motes after her). |
 | `js/chapters/24-mars-outpost.js` | 606 | The Mars outpost. |
 | `js/chapters/25-lab.js` | 89 | The Giraffe Lab (Mutation Vial). |
 | `js/chapters/26-dust-squad.js` | 135 | The dust squad (alliance after chapter 13). |
-| `js/films/27-film-mars.js` | 204 | The Mars films. |
+| `js/films/27-film-mars.js` | 221 | The Mars films. |
 | `js/films/27a-film-domes.js` | 405 | **The Dome films** (Chapter 13.5). `MARS_FILMS.domeflight` (30 s: the dark green town helicopter, `domeHeli`, lifts off from Longneck Town, flies over the glittering savannah to a ring of mirror-skinned domes, `domeBuilding`, sees frost behind a lifted flap of mylar and lands) and `MARS_FILMS.domeout` (28 s: the dome glows and cracks, the helicopter takes off, a long flight and the skyline of New York). It plays after the Chapter 13 films, and when 13.5 is started from the menu. |
 | `js/films/27b-film-tower.js` | 257 | **The Tower films** (Chapter 14), with nobody in them but the giraffe. `MARS_FILMS.towerflight` (31 s): the town helicopter comes in over a night-time New York toward the glass tower with its name down the side (`twTower`, layered towers in `twCity`), sets down on the plaza pad, she crosses the paving to the brass doors under the sign (`twFacade`), and goes into the marble lobby and the elevator (`twLobby`, `twLiftDoors`). `MARS_FILMS.towerout` (32 s): the corner office with the vial in its glass case (`twOffice`), the terrace and the rail, the paraglider she jumps with (`twGlider`: a canopy of cells, lines, and the giraffe tucked into the harness), a glide past searchlights to another roof (`twRoof`), and a second, black helicopter (`domeHeli` with a palette, `TW_HELI_PAL`) that lifts away into a paling sky. No text says it is the end. |
 | `js/films/27c-film-siege.js` | 155 | **The Siege films** (Chapter 15). `MARS_FILMS.siegeflight` (24 s: the helicopter over the grass at dusk with smoke on the horizon, Longneck Town in silhouette with machines on the road, the drop in beside the militia) and `MARS_FILMS.siegeout` (22 s: the morning after, the Warden's wreck, the hatch in the Square lifting, one small drone going east toward the waterhole; it closes nothing). Same format as the Tower films. The morning-after film shows the town as the night left it (`sgFilmState`: wrecked keys with dark lamps, a stump of the Hall, a bent mast, smoke, and scorch marks on the ground). |
@@ -177,7 +178,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/core/37-frame-transitions.js` | 413 | Frame composition, transform sequence, chapter transitions. |
 | `js/ui/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
 | `js/ui/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
-| `js/game/40-fusion.js` | 881 | Card fusion: combos, the machine screen, the film. |
+| `js/game/40-fusion.js` | 890 | Card fusion: combos, the machine screen, the film. |
 | `js/ui/41-qol.js` | 774 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
 | `js/ui/42-run-hud.js` | 242 | Run lifecycle and the HUD. `startRun` builds the Tower's world (`buildTowerWorld`) for the `tower` biome and the town (`buildSiegeWorld`) for the `siege` biome, and clears `G.tower` for every other; `chapterComplete` also sets `chapter14Complete`, `chapter15Complete` and `chapter16Complete`. |
 | `js/core/43-input.js` | 378 | Input: keyboard, mouse, touch, gamepad. |

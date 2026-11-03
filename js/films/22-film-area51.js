@@ -34,6 +34,8 @@ function afRidge(ctx, base, amp, seed, col, scroll){
 function afAcacia(ctx, x, y, s){
   ctx.fillStyle = '#2A1A1E'; ctx.fillRect(x - 3 * s, y - 52 * s, 6 * s, 52 * s);
   ctx.beginPath(); ctx.ellipse(x, y - 56 * s, 56 * s, 12 * s, 0, 0, TAU); ctx.fill(); ctx.beginPath(); ctx.ellipse(x - 26 * s, y - 50 * s, 30 * s, 8 * s, 0, 0, TAU); ctx.fill();
+  for (let i = 0; i < 7; i++){ ctx.beginPath(); ctx.ellipse(x + (i - 3) * 15 * s, y - 64 * s - Math.abs(i - 3) * -1.5 * s, 8 * s, 4 * s, 0, 0, TAU); ctx.fill(); }   /* a ragged top edge of leaf clumps */
+  ctx.strokeStyle = '#2A1A1E'; ctx.lineWidth = 2 * s; ctx.beginPath(); ctx.moveTo(x, y - 46 * s); ctx.lineTo(x - 20 * s, y - 56 * s); ctx.moveTo(x, y - 44 * s); ctx.lineTo(x + 24 * s, y - 58 * s); ctx.stroke();
 }
 /* the savannah at sunset, with the ground line at gy (it drops away as the jet climbs) */
 function afSavanna(ctx, t, gy, sc){
@@ -42,7 +44,9 @@ function afSavanna(ctx, t, gy, sc){
   afClouds(ctx, sc * 0.05 + t * 6, 6, 70, 260, 0.35, '#F8C8A0');
   afRidge(ctx, gy - 40, 70, 1.3, '#6A3A3A', sc * 0.1); afRidge(ctx, gy - 6, 50, 4.1, '#4A2A2E', sc * 0.25);
   for (let k = 0; k < 5; k++) afAcacia(ctx, (((k * 410 + 120 - sc * 0.4) % 2100) + 2100) % 2100 - 300, gy - 4, 0.8 + (k % 3) * 0.25);
-  if (gy < CS_H){ const gg = ctx.createLinearGradient(0, gy, 0, CS_H); gg.addColorStop(0, '#6A4A2A'); gg.addColorStop(1, '#3A2418'); ctx.fillStyle = gg; ctx.fillRect(0, gy, CS_W, CS_H - gy + 2); }
+  if (gy < CS_H){ const gg = ctx.createLinearGradient(0, gy, 0, CS_H); gg.addColorStop(0, '#6A4A2A'); gg.addColorStop(1, '#3A2418'); ctx.fillStyle = gg; ctx.fillRect(0, gy, CS_W, CS_H - gy + 2);
+    fdStones(ctx, { n: 14, seed: 24000, sc: sc, y0: gy + 28, y1: CS_H - 4, col: '#8A6A44', dk: '#4A3424' }); fdGrass(ctx, { n: 34, seed: 24100, sc: sc, t: t, y0: gy + 26, y1: CS_H, col: '#4A3220', hi: '#9A7040' }); }
+  fdBirds(ctx, { n: 6, seed: 24200, t: t, y0: 110, y1: gy - 160, v: 18, col: 'rgba(50,24,30,.55)' });                       /* birds going home at sunset */
 }
 /* a night desert horizon at ground line gy */
 function afNight(ctx, t, gy, sc){
@@ -64,9 +68,12 @@ function afBase(ctx, gy, t, k, x0){
     ctx.fillStyle = '#10140F'; ctx.beginPath(); ctx.moveTo(hx, gy); ctx.lineTo(hx, gy - hh * 0.6); ctx.quadraticCurveTo(hx + hw / 2, gy - hh * 1.5, hx + hw, gy - hh * 0.6); ctx.lineTo(hx + hw, gy); ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#9BE86A'; ctx.globalAlpha = 0.55 + 0.2 * Math.sin(t * 2 + i); ctx.fillRect(hx + hw * 0.3, gy - hh * 0.5, hw * 0.4, hh * 0.5); ctx.globalAlpha = 1;
   }
+  fdDish(ctx, x0 + 190 * k + 75 * k, gy - 60 * k * 1.15, 1.2 * k, t, '#10140F'); fdAerial(ctx, x0 + 570 * k + 40 * k, gy - 48 * k, 40 * k, t, '#10140F'); fdAerial(ctx, x0 + 20 * k, gy - 30 * k, 30 * k, t + 1, '#10140F');
+  for (let x = x0 - 100 * k; x < x0 + 860 * k; x += 120 * k) fdLamp(ctx, x, gy - 24 * k, 1.8 * k, '#FFE8A0', Math.sin(t * 1.5 + x * 0.1) > -0.7);   /* lamps along the fence */
   const tops = [];
   for (const tx of [x0 - 60 * k, x0 + 800 * k]){
     ctx.fillStyle = '#10140F'; ctx.fillRect(tx - 4 * k, gy - 120 * k, 8 * k, 120 * k); ctx.fillRect(tx - 16 * k, gy - 140 * k, 32 * k, 22 * k);
+    ctx.fillStyle = 'rgba(200,255,180,.45)'; ctx.fillRect(tx - 12 * k, gy - 134 * k, 24 * k, 6 * k); ctx.strokeStyle = '#10140F'; ctx.lineWidth = 1.4; ctx.beginPath(); for (let yy = gy - 116 * k; yy < gy; yy += 16 * k){ ctx.moveTo(tx - 10 * k, yy); ctx.lineTo(tx + 10 * k, yy + 16 * k); ctx.moveTo(tx + 10 * k, yy); ctx.lineTo(tx - 10 * k, yy + 16 * k); } ctx.stroke();   /* the cab's lit window and a braced frame */
     fillCircle(ctx, tx, gy - 146 * k, 3 * k, Math.sin(t * 4 + tx) > 0 ? '#FF4A3A' : '#5A1A14'); tops.push({ x: tx, y: gy - 130 * k });
   }
   return tops;
@@ -84,13 +91,18 @@ function afJet(ctx, o){
   afJetBody(ctx); const g = ctx.createLinearGradient(0, -24, 0, 17); g.addColorStop(0, '#F4F6FA'); g.addColorStop(0.6, '#D6DAE4'); g.addColorStop(1, '#9AA2B0'); ctx.fillStyle = g; ctx.fill();
   ctx.save(); afJetBody(ctx); ctx.clip();
   ctx.fillStyle = '#C8302A'; ctx.fillRect(-120, -3, 290, 5); ctx.fillStyle = '#1E2A4A'; ctx.fillRect(122, -20, 50, 40); ctx.fillStyle = '#5A606C'; ctx.fillRect(-120, 9, 290, 10);
+  fdSeams(ctx, [-80, -20, -80, 17, -30, -22, -30, 17, 104, -16, 104, 12, -110, -8, 110, -8], 'rgba(70,76,90,.4)', 1);          /* panel seams */
+  fdRivets(ctx, -78, -16, -78, 12, 7, 0.9); fdRivets(ctx, -28, -18, -28, 12, 7, 0.9);
+  ctx.fillStyle = '#2A3040'; ctx.font = '800 9px sans-serif'; ctx.fillText('N 27', -66, 7); ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(-110, -18, 210, 2);
   ctx.restore();
+  ctx.strokeStyle = '#6A707C'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(156, 2); ctx.lineTo(176, 1); ctx.stroke();      /* the pitot probe on the nose */
   afJetBody(ctx); ctx.strokeStyle = 'rgba(60,66,80,.55)'; ctx.lineWidth = 1.6; ctx.stroke();
   ctx.fillStyle = '#20242E'; ctx.beginPath(); ctx.ellipse(70, 6, 14, 6, 0, 0, TAU); ctx.fill();                                                                                  /* the intake */
   ctx.fillStyle = '#C8CCD6'; ctx.beginPath(); ctx.moveTo(40, 5); ctx.lineTo(-84, 5); ctx.lineTo(-106, 38); ctx.lineTo(-20, 22); ctx.closePath(); ctx.fill();                       /* near wing */
   ctx.fillStyle = '#C8302A'; ctx.beginPath(); ctx.moveTo(-106, 38); ctx.lineTo(-90, 34); ctx.lineTo(-96, 28); ctx.lineTo(-104, 30); ctx.closePath(); ctx.fill();
   ctx.fillStyle = '#DADEE8'; ctx.beginPath(); ctx.moveTo(-100, -13); ctx.lineTo(-128, -64); ctx.lineTo(-94, -64); ctx.lineTo(-56, -17); ctx.closePath(); ctx.fill();               /* near fin */
   ctx.fillStyle = '#C8302A'; ctx.beginPath(); ctx.moveTo(-124, -57); ctx.lineTo(-128, -64); ctx.lineTo(-94, -64); ctx.lineTo(-100, -52); ctx.closePath(); ctx.fill();
+  fdSeams(ctx, [-104, -22, -90, -46, -84, -16, -72, -32], 'rgba(90,96,110,.45)', 1); fdRivets(ctx, -98, -15, -66, -15, 6, 0.8);   /* the fin's hinge line and its rivets */
   ctx.fillStyle = '#4A4E58'; ctx.beginPath(); ctx.moveTo(-114, -9); ctx.lineTo(-128, -11); ctx.lineTo(-128, 12); ctx.lineTo(-114, 10); ctx.closePath(); ctx.fill();
   if (o.flame > 1) csGlow(ctx, -128, 1, 18, '#FFB050', 0.7);
   const lift = o.canopy || 0, pa = o.pilot === true ? 1 : (+o.pilot || 0);
@@ -142,10 +154,16 @@ function afSceneA(ctx, u, t){
   afSavanna(ctx, t, gy, 0);
   ctx.fillStyle = '#2E2024'; ctx.fillRect(40, gy - 74, 180, 74); ctx.beginPath(); ctx.moveTo(30, gy - 74); ctx.quadraticCurveTo(130, gy - 128, 230, gy - 74); ctx.closePath(); ctx.fill();      /* an old hangar */
   ctx.fillStyle = '#FFD890'; ctx.fillRect(100, gy - 40, 60, 40); csGlow(ctx, 130, gy - 20, 70, '#FFD890', 0.35);
+  ctx.strokeStyle = 'rgba(80,60,64,.6)'; ctx.lineWidth = 1.4; ctx.beginPath(); for (let x = 50; x < 220; x += 12){ if (x > 96 && x < 164) continue; ctx.moveTo(x, gy - 72); ctx.lineTo(x, gy); } ctx.stroke();   /* corrugated walls */
+  ctx.fillStyle = '#4A3A3C'; ctx.fillRect(96, gy - 44, 68, 4); ctx.fillStyle = '#C8A878'; ctx.font = '800 11px sans-serif'; ctx.fillText('HANGAR 2', 102, gy - 54);
+  fdDrums(ctx, 232, gy, 3, 1, ['#6A3A2A', '#4A5A3A']); fdCrates(ctx, 290, gy, [[0, 0, 26], [28, 0, 22], [10, 26, 20]], 1, '#7A5A3A');
+  fdAerial(ctx, 196, gy - 104, 30, t, '#2A1A1E');
   ctx.strokeStyle = '#2A1A1E'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(1180, gy); ctx.lineTo(1180, gy - 96); ctx.stroke();                                                            /* a windsock */
   const wv = Math.sin(t * 3) * 4; ctx.fillStyle = '#E8662A'; ctx.beginPath(); ctx.moveTo(1180, gy - 96); ctx.lineTo(1120, gy - 90 + wv); ctx.lineTo(1120, gy - 74 + wv); ctx.lineTo(1180, gy - 80); ctx.closePath(); ctx.fill();
   ctx.fillStyle = '#4A4650'; ctx.fillRect(0, gy, CS_W, 24); ctx.fillStyle = '#6A6670'; ctx.fillRect(0, gy, CS_W, 5);
   ctx.fillStyle = '#F4C040'; for (let x = 20; x < CS_W; x += 120) ctx.fillRect(x, gy + 12, 60, 4);
+  fdCracks(ctx, { n: 12, seed: 24300, y0: gy + 4, y1: gy + 20, col: 'rgba(20,16,20,.4)' }); fdSkids(ctx, { n: 4, seed: 24400, y0: gy + 4, y1: gy + 16 });
+  for (let x = 30; x < CS_W; x += 150) fdLamp(ctx, x, gy - 2, 2.4, '#FFD060', Math.sin(t * 2 + x) > -0.5);   /* runway edge lights */
   afJet(ctx, { x: PX, y: PY, s: PS, gear: true, t: t, canopy: csBump(u, 4.4, 7.2, 0.8), pilot: csSm(5.2, 6.0, u) });
   const wa = 1 - csSm(4.9, 5.5, u);
   if (wa > 0.01){                                                                                   /* she walks out of the hangar to the jet, then climbs in */
@@ -181,6 +199,10 @@ function afSceneC(ctx, u, t){
   const gg = ctx.createLinearGradient(0, 640, 0, CS_H); gg.addColorStop(0, '#6A4A4A'); gg.addColorStop(1, '#3A2630'); ctx.fillStyle = gg; ctx.fillRect(0, 640, CS_W, CS_H - 640);
   ctx.fillStyle = 'rgba(200,180,170,.18)'; ctx.beginPath(); ctx.ellipse(((900 - sc * 0.9) % 1800 + 1800) % 1800 - 200, 690, 260, 14, 0, 0, TAU); ctx.fill();                  /* a dry lake bed */
   afRidge(ctx, 700, 26, 8.3, '#4A2A34', sc * 0.9);
+  for (let k = 0; k < 6; k++){ const x = fdWrap(k * 300 - sc * 1.6, -100, 1800), s = 1.1; ctx.fillStyle = '#2A1820'; ctx.fillRect(x - 3, 640 - 120 * s, 5, 120 * s + 80); ctx.fillRect(x - 22, 640 - 112 * s, 44, 4); fillCircle(ctx, x - 18, 640 - 116 * s, 2, '#5A4A48'); fillCircle(ctx, x + 18, 640 - 116 * s, 2, '#5A4A48');
+    const nx = fdWrap((k + 1) * 300 - sc * 1.6, -100, 1800); if (nx > x){ ctx.strokeStyle = 'rgba(40,24,30,.6)'; ctx.lineWidth = 1.2; ctx.beginPath(); for (const dx of [-18, 18]){ ctx.moveTo(x + dx, 640 - 114 * s); ctx.quadraticCurveTo((x + nx) / 2 + dx, 640 - 96 * s, nx + dx, 640 - 114 * s); } ctx.stroke(); } }   /* telegraph poles along the old road */
+  for (let k = 0; k < 4; k++){ const x = fdWrap(k * 430 + 150 - sc * 1.25, -120, 1720), y = 700 + (k % 2) * 10, s = 0.9 + (k % 3) * 0.2; ctx.strokeStyle = '#2E1C24'; ctx.lineCap = 'round'; ctx.lineWidth = 7 * s; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - 50 * s); ctx.lineTo(x - 20 * s, y - 74 * s); ctx.moveTo(x, y - 50 * s); ctx.lineTo(x + 18 * s, y - 80 * s); ctx.moveTo(x + 9 * s, y - 64 * s); ctx.lineTo(x + 26 * s, y - 66 * s); ctx.stroke(); ctx.lineCap = 'butt';
+    ctx.fillStyle = '#3A2A2A'; for (const [dx, dy] of [[-20, -74], [18, -80], [26, -66]]){ ctx.beginPath(); ctx.arc(x + dx * s, y + dy * s, 7 * s, 0, TAU); ctx.fill(); } }   /* Joshua trees */
   const hz = csSm(5, 10, u); csGlow(ctx, 1230, 612, 150 + 120 * hz, '#9BE86A', 0.5 * hz);                                                                                    /* a green glow on the horizon */
   for (let k = 0; k < 14; k++){ const x = (((csR(k + 10000) * 1500 - sc * 3.2 * (0.6 + csR(k + 10050))) % 1500) + 1500) % 1500 - 100, y = 120 + csR(k + 10100) * 480; ctx.globalAlpha = 0.22; ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x, y, 90 + csR(k + 10150) * 120, 1.6); } ctx.globalAlpha = 1;
   afJet(ctx, { x: 620 + Math.sin(u * 0.8) * 24, y: 300 + Math.sin(u * 1.3) * 12, s: 1.15, rot: Math.sin(u * 0.8) * 0.025, flame: 70, t: t, canopy: 0, pilot: 1 });
@@ -221,6 +243,7 @@ function afSceneE(ctx, u, t){
     for (let r = 1; r <= 6; r++){ const y = gh + (CS_H - gh) * Math.pow(r / 6, 1.7); ctx.moveTo(0, y); ctx.lineTo(CS_W, y); }
     ctx.stroke();
     for (let r = 1; r <= 7; r++){ const f = Math.pow(r / 7, 1.7), y = gh + (CS_H - gh) * f; for (let i = -9; i <= 9; i++){ ctx.globalAlpha = 0.5 + 0.3 * Math.sin(t * 3 + i * 1.7 + r); fillCircle(ctx, 640 + i * (30 + 120 * f), y, 1.4 + 2.4 * f, '#FFD060'); } } ctx.globalAlpha = 1;   /* the base's lights */
+    for (let r = 2; r <= 5; r += 3){ const f = Math.pow(r / 6, 1.7), y = gh + (CS_H - gh) * f; for (let c = 0; c < 2; c++){ const xx = 640 + ((((t * 40 + c * 300 + r * 90) % 900) + 900) % 900 - 450) * (0.3 + f); fillCircle(ctx, xx, y, 1.4 + f * 2, '#FFFFFF'); fillCircle(ctx, xx - 6 - f * 6, y, 1 + f * 1.5, '#FF5A4A'); } }   /* trucks driving between the hangars */
     const hy = gh + (CS_H - gh) * 0.4; csGlow(ctx, 640, hy, 40 + 130 * p, '#9BE86A', 0.55); csGlow(ctx, 640, hy, 16 + 50 * p, '#E8FFD0', 0.7);                                      /* the hatch, getting closer */
   }
   for (let k = 0; k < 22; k++){ const x = csR(k + 10100) * CS_W, v = 900 + csR(k + 10200) * 900, y = (((csR(k + 10300) * 1600 - u * v) % 1600) + 1600) % 1600 - 400; ctx.globalAlpha = 0.28; ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x, y, 1.8, 60 + csR(k + 10350) * 90); } ctx.globalAlpha = 1;   /* wind */
@@ -232,6 +255,10 @@ function afSceneF(ctx, u, t){
   const hy = 560, gy = 592, s = 0.62, u0 = 1.2, uL = 8.2;
   afNight(ctx, t, hy, u * 6);
   const tops = afBase(ctx, hy, t, 0.95, 540);
+  fdStones(ctx, { n: 12, seed: 24500, y0: gy + 12, y1: CS_H - 6, col: '#3A3226', dk: '#1E1A12' });
+  for (let k = 0; k < 9; k++){ const x = csR(24600 + k) * CS_W, y = gy + 14 + csR(24650 + k) * 100, s = 0.7 + csR(24700 + k) * 0.7; ctx.fillStyle = k % 2 ? '#2A3020' : '#343A26'; for (let i = 0; i < 5; i++){ ctx.beginPath(); ctx.arc(x + (i - 2) * 7 * s, y - 8 * s - Math.abs(i - 2) * -2 * s, 8 * s, 0, TAU); ctx.fill(); } }   /* sagebrush */
+  ctx.fillStyle = '#2A2620'; ctx.fillRect(208, gy - 54, 4, 60); ctx.fillStyle = '#C8C4A8'; ctx.fillRect(170, gy - 70, 80, 34); ctx.strokeStyle = '#8A1A14'; ctx.lineWidth = 2; ctx.strokeRect(172, gy - 68, 76, 30);
+  ctx.fillStyle = '#8A1A14'; ctx.font = '800 9px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('RESTRICTED', 210, gy - 56); ctx.fillText('AREA', 210, gy - 45); ctx.textAlign = 'left';   /* the warning sign outside the fence */
   for (let i = 0; i < tops.length; i++) afBeam(ctx, tops[i].x, tops[i].y, -Math.PI / 2 + Math.sin(t * 0.8 + i * 1.7) * 0.9, 1000, 0.06, 0.15);
   let cx, cy;
   if (u < u0){ cx = 520; cy = -120 + 300 * Math.pow(u / u0, 1.6); }

@@ -837,17 +837,23 @@ function fusionMachine(ctx, x, y, p, t, fire){
   ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(x - 190, y - 4, 400, 12);
   ctx.fillStyle = '#4A4458'; ctx.fillRect(x - 180, y - 26 * a, 360, 26 * a);                                    /* the base plate */
   ctx.fillStyle = '#6A6478'; ctx.fillRect(x - 180, y - 26 * a, 360, 6);
+  if (a > 0.9){ fdRivets(ctx, x - 172, y - 16, x + 172, y - 16, 22, 1.4, 'rgba(30,26,40,.6)'); ctx.fillStyle = '#F4C040'; for (let k = 0; k < 9; k++){ ctx.beginPath(); ctx.moveTo(x - 170 + k * 40, y - 2); ctx.lineTo(x - 156 + k * 40, y - 2); ctx.lineTo(x - 146 + k * 40, y - 9); ctx.lineTo(x - 160 + k * 40, y - 9); ctx.closePath(); ctx.fill(); } }   /* bolts, and hazard stripes along its foot */
   for (const sx of [-1, 1]){                                                                                 /* two card chambers */
     const cx = x + sx * 105, h = 150 * b;
     ctx.fillStyle = '#2A2634'; ctx.fillRect(cx - 52, y - 26 - h, 104, h); ctx.strokeStyle = '#7A748C'; ctx.lineWidth = 4; ctx.strokeRect(cx - 52, y - 26 - h, 104, h);
-    if (b > 0.9){ ctx.fillStyle = 'rgba(120,230,255,' + (0.16 + 0.1 * Math.sin(t * 3 + sx) + 0.4 * fire) + ')'; ctx.fillRect(cx - 44, y - 26 - 142, 88, 134); }
+    if (b > 0.9){ ctx.fillStyle = 'rgba(120,230,255,' + (0.16 + 0.1 * Math.sin(t * 3 + sx) + 0.4 * fire) + ')'; ctx.fillRect(cx - 44, y - 26 - 142, 88, 134);
+      fdRivets(ctx, cx - 48, y - 172, cx + 48, y - 172, 8, 1.3, 'rgba(160,150,190,.7)');
+      const gx2 = cx + sx * 34, gy2 = y - 50; fillCircle(ctx, gx2, gy2, 9, '#1E1A26'); fillCircle(ctx, gx2, gy2, 7, '#E8E0D0'); const na = -2.4 + 1.6 * (0.5 + 0.5 * Math.sin(t * 1.3 + sx)) + 1.2 * fire; ctx.strokeStyle = '#C8302A'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(gx2, gy2); ctx.lineTo(gx2 + Math.cos(na) * 6, gy2 + Math.sin(na) * 6); ctx.stroke();   /* a pressure gauge */
+      fdLamp(ctx, cx - sx * 38, y - 44, 3, fire > 0.1 ? '#FF6AD8' : '#7AFF9A', Math.sin(t * 4 + sx) > -0.2); }
   }
   if (c > 0.01){                                                                                             /* the central coil */
     const h = 210 * c; ctx.fillStyle = '#3A3648'; ctx.fillRect(x - 30, y - 26 - h, 60, h); ctx.strokeStyle = '#8A84A0'; ctx.lineWidth = 3; ctx.strokeRect(x - 30, y - 26 - h, 60, h);
     for (let k = 0; k < 7; k++){ const yy = y - 26 - h + 18 + k * 26; if (yy > y - 40) break; ctx.fillStyle = '#B880FF'; ctx.globalAlpha = 0.5 + 0.4 * Math.sin(t * 5 + k); ctx.fillRect(x - 24, yy, 48, 6); ctx.globalAlpha = 1; }
     ctx.strokeStyle = '#7A748C'; ctx.lineWidth = 6; ctx.globalAlpha = c; ctx.beginPath(); ctx.moveTo(x - 52 - 105 + 210, y - 130); ctx.quadraticCurveTo(x - 60, y - 190 * c, x - 30, y - 150); ctx.moveTo(x + 52 + 105 - 210, y - 130); ctx.quadraticCurveTo(x + 60, y - 190 * c, x + 30, y - 150); ctx.stroke(); ctx.globalAlpha = 1;
   }
+  if (c > 0.6){ ctx.strokeStyle = '#2A2634'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x - 180, y - 8); ctx.bezierCurveTo(x - 240, y - 4, x - 260, y + 2, x - 300, y - 2); ctx.moveTo(x + 180, y - 10); ctx.bezierCurveTo(x + 230, y - 6, x + 250, y, x + 290, y - 4); ctx.stroke(); }   /* power cables across the floor */
   if (d > 0.01){
+    if (fire > 0.05) for (let k = 0; k < 6; k++){ const a2 = t * 9 + k * 1.05, r = 26 + 10 * Math.sin(t * 13 + k); ctx.strokeStyle = 'rgba(232,208,255,' + 0.7 * fire + ')'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(x, y - 190); ctx.lineTo(x + Math.cos(a2) * r * 0.5 + 3, y - 190 + Math.sin(a2) * r * 0.5 - 3); ctx.lineTo(x + Math.cos(a2) * r, y - 190 + Math.sin(a2) * r); ctx.stroke(); }   /* crackles off the core while it fuses */
     csGlow(ctx, x, y - 190, 90 + 70 * fire, '#B880FF', 0.35 * d + 0.5 * fire); fillCircle(ctx, x, y - 190, 14 * d, '#E8D0FF');
     ctx.globalAlpha = d; csText(ctx, 'CARD FUSION', x, y - 262, 24, '#E8E0F8', 'center', '800'); ctx.globalAlpha = 1;
   }
@@ -862,6 +868,9 @@ function fusionScene(ctx, t){
   const hammer = working ? Math.abs(Math.sin(t * 5)) : 0;
   csGiraffe(ctx, { x: gx, y: 616, s: 0.9, face: 1, walk: t * 6, moving: t < 2.8, neck: 0.3 + 0.18 * hammer, head: 0.1 + 0.2 * hammer, bare: true, boots: false });
   if (working && Math.sin(t * 5) > 0.9){ for (let k = 0; k < 4; k++) csGlow(ctx, 640 + k * 6, 560 + k * 4, 16, '#FFE0A0', 0.6); }
+  if (working){ const ph = (t * 5 / Math.PI) % 1; for (let k = 0; k < 7; k++){ const a2 = ph, dx = (k - 3) * 9 * a2 + Math.sin(k) * 4, dy = -30 * a2 + 60 * a2 * a2; ctx.globalAlpha = 1 - a2; fillCircle(ctx, 640 + dx, 560 + dy, 1.6, '#FFD27A'); } ctx.globalAlpha = 1; }   /* sparks off each blow, falling */
+  ctx.fillStyle = '#8A2A20'; ctx.fillRect(400, 598, 60, 18); ctx.fillStyle = '#6A1A14'; ctx.fillRect(400, 598, 60, 4); ctx.strokeStyle = '#3A3036'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(418, 598); ctx.lineTo(418, 590); ctx.lineTo(442, 590); ctx.lineTo(442, 598); ctx.stroke();   /* her toolbox */
+  ctx.fillStyle = '#9AA0AC'; ctx.save(); ctx.translate(372, 612); ctx.rotate(-0.3); ctx.fillRect(-14, -1.5, 28, 3); ctx.fillRect(10, -5, 6, 10); ctx.restore();   /* a spanner on the floor */
   if (t > 11.2){                                                                                             /* two cards go in, one comes out */
     const u = csSm(11.2, 13.2, t), out = csSm(13.2, 14.6, t);
     for (const sx of [-1, 1]){ const cx = csLerp(800 + sx * 330, 800 + sx * 105, u), cy = csLerp(380, 470, u) - 40 * Math.sin(u * Math.PI), a = 1 - csSm(13, 13.4, t); if (a > 0){ ctx.save(); ctx.translate(cx, cy); ctx.rotate(sx * (1 - u) * 0.3); ctx.globalAlpha = a; ctx.fillStyle = sx < 0 ? '#C98A3C' : '#7E9B4E'; ctx.fillRect(-26, -38, 52, 76); ctx.strokeStyle = '#EFE6D4'; ctx.lineWidth = 3; ctx.strokeRect(-26, -38, 52, 76); ctx.restore(); } }
