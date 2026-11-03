@@ -58,7 +58,7 @@ const EnemySprite = (function(){
   /* new pictures are made for a few milliseconds per frame at most (a creature that has to wait is simply drawn live that frame), so
      filling the cache never causes a hitch. It is a time budget, not a count: a fast device makes many pictures in its few
      milliseconds and the cache is full within a second or two, a slow one still makes at least one a frame and no more than it can afford. */
-  const BUILD_MS = 3;
+  let BUILD_MS = 3;
   let budgetAt = 0, spent = 0;
   function canBuild(){
     const now = performance.now();
@@ -205,6 +205,7 @@ const EnemySprite = (function(){
     draw: draw, stats: stats,
     get on(){ return on; }, set on(v){ on = !!v; },
     clear: function(){ maps = new WeakMap(); gen++; px = 0; },
+    buildMs: function(ms){ BUILD_MS = ms === undefined ? 3 : ms; },                /* a test sets a big budget so the timing of the machine cannot change what is made */
     megapixels: function(){ return px / 1e6; },
     /* for testing and for the stats panel: which kinds of creature are cached, and why not */
     report: function(){ return JSON.parse(JSON.stringify(stats.why)); }

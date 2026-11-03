@@ -48,9 +48,9 @@
     for (i2 = 0; i2 < 40; i2++){ var e3 = mk('hyena', P.x + 100 + i2, P.y); if (e3) damageEnemy(e3, 1e15, { noCrit: true, quiet: true }); }
     out.cap = EM.corpses.length <= EM.cap;
     /* the cache still takes pictures */
-    EnemySprite.clear(); G.enemies.length = 0; var cs = mk('jackal', 150, 150); cs._f = 1; cs._va = 0; cs._lag = 0; cs.ph = 0; cs._stt = 0;
+    EnemySprite.clear(); EnemySprite.buildMs(1e6); G.enemies.length = 0; var cs = mk('jackal', 150, 150); cs._f = 1; cs._va = 0; cs._lag = 0; cs.ph = 0; cs._stt = 0;
     var s0 = EnemySprite.stats.drawn; cs.hitT = 0.1; cs.hitA = 1; for (i2 = 0; i2 < 120; i2++){ cs.anim = i2 * 0.1; c.setTransform(1, 0, 0, 1, 0, 0); drawEnemy(c, cs); }
-    out.cacheDrawn = EnemySprite.stats.drawn - s0;
+    out.cacheDrawn = EnemySprite.stats.drawn - s0; EnemySprite.buildMs();
     /* the time: 300 creatures drawn */
     G.enemies.length = 0; var many = []; for (i2 = 0; i2 < 300; i2++){ var m = mk(['hyena', 'jackal', 'cheetah'][i2 % 3], 100 + (i2 % 20) * 8, 100 + Math.floor(i2 / 20) * 8); if (!m) continue; m._f = 1; m._va = 0.2; m._lag = 0.1; m.ph = i2; m._stt = 1; m.anim = i2 * 0.3; many.push(m); }
     for (i2 = 0; i2 < 30; i2++) many.forEach(function(m){ drawEnemy(c, m); });               /* warm the cache */
@@ -61,6 +61,6 @@
     }
     out.msPerFrame300 = +best.toFixed(2); out.msPerFrame300Plain = +bestPlain.toFixed(2); out.cacheLive = JSON.stringify(EnemySprite.stats.liveBy);
   } catch (err){ out.err = String(err && err.stack || err); }
-  out.pass = out.errs.length === 0 && !out.err && out.gaitOk && out.hit && out.hitEnds && out.turn && out.drawBad.length === 0 && out.portraitSame && out.corpse && out.styleBad.length === 0 && out.corpseGone && out.cap && out.cacheDrawn >= 10 && out.msPerFrame300 - out.msPerFrame300Plain < 8;
+  out.pass = out.errs.length === 0 && !out.err && out.gaitOk && out.hit && out.hitEnds && out.turn && out.drawBad.length === 0 && out.portraitSame && out.corpse && out.styleBad.length === 0 && out.corpseGone && out.cap && out.cacheDrawn >= 100 && out.msPerFrame300 - out.msPerFrame300Plain < 8;
   QA.done(out);
 })();
