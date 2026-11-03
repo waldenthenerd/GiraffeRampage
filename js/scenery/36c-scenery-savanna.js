@@ -291,6 +291,17 @@ const SV_DEF_11 = {
         ctx.fillStyle = 'rgba(110,190,178,.4)'; ctx.beginPath();
         for (let i = 0; i < 3; i++){ const x = i * 8 - 8, y = scRnd(d.seed, i) * 8 - 4; ctx.moveTo(x - 2, y + 2); ctx.lineTo(x, y - 3); ctx.lineTo(x + 2.4, y + 2); ctx.closePath(); }
         ctx.fill();
+      } },
+    { id: 'sv_drytuft', count: 70, s: [0.8, 1.4], draw: function(ctx, d, t){                       /* withered tufts: dry blades leaning every way, with a glassy tip */
+        ctx.lineCap = 'round'; ctx.strokeStyle = 'rgba(120,108,72,.55)'; ctx.lineWidth = 1.4; ctx.beginPath();
+        for (let i = 0; i < 6; i++){ const a = -Math.PI / 2 + (scRnd(d.seed, i) - 0.5) * 1.6, h = 7 + scRnd(d.seed, i + 6) * 8, x = (i - 2.5) * 2.4; ctx.moveTo(x, 0); ctx.quadraticCurveTo(x + Math.cos(a) * h * 0.4, Math.sin(a) * h * 0.6, x + Math.cos(a) * h, Math.sin(a) * h); }
+        ctx.stroke(); ctx.fillStyle = 'rgba(170,240,226,.5)';
+        for (let i = 0; i < 6; i += 2){ const a = -Math.PI / 2 + (scRnd(d.seed, i) - 0.5) * 1.6, h = 7 + scRnd(d.seed, i + 6) * 8, x = (i - 2.5) * 2.4; ctx.beginPath(); ctx.arc(x + Math.cos(a) * h, Math.sin(a) * h, 1.1, 0, TAU); ctx.fill(); }
+      } },
+    { id: 'sv_glassshard', count: 34, s: [0.8, 1.4], draw: function(ctx, d, t){                    /* splinters of glass in the dust, one edge lit */
+        for (let i = 0; i < 4; i++){ const x = (scRnd(d.seed, i + 20) - 0.5) * 34, y = (scRnd(d.seed, i + 24) - 0.5) * 18, a = scRnd(d.seed, i + 28) * TAU, l = 3 + scRnd(d.seed, i + 32) * 4;
+          ctx.fillStyle = 'rgba(30,60,58,.3)'; ctx.beginPath(); ctx.moveTo(x + 1, y + 1.5); ctx.lineTo(x + 1 + Math.cos(a) * l, y + 1.5 + Math.sin(a) * l); ctx.lineTo(x + 1 + Math.cos(a + 2.2) * l * 0.5, y + 1.5 + Math.sin(a + 2.2) * l * 0.5); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = 'rgba(176,238,226,.6)'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); ctx.lineTo(x + Math.cos(a + 2.2) * l * 0.5, y + Math.sin(a + 2.2) * l * 0.5); ctx.closePath(); ctx.fill(); }
       } }
   ],
   ambient: [

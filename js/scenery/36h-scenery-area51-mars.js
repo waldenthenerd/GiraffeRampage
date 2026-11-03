@@ -363,6 +363,20 @@
       { id: 'mr_grit', count: 40, s: [0.8, 1.4], draw: wrap(function(ctx, d){
           ctx.fillStyle = 'rgba(70,26,16,.38)';
           for (let k = 0; k < 5; k++) ctx.fillRect((scRnd(d.seed, k) - 0.5) * 34, (scRnd(d.seed, k + 5) - 0.5) * 20, 2.5, 2);
+        }, 40) },
+      { id: 'mr_pebbles', count: 70, s: [0.8, 1.5], draw: wrap(function(ctx, d){                /* a scatter of loose stones, each with its shadow and a lit top */
+          for (let k = 0; k < 7; k++){ const x = (scRnd(d.seed, k) - 0.5) * 46, y = (scRnd(d.seed, k + 7) - 0.5) * 26, r = 1.6 + scRnd(d.seed, k + 14) * 2.6;
+            E(ctx, x + 1.2, y + 1.2, r * 1.1, r * 0.7, 'rgba(36,10,6,.3)'); E(ctx, x, y, r, r * 0.72, k % 3 ? '#6A3428' : '#7C4636'); E(ctx, x - r * 0.25, y - r * 0.25, r * 0.5, r * 0.3, 'rgba(210,150,120,.5)'); }
+        }, 34) },
+      { id: 'mr_blueberry', count: 34, s: [0.8, 1.4], draw: wrap(function(ctx, d){            /* the grey-blue hematite spherules of Meridiani: tiny round beads in the soil */
+          for (let k = 0; k < 9; k++){ const x = (scRnd(d.seed, k + 20) - 0.5) * 30, y = (scRnd(d.seed, k + 29) - 0.5) * 18, r = 1 + scRnd(d.seed, k + 38) * 1.2;
+            E(ctx, x + 0.6, y + 0.8, r, r * 0.8, 'rgba(30,10,6,.35)'); E(ctx, x, y, r, r, '#5A6676'); E(ctx, x - r * 0.3, y - r * 0.3, r * 0.4, r * 0.4, 'rgba(210,222,236,.7)'); }
+        }, 28) },
+      { id: 'mr_cracks', count: 26, s: [0.9, 1.5], draw: wrap(function(ctx, d){                /* dried ground broken into plates */
+          ctx.strokeStyle = 'rgba(50,16,10,.3)'; ctx.lineWidth = 1.4; ctx.lineJoin = 'round'; ctx.beginPath();
+          ctx.moveTo(-34, -4); ctx.lineTo(-18, 2); ctx.lineTo(-4, -3); ctx.lineTo(12, 4); ctx.lineTo(30, -1);
+          ctx.moveTo(-18, 2); ctx.lineTo(-14, 14); ctx.moveTo(-4, -3); ctx.lineTo(-2, -15); ctx.moveTo(12, 4); ctx.lineTo(18, 15); ctx.stroke();
+          ctx.strokeStyle = 'rgba(230,170,136,.18)'; ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(-34, -3); ctx.lineTo(-18, 3); ctx.lineTo(-4, -2); ctx.lineTo(12, 5); ctx.lineTo(30, 0); ctx.stroke();
         }, 40) }
     ],
     ambient: [

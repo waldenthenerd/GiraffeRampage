@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 226 | 69,906 | 5.75 MiB (6,026,951 bytes) |
+| JavaScript (`js/`) | 226 | 69,931 | 5.75 MiB (6,030,510 bytes) |
 | Styles (`css/`) | 6 | 1,801 | 165 KiB (168,749 bytes) |
 | Page (`index.html`) | 1 | 276 | 14.0 KiB (14,374 bytes) |
-| **Whole game** | **233** | **71,983** | **5.92 MiB (6,210,074 bytes)** |
+| **Whole game** | **233** | **72,008** | **5.93 MiB (6,213,633 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **71,382 lines, 5.88 MiB (6,163,092 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 226 | 69,906 | 5.75 MiB (6,026,951 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **71,407 lines, 5.88 MiB (6,166,651 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 226 | 69,931 | 5.75 MiB (6,030,510 bytes) |
 | Styles (`css/`) | 6 | 1,801 | 165 KiB (168,749 bytes) |
 | Page (`index.html`) | 1 | 276 | 14.0 KiB (14,374 bytes) |
-| **Whole game** | **233** | **71,983** | **5.92 MiB (6,210,074 bytes)** |
+| **Whole game** | **233** | **72,008** | **5.93 MiB (6,213,633 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -167,12 +167,12 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/render/36k-water-depth.js` | 192 | Moving water and wet or icy ground, wakes, and depth sorting so tall scenery overlaps creatures (SCEN_TALL). |
 | `js/render/36l-combat-fx.js` | 214 | Combat feedback: hit sparks and flashes, a death effect per kind of creature (`deathStyle`), stains and debris on the ground, damage-number sizing. |
 | `js/render/36m-giraffe-fx.js` | 136 | The giraffe's presentation: stride stretch, breathing, head sway, blinking, hoof dust, power glow, afterimages, level-up pulse (GF). |
-| `js/scenery/36c-scenery-savanna.js` | 345 | Scenery definitions: savanna (see js/scenery/36a-scenery-core.js for the format). Chapter 1 the dry savanna, chapter 11 the Changed Savannah. |
+| `js/scenery/36c-scenery-savanna.js` | 356 | Scenery definitions: savanna (see js/scenery/36a-scenery-core.js for the format). Chapter 1 the dry savanna, chapter 11 the Changed Savannah. |
 | `js/scenery/36d-scenery-arctic-swamp.js` | 404 | Scenery definitions: arctic-swamp (see js/scenery/36a-scenery-core.js for the format). Chapter 2 = Arctic (ar_), chapter 3 = Swamp (sw_). |
 | `js/scenery/36e-scenery-ocean-jungle.js` | 457 | Scenery definitions: ocean-jungle (see js/scenery/36a-scenery-core.js for the format). Chapter 4 = open ocean, chapter 5 = Amazon canopy. |
 | `js/scenery/36f-scenery-city-space.js` | 438 | Scenery definitions: city-space (see js/scenery/36a-scenery-core.js for the format). Chapter 6 Houston, chapter 7 Johnson Space Center. |
 | `js/scenery/36g-scenery-moon-venus-inferno.js` | 542 | Scenery definitions: moon-venus-inferno (see js/scenery/36a-scenery-core.js for the format). |
-| `js/scenery/36h-scenery-area51-mars.js` | 424 | Scenery definitions: area51-mars (see js/scenery/36a-scenery-core.js for the format). Chapter 12 Area 51 and chapter 13 Mars; everything is inside one function so it adds no globals, and the runway, hangars, hatch and Mars base are kept clear of scenery. |
+| `js/scenery/36h-scenery-area51-mars.js` | 438 | Scenery definitions: area51-mars (see js/scenery/36a-scenery-core.js for the format). Chapter 12 Area 51 and chapter 13 Mars; everything is inside one function so it adds no globals, and the runway, hangars, hatch and Mars base are kept clear of scenery. |
 | `js/scenery/36n-scenery-domes.js` | 137 | Scenery and the floor of the Domes (chapter 14): frosted steel plates, veins of glowing crystal root, frozen crates, seed pods, grow-lamps, vents breathing fog, falling flakes, and the dome's own rim of mylar panels. `drawGroundDome`, `buildGroundDome`, `buildDomeWorld`. |
 | `js/scenery/36o-scenery-detail.js` | 282 | **Scenery detail.** Wraps the `draw` of every prop, landmark, ground decal and terrain patch of every chapter with a layer of many small parts, from nine families chosen by the object's id (foliage rings and grass blades, rock and ice facets, bark and growth rings, panel seams and rivets, strata and grains, glowing cracks, reef polyps). Each object's own drawing is read once into a mask (shape, colours, centre, axis, foot), the parts are laid out once per object (seeded by its seed, a few ms a frame at most) as a display list, and a frame replays the list. Off when effects are off (`SD.off` switches it off in tests). Each object's still parts are drawn from one picture made at the scale they are seen at (`SDC`, up to 20 megapixels, a few ms a frame to make); the glints and embers are replayed live. |
 | `js/core/37-frame-transitions.js` | 413 | Frame composition, transform sequence, chapter transitions. |
