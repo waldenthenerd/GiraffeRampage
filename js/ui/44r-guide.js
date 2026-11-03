@@ -21,7 +21,7 @@ const GUIDE_TOPICS = [
          : '<li><b>Kick</b> toward your cursor. Hold the mouse button, or leave auto-kick on and it fires itself.</li>') +
       (t ? '<li><b>Pick a card</b> by tapping it.</li>' : '<li><b>Pick a card</b> with the mouse or keys 1, 2 and 3. Press ' + guideKey('reroll') + ' to reroll.</li>') +
       (t ? '<li><b>Pause</b> with the button in the top-right corner.</li>'
-         : '<li><b>Pause</b> with Escape or ' + guideKey('pause') + '. Mute with ' + guideKey('mute') + '. See the stats with ' + guideKey('stats') + '.</li>') +
+         : '<li><b>Pause</b> with Escape. Mute with ' + guideKey('mute') + '. See the stats with ' + guideKey('stats') + '.</li>') +
       '<li>Your health is the bar at the top. Hearts that drop from enemies heal you.</li></ul>';
   } },
   { id: 'runs', title: 'Runs, waves and chapters', show: function(){ return true; }, html: function(){

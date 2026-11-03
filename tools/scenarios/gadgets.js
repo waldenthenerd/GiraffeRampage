@@ -129,6 +129,10 @@
     var nc = document.createElement('canvas'); nc.width = 640; nc.height = 360; var nctx = nc.getContext('2d'); G.W = 640; G.H = 360;
     startRun(1); frames(2); var cnt = function(){ nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.clearRect(0, 0, 640, 360); drawNight(nctx, 0.8, P.x, P.y, 0, 0, '#FFE'); var d = nctx.getImageData(0, 0, 640, 360).data, a = 0; for (var q = 3; q < d.length; q += 4) a += d[q]; return a; };
     gadData().own.lamp = 0; var dark0 = cnt(); gadData().own.lamp = 1; var dark1 = cnt(); gadData().own.lamp = 2; var dark2 = cnt(); out.dark = [dark0, dark1, dark2]; check('torchLighter', dark1 < dark0); check('gogglesLighter', dark2 < dark1);
+    /* ---- pause is Escape only: P belongs to the phone ---- */
+    var key = function(code){ window.dispatchEvent(new KeyboardEvent('keydown', { code: code, bubbles: true })); window.dispatchEvent(new KeyboardEvent('keyup', { code: code, bubbles: true })); };
+    G.state = 'menu'; startRun(1); frames(2); key('KeyP'); frames(1); check('pNoPause', G.state === 'playing'); key('Escape'); frames(1); check('escPauses', G.state === 'paused'); key('Escape'); frames(1); check('escResumes', G.state === 'playing');
+    check('noPauseBinding', !KEY_ACTIONS.some(function(a){ return a[0] === 'pause'; }));
     /* ---- the old things still work ---- */
     G.state = 'menu'; Save.reset(); townEnter('square', 1000, 1); frames(10); check('streetsStill', Town.near === null || !!Town.near.label);
   } catch (err){ out.err = String(err && err.stack || err); }

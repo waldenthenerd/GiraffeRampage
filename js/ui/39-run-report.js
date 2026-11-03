@@ -120,9 +120,9 @@ function showStats(){
 }
 
 /* ---- rebindable keys ---- */
-const KEY_ACTIONS = [['up', 'Move up'], ['down', 'Move down'], ['left', 'Move left'], ['right', 'Move right'], ['kick', 'Kick'], ['pause', 'Pause'], ['slow', 'Slow time'], ['rover', 'Rover'],
+const KEY_ACTIONS = [['up', 'Move up'], ['down', 'Move down'], ['left', 'Move left'], ['right', 'Move right'], ['kick', 'Kick'], ['slow', 'Slow time'], ['rover', 'Rover'],
   ['stats', 'Stats panel'], ['mute', 'Mute'], ['reroll', 'Reroll cards'], ['squad1', 'Call alien 1'], ['squad2', 'Call alien 2'], ['squad3', 'Call alien 3'], ['squad4', 'Call alien 4'], ['squad5', 'Call alien 5'], ['nextwave', 'Call the next wave'], ['bread', 'Eat bread']];
-const DEFAULT_KEYS = { up: 'KeyW', down: 'KeyS', left: 'KeyA', right: 'KeyD', kick: 'Space', pause: 'KeyP', slow: 'KeyT', rover: 'KeyE', stats: 'KeyC', mute: 'KeyM', reroll: 'KeyR',
+const DEFAULT_KEYS = { up: 'KeyW', down: 'KeyS', left: 'KeyA', right: 'KeyD', kick: 'Space', slow: 'KeyT', rover: 'KeyE', stats: 'KeyC', mute: 'KeyM', reroll: 'KeyR',
   squad1: 'Digit1', squad2: 'Digit2', squad3: 'Digit3', squad4: 'Digit4', squad5: 'Digit5', nextwave: 'KeyN', bread: 'KeyB' };
 const KEY_BLOCKED = /^(Escape|Tab|Enter|NumpadEnter|Arrow\w+|F\d+|Backspace|ContextMenu|Meta\w*|OS\w*|Alt\w*|Control\w*|Shift\w*|CapsLock)$/;
 function keyOf(a){ const k = Settings.keys && Settings.keys[a]; return typeof k === 'string' && k ? k : DEFAULT_KEYS[a]; }

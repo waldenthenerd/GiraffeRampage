@@ -385,7 +385,7 @@ function showHelp(){
     : '<li><b>Pick a card</b> with the mouse or keys 1, 2 and 3. Press R to reroll.</li>';
   const pauseLine = touch
     ? '<li><b>Pause</b> with the button in the top-right corner.</li>'
-    : '<li><b>Pause</b> with Escape or ' + keyName(keyOf('pause')) + '. Mute with ' + keyName(keyOf('mute')) + '. Stats with ' + keyName(keyOf('stats')) + '.</li>';
+    : '<li><b>Pause</b> with Escape. Mute with ' + keyName(keyOf('mute')) + '. Stats with ' + keyName(keyOf('stats')) + '.</li>';
   /* Aim mode has no effect once there's touch input -- the kick always locks
      onto the nearest enemy then -- so the toggle is left out rather than
      shown as a control that visibly does nothing. */
