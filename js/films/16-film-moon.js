@@ -478,12 +478,19 @@ function csScenePad(ctx, u, t){
   ctx.fillStyle = '#1E2842'; ctx.beginPath(); ctx.ellipse(1120, 506, 32, 22, 0, 0, TAU); ctx.fill();
   ctx.fillStyle = '#16241E';
   for (let i = 0; i < 62; i++){ ctx.beginPath(); ctx.arc(i * 21 + csR(i) * 10, 608, 13 + csR(i + 50) * 12, 0, TAU); ctx.fill(); }
+  for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) if (csR(28000 + i * 3 + j) > 0.5) { ctx.fillStyle = '#FFD890'; ctx.fillRect(84 + i * 32, 410 + j * 16, 14, 6); }   /* some offices are lit */
+  fdAerial(ctx, 100, 380, 30, t, '#26314F'); fdDish(ctx, 220, 380, 1, t, '#26314F');
+  for (let k = 0; k < 9; k++){ const fx = 20 + k * 150 + csR(28100 + k) * 40; if (fx > 340 && fx < 940) continue; ctx.fillStyle = '#16241E'; ctx.fillRect(fx, 560, 3, 50); ctx.beginPath(); for (let a = 0; a < 6; a++){ const an = -Math.PI / 2 + (a - 2.5) * 0.45; ctx.moveTo(fx + 1, 560); ctx.quadraticCurveTo(fx + 1 + Math.cos(an) * 14, 560 + Math.sin(an) * 14 - 4, fx + 1 + Math.cos(an) * 24, 560 + Math.sin(an) * 18 + 6); } ctx.strokeStyle = '#16241E'; ctx.lineWidth = 3; ctx.stroke(); }   /* palm trees along the shore */
+  const flee = csSm(T0 - 0.6, T0 + 2.5, u); ctx.save(); ctx.translate(-flee * 260, -flee * 220); fdBirds(ctx, { n: 8, seed: 28200, t: t * (1 + flee * 2), y0: 330, y1: 470, v: 14, s: 1.1, col: 'rgba(30,26,40,.6)' }); ctx.restore();   /* birds, which leave in a hurry at ignition */
   ctx.restore();
   /* the world, following the rocket up */
   ctx.translate(0, cam);
   const gg = ctx.createLinearGradient(0, 610, 0, 900); gg.addColorStop(0, '#2B3B26'); gg.addColorStop(1, '#1A2416');
   ctx.fillStyle = gg; ctx.fillRect(-100, 610, 1500, 1200);
+  fdGrass(ctx, { n: 50, seed: 28300, t: t, y0: 616, y1: 716, x0: -60, span: 1400, col: '#3A4A2A', hi: '#5A6A3A' });
+  ctx.strokeStyle = '#4A5050'; ctx.lineWidth = 1.2; ctx.beginPath(); for (const [a, b] of [[-20, 330], [950, 1300]]){ ctx.moveTo(a, 640); ctx.lineTo(b, 640); ctx.moveTo(a, 652); ctx.lineTo(b, 652); for (let x = a; x <= b; x += 30){ ctx.moveTo(x, 660); ctx.lineTo(x, 634); } } ctx.stroke();   /* the perimeter fence */
   ctx.fillStyle = '#8E8E8A'; ctx.fillRect(360, 596, 560, 120); ctx.fillStyle = '#A8A8A4'; ctx.fillRect(360, 596, 560, 6);   /* the pad */
+  fdCracks(ctx, { n: 10, seed: 28400, y0: 610, y1: 690, x0: 360, span: 520, col: 'rgba(60,60,64,.45)' }); fdRivets(ctx, 370, 600, 910, 600, 27, 1.2, 'rgba(90,90,94,.8)');
   for (let x = 360; x < 920; x += 20){ ctx.fillStyle = ((x - 360) / 20) % 2 ? '#E8C020' : '#1A1A1E'; ctx.fillRect(x, 704, 20, 12); }
   ctx.fillStyle = '#15151A'; ctx.fillRect(588, 602, 104, 114);                                                                 /* the flame trench */
   ctx.fillStyle = '#2A2A30'; ctx.beginPath(); ctx.moveTo(606, 716); ctx.lineTo(640, 636); ctx.lineTo(674, 716); ctx.closePath(); ctx.fill();
@@ -801,6 +808,7 @@ function csSceneSurface(ctx, u, t){
   csMoonGround(ctx, 3, panPx * 9.9 / CS_F);
   ctx.translate(-panPx, 0);
   csLandingDust(ctx, (76 + u) - 73, CS_LX, CS_LY);
+  fdStones(ctx, { n: 26, seed: 28500, y0: 610, y1: 700, x0: -200, span: 1800, col: '#B4B2AC', dk: '#7A7874' });   /* pebbles in the regolith */
   /* hoofprints, one pair for every stride so far */
   const prog = csC((u - 10.2) / 4.8, 0, 1), xg = 820 + 190 * csSm(0, 1, prog);
   ctx.fillStyle = 'rgba(70,68,64,.7)';

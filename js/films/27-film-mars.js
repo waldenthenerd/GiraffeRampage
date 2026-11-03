@@ -48,7 +48,11 @@ function marsLand(ctx, t, gy, sc, dusk){
   csGlow(ctx, 900, gy - 40, 300, '#FFD0A0', 0.45); fillCircle(ctx, 900, gy - 40, 34, '#FFE8CC');
   afClouds(ctx, sc * 0.05 + t * 6, 4, 60, 220, 0.2, '#F0B898');
   afRidge(ctx, gy - 36, 66, 3.1, '#8A4630', sc * 0.1); afRidge(ctx, gy - 6, 46, 6.2, '#6A3424', sc * 0.25);
-  if (gy < CS_H){ const gg = ctx.createLinearGradient(0, gy, 0, CS_H); gg.addColorStop(0, '#A04A2C'); gg.addColorStop(1, '#5A2616'); ctx.fillStyle = gg; ctx.fillRect(0, gy, CS_W, CS_H - gy + 2); }
+  fillCircle(ctx, 1110, 120, 7, '#C8A898'); fillCircle(ctx, 1112, 118, 5, '#E0C4B4'); fillCircle(ctx, 300, 90, 4, '#B89888');   /* Phobos and Deimos */
+  for (let k = 0; k < 2; k++){ const x = fdWrap(400 + k * 700 - sc * 0.15 + t * 8, -100, 1500), h = 110 + k * 30; ctx.fillStyle = 'rgba(200,120,80,.18)'; ctx.beginPath(); ctx.moveTo(x - 6, gy - 30); for (let yy = 0; yy <= h; yy += 10){ const w = 6 + yy * 0.22; ctx.lineTo(x + Math.sin(t * 3 + yy * 0.1 + k) * 6 - w, gy - 30 - yy); } for (let yy = h; yy >= 0; yy -= 10){ const w = 6 + yy * 0.22; ctx.lineTo(x + Math.sin(t * 3 + yy * 0.1 + k) * 6 + w, gy - 30 - yy); } ctx.closePath(); ctx.fill(); }   /* dust devils on the far plain */
+  if (gy < CS_H){ const gg = ctx.createLinearGradient(0, gy, 0, CS_H); gg.addColorStop(0, '#A04A2C'); gg.addColorStop(1, '#5A2616'); ctx.fillStyle = gg; ctx.fillRect(0, gy, CS_W, CS_H - gy + 2);
+    for (let k = 0; k < 5; k++){ const f = csR(27000 + k), x = fdWrap(csR(27010 + k) * 1500 - sc * (0.6 + f), -100, 1500), y = gy + 20 + f * (CS_H - gy - 30), r = 18 + f * 30; ctx.fillStyle = 'rgba(60,20,10,.3)'; ctx.beginPath(); ctx.ellipse(x, y, r, r * 0.28, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(230,150,110,.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(x, y + 1, r, r * 0.28, 0, 0.1, Math.PI - 0.1); ctx.stroke(); }   /* small craters with a lit rim */
+    fdStones(ctx, { n: 22, seed: 27100, sc: sc, y0: gy + 10, y1: CS_H - 4, col: '#B8603A', dk: '#6A2A18' }); }
 }
 /* ---- film 1 (18 s): the Mutation Vial, the SP-1 in space, the landing ---- */
 const MARS_TRIP_T = { B: 5.5, C: 12, END: 18 };
@@ -72,6 +76,7 @@ function marsTripScene(ctx, t){
     ctx.fillStyle = '#02040C'; ctx.fillRect(0, 0, CS_W, CS_H); csStars(ctx, 1, t, -u * 30, 0);
     csEarth(ctx, csLerp(260, -30, p), csLerp(500, 700, p), csLerp(180, 70, p), t * 0.05, t, false);
     marsPlanet(ctx, csLerp(1090, 900, p), csLerp(200, 260, p), csLerp(34, 150, p));
+    { const mx = csLerp(240, 120, p), my = csLerp(360, 470, p); fillCircle(ctx, mx, my, csLerp(46, 22, p), '#C8C8CC'); for (let k = 0; k < 5; k++) fillCircle(ctx, mx + (csR(27300 + k) - 0.5) * csLerp(50, 24, p), my + (csR(27350 + k) - 0.5) * csLerp(50, 24, p), csLerp(6, 3, p) * (0.5 + csR(27400 + k)), '#9A9AA2'); }   /* the Moon going by */
     hmPlane(ctx, { x: csLerp(380, 560, p), y: 380 + Math.sin(t * 1.4) * 8, s: 1.1, build: 4, t: t, rot: -0.02, flame: 80 + 20 * Math.sin(t * 9), core: 0.9, pilot: 1, bare: false });
   } else {
     const u = t - T.C, land = csSm(0, 3.8, u), gy = 560;
@@ -103,6 +108,9 @@ function marsShip(ctx, x, y, s, rot, t){
   ctx.fillStyle = '#3B5B92'; ctx.fillRect(-50, -4, 100, 8); ctx.fillStyle = '#DDE3EC'; ctx.fillRect(-20, -26, 12, 52);
   ctx.fillStyle = '#7FD8FF'; ctx.beginPath(); ctx.ellipse(40, 0, 16, 7, 0, 0, TAU); ctx.fill();
   ctx.fillStyle = '#4A5468'; ctx.beginPath(); ctx.moveTo(-30, -24); ctx.lineTo(-62, -52); ctx.lineTo(-52, -24); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(-30, 24); ctx.lineTo(-62, 52); ctx.lineTo(-52, 24); ctx.closePath(); ctx.fill();
+  fdSeams(ctx, [10, -22, 10, 22, -36, -25, -36, 25, 30, -14, -50, -14, 30, 14, -50, 14], 'rgba(40,48,64,.5)', 1.2); fdRivets(ctx, -48, -20, 24, -20, 9, 1); fdRivets(ctx, -48, 20, 24, 20, 9, 1);
+  ctx.fillStyle = '#C8E8FF'; for (let k = 0; k < 4; k++) ctx.fillRect(-44 + k * 14, -12, 6, 4);              /* portholes */
+  fdLamp(ctx, -60, -50, 2.4, '#FF4A3A', Math.sin(t * 5) > 0); fdLamp(ctx, -60, 50, 2.4, '#4AFF7A', Math.sin(t * 5) > 0); fdLamp(ctx, 66, 0, 2, '#FFFFFF', Math.sin(t * 3) > 0.3);
   ctx.restore();
 }
 function marsShipsScene(ctx, t){
@@ -120,7 +128,9 @@ function marsShipsScene(ctx, t){
     ctx.fillStyle = '#2A0E08'; ctx.beginPath(); ctx.ellipse(x, y - h * 0.5, 12 * s, h * 0.7, 0, 0, TAU); ctx.fill();
     for (const sd of [-1, 1]) lkLN(ctx, [x + sd * 8 * s, y - h * 0.4, x + sd * 16 * s, y], 2 * s, '#2A0E08');
     csGlow(ctx, x - 3, y - h * 0.7, 6, '#FFD0A0', 0.5 + 0.5 * rise); csGlow(ctx, x + 3, y - h * 0.7, 6, '#FFD0A0', 0.5 + 0.5 * rise);
+    ctx.fillStyle = 'rgba(200,110,70,.35)'; for (let i = 0; i < 3; i++){ const a = (t * 0.8 + i / 3 + k * 0.13) % 1; ctx.globalAlpha = 0.5 * (1 - a); ctx.beginPath(); ctx.arc(x + Math.sin(k + i) * 10, y - a * h * 1.2, 2 + a * 3, 0, TAU); ctx.fill(); } ctx.globalAlpha = 1;   /* dust trickling off them as they stand */
   }
+  fdMotes(ctx, { n: 30, seed: 27200, t: t, v: 0.03, r: 1.4, a: 0.4, col: '#E8A880', wob: 40 });                      /* fine dust in the red air */
 }
 MARS_FILMS.mships = {
   end: MARS_SHIPS_END, starts: [0, 2, 4, 6, 0, 0, 0, 0], scene: marsShipsScene,
@@ -151,8 +161,13 @@ function marsLab(ctx, x, y, p, t){
   if (b > 0.01){ ctx.fillStyle = '#6A5A4A'; ctx.fillRect(x - w / 2 + 4, y - h * b + 4, w - 8, h * b - 4); ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 2; for (let k = 1; k < 5; k++){ ctx.beginPath(); ctx.moveTo(x - w / 2 + 4, y - h * b * k / 5); ctx.lineTo(x + w / 2 - 4, y - h * b * k / 5); ctx.stroke(); } }
   if (c > 0.01){ ctx.fillStyle = 'rgba(160,230,200,' + (0.22 * c) + ')'; ctx.fillRect(x - w / 2 + 28, y - 190, 120, 110 * c); ctx.fillRect(x + w / 2 - 148, y - 190, 120, 110 * c); ctx.strokeStyle = '#C8E8D8'; ctx.lineWidth = 3; ctx.globalAlpha = c; ctx.strokeRect(x - w / 2 + 28, y - 190, 120, 110); ctx.strokeRect(x + w / 2 - 148, y - 190, 120, 110); ctx.globalAlpha = 1;
     ctx.fillStyle = '#2A3A32'; ctx.fillRect(x - 40, y - 120 * c, 80, 120 * c); }
+  if (c > 0.3){ ctx.globalAlpha = c; ctx.strokeStyle = '#5A4A3A'; ctx.lineWidth = 2; ctx.beginPath(); for (let k = 0; k < 5; k++){ ctx.moveTo(x - w / 2 + 4, y - 30 - k * 44); ctx.lineTo(x + w / 2 - 4, y - 30 - k * 44); } ctx.stroke(); ctx.globalAlpha = 1; }   /* plank seams */
   if (d > 0.01){
-    ctx.globalAlpha = d; ctx.fillStyle = '#4A3A2A'; ctx.fillRect(x - w / 2 + 40, y - 70, 150, 12); ctx.fillRect(x - w / 2 + 50, y - 58, 8, 58); ctx.fillRect(x - w / 2 + 172, y - 58, 8, 58);
+    ctx.globalAlpha = d;
+    for (let k = 0; k < 3; k++){ const fx = x - w / 2 + 60 + k * 34; ctx.fillStyle = 'rgba(200,255,200,.35)'; ctx.fillRect(fx, y - 92, 14, 22); ctx.fillStyle = k === 1 ? '#9BE86A' : '#7AD8FF'; ctx.fillRect(fx + 2, y - 84, 10, 14); }   /* flasks on the bench */
+    ctx.fillStyle = '#2E5A2A'; ctx.beginPath(); ctx.arc(x + w / 2 - 30, y - 18, 16, Math.PI, TAU); ctx.fill(); ctx.fillStyle = '#8A5A3A'; ctx.fillRect(x + w / 2 - 40, y - 18, 20, 18);   /* a potted plant */
+    ctx.fillStyle = '#E8E0C8'; ctx.fillRect(x - w / 2 + 160, y - 160, 50, 34); ctx.strokeStyle = '#4A3A2A'; ctx.lineWidth = 1; ctx.beginPath(); for (let k = 0; k < 4; k++){ ctx.moveTo(x - w / 2 + 166, y - 152 + k * 7); ctx.lineTo(x - w / 2 + 200, y - 152 + k * 7); } ctx.stroke();   /* a chart pinned to the wall */
+    ctx.fillStyle = '#4A3A2A'; ctx.fillRect(x - w / 2 + 40, y - 70, 150, 12); ctx.fillRect(x - w / 2 + 50, y - 58, 8, 58); ctx.fillRect(x - w / 2 + 172, y - 58, 8, 58);
     csGlow(ctx, x + w / 2 - 60, y - 200, 70, '#FFE0A0', 0.5); fillCircle(ctx, x + w / 2 - 60, y - 200, 9, '#FFF0C0');
     csText(ctx, 'LAB', x, y - h - 16, 26, '#E8F4E0', 'center', '800'); ctx.globalAlpha = 1;
   }
@@ -179,6 +194,8 @@ function marsHomeScene(ctx, t){
   } else if (t < T.E){                                                                  /* the SP-1 lands on the old airfield and she steps out, helmet off */
     const u = t - T.D, land = csSm(0, 3.0, u), gy = 566, PS = 1.5;
     afSavanna(ctx, t, gy, 0); ctx.fillStyle = '#4A4650'; ctx.fillRect(0, gy, CS_W, 24); ctx.fillStyle = '#6A6670'; ctx.fillRect(0, gy, CS_W, 5);
+    ctx.fillStyle = '#F4C040'; for (let x = 20; x < CS_W; x += 120) ctx.fillRect(x, gy + 12, 60, 4); fdCracks(ctx, { n: 12, seed: 27500, y0: gy + 4, y1: gy + 20, col: 'rgba(20,16,20,.4)' });
+    for (let x = 30; x < CS_W; x += 150) fdLamp(ctx, x, gy - 2, 2.4, '#FFD060', Math.sin(t * 2 + x) > -0.5);
     const py = csLerp(120, gy - 44 * PS, land);
     hmPlane(ctx, { x: 760, y: py, s: PS, build: 4, t: t, rot: 0.1 * (1 - land), gear: land > 0.7, flame: land < 0.9 ? 40 + 80 * (1 - land) : 0, core: 0.6, pilot: u > 4.2 ? 1 - csSm(4.2, 4.8, u) : 1, bare: u > 3.6, canopy: csBump(u, 3.4, 99, 0.7) });
     if (u > 4.4) csGiraffe(ctx, { x: csLerp(800, 1000, csSm(4.4, 5.5, u)), y: gy + 22, s: 0.66, face: 1, walk: u * 8, moving: u < 5.4, neck: 0.25, head: 0.1, bare: true, boots: false });

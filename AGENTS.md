@@ -57,7 +57,7 @@ size to keep working, buttons reachable without scrolling where they can be), an
   count check, the regression scenarios below on desktop and phone, and the package ship check. It takes about a minute and must end with `All <n> checks passed.`
   Also run the scenarios that touch what you changed. The regressions it covers are: `gear-oldsave`, `trinket-ui`, `wheel-spotted`,
   `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `save-gr3`, `npc-voices`, `gear-spotted`, `perf-cache`, `save-erase`, `gold-bank`, `together`, `achievements`, `gags`, `fishing`, `fishing-fight`, `input-choice`, `town-layers`, `wheels`, `intel`, `uni-bank`, `uni-slides`, `ui-pass`, `enemy-detail`, `enemy-motion`, `scenery-detail`, `minimap`, `domes`, `tower`, `siege`, `fort`, `island`, `camp`, `late-polish`, `sea-chart`,
-  `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, `music`, `jukebox`, `town-choices`, `particles`, and `phone-pass` (with `--touch`). Then build the website package and check it:
+  `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, `music`, `jukebox`, `town-choices`, `particles`, `film-sheet` (with `--params "kind=all"`), and `phone-pass` (with `--touch`). Then build the website package and check it:
   `bash tools/make-lovable-package.sh`, unzip `dist/GiraffeRampage-lovable.zip`, and run `QA_ROOT=<folder>/GiraffeRampage node tools/qa-cloud.mjs tools/scenarios/ship-check.js --wait 60000` (it must say `"pass":true`).
 - New behavior gets a scenario in `tools/scenarios/` (copy the nearest one) and a line about it in `tools/QA-GUIDE.md`.
 
