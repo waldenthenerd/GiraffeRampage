@@ -17,13 +17,43 @@
    The key is: chapter, effects level, state, size (to 0.5) and the screen scale, so nothing stale is ever drawn after a change.
    The picture is cropped to what was actually drawn. If a drawing touches the edge of its box it is not cached. The total is
    capped (SPRITE_BUDGET pixels); when it is reached the cache is emptied and refills as needed. */
+/* Rules for drawings that read one thing more than SAFE_READ, so they can be cached too (keyed by the look's name, or 'type:' and the kind
+   for a drawing without a look). A rule may give:
+     key(e)    a small whole number folded into the cache key (a light that is on or off, a timer past a mark), and set(base, key) writes
+               the fields the drawing reads so the picture shows that case; the fields set() writes are then allowed to be read;
+     alpha(e)  the picture is made fully visible and drawn at this opacity (a creature that fades in and out);
+     only(e)   false: draw it live this frame (a jumper off the ground);
+     clock     the drawing's own clock (rotors, flames, drifting soot) follows the picture's loop: it is painted with G.time = phase / 6 and
+               the phase is taken from G.time (6 a second, like the stride), so it keeps moving when the creature stands still.
+   Only what the rule names is relaxed; every other test of the probe still applies. */
+const SPRITE_FUSE = (function(){ const on = function(f){ return Math.sin(f * (10 + (3.2 - f) * 6)) > 0; }; let a = 3, b = 3; for (let f = 3.2; f > 0.1; f -= 0.01){ if (on(f)) a = f; else b = f; } return [b, a]; })();
+const SPRITE_RULES = {
+  helicopter: { clock: true }, quadcopter: { clock: true }, infernoblade: { clock: true }, bladewhirl: { clock: true },
+  firewisp: { clock: true, set: function(b){ b.x = 0; } },
+  cinderimp: { clock: true, set: function(b){ b.x = 0; } },
+  sootshaman: { clock: true, key: function(e){ return e.healTgtT > 0 ? 1 : 0; }, set: function(b, k){ b.healTgtT = k; } },
+  shadowop: { alpha: function(e){ return e.vis === undefined ? 0.1 : e.vis; }, set: function(b){ b.vis = 1; } },
+  droppod: { key: function(e){ return (e.stateT > 2.3 ? 2 : 0) + (e.stateT < 1 ? 1 : 0); }, set: function(b, k){ b.stateT = k & 2 ? 2.5 : k & 1 ? 0.5 : 1.5; } },
+  jumptrooper: { only: function(e){ return !e.z; }, set: function(b){ b.z = 0; } },
+  dust_leaper: { only: function(e){ return !e.z; }, set: function(b){ b.z = 0; } },
+  breacher: { key: function(e){ const f = e.fuse === undefined ? 3 : e.fuse; return Math.sin(f * (10 + (3.2 - (e.fuse || 3)) * 6)) > 0 ? 1 : 0; }, set: function(b, k){ b.fuse = SPRITE_FUSE[k]; } },
+  sentryturret: { key: function(e){ return (e.life === undefined ? 14 : e.life) < 3 ? 1 : 0; }, set: function(b, k){ b.life = k ? 2 : 14; } },
+  dust_brood: { key: function(e){ return e.brT !== undefined && e.brT < 0.8 ? 1 : 0; }, set: function(b, k){ b.brT = k ? 0.5 : 2; } },
+  dust_raker: { key: function(e){ return Math.round(Math.max(0, Math.min(1, e.rage || 0)) * 4); }, set: function(b, k){ b.rage = k / 4; } },
+  reaperdrone: { clock: true }, attackdrone: { clock: true },
+  'type:honeybadger': { key: function(e){ return (e.glimHeat || 0) > 0.4 ? 1 : 0; }, set: function(b, k){ b.glimHeat = k; } }
+};
+SPRITE_RULES.glim_honeybadger = SPRITE_RULES['type:honeybadger'];
+if (typeof A51_ALIAS !== 'undefined') Object.keys(A51_ALIAS).forEach(function(k){ if (SPRITE_RULES[A51_ALIAS[k]]) SPRITE_RULES[k] = SPRITE_RULES[A51_ALIAS[k]]; });     /* Area 51 wears the marines' drawings */
+Object.keys(SPRITE_RULES).forEach(function(n){ const R = SPRITE_RULES[n], o = {}; if (R.set) R.set(o, 1); R.reads = o; });
+function spriteRule(d, type){ return (d.look ? SPRITE_RULES[d.look] : SPRITE_RULES['type:' + type]) || null; }
 const EnemySprite = (function(){
   const MAX_CYCLES = 10, SPRITE_BUDGET = 18e6;
   const frames = function(k){ return Math.min(160, 16 * k); };       /* pictures per loop: 16 for every turn of the animation */
   const SAFE_READ = { def: 1, type: 1, r: 1, anim: 1, state: 1, flash: 1, big: 1, portrait: 1 };
   const ccDesc = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'globalCompositeOperation');
   let maps = new WeakMap(), px = 0, probeA = null, probeB = null, scratchSize = 0, gen = 0;      /* gen: bumped whenever the pictures are thrown away, so a creature's remembered entry is known to be stale */
-  const stats = { drawn: 0, live: 0, built: 0, bad: 0, why: {}, liveBy: { portrait: 0, big: 0, flash: 0, off: 0, kind: 0, edge: 0, wait: 0 } };
+  const stats = { drawn: 0, live: 0, built: 0, bad: 0, why: {}, liveBy: { portrait: 0, big: 0, flash: 0, off: 0, kind: 0, edge: 0, wait: 0, rule: 0 } };
   let on = true;
   /* new pictures are made for a few milliseconds per frame at most (a creature that has to wait is simply drawn live that frame), so
      filling the cache never causes a hitch. It is a time budget, not a count: a fast device makes many pictures in its few
@@ -48,17 +78,20 @@ const EnemySprite = (function(){
     return guarded(cv);
   }
   /* run the drawing once into context c (size x size px, the creature at its center) at animation phase anim; returns what happened */
-  function paint(c, def, type, state, r, anim, sc, size, spy, cols){
+  function paint(c, def, type, state, r, anim, sc, size, spy, cols, R, kv){
     c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, size, size);
     c.setTransform(sc, 0, 0, sc, size / 2, size / 2);
     c._bad = false;
     const base = { def: def, type: type, r: r, anim: anim, state: state, flash: 0, big: false, portrait: false, x: 0, y: 0, ang: 0 };
-    const te = spy ? new Proxy(base, { get: function(t, k){ if (typeof k === 'string' && !SAFE_READ[k]) spy.reads[k] = 1; return t[k]; }, has: function(t, k){ if (typeof k === 'string' && !SAFE_READ[k]) spy.reads[k] = 1; return k in t; } }) : base;
-    const rnd = Math.random, np = G.particles.length, nt = G.texts ? G.texts.length : 0;
+    if (R && R.set) R.set(base, kv);
+    const ok = function(k){ return SAFE_READ[k] || (R && R.reads && k in R.reads); };
+    const te = spy ? new Proxy(base, { get: function(t, k){ if (typeof k === 'string' && !ok(k)) spy.reads[k] = 1; return t[k]; }, has: function(t, k){ if (typeof k === 'string' && !ok(k)) spy.reads[k] = 1; return k in t; } }) : base;
+    const rnd = Math.random, np = G.particles.length, nt = G.texts ? G.texts.length : 0, t0 = G.time;
     let calls = 0;
     Math.random = function(){ calls++; return rnd(); };
+    if (R && R.clock) G.time = anim / 6;                                    /* its own clock follows the loop (see SPRITE_RULES) */
     try { drawEnemyBody(c, te, cols ? cols.body : def.color, cols ? cols.dk : def.dark, Math.sin(anim) * (r * 0.06), state === 'wind', def); }
-    finally { Math.random = rnd; }
+    finally { Math.random = rnd; G.time = t0; }
     const side = G.particles.length !== np || (G.texts && G.texts.length !== nt);
     if (G.particles.length > np) G.particles.length = np;
     if (G.texts && G.texts.length > nt) G.texts.length = nt;
@@ -75,33 +108,33 @@ const EnemySprite = (function(){
     }
     return n === 0 || diff / n < 0.02;
   }
-  function probe(def, type, state, r){
+  function probe(def, type, state, r, R, kv){
     const size = Math.ceil((r * 2.2 + 24) * 2);
     if (size > 400) return 'too big';
     if (!probeA || scratchSize < size){ probeA = canvas(size); probeB = canvas(size); scratchSize = size; }
     const A = probeA, B = probeB, spy = { reads: {} };
     const t0 = G.time, a0 = 0.7;
-    const f1 = paint(A, def, type, state, r, a0, 1, size, spy);
+    const f1 = paint(A, def, type, state, r, a0, 1, size, spy, null, R, kv);
     if (f1.random) return 'uses random';
     if (f1.side) return 'adds particles or text';
     if (f1.blend) return 'blend mode';
     const keys = Object.keys(spy.reads);
     if (keys.length) return 'reads ' + keys.slice(0, 4).join(',');
     G.time = t0 + 0.43;
-    try { paint(B, def, type, state, r, a0, 1, size, null); } finally { G.time = t0; }
+    try { paint(B, def, type, state, r, a0, 1, size, null, null, R, kv); } finally { G.time = t0; }
     if (!same(A, B, size)) return 'depends on the clock';
     for (let k = 1; k <= MAX_CYCLES; k++){
-      paint(B, def, type, state, r, a0 + k * TAU, 1, size, null);
+      paint(B, def, type, state, r, a0 + k * TAU, 1, size, null, null, R, kv);
       if (same(A, B, size)) return k;
     }
     return 'does not loop';
   }
-  function build(def, type, state, r, idx, sc, cycles, F, cols){
+  function build(def, type, state, r, idx, sc, cycles, F, cols, R, kv){
     const size = Math.ceil((r * 2.2 + 24) * 2 * sc);
     if (size > 900) return null;
     const c = canvas(size);
     const anim = (idx + 0.5) * TAU * cycles / F;
-    const res = paint(c, def, type, state, r, anim, sc, size, null, cols);
+    const res = paint(c, def, type, state, r, anim, sc, size, null, cols, R, kv);
     if (res.random || res.side || res.blend) return null;
     const d = c.getImageData(0, 0, size, size).data;
     let x0 = size, y0 = size, x1 = -1, y1 = -1;
@@ -117,32 +150,34 @@ const EnemySprite = (function(){
   function draw(ctx, e, d){
     if (!on || e.portrait || e.big || !d || !(e.anim === e.anim)){ stats.live++; stats.liveBy[!on ? 'off' : e.portrait ? 'portrait' : 'big']++; return false; }
     const sc = Math.min(2.5, Math.max(0.75, Math.round(G.zoom * G.dpr * 6) / 4));      /* made at 1.5 times the screen's scale (up to 2.5), so drawing them smaller keeps the edges crisp */
-    const rq = Math.max(1, Math.round(e.r * 2));
+    const rq = Math.max(1, Math.round(e.r * 2)), R = spriteRule(d, e.type);
+    if (R && R.only && !R.only(e)){ stats.live++; stats.liveBy.rule++; return false; }
+    const kv = R && R.key ? R.key(e) : 0;
     /* what picture set it uses is remembered on the creature and only looked up again when the chapter, effects level, kind, state or size changes
        (building the key text for every creature on every frame was a large part of the cost of this cache) */
-    const chn = G.chapter | 0, fxv = fxLevelNow(), sk = e._sk || (e._sk = { gen: -1, ch: 0, fx: 0, ty: '', st: '', rq: 0, sc: 0, ent: null });
+    const chn = G.chapter | 0, fxv = fxLevelNow(), sk = e._sk || (e._sk = { gen: -1, ch: 0, fx: 0, ty: '', st: '', rq: 0, sc: 0, kv: 0, ent: null });
     let ent, per = null, key = '';
-    if (sk.gen === gen && sk.ent !== null && sk.ch === chn && sk.fx === fxv && sk.ty === e.type && sk.st === e.state && sk.rq === rq && sk.sc === sc) ent = sk.ent;
+    if (sk.gen === gen && sk.ent !== null && sk.ch === chn && sk.fx === fxv && sk.ty === e.type && sk.st === e.state && sk.rq === rq && sk.sc === sc && sk.kv === kv) ent = sk.ent;
     else {
-      key = chn + '|' + fxv + '|' + e.type + '|' + e.state + '|' + rq + '|' + sc;
+      key = chn + '|' + fxv + '|' + e.type + '|' + e.state + '|' + rq + '|' + sc + '|' + kv;
       per = maps.get(d);
       if (!per){ per = new Map(); maps.set(d, per); }
       ent = per.get(key);
       if (!ent){
         if (!canBuild()){ stats.live++; stats.liveBy.wait++; return false; }
-        const tb = performance.now(), why = probe(d, e.type, e.state, rq / 2);
+        const tb = performance.now(), why = probe(d, e.type, e.state, rq / 2, R, kv);
         charge(tb);
         ent = { ok: typeof why === 'number', k: typeof why === 'number' ? why : 1, frames: new Array(typeof why === 'number' ? frames(why) : 0), fl: {} };
         if (typeof why !== 'number'){ stats.bad++; stats.why['c' + chn + ' ' + e.type + ' ' + e.state] = why; }
         per.set(key, ent);
       }
-      sk.gen = gen; sk.ch = chn; sk.fx = fxv; sk.ty = e.type; sk.st = e.state; sk.rq = rq; sk.sc = sc; sk.ent = ent;
+      sk.gen = gen; sk.ch = chn; sk.fx = fxv; sk.ty = e.type; sk.st = e.state; sk.rq = rq; sk.sc = sc; sk.kv = kv; sk.ent = ent;
     }
     if (!ent.ok){ stats.live++; stats.liveBy.kind++; return false; }
     /* a creature that is flashing from a hit has its colors blended toward white (the player's Hit flash setting); that is a second,
        coarser set of pictures (8 per loop; the flash is over in a fraction of a second) */
     const hf = e.flash > 0 ? Settings.hitFlash : 0;
-    const span = TAU * ent.k, ph = ((e.anim % span) + span) % span;
+    const A = R && R.clock ? G.time * 6 + (e.ph || 0) : e.anim, span = TAU * ent.k, ph = ((A % span) + span) % span;
     let arr = ent.frames, F = arr.length, cols = null;
     if (hf > 0){
       const q = Math.round(hf * 20) / 20;
@@ -152,14 +187,17 @@ const EnemySprite = (function(){
     const idx = Math.min(F - 1, Math.floor(ph / span * F));
     let f = arr[idx];
     if (f === undefined){
-      if (px > SPRITE_BUDGET){ maps = new WeakMap(); gen++; px = 0; per = new Map(); maps.set(d, per); per.set(key || (chn + '|' + fxv + '|' + e.type + '|' + e.state + '|' + rq + '|' + sc), ent); sk.gen = gen; ent.frames = new Array(ent.frames.length); ent.fl = {}; arr = hf > 0 ? (ent.fl[Math.round(hf * 20) / 20] = new Array(8)) : ent.frames; }
+      if (px > SPRITE_BUDGET){ maps = new WeakMap(); gen++; px = 0; per = new Map(); maps.set(d, per); per.set(key || (chn + '|' + fxv + '|' + e.type + '|' + e.state + '|' + rq + '|' + sc + '|' + kv), ent); sk.gen = gen; ent.frames = new Array(ent.frames.length); ent.fl = {}; arr = hf > 0 ? (ent.fl[Math.round(hf * 20) / 20] = new Array(8)) : ent.frames; }
       if (!canBuild()){ stats.live++; stats.liveBy.wait++; return false; }
       const tb = performance.now();
-      f = arr[idx] = build(d, e.type, e.state, rq / 2, idx, sc, ent.k, F, cols);
+      f = arr[idx] = build(d, e.type, e.state, rq / 2, idx, sc, ent.k, F, cols, R, kv);
       charge(tb);
     }
     if (f === null){ ent.ok = false; stats.bad++; stats.live++; stats.liveBy.edge++; return false; }
-    if (f.cv) ctx.drawImage(f.cv, f.x, f.y, f.w, f.h);
+    if (f.cv){
+      if (R && R.alpha){ const ga = ctx.globalAlpha; ctx.globalAlpha = ga * R.alpha(e); ctx.drawImage(f.cv, f.x, f.y, f.w, f.h); ctx.globalAlpha = ga; }
+      else ctx.drawImage(f.cv, f.x, f.y, f.w, f.h);
+    }
     stats.drawn++;
     return true;
   }

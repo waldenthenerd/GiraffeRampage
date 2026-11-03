@@ -43,11 +43,28 @@
     startRun(16, 361); for (s = 0; s < 4; s++) GR.step(1 / 30); G.W = 1280; G.H = 720; G.enemies.length = 0; G.state = 'playing'; P.invuln = 1e9;
     var keys = Object.keys(SGB), kb = SGB[keys[0]]; kb.hp = SIEGE_BLD.max; paint(); var g1 = count(88, 200, 74, 30); kb.hp = SIEGE_BLD.max * 0.2; paint(); var g2 = count(88, 200, 74, 30), r2 = count(240, 96, 58, 30);
     out.siegeHealth = g1 > g2 && r2 > 0; out.siegeKeys = keys.length >= 5;
+    /* what stands still is kept as a picture (MM_CACHE): it looks like the map drawn all live, it is not made again every frame while she walks
+       about zoomed in, and a new arena makes a new one */
+    var cmp = [];
+    [1, 6, 10, 15, 16].forEach(function(ch){
+      startRun(ch, first[ch]); for (s = 0; s < 4; s++) GR.step(1 / 30); G.W = 1280; G.H = 720; G.state = 'playing'; P.invuln = 1e9;
+      [[0.4, 0], [1, 1]].forEach(function(sz){
+        Settings.mmSize = sz[0]; Settings.mmZoom = sz[1]; var B = box();
+        MM_CACHE.on = true; paint(); var a = c.getImageData(B.x, B.y, B.w, B.h).data; MM_CACHE.on = false; paint(); var b = c.getImageData(B.x, B.y, B.w, B.h).data; MM_CACHE.on = true;
+        var n = 0; for (var q = 0; q < a.length; q += 4) if (Math.abs(a[q] - b[q]) + Math.abs(a[q + 1] - b[q + 1]) + Math.abs(a[q + 2] - b[q + 2]) > 90) n++;
+        cmp.push(+(n / (a.length / 4) * 100).toFixed(2));
+      });
+    });
+    out.cacheDiffPct = cmp; out.cacheSame = cmp.every(function(v){ return v < 3; });
+    startRun(1, 1); for (s = 0; s < 4; s++) GR.step(1 / 30); G.W = 1280; G.H = 720; G.state = 'playing'; Settings.mmSize = 0.6; Settings.mmZoom = 1; P.x = 900; P.y = 900; paint();
+    var b0 = MM_CACHE.builds; for (s = 0; s < 120; s++){ P.x += 8; P.y += 3; G.camX = P.x; G.camY = P.y; paint(); }
+    out.cacheBuilds = MM_CACHE.builds - b0; out.cacheReuse = out.cacheBuilds >= 1 && out.cacheBuilds <= 12;
+    var p0 = MM_CACHE.props; startRun(1, 1); for (s = 0; s < 4; s++) GR.step(1 / 30); G.W = 1280; G.H = 720; G.state = 'playing'; paint(); out.cacheNewArena = MM_CACHE.props === SCEN.props && MM_CACHE.props !== p0;
     /* a phone without the opt-in draws nothing, and nothing in the demo */
     Input.hasTouch = true; Settings.minimap = 'auto'; G.state = 'playing'; G.attract = false; out.phoneNone = !(mmOn());
     Input.hasTouch = false; Settings.minimap = 'on'; G.attract = true; var hit = 0, orig = mmDraw; mmDraw = function(){ hit++; }; drawScreenFX(c); G.attract = false; drawScreenFX(c); mmDraw = orig; out.attractNone = hit === 1;
     Input.hasTouch = was;
   } catch (err){ out.err = String(err && err.stack || err); }
-  out.pass = out.errs.length === 0 && !out.err && out.deskOn && out.phoneOff && out.phoneOptIn && out.deskOff && out.clamp && out.sane && out.keeps && out.bad.length === 0 && out.dots && out.boss && out.arrow && out.cornerOnly && out.towerFloors && out.siegeHealth && out.siegeKeys && out.phoneNone && out.attractNone;
+  out.pass = out.errs.length === 0 && !out.err && out.deskOn && out.phoneOff && out.phoneOptIn && out.deskOff && out.clamp && out.sane && out.keeps && out.bad.length === 0 && out.dots && out.boss && out.arrow && out.cornerOnly && out.towerFloors && out.siegeHealth && out.siegeKeys && out.cacheSame && out.cacheReuse && out.cacheNewArena && out.phoneNone && out.attractNone;
   QA.done(out);
 })();

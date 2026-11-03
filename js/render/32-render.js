@@ -687,13 +687,24 @@ function drawSwipes(ctx){
   }
 }
 
+/* The plain round dots are most of the particles. They are not filled one by one: each is added to the path of its color and its
+   opacity (in sixteen steps), and each such path is filled once after the other shapes, so a burst of forty sparks of one color is
+   one fill, not forty. PART_BATCH.on = false draws them one at a time as before (tests). */
+const PART_BATCH = { on: true, cols: new Map(), used: [] };
 function drawParticles(ctx){
-  const ps = G.particles, v = viewBounds(70);
+  const ps = G.particles, v = viewBounds(70), B = PART_BATCH, batch = B.on;
   for (let i = 0; i < ps.length; i++){
     const p = ps[i];
     if (p.x < v.x0 || p.x > v.x1 || p.y < v.y0 || p.y > v.y1) continue;
     const a = clamp(p.life / p.max, 0, 1);
     const r = p.shrink ? p.r * (0.35 + a * 0.65) : p.r;
+    if (batch && (p.shape === 'dot' || p.shape === undefined)){
+      const q = Math.round((p.glow ? a : a * 0.9) * 16); if (q <= 0 || !(r > 0)) continue;
+      let lv = B.cols.get(p.color);
+      if (!lv){ lv = []; for (let k = 0; k <= 16; k++) lv.push([]); B.cols.set(p.color, lv); }
+      const L = lv[q]; if (L.length === 0) B.used.push(p.color, q); L.push(p.x, p.y, r);
+      continue;
+    }
     ctx.globalAlpha = p.glow ? a : a * 0.9;
     if (p.shape === 'rock'){
       ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
@@ -728,6 +739,14 @@ function drawParticles(ctx){
     }
     ctx.globalAlpha = 1;
   }
+  for (let u = 0; u < B.used.length; u += 2){
+    const L = B.cols.get(B.used[u])[B.used[u + 1]];
+    ctx.globalAlpha = B.used[u + 1] / 16; ctx.fillStyle = B.used[u]; ctx.beginPath();
+    for (let j = 0; j < L.length; j += 3){ ctx.moveTo(L[j] + L[j + 2], L[j + 1]); ctx.arc(L[j], L[j + 1], L[j + 2], 0, TAU); }
+    ctx.fill(); L.length = 0;
+  }
+  B.used.length = 0; ctx.globalAlpha = 1;
+  if (B.cols.size > 400) B.cols.clear();                          /* colors made on the fly (rgba strings) would pile up */
 }
 
 function drawTexts(ctx){

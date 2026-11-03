@@ -620,7 +620,7 @@ function updateParticles(dt){
   for (let i = ps.length - 1; i >= 0; i--){
     const p = ps[i];
     p.life -= dt;
-    if (p.life <= 0){ ps.splice(i, 1); continue; }
+    if (p.life <= 0){ const last = ps.pop(); if (i < ps.length) ps[i] = last; if (PART.pool.length < MAX_PARTICLES) PART.pool.push(p); continue; }    /* the last one takes its place (order does not matter), and it goes back to the pool */
     const k = Math.pow(0.5, dt * p.drag);
     p.vx *= k; p.vy *= k;
     p.x += p.vx * dt; p.y += p.vy * dt;

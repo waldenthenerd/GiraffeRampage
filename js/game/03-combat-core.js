@@ -1,14 +1,22 @@
 'use strict';
 /* Particles, zones, shockwaves, projectiles, pickups, damage and death, player damage, draw helpers, targeting. */
 /* ========================= 6. PARTICLES & TEXT ========================= */
+/* How many particles there may be follows the effects level (the slow-device governor lowers it too): all of them at High, fewer at
+   Medium and Low. When the limit is reached a new one takes the place of an old one in turn (shifting the whole list along was a
+   copy of every particle). Particles that die go back to a pool (PART.pool; an object, so its shape never changes) and are used again, so a busy fight makes no garbage. */
+const PART_CAP = [160, 280, MAX_PARTICLES], PART = { pool: [] };
+let partNext = 0;
 function addParticle(x, y, vx, vy, r, life, color, opts){
-  const ps = G.particles;
-  if (ps.length >= MAX_PARTICLES) ps.shift();
-  opts = opts || {};
-  ps.push({ x:x, y:y, vx:vx, vy:vy, r:r, life:life, max:life, color:color,
-    drag: opts.drag === undefined ? 2.6 : opts.drag,
-    shape: opts.shape || 'dot', rot: opts.rot || Math.random() * TAU,
-    spin: opts.spin || rand(-6, 6), glow: !!opts.glow, shrink: opts.shrink !== false });
+  const ps = G.particles, cap = PART_CAP[typeof fxLevelNow === 'function' ? fxLevelNow() : 2] || MAX_PARTICLES;
+  const p = PART.pool.length ? PART.pool.pop() : {};
+  p.x = x; p.y = y; p.vx = vx; p.vy = vy; p.r = r; p.life = life; p.max = life; p.color = color;
+  p.drag = opts && opts.drag !== undefined ? opts.drag : 2.6;
+  p.shape = opts && opts.shape || 'dot'; p.rot = opts && opts.rot || Math.random() * TAU;
+  p.spin = opts && opts.spin || rand(-6, 6); p.glow = !!(opts && opts.glow); p.shrink = !opts || opts.shrink !== false;
+  if (ps.length >= cap){
+    if (ps.length > cap) ps.length = cap;                                     /* the level just went down */
+    partNext = (partNext + 1) % cap; PART.pool.push(ps[partNext]); ps[partNext] = p;
+  } else ps.push(p);
 }
 function burstParticles(x, y, n, color, spd, size, opts){
   for (let i = 0; i < n; i++){
