@@ -190,7 +190,7 @@ const SAVE_KEY = 'giraffe_rampage_save_v1';
 const DEFAULT_SAVE = { inputMode: '', gold: 0, gems: 0, meta: {}, gear: {}, equipped: { cape: null, weapon: null, armor: null }, equippedTrinkets: [],
   best: 0, bestWave: 0, runs: 0, totalKills: 0, chaptersComplete: 0, chapter1Complete: false, chapter2Complete: false, chapter3Complete: false, chapter4Complete: false, chapter5Complete: false, chapter6Complete: false, chapter7Complete: false, chapter8Complete: false, chapter9Complete: false, chapter10Complete: false, enginePart: false, spaceplane: 0, homecoming: false, grubs: 0, city: {}, chapter11Complete: false, chapter12Complete: false, chapter13Complete: false, chapter14Complete: false, chapter15Complete: false, chapter16Complete: false, siegeHeldBest: 0, siegeFlawless: false, siegeBld: {}, chapter17Complete: false, chapter18Complete: false, isleClean: 0, isleDry: false, isleNotes: 0, fortChaosBest: 0, fortBadges: 0, fortBestWave: 0, siegeMil: {}, mutationVial: false, iron: 0, argon: 0, marsUp: {}, mutations: {}, mutUses: 0, vials: 0, vialGiven: false, squad: {}, sulfur: 0, basalt: 0, venusUp: {}, antsUnlocked: false, food: 0, ants: null, cratesOpened: 0,
   wheelKeys: 0, lastWheelKeyAt: 0, spottedKeys: 0, lastSpottedKeyAt: 0, runSave: null, combos: {}, fusions: 0, mastered: {}, comboClaims: {}, bestiary: null, lastForageAt: 0, menuChapter: 1,
-  muted: false, autoKick: true, aimMode: 'cursor', ach: {}, gagsDone: 0, campLast: 0, campRate: 0, campCap: 0, campProg: 0, campCrates: 0, campOpened: 0, campCollects: 0, campGoldTotal: 0, campFullOnce: false, songsHeard: null };
+  muted: false, autoKick: true, aimMode: 'cursor', ach: {}, gagsDone: 0, campLast: 0, campRate: 0, campCap: 0, campProg: 0, campCrates: 0, campOpened: 0, campCollects: 0, campGoldTotal: 0, campFullOnce: false, songsHeard: null, gad: null };
 
 /* a save's own copy of the defaults. DEFAULT_SAVE holds lists and objects (combos, city, squad...); copying it with Object.assign alone would hand every save the same ones, so
    progress made by a player who started fresh would be written into DEFAULT_SAVE itself and survive "Erase all progress". */
@@ -289,6 +289,8 @@ const Save = {
     this.data.campProg = Math.min(0.999, Math.max(0, +this.data.campProg || 0)); this.data.campCrates = Math.min(9999, Math.max(0, Math.floor(+this.data.campCrates) || 0)); this.data.campOpened = scoreInt(this.data.campOpened); this.data.campCollects = scoreInt(this.data.campCollects); this.data.campGoldTotal = scoreInt(this.data.campGoldTotal); this.data.campFullOnce = !!this.data.campFullOnce;
     /* the songs she has heard, for the jukebox (js/town/44zzzz-jukebox.js); null until the jukebox first looks, which fills it from her progress */
     { const sh = this.data.songsHeard, ok = {}; if (sh && typeof sh === 'object' && !Array.isArray(sh)){ Object.keys(sh).forEach(function(k){ if (sh[k] && /^[a-z0-9]{1,16}$/.test(k)) ok[k] = 1; }); this.data.songsHeard = ok; } else this.data.songsHeard = null; }
+    /* the gadgets, the café meal, the post and the paper (js/town/44zzzzc-gadgets.js; every field is checked there when it is first read) */
+    { const g = this.data.gad; this.data.gad = g && typeof g === 'object' && !Array.isArray(g) ? g : null; }
     return this.data;
   },
   write(){                                                                        /* a JSON string holding the packed save (GR2 now, repacked as GR3 a moment later: js/core/01b-savepack.js) */

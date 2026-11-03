@@ -173,7 +173,7 @@ function drawNight(ctx, darkA, cx, cy, ox, oy, accent){
     g.addColorStop(0, 'rgba(0,0,0,' + a + ')'); g.addColorStop(1, 'rgba(0,0,0,0)');
     c.fillStyle = g; c.fillRect(sx - rr, sy - rr, rr * 2, rr * 2);
   };
-  hole(P.x, P.y, 330, 0.96);
+  hole(P.x, P.y, 330 * (typeof GADLIGHT !== 'undefined' ? GADLIGHT.k : 1), 0.96);                    /* a torch or night goggles from Volt & Co. (js/town/44zzzzf-gadget-gear.js) widen her own light */
   let lights = 0;
   const pr = G.projectiles || [];
   for (let i = 0; i < pr.length && lights < 26; i++){ hole(pr[i].x, pr[i].y, 70 + pr[i].r * 4, 0.75); glows.push(pr[i]); lights++; }

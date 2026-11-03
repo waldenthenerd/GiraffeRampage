@@ -152,7 +152,7 @@ function photoFromCode(text){
   st.bg = int(data.bg, 0, PHOTO_BG.length - 1);
   st.pose = int(data.pose, 0, PHOTO_POSE.length - 1);
   st.flip = !!data.flip;
-  { const g = data.grade || {}; st.filter = int(g.filter, 0, 4); st.frame = int(g.frame, 0, 7); st.tod = isFinite(+g.tod) && +g.tod >= 0 ? Math.min(47, Math.round(+g.tod)) : -1; st.freeze = !!g.freeze; }
+  { const g = data.grade || {}; st.filter = int(g.filter, 0, 7); st.frame = int(g.frame, 0, 10); st.tod = isFinite(+g.tod) && +g.tod >= 0 ? Math.min(47, Math.round(+g.tod)) : -1; st.freeze = !!g.freeze; }
   st.gx = num(gi.x, 0, 960, 480); st.gy = num(gi.y, 140, 540, 453.6); st.gs = num(gi.s, 0.5, 1.7, 1);
   const hat = typeof lk.hat === 'string' && ACC_BY_ID[lk.hat] && ACC_BY_ID[lk.hat].kind === 'hat' ? lk.hat : '';
   const boot = typeof lk.boots === 'string' && ACC_BY_ID[lk.boots] && ACC_BY_ID[lk.boots].kind === 'boot' ? lk.boots : '';

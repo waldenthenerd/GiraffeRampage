@@ -35,7 +35,7 @@ function bindInput(){
       return;
     }
     if (e.code === keyOf('stats') && !e.repeat){ if (G.state === 'playing'){ showPause(); showStats(); } else if (G.state === 'paused' && G.subScreen === 'stats') showPause(); }
-    if (e.code === 'Escape' || e.code === keyOf('pause')){
+    if (e.code === 'Escape'){                                                        /* pause is Escape only (P opens the phone in town) */
       if (G.state === 'forage' && G.forage && !G.forage.done) endForage();
       if (G.state === 'mini' && G.mini && G.mini.phase !== 'done') miniEscape();
       if (G.state === 'scout' && G.scout && !G.scout.done) endScout('quit');
