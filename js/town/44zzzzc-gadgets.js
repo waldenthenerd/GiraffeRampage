@@ -157,10 +157,11 @@ GAD_LABEL.tv = 'Watch the screens';
   ivk.gshelf = function(c, D, b){
     const x0 = b.x - b.w / 2, W = b.w, top = TG - b.h;
     ivShadow(c, b.x, W + 10);
-    tRect(c, '#3A4A60', x0, top, W, b.h); tRect(c, '#1A2634', x0, top, W, 8); tRect(c, '#1A2634', x0, TG - 10, W, 10);
-    for (let r = 0; r < 4; r++){ const y = top + 44 + r * 54; tRect(c, '#52687E', x0 + 4, y, W - 8, 5);
+    tRect(c, '#3A4A60', x0, top, W, b.h); tRect(c, '#1A2634', x0, TG - 10, W, 10);
+    tRect(c, '#0E1722', x0, top, W, 38); tRect(c, '#4DD8FF', x0, top + 36, W, 2);                    /* the sign across the top, so the word has something to stand on */
+    for (let r = 0; r < 4; r++){ const y = top + 78 + r * 46; tRect(c, '#52687E', x0 + 4, y, W - 8, 5);
       for (let k = 0; k < 4; k++){ const bx = x0 + 12 + k * ((W - 24) / 4), col = ['#E8F0F4', '#FFD84D', '#7AE8FF', '#FF9AB8'][(r + k) % 4]; tRound(c, col, bx, y - 34, (W - 24) / 4 - 8, 34, 4); tRect(c, 'rgba(0,0,0,.2)', bx + 4, y - 26, (W - 24) / 4 - 16, 6); tRect(c, 'rgba(0,0,0,.14)', bx + 4, y - 14, (W - 24) / 4 - 22, 4); } }
-    ivText(c, 'GADGETS', b.x, top + 26, 16, '#7AE8FF');
+    c.save(); c.shadowColor = '#4DD8FF'; c.shadowBlur = 8; ivText(c, 'GADGETS', b.x, top + 26, 18, '#7AE8FF'); c.restore();
   };
   ivk.tvwall = function(c, D, b){
     const x0 = b.x - b.w / 2, W = b.w, top = TG - b.h;
@@ -174,7 +175,7 @@ GAD_LABEL.tv = 'Watch the screens';
     for (let x = 40; x < W; x += 56) tRect(c, 'rgba(80,200,220,.07)', x, 40, 2, TG - 130);                       /* cable trunking down the wall */
     tRect(c, '#0E1722', 0, 40, W, 10); tRect(c, '#4DD8FF', 0, 48, W, 2);
     c.save(); c.shadowColor = '#4DD8FF'; c.shadowBlur = 16; tRound(c, '#0E1722', W / 2 - 150, 70, 300, 56, 8); ivText(c, 'VOLT & CO.', W / 2, 108, 34, '#7AE8FF'); c.restore();
-    [[200, '#FF6AA8'], [640, '#FFD84D'], [1000, '#7AF0A0']].forEach(function(p){ tRect(c, '#0A1018', p[0], 150, 60, 80); tRect(c, p[1], p[0] + 4, 154, 52, 60); ivText(c, 'SALE', p[0] + 30, 222, 14, '#E8F0F4'); });
+    [[200, '#FF6AA8'], [640, '#FFD84D'], [1000, '#7AF0A0']].forEach(function(p){ tRect(c, '#0A1018', p[0], 150, 60, 84); tRect(c, p[1], p[0] + 4, 154, 52, 54); tRect(c, '#C8283C', p[0] + 4, 210, 52, 20); ivText(c, 'SALE', p[0] + 30, 225, 14, '#FFFFFF'); });   /* a poster with a red banner for its word */
     tRect(c, '#52687E', 0, TG - 100, W, 6); tRect(c, 'rgba(255,255,255,.07)', 0, TG - 94, W, 4);
   };
 })();
