@@ -81,6 +81,32 @@
     if (mx > 60) sprBad.push(k + ': differs ' + Math.round(mx)); else sprOk++;
   });
   res.sprites = { tried: sprTried, ok: sprOk, bad: sprBad };
+  /* 5b. kinds cached by a rule (SPRITE_RULES in 44t): each is cached, and its picture matches the live drawing (a clock kind with its
+     clock at phase / 6, as the picture was painted); a fading one is drawn fainter at a lower visibility */
+  var ruled = [[6, 'vulture', null], [7, 'baboon', null], [8, 'mamba', { vis: 1 }], [8, 'termite', { state: 'sealed', stateT: 1.7 }], [8, 'cheetah', { z: 0 }], [8, 'ember', { fuse: 2.2 }],
+    [8, 'turret', { life: 9 }], [9, 'grub', null], [10, 'hyena', null], [10, 'sword', null], [11, 'honeybadger', { glimHeat: 0.7 }], [12, 'mamba', { vis: 1 }], [13, 'honeybadger', { rage: 0.5 }], [13, 'baboon', { z: 0 }]];
+  var rOk = 0, rBad = [];
+  ruled.forEach(function(rc){
+    try { GR.startRun(rc[0], chapterFirstWave(rc[0]) + 5); } catch (er){ rBad.push(rc.slice(0, 2).join(' ') + ': start'); return; }
+    G.enemies.length = 0; var e = spawnEnemy(rc[1], 0, 0, G.wave); if (!e){ rBad.push(rc.slice(0, 2).join(' ') + ': no spawn'); return; }
+    var R = spriteRule(e.def, e.type); if (!R){ rBad.push(rc.slice(0, 2).join(' ') + ': no rule for ' + e.def.look); return; }
+    e.x = 120; e.y = 120; e.ang = 0.4; e.flash = 0; e.ph = 0; if (rc[2]) Object.keys(rc[2]).forEach(function(k){ e[k] = rc[2][k]; });
+    var A0 = 3.5 * TAU / 16; e.anim = A0; if (R.clock) G.time = A0 / 6;
+    var cvA = document.createElement('canvas'), cvB = document.createElement('canvas'); cvA.width = cvA.height = cvB.width = cvB.height = 240;
+    var ca = cvA.getContext('2d', { willReadFrequently: true }), cb = cvB.getContext('2d', { willReadFrequently: true }), s5 = G.dpr * G.zoom;
+    var d0 = EnemySprite.stats.drawn, tries = 0;
+    while (EnemySprite.stats.drawn === d0 && tries++ < 80){ ca.setTransform(1, 0, 0, 1, 0, 0); ca.clearRect(0, 0, 240, 240); ca.setTransform(s5, 0, 0, s5, 0, 0); drawEnemy(ca, e); spin(); }
+    if (EnemySprite.stats.drawn === d0){ rBad.push(rc.slice(0, 2).join(' ') + ': not cached (' + (EnemySprite.report()['c' + G.chapter + ' ' + e.type + ' ' + e.state] || 'wait') + ')'); return; }
+    ca.setTransform(1, 0, 0, 1, 0, 0); ca.clearRect(0, 0, 240, 240); ca.setTransform(s5, 0, 0, s5, 0, 0); drawEnemy(ca, e);
+    EnemySprite.on = false; cb.setTransform(s5, 0, 0, s5, 0, 0); drawEnemy(cb, e); EnemySprite.on = true;
+    var A = ca.getImageData(0, 0, 240, 240).data, B = cb.getImageData(0, 0, 240, 240).data, mx = 0;
+    for (var by = 0; by + 4 <= 240; by += 4) for (var bx = 0; bx + 4 <= 240; bx += 4){ var ta = 0, tb = 0; for (var yy = 0; yy < 4; yy++) for (var xx = 0; xx < 4; xx++){ var q = ((by + yy) * 240 + bx + xx) * 4 + 3; ta += A[q]; tb += B[q]; } mx = Math.max(mx, Math.abs(ta - tb) / 16); }
+    if (mx > 60){ rBad.push(rc.slice(0, 2).join(' ') + ': differs ' + Math.round(mx)); return; }
+    if (R.alpha){ var sum = function(d){ var t = 0; for (var i = 3; i < d.length; i += 4) t += d[i]; return t; }, full = sum(A); e.vis = 0.4; ca.setTransform(1, 0, 0, 1, 0, 0); ca.clearRect(0, 0, 240, 240); ca.setTransform(s5, 0, 0, s5, 0, 0); drawEnemy(ca, e);
+      var faint = sum(ca.getImageData(0, 0, 240, 240).data); if (!(faint < full * 0.6)){ rBad.push(rc.slice(0, 2).join(' ') + ': not fainter'); return; } }
+    rOk++;
+  });
+  res.ruled = { tried: ruled.length, ok: rOk, bad: rBad };
   var e1 = spawnEnemy('hyena', 0, 0, 3), cv5 = document.createElement('canvas').getContext('2d');
   for (i = 0; i < 40; i++){ drawEnemy(cv5, e1); spin(); }
   var ent1 = e1._sk && e1._sk.ent; e1.state = 'wind'; for (i = 0; i < 40; i++){ drawEnemy(cv5, e1); spin(); }
@@ -95,5 +121,5 @@
   res.stepsPlaying = stepsIn('playing'); res.stepsMenu = stepsIn('menu'); res.stepsShop = stepsIn('shop'); res.stepsHelp = stepsIn('help'); res.stepsPaused = stepsIn('paused');
   window.step = realStep;
   var thr = [res.stepsMenu, res.stepsShop, res.stepsHelp, res.stepsPaused].every(function(n){ return n >= 55 && n <= 65; }) && res.stepsPlaying >= 110;
-  QA.done({ res: res, pass: thr && res.sprites.ok === res.sprites.tried && res.skFollows && res.skClears && res.cacheThere && res.shadow.worstAlphaDiff <= 12 && res.shadow.bad === 0 && res.reused && res.textsDrawn === 1 && res.particleArcs === 1 });
+  QA.done({ res: res, pass: thr && res.sprites.ok === res.sprites.tried && res.ruled.ok === res.ruled.tried && res.skFollows && res.skClears && res.cacheThere && res.shadow.worstAlphaDiff <= 12 && res.shadow.bad === 0 && res.reused && res.textsDrawn === 1 && res.particleArcs === 1 });
 })();
