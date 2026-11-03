@@ -3,12 +3,12 @@
    w (frame width, default 480), from / to (seconds; default the whole film). The sheet comes back as result.img (a PNG data URL) with the times;
    tools that save it: node tools/qa-cloud.mjs tools/scenarios/film-sheet.js --params "kind=a51" > out.json, then decode result.img.
    It also checks that every frame drew without an error and put something other than black on the screen.
-   kind=all (in ci-check.sh): every film before Chapter 13.5, 16 frames each, no picture; it fails on an error or a black frame away from the fades. */
+   kind=all (in ci-check.sh): every film (the 25 of them, to the Island's), 16 frames each, no picture; it fails on an error or a black frame away from the fades. */
 (function(){
   var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
   GR.handleAction('splash-go');
   if (QA.params.kind === 'all'){
-    var kinds = ['sh1', 'sh2', 'sh3', 'sh4', 'sh5', 'sh6', 'sh9', 'moon', 'venus', 'home', 'a51', 'mars', 'mships', 'fusion', 'marshome'], cvA = document.createElement('canvas'); cvA.width = 640; cvA.height = 360; var ca = cvA.getContext('2d'), bad = [];
+    var kinds = ['sh1', 'sh2', 'sh3', 'sh4', 'sh5', 'sh6', 'sh9', 'moon', 'venus', 'home', 'a51', 'mars', 'mships', 'fusion', 'marshome', 'domeflight', 'domeout', 'towerflight', 'towerout', 'siegeflight', 'siegeout', 'fortflight', 'fortout', 'islesail', 'isleout'], cvA = document.createElement('canvas'); cvA.width = 640; cvA.height = 360; var ca = cvA.getContext('2d'), bad = [];
     kinds.forEach(function(k){ var sn = shChapterOf(k), m = MARS_FILMS[k], E = m ? m.end : sn ? shLen(sn) : k === 'a51' ? A51_T.END : k === 'home' ? HM_T.END : k === 'venus' ? CV_T.END : CS_T.END;
       G.state = 'cutscene'; G.cut = { t: 0, kind: k, cue: 0, done: false };
       for (var j = 1; j < 17; j++){ var tt = E * j / 17; G.cut.t = tt; ca.setTransform(1, 0, 0, 1, 0, 0); ca.globalAlpha = 1;

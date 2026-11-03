@@ -34,13 +34,17 @@ function ftSkyline(ctx, gy, k, t, smoke, lit){
   ctx.beginPath(); ctx.arc(560, gy - 70 * k, 44 * k, Math.PI, TAU); ctx.fill(); ctx.fillRect(516, gy - 70 * k, 88 * k, 74 * k);
   ctx.fillRect(660, gy - 70 * k, 300 * k, 74 * k); ctx.fillRect(740, gy - 96 * k, 140 * k, 30 * k); ctx.fillRect(1000, gy - 140 * k, 12 * k, 144 * k); fillCircle(ctx, 1006, gy - 142 * k, 5 * k, lit ? '#FF5A4A' : '#3A1410');
   if (lit) for (let i = 0; i < 24; i++){ const x = 190 + csR(i + 40) * 900; if (csR(i + 90) > 0.4) { ctx.fillStyle = 'rgba(255,214,130,.85)'; ctx.fillRect(x, gy - 26 * k, 6 * k, 8 * k); } }
+  fdAerial(ctx, 880, gy - 96 * k, 46 * k, t, '#10141C'); fdLamp(ctx, 760, gy - 98 * k, 2.2 * k, '#FF5A4A', Math.sin(t * 2.4) > 0.3);
   if (smoke) for (const sx of [330, 560, 840, 1040]) sgSmoke(ctx, sx, gy - 60 * k, t + sx * 0.3, 240 * k, 0.9);
 }
 function ftWallFace(ctx, gy, top, t){                                           /* the wall close up: concrete blocks, razor wire along the top, and floodlights */
   ctx.fillStyle = '#4A4E54'; ctx.fillRect(0, top, CS_W, gy - top); ctx.fillStyle = '#6A6E74'; ctx.fillRect(0, top, CS_W, 16);
   for (let r = 0; r < Math.ceil((gy - top) / 40); r++) for (let c = 0; c < 20; c++){ const x = c * 70 + (r % 2) * 35 - 30, y = top + 16 + r * 40; ctx.fillStyle = (r + c) % 3 ? 'rgba(0,0,0,.1)' : 'rgba(255,255,255,.06)'; ctx.fillRect(x + 2, y + 2, 66, 36); ctx.strokeStyle = 'rgba(0,0,0,.4)'; ctx.lineWidth = 2; ctx.strokeRect(x, y, 70, 40); }
   ctx.strokeStyle = 'rgba(210,214,222,.8)'; ctx.lineWidth = 3; ctx.beginPath(); for (let x = 0; x <= CS_W; x += 18){ ctx.lineTo(x, top - 8 + (x / 18 % 2 ? -10 : 10)); } ctx.stroke(); ctx.beginPath(); for (let x = 9; x <= CS_W; x += 18){ ctx.lineTo(x, top - 26 + (x / 18 % 2 ? -10 : 10)); } ctx.stroke();
+  fdCracks(ctx, { n: 14, seed: 61100, y0: top + 30, y1: gy - 10, span: CS_W + 160, x0: -80, col: 'rgba(0,0,0,.35)' }); fdRivets(ctx, 0, top + 8, CS_W, top + 8, 64, 1.4, 'rgba(20,22,26,.5)');
+  for (let k = 0; k < 9; k++){ const sx = csR(k + 61200) * CS_W, sh = 40 + csR(k + 61300) * 90, sg = ctx.createLinearGradient(0, top + 16, 0, top + 16 + sh); sg.addColorStop(0, 'rgba(10,12,16,.3)'); sg.addColorStop(1, 'rgba(10,12,16,0)'); ctx.fillStyle = sg; ctx.fillRect(sx, top + 16, 5 + csR(k + 61400) * 8, sh); }       /* rain stains down the concrete */
   for (const fx of [180, 560, 940, 1260]){ ctx.fillStyle = '#2E3038'; ctx.fillRect(fx - 4, top - 44, 8, 44); ctx.fillStyle = '#FFF2B0'; ctx.fillRect(fx - 18, top - 56, 36, 14); csGlow(ctx, fx, top - 49, 110, '#FFF2B0', 0.5); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createLinearGradient(0, top - 40, 0, gy); g.addColorStop(0, 'rgba(255,240,180,.25)'); g.addColorStop(1, 'rgba(255,240,180,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(fx - 14, top - 40); ctx.lineTo(fx + 14, top - 40); ctx.lineTo(fx + 150, gy); ctx.lineTo(fx - 150, gy); ctx.closePath(); ctx.fill(); ctx.globalCompositeOperation = 'source-over'; }
+  for (const fx of [180, 560, 940]) fdMotes(ctx, { n: 8, seed: Math.round(fx) + 61500, t: t, x0: fx - 70, x1: fx + 70, y0: top - 100, y1: top - 10, v: 0.05, col: '#FFF6C8', a: 0.7, r: 1.3, wob: 18 });                       /* moths round the floodlights */
 }
 function fortClimbScene(ctx, t){
   const T = FT_CLIMB_T;

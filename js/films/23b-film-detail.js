@@ -1,5 +1,5 @@
 'use strict';
-/* Film detail: the small parts the films before Chapter 13.5 are dressed with. */
+/* Film detail: the small parts the films are dressed with. */
 /* The films draw each shot with a few big shapes. These helpers add the small things on top of them, in the layer each belongs to: grass,
    stones and cracks on the ground, birds and insects in the air, rivets, panel lines and lamps on machines, windows and aerials on buildings,
    dust, sparks and embers in the light. The scenes call them where they belong (ground details before the giraffe, motes after her), so

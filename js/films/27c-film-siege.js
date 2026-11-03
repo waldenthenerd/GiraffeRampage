@@ -28,12 +28,14 @@ function sgDusk(ctx, t, k){ afSky(ctx, '#1A1030', '#7A3050', '#F08A3A'); csStars
 function sgMorning(ctx, t){ afSky(ctx, '#3A4A78', '#E89A7A', '#FFD8A0'); csGlow(ctx, 300, 430, 280, '#FFE6B0', 0.4); fillCircle(ctx, 300, 450, 48, '#FFF2D0'); }
 function sgGround(ctx, gy, c1, c2, scroll){
   ctx.fillStyle = c1; ctx.fillRect(0, gy, CS_W, CS_H - gy); ctx.fillStyle = c2; ctx.fillRect(0, gy, CS_W, 6);
+  fdCracks(ctx, { n: 8, seed: 51100, sc: scroll, y0: gy + 12, y1: CS_H - 8, col: 'rgba(0,0,0,.3)' }); fdStones(ctx, { n: 12, seed: 51200, sc: scroll, y0: gy + 10, y1: CS_H - 8, col: 'rgba(120,100,90,.7)', dk: 'rgba(40,28,30,.9)' }); fdGrass(ctx, { n: 26, seed: 51300, sc: scroll, t: G.cut ? G.cut.t : 0, y0: gy + 4, y1: CS_H - 6, col: 'rgba(30,22,26,.8)', hi: 'rgba(80,56,48,.7)' });
   for (let k = 0; k < 40; k++){ const x = ((k * 97 - scroll * 0.6) % (CS_W + 100) + CS_W + 100) % (CS_W + 100) - 50; ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fillRect(x, gy + 14 + (k % 5) * 18, 36 + (k % 3) * 14, 3); }
 }
 function sgAcacia(ctx, x, gy, s){ ctx.fillStyle = '#120A14'; ctx.fillRect(x - 3 * s, gy - 70 * s, 6 * s, 70 * s); ctx.beginPath(); ctx.ellipse(x, gy - 76 * s, 62 * s, 16 * s, 0, 0, TAU); ctx.fill(); ctx.beginPath(); ctx.ellipse(x - 26 * s, gy - 62 * s, 36 * s, 10 * s, 0, 0, TAU); ctx.fill(); }
 function sgSmoke(ctx, x, gy, t, h, a){
   for (let k = 0; k < 16; k++){ const u = (k / 16 + t * 0.07) % 1, y = gy - u * h, w = 10 + u * 70, drift = Math.sin(t * 0.6 + k) * 8 + u * 60; ctx.fillStyle = 'rgba(40,30,34,' + (a * (1 - u) * 0.8).toFixed(3) + ')'; ctx.beginPath(); ctx.ellipse(x + drift, y, w, w * 0.7, 0, 0, TAU); ctx.fill(); }
   csGlow(ctx, x, gy - 6, 70, '#FF6A2A', 0.35 * a);
+  fdMotes(ctx, { n: 9, seed: Math.round(x) + 52000, t: t, x0: x - 40, x1: x + 70, y0: gy - h * 0.7, y1: gy, v: -0.14, col: '#FF9A4A', a: 0.8 * a, r: 1.4, wob: 10 });                    /* embers climbing out of the fires */
 }
 /* the town from the edge of the grass, in silhouette: houses, the Hall's bell tower, the lighthouse and the launch tower */
 /* what the town looks like at the end: the keys that were wrecked, and how scarred it is (G.sgFilm is written when the run ends, in js/siege/44zzzh-siege-events.js; a replay from the menu

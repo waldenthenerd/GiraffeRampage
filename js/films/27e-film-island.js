@@ -35,6 +35,9 @@ function ilFilmSea(ctx, gy, t, sc, tone){
   for (let r = 0; r < 9; r++){ const y = gy + 6 + r * r * 4, a = 0.12 + r * 0.03; ctx.strokeStyle = 'rgba(230,250,255,' + a.toFixed(2) + ')'; ctx.lineWidth = 1 + r * 0.3; ctx.beginPath();
     for (let x = -40; x <= CS_W + 40; x += 30){ const xx = ((x + sc * (0.3 + r * 0.12)) % (CS_W + 80) + CS_W + 80) % (CS_W + 80) - 40; ctx.moveTo(xx, y + Math.sin(t * 2 + x * 0.05 + r) * 2); ctx.lineTo(xx + 14 + r * 2, y + Math.sin(t * 2 + x * 0.05 + r) * 2); } ctx.stroke(); }
   ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.fillRect(0, gy, CS_W, 2);
+  for (let k = 0; k < 34; k++){ const f = csR(k + 71000), y = gy + 8 + f * f * (CS_H - gy - 12), x = ((csR(k + 71100) * 1500 - sc * (0.25 + f * 0.4)) % 1500 + 1500) % 1500 - 110, a = Math.sin(t * 3 + k * 2.1);          /* sun glints and flecks of foam on the swell */
+    if (a > 0.1){ ctx.globalAlpha = a * (tone ? 0.3 : 0.5); ctx.fillStyle = tone ? '#DCE8F0' : '#FFFBE8'; ctx.fillRect(x, y, 5 + f * 14, 1.6 + f); } }
+  ctx.globalAlpha = 1;
 }
 /* water over her legs where she wades: the water behind her is painted again inside a box from the waterline down, so it covers her legs and its edges cannot be seen; rings on the surface */
 function ilWaterLegs(ctx, x, y, w, h, paint, t){
@@ -111,7 +114,10 @@ function isleSailScene(ctx, t){
   } else {                                                                           /* the shallows: the boat on the sand, her wading in, a shape under the water */
     const u = t - T.C, gy = 430; ilMorning(ctx, t);
     ctx.fillStyle = '#2E5A3A'; ctx.fillRect(0, gy - 90, CS_W, 90); for (let i = 0; i < 8; i++){ const px = 80 + i * 170, py = gy - 90; ctx.strokeStyle = '#4A3A24'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(px, gy - 20); ctx.quadraticCurveTo(px + 14, py - 40, px + 6, py - 110); ctx.stroke(); ctx.fillStyle = '#2A6A2E'; for (let q = 0; q < 6; q++){ const a = -Math.PI / 2 + (q - 2.5) * 0.55; ctx.beginPath(); ctx.moveTo(px + 6, py - 110); ctx.quadraticCurveTo(px + 6 + Math.cos(a) * 40, py - 110 + Math.sin(a) * 30, px + 6 + Math.cos(a) * 70, py - 100 + Math.sin(a) * 26 + 20); ctx.quadraticCurveTo(px + 6 + Math.cos(a) * 36, py - 104 + Math.sin(a) * 16, px + 6, py - 110); ctx.fill(); } }
-    ctx.fillStyle = '#E8D8A8'; ctx.fillRect(0, gy, CS_W, 90); ilBeachWater(ctx, gy, t);
+    ctx.fillStyle = '#E8D8A8'; ctx.fillRect(0, gy, CS_W, 90);
+    fdGrass(ctx, { n: 30, seed: 71300, t: t, y0: gy - 6, y1: gy + 16, s: 1.1, col: '#3E7A3A', hi: '#6AA44A', span: CS_W + 220 }); fdStones(ctx, { n: 16, seed: 71400, y0: gy + 18, y1: gy + 82, s: 0.8, col: '#F2E8C8', dk: '#B8A478', span: CS_W + 120 });                    /* beach grass, pebbles and shells */
+    for (let k = 0; k < 8; k++){ const sx = csR(k + 71500) * CS_W, sy = gy + 24 + csR(k + 71600) * 50; ctx.fillStyle = k % 2 ? '#F4C8B8' : '#FFF4E0'; ctx.beginPath(); ctx.ellipse(sx, sy, 5, 3.2, 0.4, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(120,80,60,.5)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(sx - 4, sy + 1); ctx.lineTo(sx + 3, sy - 2); ctx.stroke(); }
+    ilBeachWater(ctx, gy, t);
     ilBoat(ctx, 1040, gy + 150, 0.7, t, {});
     const wade = csSm(0.6, 6, u), gx = csLerp(860, 520, wade), wy = csLerp(gy + 150, gy + 96, wade);
     csGiraffe(ctx, { x: gx, y: wy, s: 0.7, face: -1, walk: u * 5, moving: u < 6, neck: 0.4, head: 0.1, bare: true, boots: false });
@@ -144,6 +150,7 @@ function isleOutScene(ctx, t){
     const u = t - T.B, gy = 560, run = csSm(0, 2.8, u), spin = csSm(0.6, 3.2, u), lift = csSm(3.4, 7, u);
     ilDusk(ctx, t); ilFilmSea(ctx, 470, t, u * 30, 0);
     ctx.fillStyle = '#6A7072'; ctx.fillRect(0, gy, CS_W, CS_H - gy); ctx.fillStyle = '#8A9294'; ctx.fillRect(0, gy, CS_W, 8); ctx.fillStyle = 'rgba(244,244,236,.6)'; ctx.fillRect(560, gy + 20, 260, 8);
+    { const sg = []; for (let q = 60; q < 1280; q += 110) sg.push(q, gy + 8, q - 14, CS_H); fdSeams(ctx, sg, 'rgba(20,26,28,.35)', 1.4); } fdRivets(ctx, 0, gy + 6, CS_W, gy + 6, 80, 1.3, 'rgba(30,36,38,.5)'); fdDrums(ctx, 130, gy + 4, 3, 1.1, ['#2A8A7A', '#C84A3A', '#2A8A7A']); fdCrates(ctx, 300, gy + 4, [[0, 0, 36], [38, 0, 30], [10, 36, 28]], 1); fdAerial(ctx, 1200, gy, 80, t, '#B8C4C8');
     const hx = 700 - lift * lift * 900, hy = gy - 66 - lift * 300;
     if (u < 2.6) ilFilmScientist(ctx, csLerp(1100, 760, run), gy + 4, 0.9, true, t);
     ctx.save(); ctx.translate(hx, hy); ctx.scale(-1, 1); domeHeli(ctx, { x: 0, y: 0, s: csLerp(1, 0.6, lift), t: t, rot: 0.08 * lift, spin: spin, pilot: u > 2.6, pal: IL_LAB_HELI }); ctx.restore();

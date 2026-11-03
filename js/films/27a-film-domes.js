@@ -191,6 +191,13 @@ function domeDay(ctx, t, gy, sc, dusk){
   afRidge(ctx, gy - 44, 60, 2.2, dusk ? '#8A5A3A' : '#C8B070', sc * 0.1); afRidge(ctx, gy - 8, 40, 5.3, dusk ? '#6A4228' : '#B09850', sc * 0.25);
   for (let k = 0; k < 5; k++) afAcacia(ctx, (((k * 430 + 160 - sc * 0.5) % 2150) + 2150) % 2150 - 300, gy - 4, 0.7 + (k % 3) * 0.25);
   if (gy < CS_H){ const gg = ctx.createLinearGradient(0, gy, 0, CS_H); gg.addColorStop(0, dusk ? '#8A5A30' : '#D4B468'); gg.addColorStop(1, dusk ? '#4A2E18' : '#A8884A'); ctx.fillStyle = gg; ctx.fillRect(0, gy, CS_W, CS_H - gy + 2); }
+  fdBirds(ctx, { n: 4, seed: 33100, t: t, y0: 70, y1: 230, v: 22, col: dusk ? 'rgba(40,20,30,.55)' : 'rgba(50,50,60,.5)' });
+  if (gy < CS_H - 30){                                                                 /* the ground: termite mounds on the rise, then stones, dry grass and a few cracks in the baked earth */
+    fdMounds(ctx, { n: 3, seed: 33200, sc: sc, y0: gy - 2, y1: gy + 40, s: 0.9, col: dusk ? '#7A4E30' : '#B8945A', hi: dusk ? '#9A6A44' : '#D4B476' });
+    fdCracks(ctx, { n: 9, seed: 33300, sc: sc, y0: gy + 20, y1: CS_H - 8, col: dusk ? 'rgba(30,16,8,.3)' : 'rgba(90,64,28,.28)' });
+    fdStones(ctx, { n: 16, seed: 33400, sc: sc, y0: gy + 12, y1: CS_H - 10, s: 1, col: dusk ? '#A07850' : '#CDB07A', dk: dusk ? '#5A3A22' : '#8E7442' });
+    fdGrass(ctx, { n: 34, seed: 33500, sc: sc, t: t, y0: gy + 6, y1: CS_H - 6, s: 1, col: dusk ? '#7A5A2A' : '#9A8A3A', hi: dusk ? '#B08A44' : '#C8B25A' });
+  }
   if (!dusk){ ctx.strokeStyle = 'rgba(255,255,255,.2)'; ctx.lineWidth = 2; for (let k = 0; k < 6; k++){ ctx.beginPath(); for (let x = 0; x <= CS_W; x += 20) ctx.lineTo(x, gy - 6 - k * 6 + Math.sin(x * 0.03 + t * 3 + k) * 3); ctx.stroke(); } }      /* heat shimmer over the horizon */
 }
 /* the glitter on the grass: bright cyan points that thicken the nearer the domes get (k from 0 to 1) */
@@ -333,12 +340,15 @@ function domeSkyline(ctx, t, gy, sc, p){                                        
     ctx.fillStyle = col; ctx.fillRect(x - w / 2, top, w, b[1] * p + 6);
     ctx.fillStyle = hi; ctx.fillRect(x - w / 2, top, 3, b[1] * p + 6);                                                          /* the lit edge */
     if (tall){ ctx.fillStyle = col; ctx.fillRect(x - w * 0.34, top - 26 * p, w * 0.68, 26 * p + 1); ctx.fillRect(x - w * 0.2, top - 46 * p, w * 0.4, 20 * p + 1); ctx.fillStyle = hi; ctx.fillRect(x - w * 0.34, top - 26 * p, 2, 26 * p); }   /* setbacks */
-    else { ctx.fillStyle = hi; ctx.fillRect(x - w / 2, top, w, 3); ctx.fillStyle = col; ctx.fillRect(x - w * 0.18, top - 9 * p, w * 0.36, 9 * p + 1); }                                                          /* a rooftop box */
+    else { ctx.fillStyle = hi; ctx.fillRect(x - w / 2, top, w, 3); ctx.fillStyle = col; ctx.fillRect(x - w * 0.18, top - 9 * p, w * 0.36, 9 * p + 1); if (i % 3 === 0) fdAerial(ctx, x + w * 0.3, top, 22 * p, t, '#4A4560'); }                                                          /* a rooftop box */
     for (let k = 0; k < 60; k++){ const wx = x - w / 2 + 6 + (k % 6) * (w - 12) / 6, wy = top + 10 + Math.floor(k / 6) * 14; if (wy > gy - 4 || csR(i * 77 + k) < 0.35) continue; ctx.fillStyle = csR(i * 91 + k) > 0.5 ? '#FFE49A' : '#FFC870'; ctx.fillRect(wx, wy, 5, 7); }
     if (tall){ const sx = x, st = top - (i === 5 || i === 10 ? 46 : 26) * p; ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(sx - 6, st); ctx.lineTo(sx, st - 40 * p); ctx.lineTo(sx + 6, st); ctx.closePath(); ctx.fill(); ctx.strokeStyle = '#6A6A80'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(sx, st - 40 * p); ctx.lineTo(sx, st - 62 * p); ctx.stroke(); fillCircle(ctx, sx, st - 63 * p, 2.4, Math.sin(t * 3 + i) > 0 ? '#FF5A4A' : '#5A1A14'); }
   });
   const wg = ctx.createLinearGradient(0, gy, 0, CS_H); wg.addColorStop(0, '#6A3A5A'); wg.addColorStop(1, '#1C1430'); ctx.fillStyle = wg; ctx.fillRect(0, gy, CS_W, CS_H - gy + 2);
   ctx.strokeStyle = 'rgba(255,200,140,.32)'; ctx.lineWidth = 2; for (let k = 0; k < 9; k++){ const y = gy + 14 + k * 18; ctx.beginPath(); for (let x = 0; x <= CS_W; x += 24) ctx.lineTo(x, y + Math.sin(x * 0.04 + t * 2 + k) * 2); ctx.stroke(); }
+  for (let k = 0; k < 40; k++){ const wx = ((csR(k + 33600) * 1400 - sc * 0.12) % 1400 + 1400) % 1400 - 60, wy = gy + 12 + csR(k + 33700) * (CS_H - gy - 30); ctx.globalAlpha = 0.18 + 0.22 * Math.sin(t * 2 + k * 1.9) * Math.sin(t * 2 + k * 1.9); ctx.fillStyle = csR(k + 33800) > 0.5 ? '#FFD890' : '#FF9A6A'; ctx.fillRect(wx, wy, 2, 8 + csR(k + 33900) * 14); }                /* the lights of the towers broken up on the water */
+  ctx.globalAlpha = 1;
+  fdBirds(ctx, { n: 4, seed: 33950, t: t, y0: 120, y1: gy - 200, v: 26, col: 'rgba(20,10,30,.5)' });
   domeLady(ctx, 1080 - sc * 0.1, gy, t);
 }
 /* the Lady on her island, small and far: a rock, a stepped pedestal, a robed figure with folds, a crown of rays, a tablet in one arm and the torch held high with a flame */

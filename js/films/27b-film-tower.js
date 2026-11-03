@@ -36,6 +36,7 @@ function twCity(ctx, gy, sc, layer, seed){
     ctx.fillStyle = K.col; ctx.fillRect(x, gy - h, w, h + 4);
     if (r3 > 0.78){ ctx.beginPath(); ctx.moveTo(x + w * 0.2, gy - h); ctx.lineTo(x + w * 0.5, gy - h - 40 - r1 * 40); ctx.lineTo(x + w * 0.8, gy - h); ctx.closePath(); ctx.fill(); ctx.fillRect(x + w * 0.48, gy - h - 70 - r1 * 40, 2, 34); }
     else if (r3 > 0.5){ ctx.fillRect(x + w * 0.2, gy - h - 14, w * 0.6, 14); }
+    if (layer < 2 && r3 > 0.62 && r3 <= 0.78) fdAerial(ctx, x + w * 0.5, gy - h - 14, 26 + r1 * 16, G.cut ? G.cut.t : 0, '#2A2E44');                       /* aerials and beacons on the roofs */
     if (layer < 2) for (let wy = gy - h + 10; wy < gy - 6; wy += 13) for (let wx = x + 6; wx < x + w - 8; wx += 11){ if (csR(seed + wx * 0.37 + wy * 1.7 + layer) < K.win){ ctx.fillStyle = csR(wx * 3.1 + wy) > 0.5 ? 'rgba(255,228,150,.85)' : 'rgba(255,200,120,.7)'; ctx.fillRect(wx, wy, 5, 6); } }
     x += w + K.gap + r1 * 12; i++;
   }
@@ -59,7 +60,7 @@ function twRiver(ctx, t, gy, sc, tone){
   const g = ctx.createLinearGradient(0, gy, 0, CS_H); g.addColorStop(0, '#2A2448'); g.addColorStop(1, '#0A0C18'); ctx.fillStyle = g; ctx.fillRect(0, gy, CS_W, CS_H - gy + 2);
   for (let k = 0; k < 70; k++){ const x = (((csR(k + 41000) * 1700 - sc * (0.2 + csR(k + 41050) * 0.5)) % 1700) + 1700) % 1700 - 200, y = gy + 6 + csR(k + 41100) * (CS_H - gy - 10); ctx.globalAlpha = 0.3 + 0.4 * Math.sin(t * 2 + k); ctx.fillStyle = csR(k + 41200) > 0.5 ? '#FFE49A' : '#9AB8FF'; ctx.fillRect(x, y, 6 + csR(k + 41300) * 22, 2); } ctx.globalAlpha = 1;
 }
-function twNight(ctx, t, tone){ afSky(ctx, '#05071A', '#241B4A', '#6A3A62'); csStars(ctx, 1, t, 0, 0); csGlow(ctx, 1040, 120, 200, '#DCE4FF', 0.2); fillCircle(ctx, 1040, 120, 34, '#EEF2FF'); fillCircle(ctx, 1028, 112, 6, 'rgba(160,170,200,.5)'); fillCircle(ctx, 1052, 130, 4, 'rgba(160,170,200,.5)'); }
+function twNight(ctx, t, tone){ afSky(ctx, '#05071A', '#241B4A', '#6A3A62'); csStars(ctx, 1, t, 0, 0); csGlow(ctx, 1040, 120, 200, '#DCE4FF', 0.2); fillCircle(ctx, 1040, 120, 34, '#EEF2FF'); fillCircle(ctx, 1028, 112, 6, 'rgba(160,170,200,.5)'); fillCircle(ctx, 1052, 130, 4, 'rgba(160,170,200,.5)'); fdBirds(ctx, { n: 3, seed: 41500, t: t, y0: 60, y1: 200, v: 18, col: 'rgba(160,160,200,.28)', s: 0.8 }); }
 
 /* ---- film 1 (31 s): in over the river, down on the plaza, across it, and up in the elevator ---- */
 function towerFlightScene(ctx, t){
@@ -99,6 +100,7 @@ function twPlaza(ctx, t, gy, noPad, sc){
   const g = ctx.createLinearGradient(0, gy, 0, CS_H); g.addColorStop(0, '#3A3650'); g.addColorStop(1, '#1A1830'); ctx.fillStyle = g; ctx.fillRect(0, gy, CS_W, CS_H - gy + 2);
   ctx.strokeStyle = 'rgba(120,130,170,.25)'; ctx.lineWidth = 2; for (let k = -2; k < 24; k++){ const x = ((k * 90 - (sc || 0)) % 2160 + 2160) % 2160 - 200; ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x - 80 - (x - 640) * 0.3, CS_H); ctx.stroke(); }
   for (let j = 1; j < 5; j++){ ctx.beginPath(); ctx.moveTo(0, gy + j * j * 8); ctx.lineTo(CS_W, gy + j * j * 8); ctx.stroke(); }
+  fdCracks(ctx, { n: 12, seed: 41300, sc: sc || 0, y0: gy + 10, y1: CS_H - 10, col: 'rgba(8,6,20,.45)', par: 1.1 }); fdSkids(ctx, { n: 7, seed: 41400, sc: sc || 0, y0: gy + 20, y1: CS_H - 16 });                  /* cracks and tyre marks in the paving */
   if (!noPad){ domePad(ctx, 470, gy, t, 1); }
   for (const lx of (noPad ? [150, 400] : [150, 820, 1180])){ ctx.fillStyle = '#2A2E3E'; ctx.fillRect(lx - 3, gy - 150, 6, 150); ctx.fillRect(lx - 14, gy - 154, 28, 6); csGlow(ctx, lx, gy - 148, 90, '#FFE49A', 0.4); fillCircle(ctx, lx, gy - 146, 6, '#FFF4C0'); }
 }
@@ -186,6 +188,7 @@ function towerOutScene(ctx, t){
     ctx.fillStyle = '#10141C'; ctx.fillRect(34, gy - 8, 6, 8); ctx.fillRect(130, gy - 8, 6, 8); ctx.fillStyle = '#4A3A22'; ctx.fillRect(30, gy - 62, 110, 56); ctx.strokeStyle = '#8A6A3A'; ctx.lineWidth = 2; ctx.strokeRect(30, gy - 62, 110, 56);
     ctx.fillStyle = '#FF8A3A'; ctx.fillRect(40, gy - 54, 90, 22); ctx.fillStyle = '#F6F0E4'; ctx.fillRect(40, gy - 30, 90, 16); ctx.fillStyle = '#2A2238'; ctx.fillRect(40, gy - 33, 90, 3);        /* the rack and the folded paraglider */
     ctx.fillStyle = '#383250'; ctx.fillRect(896, gy, 8, CS_H - gy); ctx.fillStyle = '#B8BCC8'; ctx.fillRect(896, gy - 70, 5, 70);
+    fdCracks(ctx, { n: 5, seed: 41600, y0: gy + 16, y1: CS_H - 10, span: 900, x0: 0, col: 'rgba(6,4,16,.5)' }); fdRivets(ctx, 0, gy - 68, 900, gy - 68, 40, 1.2, 'rgba(255,255,255,.35)'); fdAerial(ctx, 200, gy - 70, 60, t, '#8A90A8');
     const px = csLerp(180, 860, run) + jump * 150, py = csLerp(gy + 10, gy + 10, 0) - jump * 90 + fall * 220;
     if (u < 5.2) csGiraffe(ctx, { x: px, y: py, s: 0.8, face: 1, walk: u * 9, moving: u < 4.7, neck: 0.3, head: 0.1, bare: true, boots: false });
     else twGlider(ctx, { x: px + 20, y: py - 90 + 60 * fall, s: 0.9, t: t, fill: csSm(5.4, 7.4, u) });
@@ -244,6 +247,9 @@ function twRoof(ctx, x, gy, t, k){
   ctx.fillStyle = '#10141C'; ctx.beginPath(); ctx.ellipse(x - 20, gy - 20, 230, 16, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = '#E8E8E4'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(x - 20, gy - 20, 204, 12, 0, 0, TAU); ctx.stroke();
   ctx.fillStyle = '#F2F2EE'; ctx.font = '700 26px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('H', x - 20, gy - 10); ctx.textAlign = 'left';
   for (let i = 0; i < 12; i++){ const a = i / 12 * TAU; fillCircle(ctx, x - 20 + Math.cos(a) * 224, gy - 20 + Math.sin(a) * 15, 3.4, Math.sin(t * 4 + i) > 0 ? '#6AFFB0' : '#2A5A44'); }
+  { const sg = []; for (let q = -300; q <= 300; q += 75) sg.push(x + q, bk, x + q - 10, gy + 2); fdSeams(ctx, sg, 'rgba(8,10,20,.4)', 1.2); }                                                      /* panel seams in the roof */
+  fdAerial(ctx, x - 262, bk - 106, 52, t, '#5A6480'); fdDish(ctx, x + 250, bk - 4, 0.8, t, '#5A6480'); fdLamp(ctx, x - 300, bk - 100, 2.4, '#FF5A4A', Math.sin(t * 3) > 0);
+  fdRivets(ctx, x - 330, gy - 4, x + 330, gy - 4, 40, 1.2, 'rgba(10,12,22,.5)');
   ctx.fillStyle = '#E8C84A'; ctx.font = '900 14px "Arial Black", sans-serif'; ctx.lineJoin = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = '#0A0C14'; ctx.strokeText('H-2', x + 220, gy + 30); ctx.fillText('H-2', x + 220, gy + 30);
 }
 MARS_FILMS.towerout = {
