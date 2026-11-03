@@ -5,7 +5,7 @@
    run, Mail and News open. The earbuds are what play the phone's song: town only at first, menus and runs at Pods Plus, shuffle at Pods Max, off while the jukebox plays or
    when they are out. The café menu: a dish per chapter, eaten before a run it boosts that run's stats once. Mail: a letter per chapter, its gift taken once. News: a paper a
    day with a task that pays once. Photo: new filters and frames draw, and are locked until the kit is bought. Torch and goggles widen the light of a run's night.
-   Picture: --params "view=shop|phone|news|mail|menu|street". */
+   Picture: --params "view=shop|room|phone|news|mail|menu|street". */
 (function(){
   var out = { failed: [], errs: [] }, check = function(k, v){ if (!v) out.failed.push(k); };
   window.addEventListener('error', function(e){ out.errs.push(e.message); });
@@ -35,13 +35,14 @@
     Save.data.gold = 1; check('poor', !gadBuy('buds1'));
     Save.data.gold = 1e9;
     /* ---- the street ---- */
-    Save.data.chapter3Complete = true; G.state = 'menu'; townEnter('market', 2180, 1); Town.fixHour = 12; Town.walkers = []; Town.bannerT = 0; frames(20);
+    Save.data.chapter3Complete = true; G.state = 'menu'; townEnter('market', 2180, 1); Town.fixHour = +(QA.params.hour || 12); Town.walkers = []; Town.bannerT = 0; frames(20);
     var M = TOWN_DIST.market; ['electro', 'postoffice', 'newsstand'].forEach(function(id){ check('on_' + id, M.b.some(function(b){ return b.id === id; })); });
     var bs = M.b.slice().sort(function(a, b){ return a.x - b.x; }), clash = false; for (var i = 1; i < bs.length; i++) if (bs[i].x - bs[i].w / 2 < bs[i - 1].x + bs[i - 1].w / 2 - 1) clash = true; check('noOverlap', !clash);
     check('nothingUnder', !M.p.some(function(p){ return M.b.some(function(b){ return b.id !== 'gym' && Math.abs(p.x - b.x) < b.w / 2 - 10 && p.k !== 'lamp' && false; }); }));
     out.nearStore = Town.near && Town.near.label; check('nearStore', !!Town.near && Town.near.b.id === 'electro');
     if (view === 'street'){ QA.done(out); return; }
     press('KeyE'); frames(10); out.inRoom = Town.d; check('entersRoom', Town.d === 'in_electro');
+    if (view === 'room'){ Town.x = +(QA.params.x || 700); frames(8); QA.done(out); return; }
     Town.x = 760; frames(6); out.nearCounter = Town.near && Town.near.label; check('counter', !!Town.near && Town.near.b.id === 'gcounter');
     press('KeyE'); frames(2); check('shopOpens', !!document.querySelector('.tp-electro')); out.shopRows = document.querySelectorAll('.gd-row').length; check('shopRows', out.shopRows === GAD_ITEMS.length);
     if (view === 'shop'){ QA.done(out); return; }
