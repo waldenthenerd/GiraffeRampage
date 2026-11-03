@@ -204,6 +204,54 @@ function sdDraw(ctx, ops, t){
   }
   ctx.lineCap = 'butt';
 }
+/* The list is two to three thousand tiny shapes a frame at full effects (20 to 35 ms in software drawing in the busy chapters). Most of
+   them never change, so an object's still parts (everything but the glints, 4, and the rising embers, 5) are painted once into a small
+   picture at the scale they are seen at, and each frame draws that picture and replays only the glints and embers. Pictures are made for a
+   few milliseconds a frame at most (an object waiting for one is drawn as before), are made again at a new zoom, and are all let go when
+   they pass SDC.budget pixels. SDC.on = false replays every shape as before (tests compare the two). */
+const SDC = { on: true, gen: 0, px: 0, budget: 20e6, held: [], frame: -1, ms: 0, built: 0, hits: 0, live: 0 };
+function sdSplit(p, ops){
+  const st = [], an = []; let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const add = function(x, y, r){ if (x - r < x0) x0 = x - r; if (y - r < y0) y0 = y - r; if (x + r > x1) x1 = x + r; if (y + r > y1) y1 = y + r; };
+  for (let i = 0; i < ops.length; i++){
+    const q = ops[i];
+    switch (q[0]){
+      case 0: add(q[1], q[2], q[3]); break;
+      case 1: add(q[1], q[2], q[5]); add(q[3], q[4], q[5]); break;
+      case 2: add(q[1], q[2], 0); add(q[3], q[4], 0); add(q[5], q[6], 0); break;
+      case 3: add(q[1], q[2], Math.max(q[3], q[4])); break;
+      case 6: add(q[1], q[2], Math.max(q[3], q[4]) + 0.6); break;
+      default: an.push(q); continue;
+    }
+    st.push(q);
+  }
+  p._sdSt = st; p._sdAn = an; p._sdBox = st.length ? [x0 - 2, y0 - 2, x1 + 2, y1 + 2] : null;
+}
+function sdDrawFast(ctx, p, ops, t){
+  if (!SDC.on || !ctx.getTransform || typeof document === 'undefined'){ sdDraw(ctx, ops, t); return; }
+  if (p._sdSt === undefined) sdSplit(p, ops);
+  const B = p._sdBox;
+  if (B){
+    const m = ctx.getTransform(), s = Math.max(0.25, Math.ceil(Math.hypot(m.a, m.b) * 4) / 4);
+    let sp = p._sdSpr;
+    if (sp && (sp.gen !== SDC.gen || sp.s !== s)) sp = null;
+    if (!sp){
+      if (SDC.frame !== G.time){ SDC.frame = G.time; SDC.ms = 0; }
+      const W = Math.ceil((B[2] - B[0]) * s), H = Math.ceil((B[3] - B[1]) * s);
+      if (SDC.ms < 3 && W > 0 && H > 0 && W <= 1024 && H <= 1024){
+        const t0 = performance.now();
+        if (SDC.px + W * H > SDC.budget){ for (let i = 0; i < SDC.held.length; i++) SDC.held[i]._sdSpr = null; SDC.held.length = 0; SDC.px = 0; SDC.gen++; }
+        const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+        const c = cv.getContext('2d'); c.setTransform(s, 0, 0, s, -B[0] * s, -B[1] * s); sdDraw(c, p._sdSt, t);
+        sp = p._sdSpr = { cv: cv, s: s, gen: SDC.gen, w: W / s, h: H / s }; SDC.held.push(p); SDC.px += W * H; SDC.built++;
+        SDC.ms += performance.now() - t0;
+      }
+    }
+    if (sp){ ctx.drawImage(sp.cv, B[0], B[1], sp.w, sp.h); SDC.hits++; }
+    else { sdDraw(ctx, p._sdSt, t); SDC.live++; }
+  }
+  if (p._sdAn.length) sdDraw(ctx, p._sdAn, t);
+}
 /* wrap every drawing of every chapter's definitions (a definition is shared by the chapters that use it, so each is wrapped once) */
 (function(){
   const seen = new Set();
@@ -221,7 +269,7 @@ function sdDraw(ctx, ops, t){
           if (SD.ms > 3) return;
           const t0 = performance.now(); ops = p._sd = sdGen(o, kind, p); SD.ms += performance.now() - t0;
         }
-        if (ops) sdDraw(ctx, ops, t);
+        if (ops) sdDrawFast(ctx, p, ops, t);
       };
     }
   }
