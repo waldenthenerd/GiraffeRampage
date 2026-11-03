@@ -41,9 +41,14 @@ const SPRITE_RULES = {
   dust_brood: { key: function(e){ return e.brT !== undefined && e.brT < 0.8 ? 1 : 0; }, set: function(b, k){ b.brT = k ? 0.5 : 2; } },
   dust_raker: { key: function(e){ return Math.round(Math.max(0, Math.min(1, e.rage || 0)) * 4); }, set: function(b, k){ b.rage = k / 4; } },
   reaperdrone: { clock: true }, attackdrone: { clock: true },
+  drone: { clock: true }, microdrone: { clock: true }, plasmaorb: { clock: true },
+  medic: { key: function(e){ return e.healTgtT > 0 ? 1 : 0; }, set: function(b, k){ b.healTgtT = k; } },
+  flareleaper: { only: function(e){ return !e.z; }, set: function(b){ b.z = 0; } },
+  magmahopper: { only: function(e){ return !e.z; }, set: function(b){ b.z = 0; } },
   'type:honeybadger': { key: function(e){ return (e.glimHeat || 0) > 0.4 ? 1 : 0; }, set: function(b, k){ b.glimHeat = k; } }
 };
 SPRITE_RULES.glim_honeybadger = SPRITE_RULES['type:honeybadger'];
+SPRITE_RULES.emberpriest = Object.assign({}, SPRITE_RULES.medic, { clock: true }); SPRITE_RULES.sporeimp = SPRITE_RULES.blastbeetle = SPRITE_RULES.breacher;
 if (typeof A51_ALIAS !== 'undefined') Object.keys(A51_ALIAS).forEach(function(k){ if (SPRITE_RULES[A51_ALIAS[k]]) SPRITE_RULES[k] = SPRITE_RULES[A51_ALIAS[k]]; });     /* Area 51 wears the marines' drawings */
 Object.keys(SPRITE_RULES).forEach(function(n){ const R = SPRITE_RULES[n], o = {}; if (R.set) R.set(o, 1); R.reads = o; });
 function spriteRule(d, type){ return (d.look ? SPRITE_RULES[d.look] : SPRITE_RULES['type:' + type]) || null; }

@@ -84,7 +84,9 @@
   /* 5b. kinds cached by a rule (SPRITE_RULES in 44t): each is cached, and its picture matches the live drawing (a clock kind with its
      clock at phase / 6, as the picture was painted); a fading one is drawn fainter at a lower visibility */
   var ruled = [[6, 'vulture', null], [7, 'baboon', null], [8, 'mamba', { vis: 1 }], [8, 'termite', { state: 'sealed', stateT: 1.7 }], [8, 'cheetah', { z: 0 }], [8, 'ember', { fuse: 2.2 }],
-    [8, 'turret', { life: 9 }], [9, 'grub', null], [10, 'hyena', null], [10, 'sword', null], [11, 'honeybadger', { glimHeat: 0.7 }], [12, 'mamba', { vis: 1 }], [13, 'honeybadger', { rage: 0.5 }], [13, 'baboon', { z: 0 }]];
+    [8, 'turret', { life: 9 }], [9, 'grub', null], [10, 'hyena', null], [10, 'sword', null], [11, 'honeybadger', { glimHeat: 0.7 }], [12, 'mamba', { vis: 1 }], [13, 'honeybadger', { rage: 0.5 }], [13, 'baboon', { z: 0 }],
+    [6, 'ember', null], [7, 'grub', null], [7, 'ember', null], [8, 'baboon', { healTgtT: 0 }], [8, 'baboon', { healTgtT: 0.5 }], [9, 'baboon', { healTgtT: 0 }], [9, 'cheetah', { z: 0 }], [9, 'ember', { fuse: 2.2 }],
+    [10, 'cheetah', { z: 0 }], [10, 'ember', { fuse: 2.2 }]];
   var rOk = 0, rBad = [];
   ruled.forEach(function(rc){
     try { GR.startRun(rc[0], chapterFirstWave(rc[0]) + 5); } catch (er){ rBad.push(rc.slice(0, 2).join(' ') + ': start'); return; }
