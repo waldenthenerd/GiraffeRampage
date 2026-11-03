@@ -153,7 +153,7 @@ function townInput(){
   if (Input.padOn){ if (Math.abs(Input.padX) > 0.25) I.mx += Input.padX; if (Input.padY < -0.5) I.up = true; if (Input.padY > 0.5) I.down = true; }
   I.act = townEdge('act', !!(Input.keys.KeyE || Input.keys.Enter || Input.keys.NumpadEnter || Input.keys.Space || Input.padBtn));
   I.act2 = townEdge('act2', !!(Input.keys.KeyQ || Input.padBtn2));                          /* the second thing in reach (js/town/44zzzzb-town-choices.js) */
-  I.jrn = townEdge('jrn', !!Input.keys.KeyJ); I.map = townEdge('map', !!Input.keys.KeyM); I.car = townEdge('car', !!Input.keys.KeyC);
+  I.jrn = townEdge('jrn', !!Input.keys.KeyJ); I.map = townEdge('map', !!Input.keys.KeyM); I.car = townEdge('car', !!Input.keys.KeyC); I.phone = townEdge('phone', !!Input.keys.KeyP);
   const ptr = !!Input.mdown;
   I.click = townEdge('ptr', ptr); I.ptr = ptr; I.cx = Input.sx; I.cy = Input.sy;
   return I;
@@ -266,6 +266,7 @@ function updateTown(dt, frozen){
   if (inp.jrn && typeof townShowJournal === 'function') townShowJournal();
   if (inp.map && typeof townShowMap === 'function') townShowMap();
   if (inp.car && typeof townCarToggle === 'function') townCarToggle();
+  if (inp.phone && typeof phoneOpen === 'function') phoneOpen();                                 /* the Peep Phone from Volt & Co. (js/town/44zzzzd-phone.js) */
   if (inp.click){
     for (let i = 0; i < Town.ui.btns.length; i++){ const b = Town.ui.btns[i]; if (townInRect(b, inp.cx, inp.cy)){ townButton(b.id); return; } }
   }
@@ -277,6 +278,7 @@ function townButton(id){
   else if (id === 'menu') townShowMenu();
   else if (id === 'car') townCarToggle();
   else if (id === 'ride') wheelsToggle();
+  else if (id === 'phone' && typeof phoneOpen === 'function') phoneOpen();
 }
 function townEscape(){
   if (typeof townDialogOpen === 'function' && townDialogOpen()){ townCloseDialog(); return; }
@@ -567,6 +569,7 @@ function townDrawHud(ctx, D, h){
   /* buttons, top right */
   const labels = [['journal', Input.hasTouch ? 'Journal' : 'Journal J'], ['map', Input.hasTouch ? 'Map' : 'Map M'], ['menu', Input.hasTouch ? 'Menu' : 'Menu Esc']];
   if (typeof townCarOwned === 'function' && townCarOwned() && !D.indoor && !D.cave) labels.unshift(['car', Town.car ? 'Get out' : (Input.hasTouch ? 'Car' : 'Car C')]);
+  if (typeof gadPhone === 'function' && gadPhone() > 0) labels.unshift(['phone', Input.hasTouch ? 'Phone' : 'Phone P']);
   if (typeof wheelsOwned === 'function' && wheelsOwned()) labels.unshift(['ride', Town.wheels ? 'Hop off' : (Input.hasTouch ? 'Ride' : 'Ride ' + keyName(keyOf('ride')))]);       /* a skateboard or a bicycle goes indoors too */
   labels.forEach(function(b, i){
     const x = W - 10 - (labels.length - i) * (bw + 6) + 6, y = rowY;
