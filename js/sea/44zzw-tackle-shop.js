@@ -149,5 +149,5 @@ IV_ROOMS.tackle = function(c, D, K){
   tCircle(c, '#D5352B', 164, 154, 7); tCircle(c, '#F4F1E8', 240, 160, 7); tCircle(c, '#D5352B', 316, 154, 7);
   ivBoard(c, 585, 62, 165, 70, '#A8734A', '#5A3B22'); tEll(c, '#9FB8D0', 660, 98, 52, 16); tPoly(c, '#7A9AB8', [708, 98, 736, 82, 736, 114]); tCircle(c, '#FFFFFF', 630, 94, 4.5); tCircle(c, '#2A2A30', 630, 94, 2.2); ivText(c, 'BIGGEST CATCH', 667, 124, 9, '#F4E3C0');
   ivLine(c, '#2A2A30', 2, 900, 34, 900, 60); tCircle(c, '#D5352B', 900, 100, 38); tCircle(c, '#F4F1E8', 900, 100, 26); tCircle(c, '#D5352B', 900, 100, 14); tCircle(c, '#F4F1E8', 900, 100, 6);
-  ivLine(c, '#6A6F78', 3, 1040, 44, 1040, 130); tCircle(c, '#F4F1E8', 1040, 140, 24); ivLine(c, '#2A2A30', 2.4, 1040, 140, 1040, 124); ivLine(c, '#2A2A30', 2.4, 1040, 140, 1052, 146);
+  ivLine(c, '#6A6F78', 3, 1040, 44, 1040, 114); tCircle(c, '#5A3B22', 1040, 140, 28); tCircle(c, '#F4F1E8', 1040, 140, 24); ivLine(c, '#2A2A30', 2.4, 1040, 140, 1040, 124); ivLine(c, '#2A2A30', 2.4, 1040, 140, 1052, 146);
 };

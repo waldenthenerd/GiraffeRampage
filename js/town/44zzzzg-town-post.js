@@ -218,10 +218,10 @@ GAD_LABEL.news = function(){ return newsFresh() ? 'Read today’s paper (new)' :
     if (b.kind === 'postoffice'){
       tRect(c, '#C9503C', x0, top, W, h); for (let yy = top + 6; yy < TG; yy += 12) tRect(c, 'rgba(0,0,0,.1)', x0, yy, W, 1.5);
       tRect(c, '#F4F1E8', x0 - 6, top - 12, W + 12, 16); tPoly(c, '#8A2E22', [x0 - 6, top - 12, x, top - 46, x0 + W + 6, top - 12]);
-      tRound(c, '#F4F1E8', x - 26, top - 36, 52, 20, 5); tRect(c, '#C9503C', x - 18, top - 30, 36, 8);
+      tRound(c, '#F4F1E8', x - 22, top - 38, 44, 24, 3); c.strokeStyle = '#C9503C'; c.lineWidth = 2; c.beginPath(); c.moveTo(x - 20, top - 36); c.lineTo(x, top - 24); c.lineTo(x + 20, top - 36); c.stroke();   /* an envelope in the gable */
       tWin(c, D, x0 + 24, top + 50, 70, 60, '#BFE0F4'); tDoor(c, x0 + W - 62, 54, 98, '#3A2A1E');
       tRound(c, '#2A3A8A', x0 + 108, TG - 92, 42, 92, 10); tRect(c, '#0E1650', x0 + 112, TG - 86, 34, 8); tCircle(c, '#E8C96A', x0 + 129, TG - 54, 4);   /* the postbox, standing on the ground */
-      tSign(c, b.label, x, top + 130, 170, '#8A2E22', '#FFF2D0');
+      tSign(c, b.label, x, top + 26, 170, '#8A2E22', '#FFF2D0');                                                       /* the name across the top, clear of the door and the postbox */
     } else {
       tRect(c, '#4A3A2C', x0, TG - 84, W, 84); tRect(c, '#6A5238', x0, TG - 84, W, 8); tRect(c, 'rgba(0,0,0,.15)', x0 + 6, TG - 70, W - 12, 60);
       tRect(c, '#5A4630', x0 + 4, top, 6, h - 84); tRect(c, '#5A4630', x0 + W - 10, top, 6, h - 84);

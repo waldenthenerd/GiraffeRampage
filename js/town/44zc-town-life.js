@@ -11,6 +11,26 @@ const TOWN_WALK_SAY = ['Lovely day.', 'Mind the neck!', 'Is it Tuesday?', 'Hello
   'Almost home.', 'Excuse me!', 'Nice neck.', 'The tram is late again.', 'Have you tried the buns?', 'I lost a coin somewhere.', 'Careful on the roofs.'];
 const TOWN_WALK_REPLY = [['Oh, hello! Lovely town, isn’t it?', 'I walk it every day. I still find new corners.'], ['Have you been up the clock tower? Well. Up it, I mean.', 'Mind the tram. It does not stop for giraffes.'],
   ['I heard there are coins hidden on every street.', 'The best hats are found, not bought.'], ['I’d chat, but I’m late for nothing in particular.', 'Is it true you’ve been to the Moon?']];
+/* the park's big wheel: its rim, spokes and gondolas (drawn in the behind slot, js/town/44zc-town-life.js) */
+function townFerris(ctx, t, dark){
+  const cx = 2830, cy = TG - 140, R = 118, a0 = t * 0.18;
+  ctx.strokeStyle = '#C9CDD9'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, R * 0.6, 0, TAU); ctx.stroke();
+  ctx.lineWidth = 2; for (let i = 0; i < 8; i++){ const a = a0 + i * TAU / 8; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R); ctx.stroke(); }
+  for (let i = 0; i < 8; i++){
+    const a = a0 + i * TAU / 8, gx = cx + Math.cos(a) * R, gy = cy + Math.sin(a) * R;
+    ctx.fillStyle = ['#D5352B', '#F2C230', '#4DA0D8', '#6BBB45'][i % 4]; ctx.beginPath(); ctx.roundRect(gx - 10, gy - 2, 20, 18, 4); ctx.fill();
+    ctx.fillStyle = '#2A2A34'; ctx.fillRect(gx - 10, gy - 4, 20, 3);
+    if (dark > 0.2){ ctx.fillStyle = 'rgba(255,240,170,' + (0.5 + 0.5 * Math.sin(t * 5 + i)).toFixed(2) + ')'; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * R, cy + Math.sin(a) * R, 4, 0, TAU); ctx.fill(); }
+  }
+  tCircle(ctx, '#3A3A44', cx, cy, 10);
+}
+
+/* a FOR SALE sign on a post, standing on the floor beside the car or the plane (it used to hang in the air) */
+function townForSale(ctx, x){
+  tRect(ctx, '#3A2A1E', x - 16, TG - 5, 32, 5); tRect(ctx, '#4A3A2C', x - 2, TG - 66, 4, 62);
+  tRound(ctx, '#3A2A1E', x - 62, TG - 98, 124, 34, 6); tRound(ctx, '#F2C230', x - 59, TG - 95, 118, 28, 5);
+  ctx.fillStyle = '#3A2A1E'; ctx.font = 'bold 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('FOR SALE', x, TG - 75);
+}
 function townSpawnWalkers(){
   Town.walkers = [];
   const D = TOWN_DIST[Town.d]; if (!D) return;
@@ -154,16 +174,6 @@ function townDynX(ctx, D, t, dark){
       if (Math.sin(t * 0.8) > 0.2){ ctx.fillStyle = 'rgba(40,40,60,.7)'; ctx.font = 'bold 13px system-ui'; ctx.textAlign = 'left'; ctx.fillText('z', 656, TG - 232 - (t % 2) * 6); ctx.font = 'bold 10px system-ui'; ctx.fillText('z', 668, TG - 246 - (t % 2) * 6); }
       break;
     case 'park': {
-      const cx = 2830, cy = TG - 140, R = 118, a0 = t * 0.18;
-      ctx.strokeStyle = '#C9CDD9'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, R * 0.6, 0, TAU); ctx.stroke();
-      ctx.lineWidth = 2; for (let i = 0; i < 8; i++){ const a = a0 + i * TAU / 8; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R); ctx.stroke(); }
-      for (let i = 0; i < 8; i++){
-        const a = a0 + i * TAU / 8, gx = cx + Math.cos(a) * R, gy = cy + Math.sin(a) * R;
-        ctx.fillStyle = ['#D5352B', '#F2C230', '#4DA0D8', '#6BBB45'][i % 4]; ctx.beginPath(); ctx.roundRect(gx - 10, gy - 2, 20, 18, 4); ctx.fill();
-        ctx.fillStyle = '#2A2A34'; ctx.fillRect(gx - 10, gy - 4, 20, 3);
-        if (dark > 0.2){ ctx.fillStyle = 'rgba(255,240,170,' + (0.5 + 0.5 * Math.sin(t * 5 + i)).toFixed(2) + ')'; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * R, cy + Math.sin(a) * R, 4, 0, TAU); ctx.fill(); }
-      }
-      tCircle(ctx, '#3A3A44', cx, cy, 10);
       townBalloon(ctx, D, t);
       /* the bandstand: two musicians who sway */
       [2430, 2530].forEach(function(bx, i){ townGiraffe(ctx, bx, TG - 34, { s: 1.0, look: { coat: i ? '#F2A08A' : '#9AD0E8', spot: i ? '#B04A32' : '#2F6B9A', pat: 0, hat: i ? 'tophat' : 'beanie' }, bob: Math.abs(Math.sin(t * 4 + i)) * 3, reach: 0.15 + 0.1 * Math.sin(t * 2 + i), flip: i === 1, t: t, seed: i }); });
@@ -213,7 +223,7 @@ function townDynX(ctx, D, t, dark){
       const owned = townCarOwned(), sw = 0.5 + 0.5 * Math.sin(t * 0.8);
       townCarSide(ctx, 580, TG - 10 + Math.sin(t * 1.4) * 1.5, { col: owned ? townCarColour() : '#D5352B', t: t, spin: t * 2, moving: false });
       ctx.fillStyle = 'rgba(255,255,255,' + (0.1 + 0.15 * sw).toFixed(2) + ')'; ctx.beginPath(); ctx.moveTo(500 + sw * 140, TG - 90); ctx.lineTo(540 + sw * 140, TG - 90); ctx.lineTo(500 + sw * 140 + 30, TG - 20); ctx.lineTo(480 + sw * 140, TG - 20); ctx.fill();
-      if (!owned){ tRound(ctx, '#F2C230', 520, TG - 170, 120, 30, 6); ctx.fillStyle = '#3A2A1E'; ctx.font = 'bold 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('FOR SALE', 580, TG - 149); }
+      if (!owned) townForSale(ctx, 724);
       break;
     }
     case 'in_house1': case 'in_house2': {
@@ -255,11 +265,13 @@ function townDynX(ctx, D, t, dark){
     if (Town.ride){ townDrawRide(ctx); return; }
     return rt(ctx);
   };
-  /* the sailboats sit out on the water, behind everything on the quay: drawn between the back and front pictures, so nothing in front can be overdrawn */
-  TOWN_DIST.harbour.behind = true;
+  /* the sailboats sit out on the water, behind everything on the quay: drawn between the back and front pictures, so nothing in front can be overdrawn.
+     The park's big wheel turns there too: Mim's cottage, the flower cart and the wheel's own legs stand in front of it */
+  TOWN_DIST.harbour.behind = true; TOWN_DIST.park.behind = true;
   const db = townDynamicBehind;
   townDynamicBehind = function(ctx, D, t, dark){
     db(ctx, D, t, dark);
+    if (D.id === 'park'){ townFerris(ctx, t, dark); return; }
     if (D.id !== 'harbour') return;
     for (let k = 0; k < 2; k++){
       const bx = ((t * 12 + k * 1100) % (D.w + 400)) - 200, by = TG - 72 + Math.sin(t * 1.3 + k) * 2;

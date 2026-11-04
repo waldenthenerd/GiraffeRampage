@@ -225,8 +225,8 @@ const IV_KINDS = {
     c.strokeStyle = '#FF4D8D'; c.lineWidth = 4; c.strokeRect(x0 + 4, TG - 186, W - 8, 172);
     ivText(c, 'HIGH SCORES', b.x, TG - 164, 15, '#4DD8FF'); c.font = 'bold 15px monospace';
     for (let i = 0; i < 5; i++){ tRect(c, 'rgba(255,255,255,.4)', x0 + 16, TG - 144 + i * 24, 70, 5); tRect(c, '#FFD84D', x0 + W - 66, TG - 144 + i * 24, 40, 5); ivText(c, String(i + 1), x0 + 8, TG - 138 + i * 24, 10, '#FF4D8D'); }
-    ivLine(c, '#2A2A34', 3, b.x - 30, TG - 196, b.x - 30, TG - 210); ivLine(c, '#2A2A34', 3, b.x + 30, TG - 196, b.x + 30, TG - 210);
-    tRound(c, '#FFD84D', b.x - 44, TG - 224, 88, 14, 6);
+    ivLine(c, '#8A8E98', 3, b.x - 30, TG - 196, b.x - 30, TG - 212); ivLine(c, '#8A8E98', 3, b.x + 30, TG - 196, b.x + 30, TG - 212);   /* a marquee bulb bar on two posts */
+    tRound(c, '#3A2E5A', b.x - 46, TG - 226, 92, 16, 6); for (let i = 0; i < 9; i++) tCircle(c, i % 2 ? '#FF4D8D' : '#FFD84D', b.x - 36 + i * 9, TG - 218, 2.6);
   },
   tripod: function(c, D, b){
     const x = b.x;
@@ -316,10 +316,10 @@ const IV_KINDS = {
 
 /* ======================= 2. THE ROOMS ======================= */
 function ivWindows(c, D, K){
-  const W = D.w, winN = Math.floor(W / 330);
-  for (let i = 0; i < winN; i++){
+  const W = D.w, winX = townWinXs(D);
+  for (let i = 0; i < winX.length; i++){
     if (D.room === 'home' && i === 0 || D.room === 'arcade' || D.room === 'ilight' || D.room === 'gym' || D.room === 'garage' && i % 2) continue;      /* at home the first window is the one she dresses: no second one under it */
-    const wx = 220 + i * (W - 300) / Math.max(1, winN), wy = 80, cur = ['#B5547A', '#3E6A8A', '#6A8A3E', '#C98A44'][(i + W) % 4];
+    const wx = winX[i], wy = 80, cur = ['#B5547A', '#3E6A8A', '#6A8A3E', '#C98A44'][(i + W) % 4];
     tRect(c, '#5A3B22', wx - 18, wy - 16, 114, 6);                                       /* the rod, on two brackets */
     tRect(c, '#5A3B22', wx - 18, wy - 16, 4, 12); tRect(c, '#5A3B22', wx + 92, wy - 16, 4, 12);
     tPoly(c, cur, [wx - 12, wy - 10, wx + 14, wy - 10, wx + 20, wy + 124, wx - 12, wy + 124]);
@@ -343,13 +343,13 @@ function ivFrame(c, x, y, w, h, art){
 }
 const IV_ROOMS = {
   bakery: function(c, D, K){
-    for (let i = 0; i < 4; i++){
-      const x = 250 + i * 190; ivShelfBoard(c, x, 150, 120);
-      if (i % 2 === 0){ for (let k = 0; k < 3; k++) ivLoaf(c, x + 24 + k * 36, 150, ['#D9A05A', '#E8B876', '#C98A44'][k]); }
-      else { for (let k = 0; k < 3; k++){ tRound(c, ['#E8B7C9', '#F2D9A0', '#9FD8F2'][k], x + 14 + k * 36, 124, 26, 26, 4); tRect(c, '#C9CDD9', x + 14 + k * 36, 120, 26, 6); } }
-    }
-    ivChains(c, 760, 830, 36, 86); ivBoard(c, 730, 86, 130, 44, '#FFFFFF', '#7A4B2A'); ivText(c, 'FRESH BREAD', 795, 116, 20, '#7A4B2A');
-    ivFrame(c, 980, 100, 60, 46, function(cc, x, y, w, h){ for (let i = 0; i < 3; i++){ ivLine(cc, '#C9A24A', 3, x + 14 + i * 16, y + h - 6, x + 14 + i * 16, y + 8); tEll(cc, '#E8C96A', x + 14 + i * 16, y + 12, 4, 8); } });
+    [[600, 176], [870, 150]].forEach(function(p, i){                                          /* two shelves, in the walls between the windows */
+      const x = p[0], y = p[1]; ivShelfBoard(c, x, y, 120);
+      if (i % 2 === 0){ for (let k = 0; k < 3; k++) ivLoaf(c, x + 24 + k * 36, y, ['#D9A05A', '#E8B876', '#C98A44'][k]); }
+      else { for (let k = 0; k < 3; k++){ tRound(c, ['#E8B7C9', '#F2D9A0', '#9FD8F2'][k], x + 14 + k * 36, y - 26, 26, 26, 4); tRect(c, '#C9CDD9', x + 14 + k * 36, y - 30, 26, 6); } }
+    });
+    ivChains(c, 600, 718, 36, 86); ivBoard(c, 585, 86, 148, 44, '#FFFFFF', '#7A4B2A'); ivText(c, 'FRESH BREAD', 659, 116, 20, '#7A4B2A');
+    ivFrame(c, 1004, 100, 60, 46, function(cc, x, y, w, h){ for (let i = 0; i < 3; i++){ ivLine(cc, '#C9A24A', 3, x + 14 + i * 16, y + h - 6, x + 14 + i * 16, y + 8); tEll(cc, '#E8C96A', x + 14 + i * 16, y + 12, 4, 8); } });
     tCircle(c, '#5A3B22', 170, 120, 24); tCircle(c, '#FBF3DC', 170, 120, 20); ivLine(c, '#2A1A0A', 2.4, 170, 120, 170, 106); ivLine(c, '#2A1A0A', 2, 170, 120, 180, 124);
   },
   cafe: function(c, D, K){
@@ -357,15 +357,15 @@ const IV_ROOMS = {
     c.fillStyle = '#F4F1E8'; c.font = '15px system-ui'; c.textAlign = 'left'; ['TEA  ·  2', 'BUN  ·  3', 'CAKE · 5', 'SOUP · 4'].forEach(function(l, i){ c.fillText(l, 780, 120 + i * 22); });
     c.strokeStyle = '#4A3A28'; c.lineWidth = 2; c.beginPath(); c.moveTo(150, 44); c.quadraticCurveTo(420, 96, 700, 44); c.stroke();   /* bunting on its string */
     for (let i = 0; i < 9; i++){ const u = (i + 0.5) / 9, bxp = 150 + u * 550, byp = 44 + Math.sin(u * Math.PI) * 38; tPoly(c, ['#D5352B', '#F2C230', '#4DA0D8', '#6BBB45', '#E85D9F'][i % 5], [bxp - 10, byp, bxp + 10, byp, bxp, byp + 22]); }
-    ivFrame(c, 200, 120, 60, 50, function(cc, x, y, w, h){ tCircle(cc, '#FFD84D', x + 40, y + 14, 8); tPoly(cc, '#6BBB45', [x, y + h, x + 20, y + 22, x + 36, y + 38, x + 52, y + 18, x + w, y + h]); });
-    ivFrame(c, 280, 160, 46, 36, function(cc, x, y, w, h){ tRect(cc, '#C9628C', x + 8, y + 6, w - 16, h - 12); });
+    ivFrame(c, 336, 116, 60, 50, function(cc, x, y, w, h){ tCircle(cc, '#FFD84D', x + 40, y + 14, 8); tPoly(cc, '#6BBB45', [x, y + h, x + 20, y + 22, x + 36, y + 38, x + 52, y + 18, x + w, y + h]); });
+    ivFrame(c, 404, 156, 46, 36, function(cc, x, y, w, h){ tRect(cc, '#C9628C', x + 8, y + 6, w - 16, h - 12); });
     ivShelfBoard(c, 1010, 170, 80, '#7A5230'); ivCup(c, 1030, 170, 12, '#9FD8F2'); ivCup(c, 1052, 170, 12, '#F2D9A0'); ivCup(c, 1074, 170, 12, '#E8B7C9');
   },
   garage: function(c, D, K){
     tRect(c, '#F2C230', 0, TG - 102, D.w, 8); for (let x = 0; x < D.w; x += 40) tPoly(c, '#2A2A34', [x, TG - 102, x + 20, TG - 102, x + 10, TG - 94, x - 10, TG - 94]);
-    tRect(c, '#3A3A44', 210, 150, 880, 8); ivBracket(c, 220, 158, '#2A2A30', 1); ivBracket(c, 1070, 158, '#2A2A30', -1); ivBracket(c, 650, 158, '#2A2A30', 1);   /* a tire rail on brackets */
-    for (let i = 0; i < 5; i++){ const x = 280 + i * 190; ivLine(c, '#2A2A30', 3, x, 158, x, 168); tRect(c, '#2A2A30', x - 3, 158, 6, 12); tCircle(c, '#2A2A34', x, 200, 32); tCircle(c, '#44444C', x, 200, 22); tCircle(c, '#C9CDD9', x, 200, 14); for (let k = 0; k < 5; k++){ const a = k / 5 * TAU; tCircle(c, '#8A93A8', x + Math.cos(a) * 8, 200 + Math.sin(a) * 8, 2); } }
-    ivChains(c, 780, 880, 36, 80); ivBoard(c, 760, 80, 140, 36, '#D5352B', '#3A4252'); ivText(c, 'OPEN', 830, 106, 22, '#F4F1E8');
+    tRect(c, '#3A3A44', 210, 232, 650, 8); ivBracket(c, 220, 240, '#2A2A30', 1); ivBracket(c, 850, 240, '#2A2A30', -1); ivBracket(c, 540, 240, '#2A2A30', 1);   /* a tire rail on brackets, under the windows and clear of the pegboard */
+    for (let i = 0; i < 4; i++){ const x = 290 + i * 170, ty = 282; ivLine(c, '#2A2A30', 3, x, 240, x, 250); tRect(c, '#2A2A30', x - 3, 240, 6, 12); tCircle(c, '#2A2A34', x, ty, 32); tCircle(c, '#44444C', x, ty, 22); tCircle(c, '#C9CDD9', x, ty, 14); for (let k = 0; k < 5; k++){ const a = k / 5 * TAU; tCircle(c, '#8A93A8', x + Math.cos(a) * 8, ty + Math.sin(a) * 8, 2); } }
+    ivChains(c, 580, 680, 36, 80); ivBoard(c, 560, 80, 140, 36, '#D5352B', '#3A4252'); ivText(c, 'OPEN', 630, 106, 22, '#F4F1E8');
     tRound(c, '#3A6AA0', 1100, TG - 70, 40, 70, 6); tRect(c, '#2A4A7A', 1100, TG - 50, 40, 4); tRect(c, '#2A4A7A', 1100, TG - 30, 40, 4); tRect(c, '#C9CDD9', 1112, TG - 78, 16, 8);   /* an oil drum */
   },
   library: function(c, D, K){
@@ -374,10 +374,10 @@ const IV_ROOMS = {
       for (let row = 0; row < 5; row++){ const base = 156 + (row + 1) * 68; let bx = x0 + 6, i = 0; while (bx < x0 + 110){ const bw = 8 + ((i * 7 + j) % 7), bh = 40 + ((i * 11 + row * 5) % 20); ivBook(c, bx, base, bw, bh, ['#6A3A2A', '#2A4A6A', '#5A6A2A', '#7A5A2A', '#8A2A3A', '#4A3A6A'][(i + row + j) % 6]); bx += bw + 1; i++; } tRect(c, '#5A3B22', x0, base, 120, 6); }
     });
     ivLine(c, '#2A2A30', 2, 200, 36, 200, 90); tCircle(c, '#5A3B22', 200, 120, 32); tCircle(c, '#E8D8B0', 200, 120, 27); ivLine(c, '#3A2A1E', 2.6, 200, 120, 200, 100); ivLine(c, '#3A2A1E', 2.2, 200, 120, 214, 128);
-    tRect(c, '#C9A24A', 270, 190, 860, 5); tRect(c, '#C9A24A', 270, 186, 6, 14); tRect(c, '#C9A24A', 1124, 186, 6, 14);        /* the ladder rail, fixed at each end */
-    tRect(c, '#8A6642', 536, 195, 6, 305); tRect(c, '#8A6642', 566, 195, 6, 305); tCircle(c, '#2A2A30', 539, 192, 5); tCircle(c, '#2A2A30', 569, 192, 5);   /* the ladder hangs from it, to the floor */
+    tRect(c, '#C9A24A', 270, 214, 860, 5); tRect(c, '#C9A24A', 270, 210, 6, 14); tRect(c, '#C9A24A', 1124, 210, 6, 14);        /* the ladder rail, fixed at each end, under the window sills */
+    tRect(c, '#8A6642', 536, 219, 6, 281); tRect(c, '#8A6642', 566, 219, 6, 281); tCircle(c, '#2A2A30', 539, 216, 5); tCircle(c, '#2A2A30', 569, 216, 5);   /* the ladder hangs from it, to the floor */
     for (let y = 230; y < 500; y += 36) tRect(c, '#6A4A2C', 536, y, 36, 5);
-    ivChains(c, 640, 760, 36, 76); ivBoard(c, 620, 76, 160, 30, '#2A4A6A', '#C9A24A'); ivText(c, 'QUIET PLEASE', 700, 97, 15, '#F4F1E8');
+    ivChains(c, 612, 728, 36, 76); ivBoard(c, 600, 76, 140, 30, '#2A4A6A', '#C9A24A'); ivText(c, 'QUIET PLEASE', 670, 97, 15, '#F4F1E8');
   },
   tailor: function(c, D, K){
     tRect(c, '#5A3B22', 120, 90, 840, 8); tRect(c, '#5A3B22', 120, 150, 840, 6); tRect(c, '#5A3B22', 120, 214, 840, 6);                  /* a cubby rack: three rails, two end posts */

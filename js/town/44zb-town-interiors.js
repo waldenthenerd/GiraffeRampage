@@ -37,7 +37,7 @@ const TOWN_DOORS = { tailor: 'in_tailor', hall: 'in_hall', cafe: 'in_cafe', libr
   /* more street: each district is longer, and the new parts are on its far end */
   S.w = 3000; M.w = 3150; P.w = 3300; H.w = 3000; R.w = 3000; L.w = 3000; B.w = 2800;
   S.b.push({ id: 'house1', kind: 'house', x: 2520, w: 250, h: 215, label: 'Granny Hoof’s', act: 'house', to: 'in_house1', tint: '#C9A27A' });
-  S.p.push({ k: 'statue', x: 2370 }, { k: 'kiosk', x: 2640 }, { k: 'clocktower', x: 2780 }, { k: 'flowers', x: 2300 }, { k: 'hedge', x: 1600 }, { k: 'hedge', x: 520 }, { k: 'signpost', x: 700 }, { k: 'lamp', x: 2420 }, { k: 'poster', x: 1450 });
+  S.p.push({ k: 'statue', x: 2370 }, { k: 'kiosk', x: 2690, s: 0.62 }, { k: 'clocktower', x: 2780 }, { k: 'flowers', x: 2300 }, { k: 'hedge', x: 1600 }, { k: 'hedge', x: 520 }, { k: 'signpost', x: 700 }, { k: 'lamp', x: 2420 }, { k: 'poster', x: 1450 });
   S.L.push({ x: 2420, y: 360, r: 110 }, { x: 2780, y: 120, r: 140 }, { x: 2520, y: 400, r: 120 });
   M.b.push({ id: 'bakery', kind: 'bakery', x: 2560, w: 320, h: 220, label: 'Crumb’s Bakery', act: 'bakery', to: 'in_bakery' }, { id: 'garage', kind: 'garage', x: 2900, w: 300, h: 200, label: 'Torque Motors', act: 'garage', to: 'in_garage' });
   M.p.push({ k: 'cart', x: 2250 }, { k: 'lamp', x: 2380 }, { k: 'bench', x: 2100 }, { k: 'signpost', x: 760 }, { k: 'cat', x: 640 }, { k: 'poster', x: 1360 }, { k: 'lamp', x: 2800 });
@@ -164,6 +164,19 @@ TOWN_ERRANDS.forEach(function(e){ TOWN_ERR_BY_ID[e.id] = e; });
   townBuilding = function(c, D, b, P, r){ if (!townBuildingX(c, D, b, P, r)) pb(c, D, b, P, r); };
 })();
 
+/* where a room's back-wall windows go: evenly spaced, unless TOWN_WIN_AT names places for that room (chosen so no sign, shelf or picture
+   hangs across a window; tools/scenarios/town-detail.js checks it). Every painter of windows, curtains and window light asks this. */
+const TOWN_WIN_AT = {
+  in_cafe: [220, 487], in_library: [495, 770], in_tailor: [], in_hall: [], in_studio: [220], in_fstand: [220, 687], in_barn: [430, 570],
+  in_coop: [180, 560], in_fhouse: [220, 453], in_icottage: [440], in_tackle: [400, 1120], in_wheels: [540, 1010], in_hangar: []
+};
+function townWinXs(D){
+  if (window.TOWN_WIN_OFF) return [];
+  const at = TOWN_WIN_AT[D.id]; if (at) return at.slice();
+  const W = D.w, n = Math.floor(W / 330), out = [];
+  for (let i = 0; i < n; i++) out.push(220 + i * (W - 300) / Math.max(1, n));
+  return out;
+}
 function townPaintRoom(c, D, W, H, R){
   const K = TOWN_ROOM[D.room] || TOWN_ROOM.house, r = miniRng(D.w * 5 + D.id.length * 11);
   D._win = [];
@@ -179,9 +192,9 @@ function townPaintRoom(c, D, W, H, R){
   for (let y = TG + 22; y < 600; y += 24){ c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
   for (let i = 0; i < W / 30; i++){ const y = TG + Math.floor(r() * 4) * 24, x = r() * W; c.beginPath(); c.moveTo(x, y); c.lineTo(x, y + 24); c.stroke(); }
   /* windows on the back wall, with daylight in them */
-  const winN = Math.floor(W / 330);
-  for (let i = 0; i < winN; i++){
-    const wx = 220 + i * (W - 300) / Math.max(1, winN), wy = 80;
+  const winX = townWinXs(D);
+  for (let i = 0; i < winX.length; i++){
+    const wx = winX[i], wy = 80;
     if (D.room === 'home' && i === 0 || D.room === 'arcade' || D.room === 'ilight' || D.room === 'gym' || D.room === 'garage' && i % 2 || window.UNI_ROOMS && UNI_ROOMS[D.room]) continue;
     tRect(c, '#4A3A2C', wx - 3, wy - 3, 84, 124); tRect(c, '#BFE3F6', wx, wy, 78, 118); tRect(c, 'rgba(255,255,255,.4)', wx + 6, wy + 6, 20, 106);
     tRect(c, '#4A3A2C', wx + 38, wy, 3, 118); tRect(c, '#4A3A2C', wx, wy + 56, 78, 3);
@@ -254,9 +267,11 @@ function townPropX(c, D, p, P, r){
       c.beginPath(); c.ellipse(x + 34, TG - 170, 12, 7, -0.25, 0, TAU); c.fill();
       break;
     case 'kiosk':
+      c.save(); c.translate(x, TG); c.scale(s, s); c.translate(-x, -TG);                     /* a sweet stall; on the square it is a small one, between Granny Hoof's and the clock tower */
       tRect(c, '#5A8AC0', x - 48, TG - 110, 96, 110); tPoly(c, '#2A4A7A', [x - 58, TG - 110, x, TG - 140, x + 58, TG - 110]); tRect(c, '#FFF6E0', x - 38, TG - 90, 76, 40);
       [['#D5352B', -30], ['#F2C230', -10], ['#4DA0D8', 10], ['#6BBB45', 30]].forEach(function(m){ tRect(c, m[0], x + m[1] - 6, TG - 86, 12, 30); });
       tRect(c, '#8A6642', x - 44, TG - 44, 88, 8);
+      c.restore();
       break;
     case 'hedge':
       tRound(c, '#3E7A3A', x - 60, TG - 44, 120, 44, 14); for (let i = 0; i < 6; i++) tCircle(c, '#4C8A44', x - 50 + i * 20, TG - 44, 12);
@@ -369,7 +384,9 @@ function townBuildingX(c, D, b, P, r){
       tRect(c, '#C9CED6', x0, top, W, h); tRect(c, '#4A5568', x0, top, W, 16); tRect(c, '#3A4252', x0 - 6, top - 12, W + 12, 14);
       tRect(c, '#8A93A8', x0 + 24, top + 46, W - 150, h - 46); for (let i = 1; i < 6; i++) tRect(c, 'rgba(0,0,0,.18)', x0 + 24, top + 46 + i * ((h - 46) / 6), W - 150, 2);
       tDoor(c, x0 + W - 52, 50, 92, '#3A4252'); tWin(c, D, x0 + W - 78, top + 40, 50, 30, '#BFE0F4');
-      tCircle(c, '#D5352B', x0 + 40, top + 28, 9); tSign(c, b.label, x, top - 30, 220, '#3A4252');
+      tCircle(c, '#F4F1E8', x0 + 40, top + 28, 12); tCircle(c, '#D5352B', x0 + 40, top + 28, 9); c.strokeStyle = '#F4F1E8'; c.lineWidth = 2.4; c.lineCap = 'round'; c.beginPath(); c.moveTo(x0 + 35, top + 33); c.lineTo(x0 + 44, top + 24); c.stroke(); tCircle(c, '#F4F1E8', x0 + 45, top + 23, 2.6); c.lineCap = 'butt';   /* the badge: a spanner on red */
+      tRect(c, '#5A6378', x0 + 24 + (W - 150) / 2 - 14, TG - 12, 28, 4); tRect(c, '#3A4252', x0 + 60, top + 36, 70, 4); tRound(c, '#3A4252', x0 + 88, top + 30, 14, 8, 3); tRect(c, '#FFE9A8', x0 + 90, top + 36, 10, 2);   /* the roller door's handle, and a lamp over it */
+      tSign(c, b.label, x, top - 30, 220, '#3A4252');
       break;
     case 'ctower':
       tPoly(c, '#E8EAF0', [x - 60, TG, x - 40, top + 80, x + 40, top + 80, x + 60, TG]); tRect(c, '#4A6ED8', x - 50, TG - 120, 100, 14);

@@ -207,8 +207,10 @@ function townPaintRunwayField(c, D, W, H, R){
     if (D.room === 'hangar'){                                                      /* inside the film's hangar */
       const wall = c.createLinearGradient(0, 0, 0, TG); wall.addColorStop(0, '#2A2018'); wall.addColorStop(1, '#5A4636'); c.fillStyle = wall; c.fillRect(0, 36, D.w, TG - 36 - 90);
       c.strokeStyle = 'rgba(0,0,0,.3)'; c.lineWidth = 3; for (let x = 0; x < D.w; x += 80){ c.beginPath(); c.moveTo(x, 36); c.lineTo(x, TG - 90); c.stroke(); }
-      tRect(c, '#FFD890', 280, 120, 90, 150); tRect(c, '#1C1410', 286, 126, 78, 138);
+      tRect(c, '#FFD890', 280, 120, 90, 150); tRect(c, '#E89A5A', 286, 126, 78, 70); tRect(c, '#B8607A', 286, 196, 78, 30); tPoly(c, '#4A2E3A', [286, 264, 286, 214, 316, 196, 346, 216, 364, 204, 364, 264]);   /* a window onto the dusk */
+      tRect(c, '#FFD890', 323, 126, 4, 138); tRect(c, '#FFD890', 286, 190, 78, 4); tCircle(c, '#FFE9A8', 340, 160, 9);
       tRect(c, '#6A5A4A', 0, TG - 12, D.w, 12);
+      tRect(c, '#2A2018', 560, 46, 2, 16); tRect(c, '#2A2018', 718, 46, 2, 16); tRound(c, '#3A2A1E', 548, 60, 184, 36, 5); tRect(c, '#C8A878', 554, 66, 172, 2); tRect(c, '#C8A878', 554, 88, 172, 2);   /* the name on a board */
       c.fillStyle = '#C8A878'; c.font = '800 22px "Courier New", monospace'; c.textAlign = 'center'; c.fillText('HANGAR 7', 640, 86);
     }
   };
@@ -243,7 +245,7 @@ function townPaintRunwayField(c, D, W, H, R){
     }
     if (D.id === 'in_hangar'){
       flyPlane(ctx, 620, TG - 40 + Math.sin(t * 1.3) * 1.5, { rider: false, prop: t * 6, s: 1.5, t: t, col: planeOwned() ? planeColour() : '#E8B648' });
-      if (!planeOwned()){ tRound(ctx, '#F2C230', 560, TG - 200, 120, 30, 6); ctx.fillStyle = '#3A2A1E'; ctx.font = 'bold 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('FOR SALE', 620, TG - 179); }
+      if (!planeOwned()) townForSale(ctx, 410);
     }
   };
   /* the runway fades into the film's dusk: the town's own clock does not tint it */
