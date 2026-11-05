@@ -62,7 +62,7 @@
     nm.inv = 0; nm.beam[0].a = Math.atan2(nm.p.y - ng.H * 0.14, nm.p.x - ng.W * 0.08); nm.beam[0].d = 0; var lv2 = nm.lives; steps(1); out.sneakSpotted = nm.lives === lv2 - 1;
     nm.score = 16; nm.over = true; steps(2); out.sneakStars = (Save.data.mini.stars[COUNTER_CHAPTER] | 0) === 3 && wardUnlocked(55) && WARD[55].name === 'Hazard Yellow';
     G.state = 'menu'; G.mini = null;
-    out.starTotals = MINI_STAR_CHAPTERS.length === 18 && miniStarTotal() >= 9;
+    out.starTotals = MINI_STAR_CHAPTERS.length === 19 && miniStarTotal() >= 9;
     var lab = (function(){ Save.reset(); Save.data.chapter14Complete = true; showWardrobe(); var t = (document.querySelector('[data-a="ward-skin-53"]') || {}).title || ''; var t2 = (document.querySelector('[data-a="ward-skin-51"]') || {}).title || ''; hideOverlay(); G.state = 'menu'; return t + '|' + t2; })();
     out.labels = /Get three stars in Slide Dome/.test(lab) && /Finish Chapter 16/.test(lab);
 

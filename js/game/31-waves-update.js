@@ -201,7 +201,7 @@ const KILL_VALUE = 1 / WAVE_COUNT_MUL;
 const WAVE_INTRO_S = 0.8, WAVE_CLEAR_S = 1.0, WAVE_PATIENCE_S = 6;      /* were 1.6, 2.1 and 11 */
 /* Chapters 1 to 13 are 25 waves each. Internal chapter 14 is the mini-chapter shown as "13.5" (the Domes): ten waves, 326 to 335, with a boss on 330 and 335,
    and its run ends there. Internal chapter 15 is shown as "14" (the Tower): 25 waves, 336 to 360, a boss every fifth wave. Internal chapter 16 is shown as "15" (the Siege of Longneck Town): 25 waves, 361 to 385. Internal chapter 17 is shown as "16" (the counter attack on Fort Shortneck): 25 waves, 386 to 410. Internal chapter 18 is shown as "17" (the Island Lab): 25 waves, 411 to 435. CHAPTER_LABEL is the name the player sees. */
-const TOTAL_CHAPTERS = 18;
+const TOTAL_CHAPTERS = 19;                    /* the 19th is Chapter 17.5, the Air Chase: a sky shooter played on its own screen (js/sky/44zzzzi-sky-chase.js), not in these waves */
 const MAIN_CHAPTERS = 13, DOME_CHAPTER = 14, DOME_FIRST_WAVE = WAVES_PER_CHAPTER * MAIN_CHAPTERS + 1, DOME_WAVES = 10, DOME_LAST_WAVE = DOME_FIRST_WAVE + DOME_WAVES - 1;
 const TOWER_CHAPTER = 15, TOWER_FIRST_WAVE = DOME_LAST_WAVE + 1, TOWER_WAVES = 25;
 const TOWER_LAST_WAVE = TOWER_FIRST_WAVE + TOWER_WAVES - 1;
@@ -211,12 +211,13 @@ const COUNTER_CHAPTER = 17, COUNTER_FIRST_WAVE = SIEGE_LAST_WAVE + 1, COUNTER_WA
 const COUNTER_LAST_WAVE = COUNTER_FIRST_WAVE + COUNTER_WAVES - 1;
 const ISLE_CHAPTER = 18, ISLE_FIRST_WAVE = COUNTER_LAST_WAVE + 1, ISLE_WAVES = 25;       /* Chapter 17, the Island Lab: waves 411 to 435 */
 const CHAPTER_LAST_WAVE = ISLE_FIRST_WAVE + ISLE_WAVES - 1;
-const CHAPTER_LABEL = { 14: '13.5', 15: '14', 16: '15', 17: '16', 18: '17' };
+const SKY_CHAPTER = 19, SKY_WAVES = 10, SKY_FIRST_WAVE = CHAPTER_LAST_WAVE + 1;      /* Chapter 17.5, the Air Chase: numbered 436 to 445 on the menu, but flown in the sky shooter, so no run ever reaches these waves */
+const CHAPTER_LABEL = { 14: '13.5', 15: '14', 16: '15', 17: '16', 18: '17', 19: '17.5' };
 function chapterLabel(ch){ return CHAPTER_LABEL[ch] || String(ch); }
 function chapterOf(w){ return w >= ISLE_FIRST_WAVE ? ISLE_CHAPTER : w >= COUNTER_FIRST_WAVE ? COUNTER_CHAPTER : w >= SIEGE_FIRST_WAVE ? SIEGE_CHAPTER : w >= TOWER_FIRST_WAVE ? TOWER_CHAPTER : w >= DOME_FIRST_WAVE ? DOME_CHAPTER : Math.ceil(w / WAVES_PER_CHAPTER); }
 function chapterWaveOf(w){ return w >= ISLE_FIRST_WAVE ? w - ISLE_FIRST_WAVE + 1 : w >= COUNTER_FIRST_WAVE ? w - COUNTER_FIRST_WAVE + 1 : w >= SIEGE_FIRST_WAVE ? w - SIEGE_FIRST_WAVE + 1 : w >= TOWER_FIRST_WAVE ? w - TOWER_FIRST_WAVE + 1 : w >= DOME_FIRST_WAVE ? w - DOME_FIRST_WAVE + 1 : ((w - 1) % WAVES_PER_CHAPTER) + 1; }
-function chapterLen(ch){ return ch === DOME_CHAPTER ? DOME_WAVES : WAVES_PER_CHAPTER; }
-function chapterFirstWave(ch){ return ch >= ISLE_CHAPTER ? ISLE_FIRST_WAVE : ch >= COUNTER_CHAPTER ? COUNTER_FIRST_WAVE : ch >= SIEGE_CHAPTER ? SIEGE_FIRST_WAVE : ch >= TOWER_CHAPTER ? TOWER_FIRST_WAVE : ch >= DOME_CHAPTER ? DOME_FIRST_WAVE : (ch - 1) * WAVES_PER_CHAPTER + 1; }
+function chapterLen(ch){ return ch === DOME_CHAPTER ? DOME_WAVES : ch === SKY_CHAPTER ? SKY_WAVES : WAVES_PER_CHAPTER; }
+function chapterFirstWave(ch){ return ch >= SKY_CHAPTER ? SKY_FIRST_WAVE : ch >= ISLE_CHAPTER ? ISLE_FIRST_WAVE : ch >= COUNTER_CHAPTER ? COUNTER_FIRST_WAVE : ch >= SIEGE_CHAPTER ? SIEGE_FIRST_WAVE : ch >= TOWER_CHAPTER ? TOWER_FIRST_WAVE : ch >= DOME_CHAPTER ? DOME_FIRST_WAVE : (ch - 1) * WAVES_PER_CHAPTER + 1; }
 function isChapterFinaleWave(w){ return chapterWaveOf(w) === chapterLen(chapterOf(w)); }
 
 function buildWave(w){

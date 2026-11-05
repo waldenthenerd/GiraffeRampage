@@ -35,7 +35,7 @@
       out.view = V; QA.done(out); return;
     }
     /* the chapter table */
-    out.table = ISLE_CHAPTER === 18 && ISLE_FIRST_WAVE === 411 && ISLE_WAVES === 25 && CHAPTER_LAST_WAVE === 435 && COUNTER_LAST_WAVE === 410 && TOTAL_CHAPTERS === 18 && chapterLabel(18) === '17' &&
+    out.table = ISLE_CHAPTER === 18 && ISLE_FIRST_WAVE === 411 && ISLE_WAVES === 25 && CHAPTER_LAST_WAVE === 435 && COUNTER_LAST_WAVE === 410 && TOTAL_CHAPTERS === 19 && chapterLabel(18) === '17' &&
       chapterOf(410) === COUNTER_CHAPTER && chapterOf(411) === ISLE_CHAPTER && chapterOf(435) === ISLE_CHAPTER && chapterWaveOf(411) === 1 && chapterWaveOf(435) === 25 &&
       chapterFirstWave(18) === 411 && chapterFirstWave(17) === 386 && chapterLen(18) === 25 && isChapterFinaleWave(435) && isRunEnd(435) === true && isRunEnd(410) === true && isRunEnd(411) === false;
     out.bossWaves = [415, 420, 425, 430, 435].map(bossForWave).join() === 'lion,matriarch,buffalo,crocodile,wildfire';
@@ -45,7 +45,7 @@
     /* the kit: twelve kinds and five bosses in the Bestiary's slots, all new, each drawn and each with a behavior */
     var kinds = BESTIARY_ORDER.slice(0, 17);
     out.cast = kinds.every(function(k){ var d = ETYPES_ISLE[k]; return !!d && d.isle === true && /^il_/.test(d.look) && LOOK_NAMES[d.look] && typeof ISLE_AI[d.ai] === 'function' && typeof ENEMY_LOOK_DRAW[d.look] === 'function'; });
-    out.bestiary = BESTIARY_CHAPTERS.length === 18 && BESTIARY_CHAPTERS[17] === 'The Island Lab' && bestiaryTable(18) === ETYPES_ISLE;
+    out.bestiary = BESTIARY_CHAPTERS.length === 19 && BESTIARY_CHAPTERS[17] === 'The Island Lab' && bestiaryTable(18) === ETYPES_ISLE;
     var looks = {}; kinds.forEach(function(k){ looks[ETYPES_ISLE[k].look] = 1; }); out.uniqueLooks = Object.keys(looks).length === 17;
     out.traits = ETYPES_ISLE.vulture.flyOver === true && ETYPES_ISLE.matriarch.flyOver === true && !ETYPES_ISLE.hyena.flyOver && ETYPES_ISLE.warthog.shieldArc > 0 && ETYPES_ISLE.jackal.swim && ETYPES_ISLE.mamba.swim && !ETYPES_ISLE.warthog.swim;
     /* every picture draws without an error, in every state its behavior uses */
@@ -58,7 +58,7 @@
     freshSave(); out.saveDefault = Save.data.chapter18Complete === false && Save.data.isleClean === 0 && Save.data.isleDry === false && Save.data.isleNotes === 0;
     Save.data.chapter18Complete = 'junk'; Save.data.isleClean = 9999; Save.data.isleDry = 'x'; Save.data.isleNotes = 'lots'; Save.write(); Save.load();
     out.saveSane = typeof Save.data.chapter18Complete === 'boolean' && Save.data.isleClean <= 31 && Save.data.isleDry === true && Save.data.isleNotes === 0;
-    freshSave(); out.ward = WARD.length === 58 && WARD_MAX === 57 && WARD[56].name === 'Kraken Violet' && WARD[57].name === 'Tide Pool' && wardUnlocked(56) === false && wardUnlocked(57) === false && WARD_PAT_MAX === 18 && WARD_PATTERNS[18] === 'Reef scales' && wardPatUnlocked(18) === false;
+    freshSave(); out.ward = WARD.length === 60 && WARD_MAX === 59 && WARD[56].name === 'Kraken Violet' && WARD[57].name === 'Tide Pool' && wardUnlocked(56) === false && wardUnlocked(57) === false && WARD_PAT_MAX === 18 && WARD_PATTERNS[18] === 'Reef scales' && wardPatUnlocked(18) === false;
     Save.data.chapter18Complete = true; out.wardOpen = wardUnlocked(56) === true && wardPatUnlocked(18) === true;
 
     /* waves: every wave builds, boss waves have their boss, the pool grows */
@@ -72,7 +72,7 @@
     freshSave(); Save.data.chapter17Complete = false; setMenuChapter(18); showMenu(); var html = chapterSelectorHTML();
     out.menuLocked = /disabled/.test(html) && /Clear Chapter 16/.test(html) && /Chapter 17/.test(html) && /The Island Lab/.test(html) && /Waves 411–435 · 5 bosses/.test(html);
     Save.data.chapter17Complete = true; html = chapterSelectorHTML();
-    out.menuOpen = /data-a="play18"/.test(html) && /Start Chapter 17/.test(html) && /Straight to wave 411/.test(html) && /ch-next" aria-label="Next chapter" disabled/.test(html);
+    out.menuOpen = /data-a="play18"/.test(html) && /Start Chapter 17/.test(html) && /Straight to wave 411/.test(html) && !/ch-next" aria-label="Next chapter" disabled/.test(html);      /* the Air Chase (17.5) comes after it now */
     handleAction('play18'); out.menuFilm = G.state === 'cutscene' && !!G.cut && G.cut.kind === 'islesail'; G.cut.t = IL_SAIL_T.END - 0.01; steps(3);
     out.starts = G.state === 'playing' && G.wave === 411 && G.chapter === ISLE_CHAPTER && G.biome === 'isle' && Math.abs(P.x - 2130) < 5 && Math.abs(P.y - 2760) < 5;
     godMode(); steps(120);
