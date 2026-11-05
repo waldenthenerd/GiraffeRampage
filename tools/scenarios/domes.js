@@ -105,7 +105,7 @@
 
     /* the Bestiary */
     freshSave(); var b = bestiaryData();
-    out.bestTotal = BESTIARY_TOTAL_CREATURES === 17 * 13 + 14 + 17 + 17 + 17 + 17 && bestiaryCounts().totalCreatures === BESTIARY_TOTAL_CREATURES;
+    out.bestTotal = BESTIARY_TOTAL_CREATURES === 17 * 13 + 14 + 17 + 17 + 17 + 17 + 8 && bestiaryCounts().totalCreatures === BESTIARY_TOTAL_CREATURES;
     out.bestName = bestiaryName(14, 'thawed').title === 'The Thawed' && bestiaryName(14, 'iceheart').title === 'The Ice Heart' && /Changed Arctic Wolf/.test(bestiaryName(14, 'hyena').title) && bestiaryName(1, 'hyena').title === 'Spotted Hyena';
     var ee = { type: 'thawed', waveRef: 330, x: 0, y: 0, r: 40, def: ETYPES_DOME.thawed }; recordBestiaryKill(ee);
     out.bestKill = b.creatures['14:thawed'] === 1 && !b.creatures['14:lion'];
