@@ -59,7 +59,7 @@ const LOOK_NAMES = {
   pyrax: 'Fire Warlord', pyreseer: 'Fire Seer', magmacolossus: 'Magma Colossus', maelstrom: 'Living Maelstrom', infernoqueen: 'Inferno Queen'
 };
 let BESTIARY_TOTAL_CREATURES = 17 * 13;                       /* worked out again, exactly, once every chapter's table exists (js/chapters/30a-chapter-domes.js) */
-function bestiaryTable(ch){ return [ETYPES, ETYPES_FROST, ETYPES_SWAMP, ETYPES_OCEAN, ETYPES_JUNGLE, ETYPES_CITY, ETYPES_SPACE, ETYPES_MARINE, ETYPES_VENUS, ETYPES_INFERNO, ETYPES_GLIM, ETYPES_A51, ETYPES_MARS_BEST, ETYPES_DOME, typeof ETYPES_TOWER === 'undefined' ? {} : ETYPES_TOWER, typeof ETYPES_SIEGE === 'undefined' ? {} : ETYPES_SIEGE, typeof ETYPES_FORT === 'undefined' ? {} : ETYPES_FORT, typeof ETYPES_ISLE === 'undefined' ? {} : ETYPES_ISLE][ch - 1]; }
+function bestiaryTable(ch){ return [ETYPES, ETYPES_FROST, ETYPES_SWAMP, ETYPES_OCEAN, ETYPES_JUNGLE, ETYPES_CITY, ETYPES_SPACE, ETYPES_MARINE, ETYPES_VENUS, ETYPES_INFERNO, ETYPES_GLIM, ETYPES_A51, ETYPES_MARS_BEST, ETYPES_DOME, typeof ETYPES_TOWER === 'undefined' ? {} : ETYPES_TOWER, typeof ETYPES_SIEGE === 'undefined' ? {} : ETYPES_SIEGE, typeof ETYPES_FORT === 'undefined' ? {} : ETYPES_FORT, typeof ETYPES_ISLE === 'undefined' ? {} : ETYPES_ISLE, typeof ETYPES_SKY === 'undefined' ? {} : ETYPES_SKY][ch - 1]; }
 function bestiaryName(ch, type){
   const def = bestiaryTable(ch)[type];
   const species = ch === 1 ? CH1_NAMES[type] : ch === DOME_CHAPTER && !def.big ? 'Changed ' + (LOOK_NAMES[def.look] || type) : (LOOK_NAMES[def.look] || type);

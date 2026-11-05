@@ -114,7 +114,7 @@ const Music = {
     else if (s === 'cutscene' && G.cut){
       const K = G.cut.kind, shn = shChapterOf(K);
       theme = shn ? (MUSIC_BY_CHAPTER[shn + 1] || chTheme) : K === 'a51' ? 'film51' : K === 'home' ? 'filmhome' : K === 'venus' ? 'filmvenus'
-            : K === 'marshome' || K === 'fusion' || K === 'domeflight' || K === 'towerflight' || K === 'siegeflight' ? 'filmhome' : K === 'mships' || K === 'domeout' || K === 'towerout' || K === 'siegeout' || K === 'fortflight' || K === 'fortout' || K === 'isleout' ? 'filmwar' : K === 'islesail' ? 'filmhome' : MARS_FILMS[K] ? 'filmmars' : 'film';
+            : K === 'marshome' || K === 'fusion' || K === 'domeflight' || K === 'towerflight' || K === 'siegeflight' ? 'filmhome' : K === 'mships' || K === 'domeout' || K === 'towerout' || K === 'siegeout' || K === 'fortflight' || K === 'fortout' || K === 'isleout' || K === 'skyin' ? 'filmwar' : K === 'islesail' || K === 'skyout' ? 'filmhome' : MARS_FILMS[K] ? 'filmmars' : 'film';
       lvl = (!shn && G.cut.t > 14) ? 1 : 0;
     }
     else if (s === 'cutscene'){ theme = 'film'; lvl = 0; }
