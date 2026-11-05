@@ -195,7 +195,7 @@ const FR_KINDS = {
     for (let i = 0; i < steps; i++){ const x = sx + i * ((W - 50) / steps), y = TG - (i + 1) * (h / steps); tRect(c, '#9A9AA4', x, y, (W - 50) / steps + 2, TG - y); tRect(c, '#C9C9D2', x, y, (W - 50) / steps + 2, 5); tRect(c, 'rgba(0,0,0,.14)', x, y + 5, (W - 50) / steps + 2, 3); }
     ivLine(c, '#2A2A34', 4, sx, TG - 60, x0 + W - 46, topY - 52); for (let i = 0; i <= steps; i += 2){ const x = sx + i * ((W - 50) / steps), y = TG - (i + 1) * (h / steps); ivLine(c, '#2A2A34', 3, x, y, x, y - 54 + 0); }
     tRound(c, '#3A3A44', x0 + W - 36, topY - 56, 36, 44, 6); tCircle(c, '#FFE9A0', x0 + W - 18, topY - 36, 10);
-    ivText(c, 'TOP', x0 + W - 20, topY - 66, 12, '#D5352B');
+    tRect(c, '#5A5A64', x0 + W - 19, topY - 62, 2, 6); tRound(c, '#F4F1E8', x0 + W - 38, topY - 80, 36, 18, 4); tRect(c, 'rgba(0,0,0,.15)', x0 + W - 38, topY - 64, 36, 2); ivText(c, 'TOP', x0 + W - 20, topY - 66, 12, '#D5352B');   /* a little plate on the lamp box */
   }
 };
 const FR_PROPS = {
@@ -259,11 +259,11 @@ const FR_PROPS = {
   IV_ROOMS.coop = function(c, D, K){
     tRect(c, '#6A4A32', 120, 250, 560, 8); tRect(c, '#6A4A32', 120, 250, 8, TG - 250); tRect(c, '#6A4A32', 672, 250, 8, TG - 250);       /* a perch on two posts */
     for (let i = 0; i < 4; i++) tEll(c, '#E8D8A0', 560 + i * 24, 245, 10, 8);
-    ivChains(c, 330, 440, 36, 96); ivBoard(c, 300, 96, 170, 36, '#F4F1E8', '#6A4A32'); ivText(c, 'EGGS: MIND THE HENS', 385, 120, 13, '#6A3A22');
+    ivChains(c, 330, 440, 36, 54); ivBoard(c, 300, 54, 170, 36, '#F4F1E8', '#6A4A32'); ivText(c, 'EGGS: MIND THE HENS', 385, 78, 13, '#6A3A22');
   };
   IV_ROOMS.fhouse = function(c, D, K){
     ivShelfBoard(c, 560, 150, 220); for (let i = 0; i < 4; i++){ tRound(c, ['#B8602A', '#F2C230', '#8AB84A', '#C9503C'][i], 576 + i * 50, 112, 30, 38, 6); tRect(c, '#C9CDD9', 579 + i * 50, 106, 24, 7); }
-    tCircle(c, '#5A3B22', 440, 110, 26); tCircle(c, '#FBF3DC', 440, 110, 22); ivLine(c, '#2A1A0A', 2.4, 440, 110, 440, 96); ivLine(c, '#2A1A0A', 2, 440, 110, 450, 114);
+    tCircle(c, '#5A3B22', 370, 120, 26); tCircle(c, '#FBF3DC', 370, 120, 22); ivLine(c, '#2A1A0A', 2.4, 370, 120, 370, 106); ivLine(c, '#2A1A0A', 2, 370, 120, 380, 124);
     ivFrame(c, 700, 190, 72, 56, function(cc, x, y, w, h){ for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++){ cc.fillStyle = (i + j) % 2 ? '#C9503C' : '#F4F1E8'; cc.fillRect(x + 6 + i * 15, y + 6 + j * 15, 15, 15); } });
   };
   IV_ROOMS.icottage = function(c, D, K){
@@ -274,14 +274,14 @@ const FR_PROPS = {
   };
   IV_ROOMS.ifish = function(c, D, K){
     ivLine(c, '#5A3B22', 4, 160, 34, 760, 34);
-    for (let i = 0; i < 7; i++){ const hx = 200 + i * 86; ivLine(c, '#8A6642', 2, hx, 34, hx, 60 + (i % 2) * 8); tEll(c, ['#9FB8D0', '#E89A5A', '#B8C8D8'][i % 3], hx, 84 + (i % 2) * 8, 8, 24); tPoly(c, '#7A9AB8', [hx - 6, 104 + (i % 2) * 8, hx + 6, 104 + (i % 2) * 8, hx, 118 + (i % 2) * 8]); tCircle(c, '#111', hx, 70 + (i % 2) * 8, 1.6); }
-    ivChains(c, 770, 850, 36, 96); ivBoard(c, 740, 96, 150, 60, '#E8F0F4', '#3A4A5A'); ivText(c, 'TIDES', 815, 118, 14, '#2F5F94'); c.strokeStyle = '#4DA0D8'; c.lineWidth = 2; c.beginPath(); c.moveTo(752, 140); for (let i = 0; i <= 12; i++) c.lineTo(752 + i * 11, 140 + Math.sin(i * 0.9) * 8); c.stroke();
+    [335, 378, 415, 590, 628, 650].forEach(function(hx, i){                                 /* fish hung in the walls between the windows */ ivLine(c, '#8A6642', 2, hx, 34, hx, 60 + (i % 2) * 8); tEll(c, ['#9FB8D0', '#E89A5A', '#B8C8D8'][i % 3], hx, 84 + (i % 2) * 8, 8, 24); tPoly(c, '#7A9AB8', [hx - 6, 104 + (i % 2) * 8, hx + 6, 104 + (i % 2) * 8, hx, 118 + (i % 2) * 8]); tCircle(c, '#111', hx, 70 + (i % 2) * 8, 1.6); });
+    ivChains(c, 830, 910, 36, 96); ivBoard(c, 800, 96, 150, 60, '#E8F0F4', '#3A4A5A'); ivText(c, 'TIDES', 875, 118, 14, '#2F5F94'); c.strokeStyle = '#4DA0D8'; c.lineWidth = 2; c.beginPath(); c.moveTo(812, 140); for (let i = 0; i <= 12; i++) c.lineTo(812 + i * 11, 140 + Math.sin(i * 0.9) * 8); c.stroke();
   };
   IV_ROOMS.icrab = function(c, D, K){
     ivLine(c, '#4A3018', 3, 160, 60, 840, 60);
     for (let i = 0; i < 9; i++){ const lx = 190 + i * 76; ivLine(c, '#4A3018', 1.6, lx, 60, lx, 74); tCircle(c, '#FFE9A8', lx, 82, 6); const g = c.createRadialGradient(lx, 82, 1, lx, 82, 26); g.addColorStop(0, 'rgba(255,230,150,.5)'); g.addColorStop(1, 'rgba(255,230,150,0)'); c.fillStyle = g; c.fillRect(lx - 26, 56, 52, 52); }
     [[120, '#D5352B'], [150, '#F2C230']].forEach(function(o){ ivLine(c, '#5A3B22', 2, o[0] + 8, 150, o[0] + 8, 170); tCircle(c, o[1], o[0] + 8, 184, 14); tRect(c, '#F4F1E8', o[0] - 6, 180, 28, 4); });
-    ivChains(c, 570, 650, 36, 110); ivBoard(c, 540, 110, 150, 40, '#7A2A1E', '#3A2A1E'); ivText(c, 'CRAB · 6', 615, 138, 18, '#FFF6E0');
+    ivChains(c, 574, 644, 36, 110); ivBoard(c, 554, 110, 110, 40, '#7A2A1E', '#3A2A1E'); ivText(c, 'CRAB · 6', 609, 138, 18, '#FFF6E0');
   };
   IV_ROOMS.ilight = function(c, D, K){
     /* compact: one red band clear of everything, one porthole over the door side, one lantern; the stair has the right-hand wall to itself */

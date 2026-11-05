@@ -63,9 +63,10 @@
     tRect(c, 'rgba(20,12,4,.35)', 0, TG - 2, W, 3);
     /* the light */
     const warm = c.createLinearGradient(0, 0, 0, 1); void warm;
-    for (let i = 0; i < winN; i++){
+    const winX = townWinXs(D);
+    for (let i = 0; i < winX.length; i++){
       if (D.room === 'arcade') break;
-      const wx = 220 + i * step, top = 90, bot = 80 + 118, off = 180 + i * 20;
+      const wx = winX[i], top = 90, bot = 80 + 118, off = 180 + i * 20;
       tEll(c, 'rgba(255,238,190,.14)', wx + 39 + off * 0.6, TG + 34, 62, 11);
       c.save(); c.globalAlpha = 0.1; tPoly(c, '#FFF1C0', [wx + 4, bot, wx + 74, bot, wx + 74 + off, TG, wx + 10 + off, TG]); c.globalAlpha = 0.06; tPoly(c, '#FFF1C0', [wx + 30, bot, wx + 48, bot, wx + 48 + off, TG, wx + 34 + off, TG]); c.restore();
       for (let k = 0; k < 9; k++){ const t = r(), px = wx + 12 + t * (off + 60) - (1 - t) * 0, py = bot + (TG - bot) * t; c.fillStyle = 'rgba(255,250,220,' + (0.18 + r() * 0.25).toFixed(2) + ')'; c.fillRect(px + (r() - 0.5) * 30, py + (r() - 0.5) * 14, 1.6, 1.6); }

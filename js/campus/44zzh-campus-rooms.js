@@ -54,13 +54,13 @@
     crestWall(c, 640, 130, 1.4); ln(c, '#2A2A30', 1.6, 640, 56, 640, 96);
     wallClock(c, 1580, 100, 28, 10, 10);
     /* the portraits of the old chancellors, framed, each a giraffe's head and a different collar */
-    [[190, 120], [300, 150]].forEach(function(p, i){ ivFrame(c, p[0], p[1], 64, 84, function(c, x, y, w, h){ tRect(c, ['#C9D4B8', '#B8C4D8'][i], x, y, w, h); tRect(c, '#E8B23C', x + w / 2 - 4, y + 26, 8, 40); tEll(c, '#E8B23C', x + w / 2 + 1, y + 24, 12, 8); tRect(c, ['#2B3A5A', '#8A1F3A'][i], x + 6, y + h - 22, w - 12, 22); tRect(c, '#F4F1E8', x + w / 2 - 6, y + h - 24, 12, 8); tCircle(c, '#5A3A1A', x + w / 2 - 2, y + 22, 1.4); }); });
-    [2300, 2560, 2760].forEach(function(x, i){ if (x > W - 120) return; ivFrame(c, x - 24, 300, 48, 60, function(c, x, y, w, h){ tRect(c, ['#F3EAD2', '#D8E6F0', '#E8D8C0'][i], x, y, w, h); tRect(c, FC(UNI_FAC[i * 2].id), x + 6, y + 8, w - 12, 18); for (let k = 0; k < 3; k++) tRect(c, '#8A8E98', x + 6, y + 32 + k * 6, w - 12 - k * 6, 2); }); });
+    [[166, 120], [250, 150]].forEach(function(p, i){ ivFrame(c, p[0], p[1], 64, 84, function(c, x, y, w, h){ tRect(c, ['#C9D4B8', '#B8C4D8'][i], x, y, w, h); tRect(c, '#E8B23C', x + w / 2 - 4, y + 26, 8, 40); tEll(c, '#E8B23C', x + w / 2 + 1, y + 24, 12, 8); tRect(c, ['#2B3A5A', '#8A1F3A'][i], x + 6, y + h - 22, w - 12, 22); tRect(c, '#F4F1E8', x + w / 2 - 6, y + h - 24, 12, 8); tCircle(c, '#5A3A1A', x + w / 2 - 2, y + 22, 1.4); }); });
+    [2360, 2560, 2760].forEach(function(x, i){ if (x > W - 120) return; ivFrame(c, x - 24, 300, 48, 60, function(c, x, y, w, h){ tRect(c, ['#F3EAD2', '#D8E6F0', '#E8D8C0'][i], x, y, w, h); tRect(c, FC(UNI_FAC[i * 2].id), x + 6, y + 8, w - 12, 18); for (let k = 0; k < 3; k++) tRect(c, '#8A8E98', x + 6, y + 32 + k * 6, w - 12 - k * 6, 2); }); });
     rug(c, 520, 1900, '#7A2438', GOLD);
   };
   IV_ROOMS.ulecture = function(c, D){
     const W = D.w;
-    [380, 2430, 2780].forEach(function(x){ tallWindow(c, x, 70, 54, 200, '#B8DCF2'); });
+    [380, 2640, 2780].forEach(function(x){ tallWindow(c, x, 70, 54, 200, '#B8DCF2'); });
     /* a skeleton of a giraffe, a map of the world and a chart of the planets, framed on the wall above the seats */
     ivFrame(c, 2000, 130, 150, 84, function(c, x, y, w, h){ tRect(c, '#F3EAD2', x, y, w, h); c.strokeStyle = '#6A5A3A'; c.lineWidth = 2.2; c.lineCap = 'round'; c.beginPath(); c.moveTo(x + 40, y + 52); c.lineTo(x + 100, y + 52); c.moveTo(x + 92, y + 52); c.lineTo(x + 106, y + 16); c.stroke(); tCircle(c, '#6A5A3A', x + 110, y + 14, 5); for (let i = 0; i < 7; i++){ ln(c, '#6A5A3A', 1.4, x + 44 + i * 9, y + 46, x + 44 + i * 9, y + 56); } [44, 56, 88, 98].forEach(function(lx){ ln(c, '#6A5A3A', 2, x + lx, y + 52, x + lx, y + h - 8); }); });
     ivFrame(c, 2220, 130, 150, 84, function(c, x, y, w, h){ tRect(c, '#8FC4E8', x, y, w, h); c.fillStyle = '#6AB04A'; c.beginPath(); c.ellipse(x + 40, y + 34, 22, 14, 0.2, 0, TAU); c.ellipse(x + 80, y + 52, 16, 22, -0.3, 0, TAU); c.ellipse(x + 120, y + 30, 20, 12, 0.1, 0, TAU); c.fill(); c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 0.8; for (let i = 1; i < 6; i++){ c.beginPath(); c.moveTo(x + i * 25, y); c.lineTo(x + i * 25, y + h); c.stroke(); } });

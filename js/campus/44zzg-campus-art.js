@@ -251,7 +251,7 @@
       tAwning(c, x0 + 10, top + 38, 170, 22, '#C9503C', '#F4F1E8');
       tDoor(c, x0 + W - 62, 52, 96, '#6A3A22'); tAwning(c, x0 + W - 94, top + 70, 68, 16, '#2F6A5A', '#F4F1E8');
       tRound(c, '#3A2A1E', x - 52, top + 12, 104, 24, 4); ivText(c, 'CAMPUS CAFÉ', x, top + 29, 13, '#FFE9A8');
-      ln(c, '#2A2A30', 2, x0 + 200, top + 8, x0 + 200, top + 24); tRound(c, '#F4F1E8', x0 + 188, top + 24, 24, 20, 5); tRect(c, '#6A3A1E', x0 + 190, top + 28, 20, 5); c.strokeStyle = '#F4F1E8'; c.lineWidth = 3; c.beginPath(); c.arc(x0 + 214, top + 34, 5, -1.4, 1.4); c.stroke();
+      ln(c, '#2A2A30', 2, x0 + 216, top + 8, x0 + 216, top + 24); tRound(c, '#F4F1E8', x0 + 204, top + 24, 24, 20, 5); tRect(c, '#6A3A1E', x0 + 206, top + 28, 20, 5); c.strokeStyle = '#F4F1E8'; c.lineWidth = 3; c.beginPath(); c.arc(x0 + 230, top + 34, 5, -1.4, 1.4); c.stroke();
       tRect(c, '#2B3A2E', x0 + W - 28, TG - 96, 22, 60); tRect(c, '#7A5230', x0 + W - 30, TG - 98, 26, 4); ivText(c, 'TEA', x0 + W - 17, TG - 78, 7, '#F4F1E8');
       for (let i = 0; i < 3; i++){ const px = x0 + 40 + i * 50; K.pot(c, px, TG - 8, 1); }
       /* two outdoor tables under parasols */
@@ -307,7 +307,7 @@
         if (i === 1){ tRound(c, '#C98A44', 14, -50, 16, 12, 2); tRect(c, '#8A5A2A', 14, -52, 16, 3); }
         c.restore();
       });
-      tRect(c, '#2B3A5A', x - 58, TG - 62, 20, 12); ivText(c, 'BIKES', x - 48, TG - 53, 6, '#F6E7B8');
+      tRect(c, '#4A4A52', x - 49, TG - 50, 2, 50); tRect(c, '#2B3A5A', x - 58, TG - 62, 20, 12); ivText(c, 'BIKES', x - 48, TG - 53, 6, '#F6E7B8');   /* the sign on its own little post */
     },
     u_statue: function(c, D, p){
       const x = p.x; shadow(c, x, 110);
