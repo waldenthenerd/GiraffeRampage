@@ -29,8 +29,8 @@ MINI_STAR_CHAPTERS.push(SKY_CHAPTER);
       const cast = ['hyena', 'grub', 'cheetah', 'jackal', 'rhino'];
       cast.forEach(function(k, i){ const d = ETYPES_SKY[k], a = i / cast.length * TAU + t * 0.4, x = W / 2 + Math.cos(a) * 130, y = H / 2 + Math.sin(a) * 120;
         c.save(); c.translate(x, y); c.rotate(a + Math.PI / 2); SKY_DRAW[d.look](c, { r: d.r * (k === 'rhino' ? 0.8 : 1.3), anim: t * 3 + i }, d.color, d.dark, 0, false, d); c.restore(); });
-      c.save(); c.translate(W / 2, H / 2 + Math.sin(t * 1.3) * 4); c.rotate(-Math.PI / 2); skyHeliTop(c, 62, SKY_PAL.town, { open: true, gun: true, noRotor: true });
-      drawTopGiraffe(c, 8, 0, 0, 0.36, 0, { neck: 26 }); skyRotor(c, -3, 0, 80, t * 20, 4, false); c.restore();
+      c.save(); c.translate(W / 2, H / 2 + Math.sin(t * 1.3) * 4); c.rotate(-Math.PI / 2); skyHeliTop(c, 62, SKY_PAL.town, { gun: true, noRotor: true });
+      skyRotor(c, -3, 0, 80, t * 20, 4, false); c.restore();
       const v = c.createRadialGradient(W / 2, H / 2, W * 0.3, W / 2, H / 2, W * 0.6); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(40,10,20,.4)'); c.fillStyle = v; c.fillRect(0, 0, W, H);
     } catch (e) {}
     c.restore();
@@ -108,7 +108,7 @@ MINI[SKY_CHAPTER].draw = function(ctx, m, g){
   m.dr.forEach(function(d){ const def = ETYPES_SKY[d.k]; ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(Math.PI / 2); SKY_DRAW[def.look](ctx, { r: def.r * s * 1.3, anim: t * 3 + d.ph }, def.color, def.dark, 0, false, def); ctx.restore(); });
   m.focus = { x: p.x, y: p.y };
   ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(-Math.PI / 2); if (m.inv > 0 && Math.floor(t * 14) % 2) ctx.globalAlpha = 0.5;
-  skyHeliTop(ctx, 46 * s, SKY_PAL.town, { open: true, gun: true, noRotor: true }); drawTopGiraffe(ctx, 6 * s, 0, 0, 0.27 * s, 0, { neck: 26 }); skyRotor(ctx, -2 * s, 0, 58 * s, t * 26, 4, false);
+  skyHeliTop(ctx, 46 * s, SKY_PAL.town, { gun: true, noRotor: true }); skyRotor(ctx, -2 * s, 0, 58 * s, t * 26, 4, false);
   ctx.restore();
 };
 

@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 235 | 71,926 | 5.93 MiB (6,220,789 bytes) |
+| JavaScript (`js/`) | 236 | 72,364 | 5.98 MiB (6,268,752 bytes) |
 | Styles (`css/`) | 6 | 1,835 | 173 KiB (176,641 bytes) |
-| Page (`index.html`) | 1 | 285 | 14.5 KiB (14,846 bytes) |
-| **Whole game** | **242** | **74,046** | **6.12 MiB (6,412,276 bytes)** |
+| Page (`index.html`) | 1 | 286 | 14.5 KiB (14,899 bytes) |
+| **Whole game** | **243** | **74,485** | **6.16 MiB (6,460,292 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **73,445 lines, 6.07 MiB (6,365,294 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 235 | 71,926 | 5.93 MiB (6,220,789 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **73,884 lines, 6.12 MiB (6,413,310 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 236 | 72,364 | 5.98 MiB (6,268,752 bytes) |
 | Styles (`css/`) | 6 | 1,835 | 173 KiB (176,641 bytes) |
-| Page (`index.html`) | 1 | 285 | 14.5 KiB (14,846 bytes) |
-| **Whole game** | **242** | **74,046** | **6.12 MiB (6,412,276 bytes)** |
+| Page (`index.html`) | 1 | 286 | 14.5 KiB (14,899 bytes) |
+| **Whole game** | **243** | **74,485** | **6.16 MiB (6,460,292 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -317,6 +317,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/sky/44zzzzj-sky-chase.js` | 609 | **The Air Chase itself, a sky shooter** (`G.state 'sky'`, its own screen like the sea's): steering, the three guns (nose, left door, right door; J, K and L move her, the gun she is at fires by itself, I turns the dotted aiming line on and off), her gear on the hull and the guns, the ten waves (`SKY_WAVES_DEF`, numbered 436 to 445), each kind's behavior, the escorts that break off, the Grey Escort and the White Bird's three phases, the upgrades after waves 2, 4, 6 and 8 (`SKY_PERKS`), being shot down and trying again from the checkpoint, the end (save, film, minigame, results) and the phone's buttons. `SKY_TUNE` and `SKY_E` hold the numbers to change. |
 | `js/sky/44zzzzk-sky-films.js` | 143 | **The Air Chase films**: `skyin` (the chase from Chapter 17's last shot, LAB-1's cargo door and its drones, her at the door gun) and `skyout` (LAB-1 hit and down in the sea, the coast guard, the two scientists caught, the boat and the helicopter heading home). |
 | `js/sky/44zzzzl-sky-extras.js` | 133 | **What the Air Chase adds around the game**: the menu card and its round window's picture, the Bestiary page, the Guide page, the coat colors Sky Ace (58) and Cloud Nine (59), three achievements, the two films in the Films list, the minigame Sky Patrol, and the wreck of LAB-1 on the quay in the Harbor. |
+| `js/sky/44zzzzm-sky-detail.js` | 438 | **The Air Chase's detail layer**: wraps the sky shooter's drawing. The sea: whitecaps, sun glints, cloud shadows, gulls, a drifting crate or log, her downwash and the rotor's shadow, thin cloud wisps passing over. On it: the cargo ship (foam V wake, bow wave, containers, bridge, funnel smoke, cranes, lights), fishing boats with nets and gulls, yachts under sail, speedboats, a whale that surfaces and blows, dolphins, a jagged rock with surf and kelp, a buoy with its cage and light, the island with shallows, palms, a hut and a jetty. Boats and animals steer (`skyMoveSea`: look ahead, turn away from rocks, islands, buoys and each other, pushed out if ever inside); fixed things scroll at the water's one speed; nothing is spawned on another (`skyObjCore`, `skyObjReach`, `skyObjsClash`). Machines: skids, wing-tip lights, a tail strobe, the mechanic in the cockpit, the hired door gunner, a small part more on each drone. Her helicopter has its roof on; only her head shows, out of the door she shoots from (`skyDoorHead`). The fighting: tracer trails, brass, falling drone pieces with splashes, LAB-1's pages blowing out, smoke from hurt machines and from her helicopter at low hull. |
 | `js/core/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/dev/45b-dev-panel.js` | 601 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/core/46-main.js` | 5 | Starts the game. |

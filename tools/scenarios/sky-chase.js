@@ -4,7 +4,7 @@
    down and trying again from the checkpoint, the ending (the save, the film, the minigame offer, the results), the coat colors, the achievements, the
    Guide, the Films list, the Bestiary page, the minigame Sky Patrol, the wreck in the Harbor, and an old save.
    Run: node tools/qa-cloud.mjs tools/scenarios/sky-chase.js --wait 60000
-   Pictures: --params "view=play&wave=4" | "view=grey" | "view=white&phase=1|2|3" | "view=perk" | "view=down" | "view=menu" | "view=film&kind=skyin|skyout&t=9"
+   Pictures: --params "view=play&wave=4" ("&n=900&safe=1": a long stretch, not shot down) | "view=sea" (one of each thing on the water; "&set=2" the boats and animals, "&ph=" a moment of the whale's dive) | add "&gun=left|right" (her head out of that door), "&hull=0.2" (smoke) | "view=grey" | "view=white&phase=1|2|3" | "view=perk" | "view=down" | "view=menu" | "view=film&kind=skyin|skyout&t=9"
              | "view=bestiary" | "view=mini" | "view=wreck" | "view=results" (with --shot out.png) */
 (function(){
   var out = { failed: [], errs: [] }, check = function(k, v){ if (!v) out.failed.push(k); };
@@ -17,7 +17,11 @@
   try {
     if (V){
       Save.data.chapter18Complete = true; Save.data.gold = 1e6;
-      if (V === 'play'){ skyStart(+QA.params.wave || 1); steps(+QA.params.n || 150); Sky.hull = Sky.max; }
+      if (V === 'play'){ skyStart(+QA.params.wave || 1); if (QA.params.safe) Sky.inv = 1e9; steps(+QA.params.n || 150); Sky.hull = Sky.max; if (QA.params.safe) Sky.inv = 0; }
+      else if (V === 'sea'){ skyStart(+QA.params.wave || 3); Sky.q = []; steps(4); Sky.en = []; var mv = function(k, x, y, h, sd){ return { k: k, x: G.W * x, y: G.H * y, a: 0, v: 0, r: 40, seed: sd, h: h, want: h, spd: 0.001, ph: QA.params.ph ? +QA.params.ph : 9 }; };
+        Sky.objs = QA.params.set === '2' ? [mv('trawler', 0.3, 0.3, 0.3, 1.1), mv('sail', 0.7, 0.28, 2.6, 2.4), mv('speed', 0.55, 0.55, -1.2, 3.3), mv('whale', 0.2, 0.72, 0.2, 4.4), mv('dolphins', 0.8, 0.7, 3.4, 5.5)]
+          : [mv('ship', 0.28, 0.3, Math.PI / 2, 2.2), { k: 'rock', x: G.W * 0.74, y: G.H * 0.26, a: 0.4, v: 0, r: 52, seed: 5.1 }, { k: 'buoy', x: G.W * 0.58, y: G.H * 0.5, a: 0, v: 0, r: 30, seed: 3.3 }, { k: 'isle', x: G.W * 0.18, y: G.H * 0.74, a: 0.2, v: 0, r: 46, seed: 7.7 }];
+        Sky.ws = 'clear'; Sky.wt = 99; var sv = SKY_TUNE.scroll; SKY_TUNE.scroll = 0; steps(40); SKY_TUNE.scroll = sv; }
       else if (V === 'grey'){ skyStart(5); steps(240); Sky.hull = Sky.max; }
       else if (V === 'white'){ skyStart(10); steps(120); var w = Sky.en.filter(function(e){ return e.k === 'white'; })[0]; var ph = +QA.params.phase || 1; if (w){ w.hp = w.maxHp * (ph === 1 ? 0.9 : ph === 2 ? 0.5 : 0.2); } steps(150); Sky.hull = Sky.max; tap('KeyJ'); steps(6); }
       else if (V === 'perk'){ skyStart(2); clearWave(); steps(60); }
@@ -28,6 +32,8 @@
       else if (V === 'mini'){ Save.data.chapter19Complete = true; Save.data.mini = { own: {}, best: {}, stars: {}, last: 0, plays: 0, hat: '', boot: '' }; startMini(SKY_CHAPTER, null, 'menu'); G.mini.phase = 'play'; steps(150); }
       else if (V === 'wreck'){ for (var cc = 1; cc <= 19; cc++) Save.data['chapter' + cc + 'Complete'] = true; G.state = 'menu'; Town.fixHour = 17; Town.fixWeather = 'clear'; townEnter('harbour', +QA.params.x || 1760, 1); Town.walkers = []; steps(30); }
       else if (V === 'results'){ Sky.result = { gold: 31200, gems: 150, first: true, kills: 212, escorts: '8 of 8', clean: false }; skyResults(); steps(10); }
+      if (QA.params.gun && Sky.on){ skyGoGun(QA.params.gun); steps(20); }
+      if (QA.params.hull && Sky.on){ Sky.hull = Sky.max * +QA.params.hull; steps(40); }
       GR.render(); QA.done({ view: V, errs: out.errs, state: G.state, wave: Sky.wave, en: Sky.en.length }); return;
     }
     /* ---- the chapter in the list ---- */
@@ -106,6 +112,40 @@
     check('wreck', TOWN_DIST.harbour.p.some(function(p){ return p.k === 'skywreck'; }));
     /* ---- the phone's run list and startRun go to the chase ---- */
     G.state = 'menu'; startRun(SKY_CHAPTER); check('startRun', G.state === 'cutscene' && G.cut.kind === 'skyin'); endCutscene(); skyQuit();
+    /* ---- the detail layer (js/sky/44zzzzm-sky-detail.js) ---- */
+    skyStart(3); steps(10); Sky.q = []; Sky.en = []; Sky.ws = 'intro'; Sky.wt = 1e9;               /* a wave that never ends, so nothing waits on an upgrade pick */
+    var tops = 0, heads = [], tg = drawTopGiraffe, dh = skyDoorHead;                           /* she is never drawn standing on top; only her head, out of the door she shoots from */
+    drawTopGiraffe = function(){ tops++; return tg.apply(this, arguments); }; skyDoorHead = function(c, r, sd, k){ if (k > 0.02) heads.push(sd); return dh.apply(this, arguments); };
+    heads = []; GR.render(); var noseHeads = heads.length; skyGoGun('left'); steps(20); heads = []; GR.render(); var leftHeads = heads.slice(); skyGoGun('right'); steps(20); heads = []; GR.render(); var rightHeads = heads.slice();
+    var mc = document.createElement('canvas'); mc.width = 400; mc.height = 400; try { drawMenuPreview(mc.getContext('2d'), 400, 400, 1); } catch (e) {}
+    drawTopGiraffe = tg; skyDoorHead = dh;
+    out.heads = [noseHeads, leftHeads.join(), rightHeads.join()].join('|'); check('noTopGiraffe', tops === 0); check('headAtDoor', noseHeads === 0 && leftHeads.join() === '-1' && rightHeads.join() === '1');
+    var dc = document.createElement('canvas').getContext('2d'), drawBad = '';                  /* every thing on the sea draws, small and large */
+    ['ship', 'trawler', 'sail', 'speed', 'whale', 'dolphins', 'rock', 'buoy', 'isle', 'fog'].forEach(function(k){ [0.6, 1.4].forEach(function(z){ [0, 3, 9, 11].forEach(function(ph){ try { skyDrawObj(dc, { k: k, x: 200, y: 200, a: 0.3, v: 1, r: 50, seed: 4.2, h: 1, ph: ph }, z); } catch (e) { drawBad += k + ':' + e.message + ' '; } }); }); });
+    try { skyDrawSea(dc, 800, 600); skyDrawHeli(dc); } catch (e) { drawBad += 'sea:' + e.message; }
+    check('detailDraw', drawBad === ''); out.detailBad = drawBad;
+    Sky.objs = []; for (var so = 0; so < 30; so++) skySeaObj(Math.random() * G.H);              /* nothing on the sea on top of something else */
+    var clashes = 0; Sky.objs.forEach(function(a, i){ Sky.objs.forEach(function(b, j){ if (j > i && skyObjsClash(a, b, skyS())) clashes++; }); });
+    check('seaApart', clashes === 0); out.seaClashes = clashes;
+    check('oneSpeed', Sky.objs.every(function(o){ return o.k === 'fog' || o.v === 1; }));          /* rocks and islands all scroll with the water, so they never drift together */
+    /* boats steer round things: a ship aimed straight at a rock, and two boats head on; neither ever gets inside the other */
+    var ss = skyS(), sv = SKY_TUNE.scroll; SKY_TUNE.scroll = 0; Sky.en = []; Sky.q = []; Sky.eb = [];
+    var rk = { k: 'rock', x: 640, y: 300, a: 0, v: 1, r: 50, seed: 2 }, sh = { k: 'ship', x: 640, y: -200, a: 0, v: 1, r: 40, seed: 1, h: Math.PI / 2, want: Math.PI / 2, spd: 60, ph: 0 };
+    Sky.objs = [rk, sh]; var minD = 1e9; for (var st = 0; st < 600; st++){ GR.step(1 / 30); minD = Math.min(minD, Math.hypot(sh.x - rk.x, sh.y - rk.y)); }
+    check('shipAvoidsRock', minD >= (skyObjCore(rk) + skyObjCore(sh)) * ss * 0.98 && sh.y > rk.y); out.shipRock = Math.round(minD) + '/' + Math.round((skyObjCore(rk) + skyObjCore(sh)) * ss);
+    var b1 = { k: 'trawler', x: 200, y: 300, a: 0, v: 1, r: 40, seed: 1, h: 0, want: 0, spd: 40, ph: 0 }, b2 = { k: 'sail', x: 1000, y: 300, a: 0, v: 1, r: 40, seed: 2, h: Math.PI, want: Math.PI, spd: 40, ph: 0 };
+    Sky.objs = [b1, b2]; var minB = 1e9; for (var st2 = 0; st2 < 600; st2++){ GR.step(1 / 30); minB = Math.min(minB, Math.hypot(b1.x - b2.x, b1.y - b2.y)); }
+    check('boatsAvoid', minB >= (skyObjCore(b1) + skyObjCore(b2)) * ss * 0.98 && b1.x > b2.x); out.boats = Math.round(minB) + '/' + Math.round((skyObjCore(b1) + skyObjCore(b2)) * ss);
+    SKY_TUNE.scroll = sv;
+    Sky.dbits = []; Sky.gun = 'right'; Sky.sw = 0; skyFire(); var brass = Sky.dbits.filter(function(b){ return b.k === 'brass'; }).length;
+    var dr = skyEnemy('rotor'); dr.x = 300; dr.y = 200; dr.hp = 0; skyKill(dr); var bits = Sky.dbits.filter(function(b){ return b.k !== 'brass'; }).length;
+    var fx0 = Sky.fx.length; steps(60); check('bits', brass === 1 && bits >= 4 && Sky.dbits.filter(function(b){ return b.k !== 'brass'; }).length === 0 && fx0 >= 0);                 /* the pieces fall and are gone (the gun keeps throwing brass) */
+    Sky.hull = Sky.max * 0.1; Sky.inv = 99; var sm0 = Sky.fx.filter(function(f){ return f.smoke; }).length; Sky.en = []; Sky.q = []; steps(60); check('hurtSmoke', Sky.fx.filter(function(f){ return f.smoke; }).length > sm0);
+    /* a minute of real play with the sea filling up as it goes: no two things on the water ever inside each other */
+    skyStart(4); Sky.inv = 1e9; Sky.q = []; Sky.en = []; Sky.ws = 'intro'; Sky.wt = 1e9; var worst = 1e9, seen = {};
+    for (var pl = 0; pl < 1800; pl++){ GR.step(1 / 30); if (pl % 5) continue; Sky.objs.forEach(function(a, i){ seen[a.k] = 1; Sky.objs.forEach(function(b, j){ if (j > i && a.k !== 'fog' && b.k !== 'fog') worst = Math.min(worst, Math.hypot(a.x - b.x, a.y - b.y) - (skyObjCore(a) + skyObjCore(b)) * skyS()); }); }); }
+    check('seaNoCollide', worst > -1.5); out.seaWorst = Math.round(worst); out.seaSeen = Object.keys(seen).sort().join(',');
+    skyQuit();
     /* ---- an old save ---- */
     var old = JSON.parse(JSON.stringify(Save.data)); ['chapter19Complete', 'skyBestWave', 'skyEscorts', 'skyClean', 'skyAim', 'skyRuns'].forEach(function(k){ delete old[k]; });
     localStorage.setItem(SAVE_KEY, JSON.stringify(old)); Save.load();

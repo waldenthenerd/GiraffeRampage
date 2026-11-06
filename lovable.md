@@ -70,7 +70,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 This list is of the **source** files, which the ZIP no longer contains one by one (the build joins them into a few files in exactly this order and
 minifies them; the folder names are only for finding things). The scripts are loaded in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/core/46-main.js`, which starts the
-game. This is the complete list for this version (235 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (236 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -306,9 +306,10 @@ game. This is the complete list for this version (235 scripts; the developer pan
 | 230 | `js/sky/44zzzzj-sky-chase.js` | Chapter 17.5, the Air Chase: the sky shooter (steering, the nose and door guns, ten waves, two bosses, upgrades, the ending). |
 | 231 | `js/sky/44zzzzk-sky-films.js` | The Air Chase's two films: the cargo door, and LAB-1 down in the sea with the scientists caught. |
 | 232 | `js/sky/44zzzzl-sky-extras.js` | What the Air Chase adds: menu card, Bestiary, Guide, coat colors, achievements, Films list, the minigame Sky Patrol and the wreck in the Harbor. |
-| 233 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
-| 234 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
-| 235 | `js/core/46-main.js` | Starts the game. |
+| 233 | `js/sky/44zzzzm-sky-detail.js` | The Air Chase's detail layer: the sea's small things, boats and animals that steer around rocks, the machines' small parts, her head out of the side door. |
+| 234 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
+| 235 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| 236 | `js/core/46-main.js` | Starts the game. |
 
 CSS, in the order `index.html` links it: `css/style.css` (all the base styles), `css/polish.css` (layered on top: cards, buttons, HUD, menu, and every screen
 added later: minigames, the album book, the guide, photo studio, collection, wide panels on big screens), `css/campus.css` (the university), `css/townlife.css` (Longneck Town panels),
