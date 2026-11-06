@@ -1,0 +1,72 @@
+/* Workshop layout; colours, typography and buttons belong to the original game. */
+.cb-dialog{box-sizing:border-box;width:min(1180px,96vw);max-width:1180px;max-height:94dvh;margin:auto;padding:24px;border:1px solid var(--bark2);border-top:3px solid var(--hide);border-radius:6px;background:var(--night);color:var(--bone);font:inherit;line-height:1.5;overflow:auto;touch-action:pan-y;box-shadow:0 16px 70px #0009}
+.cb-dialog::backdrop{background:rgba(12,9,8,.86)}
+.cb-dialog *{box-sizing:border-box}
+.cb-dialog h1.display{font-size:34px;line-height:1.02;margin:4px 0;color:var(--sun)}
+.cb-dialog h2.display{font-size:23px;line-height:1.08;margin:0 0 16px;color:var(--bone)}
+.cb-dialog h3{margin:0;font-size:16px;color:var(--sun)}
+.cb-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--bark2);padding-bottom:16px}
+.cb-eyebrow{font-size:10px;letter-spacing:.12em;color:var(--hide);font-weight:700}
+.cb-intro{max-width:800px;color:var(--dust);font-size:14px}
+.cb-dialog p{margin:10px 0}
+.cb-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cb-card.slab{border-radius:6px;padding:18px;margin-bottom:16px}
+.cb-columns .cb-card{min-width:0}
+.cb-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cb-dialog label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--bone);min-width:0}
+.cb-wide{grid-column:1/-1}
+.cb-dialog input,.cb-dialog select,.cb-dialog textarea{font:inherit;font-size:14px;line-height:1.4;width:100%;min-height:42px;padding:8px 10px;border:1px solid var(--bark2);border-radius:3px;color:var(--bone);background:var(--night);user-select:text}
+.cb-dialog textarea{resize:vertical}
+.cb-dialog input:focus-visible,.cb-dialog select:focus-visible,.cb-dialog textarea:focus-visible,.cb-dialog canvas:focus-visible{outline:2px solid var(--bone);outline-offset:2px;border-color:var(--hide)}
+.cb-dialog input[type=checkbox]{min-height:22px;width:22px;accent-color:var(--hide)}
+.cb-dialog input[type=color]{padding:3px;cursor:pointer}
+.cb-dialog .cb-check{flex-direction:row;align-items:center;gap:9px}
+.cb-dialog .btn{width:auto;min-height:42px;white-space:normal}
+.cb-dialog .cb-primary{font-size:16px}
+.cb-dialog .btn[aria-pressed=true]{background:var(--bark2);border-color:var(--hide);color:var(--sun)}
+.cb-toolbar,.cb-tools,.cb-wave-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cb-toolbar{margin:12px 0}
+.cb-template{flex:1;min-width:150px;max-width:260px}
+.cb-help{font-size:12px;color:var(--dust)}
+.cb-summary{font-size:12px;padding:9px 12px;border:1px solid var(--bark2);border-left:3px solid var(--hide);background:var(--soil);color:var(--dust)}
+.cb-tools{margin-bottom:12px}
+.cb-dialog canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;border:2px solid var(--bark2);border-radius:3px;touch-action:none}
+.cb-coords{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin-top:10px}.cb-coords label{width:80px;flex:1;min-width:62px}
+.cb-wave{padding:14px;border:1px solid var(--bark2);background:var(--night);border-radius:4px;margin:12px 0}
+.cb-wave-head{margin-bottom:12px}.cb-wave-head h3{flex:1}.cb-wave>label{max-width:150px}
+.cb-group{display:grid;grid-template-columns:1fr 80px 1fr auto;align-items:end;gap:10px;margin:12px 0}.cb-group .btn{max-width:100px}
+.cb-draft{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--bark2)}.cb-draft span{flex:1;overflow-wrap:anywhere}
+.cb-object-list{display:flex;flex-wrap:wrap;gap:6px;max-height:140px;overflow:auto}
+.cb-object-list span{font-size:12px;display:flex;gap:4px;align-items:center;border:1px solid var(--bark2);border-radius:3px;padding:4px;color:var(--dust)}
+.cb-object-list .btn{min-height:32px;padding:4px;font-size:11px}
+.cb-selected{border-color:var(--hide)!important;background:var(--bark)}
+.cb-dialog details{border-top:1px solid var(--bark2);padding-top:10px;margin:8px 0}
+.cb-dialog summary{cursor:pointer;color:var(--sun);font-size:13px;padding:4px 0;min-height:32px}
+.cb-dialog summary:focus-visible{outline:2px solid var(--bone);outline-offset:2px}
+.cb-dialog details>.cb-fields{margin-top:10px}
+.cb-roster{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:12px;color:var(--dust)}
+.cb-roster b{color:var(--bone)}
+.cb-dialog #cbMakerCanvas{width:240px;max-width:100%;height:auto;aspect-ratio:4/3;margin:10px auto;border-color:var(--hide)}
+.cb-part{padding:12px;border:1px solid var(--bark2);border-radius:4px;margin:10px 0;background:var(--night)}
+.cb-part .cb-fields{grid-template-columns:1fr 1fr}.cb-part .cb-wave-head b{flex:1;color:var(--sun);font-size:13px}
+.cb-maker-top{display:grid;grid-template-columns:240px minmax(0,1fr);align-items:center;gap:20px}
+.cb-parts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}
+#cbNotice:not(:empty){padding:12px;border:1px solid var(--hide);background:var(--bark);border-radius:4px;margin:12px 0;color:var(--bone);overflow-wrap:anywhere}
+#cbNotice.cb-error{border-color:var(--blood);background:var(--soil);color:var(--bone)}
+#cbProof{color:var(--sun)}#cbCode{overflow-wrap:anywhere;font:13px/1.5 ui-monospace,monospace}
+#cbValidation{padding:8px 12px;border-left:3px solid var(--hide);font-size:12px;color:var(--dust);background:var(--soil)}
+#cbValidation.cb-error{border-color:var(--blood);color:var(--bone)}
+.cb-swatches{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.cb-swatches span{display:flex;gap:5px;align-items:center;font-size:11px;color:var(--dust)}
+.cb-swatches i{display:inline-block;width:22px;height:22px;border:1px solid var(--dust);border-radius:3px}
+@media(max-width:700px){
+  .cb-dialog{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;padding:16px}
+  .cb-dialog h1.display{font-size:27px}.cb-dialog h2.display{font-size:22px}
+  .cb-columns{grid-template-columns:1fr;gap:0}.cb-card.slab{padding:14px}.cb-fields{gap:10px}
+  .cb-maker-top,.cb-parts-grid{grid-template-columns:1fr}.cb-maker-top{gap:8px}
+  .cb-dialog .btn{min-height:44px}.cb-group{grid-template-columns:1fr 70px;gap:8px}.cb-group .btn{max-width:none}
+  .cb-wave-head{gap:6px}.cb-wave-head h3{flex-basis:100%}.cb-toolbar>.btn{flex-grow:1}
+  .cb-toolbar .cb-template{max-width:none;flex-basis:100%}.cb-coords{flex-wrap:wrap}
+  .cb-object-list .btn{min-height:44px}.cb-dialog input,.cb-dialog select,.cb-dialog textarea{font-size:16px;min-height:44px}
+  .cb-eyebrow{font-size:10px;letter-spacing:.08em}.cb-head>.btn{flex:none}
+}

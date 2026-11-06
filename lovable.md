@@ -51,8 +51,8 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
    for you to read: it describes every file. It also documents the developer panel for people who clone the repository, so the
    panel's words appear in it; that is expected, because it is not part of the shipped game.)
 2. Replace `public/game/rampage/css/` and `public/game/rampage/js/` with the ZIP's (delete the old folders first, so removed
-   files go away). There are six stylesheets, in this order: `style.css`, `polish.css`, `campus.css`, `townlife.css`,
-   `gearpage.css`, `phone.css`; `index.html` links them.
+   files go away). There are seven stylesheets, in this order: `style.css`, `polish.css`, `campus.css`, `townlife.css`,
+   `gearpage.css`, `phone.css`, then `challenge.css`; `index.html` links them (seven stylesheets).
 3. Rebuild `public/game/rampage/index.html` as: the ZIP's `index.html` lines 1 to 3 (up to `<head>`), then the bridge script
    (kept from the current hosted file, **updated as described in section 4** if the save format changed), then the rest of the
    ZIP's `index.html` from line 4. Keep every `<script src>` as a separate, ordered tag (section 3); never concatenate them.
@@ -66,7 +66,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 
 The scripts are loaded by `index.html` in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/46-main.js`, which starts the
-game. This is the complete list for this version (160 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (163 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -230,6 +230,9 @@ game. This is the complete list for this version (160 scripts; the developer pan
 | 90 | `js/45-test-exports.js` | The window.GR object used by the automated tests. |
 | 91 | `js/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | 92 | `js/46-main.js` | Starts the game. |
+| - | `js/45c-challenge-data.js` | Challenge recipe validation, share codec and separate browser-local drafts. Load after the test exports and before the challenge runtime. |
+| - | `js/45e-challenge-play.js` | Independent challenge combat prototype; no campaign saves or rewards. Load after challenge data. |
+| - | `js/45f-challenge-ui.js` | Challenge Workshop editor, menu entry and sharing. Load after challenge play and before `js/46-main.js`. |
 
 CSS: `css/style.css` (all the base styles) and `css/polish.css` (layered on top: cards, buttons, HUD, menu, and every screen
 added later: minigames, the album book, the guide, photo studio, collection, wide panels on big screens).

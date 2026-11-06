@@ -10,6 +10,12 @@ Open `index.html` in a browser, or serve the folder (`python3 -m http.server 812
 
 Giraffe Rampage is **source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE)**. In plain words: you may read, run, change and share it for any noncommercial purpose (personal use, study, hobby projects, charities, schools and the like), as long as you pass on the licence and the `Required Notice` line in `LICENSE`. You may not use it or anything made from it to make money. The licence text is the only thing that counts; this paragraph is a summary. It is not an OSI "open source" licence, because of the noncommercial limit. For anything commercial, ask the author first. All the code, art (it is drawn in code), icons and sound (made in code) are original to this project, so there are no third-party licences to carry along.
 
+## Challenge Workshop (local prototype)
+
+Open **Challenge Workshop** from the main menu to create a separate arena challenge. Choose one of eleven starter recipes, edit waves and enemy groups, place and resize walls/hazards/pickups/an exit/decorations on the grid, choose a fixed kit and objective, then playtest it. Seven biomes, palette presets, custom ground/foliage colors, time of day, cosmetic weather/detail and combat modifiers shape the arena. A layered custom-object maker creates reusable named decorative or rectangular-solid designs that travel with share codes. The editor shares its arena painter with playtests. Clear the exact recipe to unlock code/link sharing; edits reset that local check. This is an independent, simplified combat prototype, not the campaign's gear/card system. Completion is a local design check, not online anti-cheat verification.
+
+Drafts use a separate browser-local shelf (24 recipes); they do not sync with campaign cloud saves. Challenges award no campaign currency or progress. Imports are bounded, validated data, never executable scripts. Links open for review, never autoplay. See `docs/challenge-workshop.md` for scope and test commands.
+
 ## Developer panel
 
 `js/45b-dev-panel.js` is a testing tool for the author and anyone who clones the repo. It is loaded by `index.html` here, but it is **not part of the published game**: the hosted website must be built without that script (see `lovable.md`). Deleting the file and its `<script>` tag changes nothing else.
@@ -40,12 +46,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 160 | 52,360 | 3.92 MiB (4,114,492 bytes) |
-| Styles (`css/`) | 6 | 1,644 | 151 KiB (154,599 bytes) |
-| Page (`index.html`) | 1 | 208 | 8.9 KiB (9,114 bytes) |
-| **Whole game** | **167** | **54,212** | **4.08 MiB (4,278,205 bytes)** |
+| JavaScript (`js/`) | 163 | 53,283 | 4.01 MiB (4,208,720 bytes) |
+| Styles (`css/`) | 7 | 1,716 | 157 KiB (161,066 bytes) |
+| Page (`index.html`) | 1 | 212 | 9.1 KiB (9,308 bytes) |
+| **Whole game** | **171** | **55,211** | **4.18 MiB (4,379,094 bytes)** |
 
-Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **53,642 lines, 4.04 MiB (4,234,499 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/45b-dev-panel.js`, which is not shipped to the website): **54,641 lines, 4.13 MiB (4,335,388 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
 ## How the files fit together
 
@@ -222,6 +228,10 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/45-test-exports.js` | 56 | The window.GR object used by the automated tests. |
 | `js/45b-dev-panel.js` | 570 | Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
 | `js/46-main.js` | 4 | Starts the game. |
+| `js/45c-challenge-data.js` | 222 | Validated challenge recipes, seeded randomness, share codec and separate local draft shelf. |
+| `js/45e-challenge-play.js` | 398 | Isolated fixed-step challenge arena, input, combat, objectives and results. |
+| `js/45f-challenge-ui.js` | 303 | Challenge Workshop editor, menu entry, templates, playtesting and sharing. |
+| `css/challenge.css` | 72 | Responsive Challenge Workshop dialog and editor controls. |
 
 ## Tests
 

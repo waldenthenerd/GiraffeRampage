@@ -8,6 +8,14 @@ screenshots only into your own scratch folder (given in your task).
 
 ## Running a scenario
 
+### Challenge Workshop
+
+Biome/color/custom-object coverage: all seven terrain types, palette and strict hex-color validation, legacy-code defaults, shape limits and missing asset references, reusable custom layers in share-code round trips, decorative versus rectangular-solid collision, and in-use definition deletion safeguards. `view=custom` stages the custom-object designer for screenshots.
+
+The extended scenario covers appearance/tuning round trips, healing and decorative object editing, dimensions and bounds, move/resize/duplicate, grid and layout recipes, quick waves, shared styles and kit/objective guidance. Use `--params "view=showcase"` to leave the decorated Dusk garden open for visual review. Test the shared arena painter and healing with the runtime unit suite; weather/light changes are cosmetic, while player speed, attack rate and darkness affect play.
+
+Run `node tools/challenge-data-test.mjs` and `node tools/challenge-play-test.mjs` for isolated recipe/codec/storage and fixed-step runtime tests. Run `node tools/qa-cloud.mjs tools/scenarios/challenge-builder.js --wait 30000 --shot challenge-desktop.png` for the integrated editor. Repeat at `--w 390 --h 844 --touch` and `--w 844 --h 390 --touch`. The mode deliberately uses independent combat rather than campaign gear/cards. Verify campaign save bytes remain unchanged, invalid imports stay visible as errors, edits invalidate sharing, and links never autoplay.
+
 ```powershell
 powershell -NoProfile -File <path-to-your-checkout>\tools\qa-run.ps1 -Scenario <your-folder>\a.js -Shot <your-folder>\a.png -WaitMs 20000
 ```
