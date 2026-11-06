@@ -5,7 +5,8 @@
    (after the Chapter 13 films, or when 13.5 is started from the menu), and the escape from the domes to New York City (the end of Chapter 13.5).
    Every frame is a pure function of time. */
 /* the town helicopter, side on, nose to the right: a dark green pod with a glass nose, a tail boom with a fin and a tail rotor, skids, and a main rotor on a mast.
-   o = { x, y (the middle of the body), s, t, rot, spin (0 to 1: how fast the rotors turn), pilot (the giraffe in the cockpit), light } */
+   o = { x, y (the middle of the body), s, t, rot, spin (0 to 1: how fast the rotors turn), pilot (the giraffe in the cockpit), light,
+   seat (a function(ctx, t) that draws whoever sits in the cockpit instead), tailGone (the tail rotor shot off), wreck (stopped, blades bent, tail rotor gone) } */
 function domeHeli(ctx, o){
   const s = o.s || 1, t = o.t || 0, spin = o.spin === undefined ? 1 : o.spin, pal = o.pal || {}, GREEN = pal.g || '#35543A', GREEN_D = pal.gd || '#223A28', GREEN_L = pal.gl || '#4A7050', GLASS = '#BCE4F0', INK = pal.ink || '#1A2A1E', BAND = pal.band || '#E8C23A';
   const nose = () => { ctx.beginPath(); ctx.moveTo(10, -30); ctx.quadraticCurveTo(52, -34, 76, -6); ctx.quadraticCurveTo(74, 18, 40, 24); ctx.lineTo(10, 24); ctx.closePath(); };
@@ -34,9 +35,14 @@ function domeHeli(ctx, o){
   /* tail rotor, on a gearbox at the top of the fin */
   const ta = t * 38 * spin;
   fillRoundBox(ctx, -203, -60, 10, 14, 3, '#121C14');
+  if (o.tailGone || o.wreck){                                                                                                      /* shot away: a torn shaft and a jagged stub of blade */
+    ctx.strokeStyle = '#141E16'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-198, -54); ctx.lineTo(-196, -64); ctx.lineTo(-199, -61); ctx.lineTo(-197, -70); ctx.stroke();
+    fillCircle(ctx, -198, -54, 3.6, '#5A645C');
+  } else {
   ctx.fillStyle = '#10181288'; ctx.beginPath(); ctx.ellipse(-198, -54, 4 + 3 * (1 - spin), 26, 0, 0, TAU); ctx.fill();
   ctx.strokeStyle = '#141E16'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-198, -54 - Math.cos(ta) * 24); ctx.lineTo(-198, -54 + Math.cos(ta) * 24); ctx.stroke();
   fillCircle(ctx, -198, -54, 4.4, '#C8D0C0'); fillCircle(ctx, -198, -54, 1.6, '#5A645C');
+  }
   /* the body */
   ctx.fillStyle = GREEN_D; ctx.beginPath(); ctx.ellipse(0, 6, 76, 42, 0, 0, TAU); ctx.fill();
   ctx.fillStyle = GREEN; ctx.beginPath(); ctx.ellipse(0, 0, 76, 40, 0, 0, TAU); ctx.fill();
@@ -64,6 +70,7 @@ function domeHeli(ctx, o){
   ctx.fillStyle = gg; nose(); ctx.fill();
   ctx.save(); nose(); ctx.clip();
   ctx.fillStyle = '#2A3A30'; ctx.beginPath(); ctx.moveTo(8, -6); ctx.quadraticCurveTo(16, -10, 22, 0); ctx.lineTo(24, 24); ctx.lineTo(8, 24); ctx.closePath(); ctx.fill();         /* the seat back, behind her */
+  if (o.seat) o.seat(ctx, t);
   if (o.pilot){                                                                                                                    /* the giraffe, her neck bent forward under the glass */
     csGiraffe(ctx, { x: 6, y: 52, s: 0.44, face: 1, neck: 0.55, head: 0.35, crouch: 14, bare: true, boots: false });
   }
@@ -80,6 +87,13 @@ function domeHeli(ctx, o){
   /* the main rotor: a mast, a swashplate, a hub with blade grips, a soft disc when it is fast and two long blades with yellow tips when it is slow */
   ctx.fillStyle = '#1A2A1E'; ctx.fillRect(-5, -60, 10, 14); ctx.fillStyle = '#2A3A2E'; ctx.fillRect(-9, -50, 18, 4); ctx.strokeStyle = '#6A7A6E'; ctx.lineWidth = 1.4;
   ctx.beginPath(); ctx.moveTo(-7, -50); ctx.lineTo(-12, -62); ctx.moveTo(7, -50); ctx.lineTo(12, -62); ctx.stroke();                                                                  /* pitch links */
+  if (o.wreck){                                                                                                                      /* the blades stopped and bent: one droops over the side, one snapped short */
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#121C14'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(0, -62); ctx.lineTo(-96, -58); ctx.quadraticCurveTo(-132, -54, -150, -24); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, -62); ctx.lineTo(62, -70); ctx.stroke(); ctx.strokeStyle = BAND; ctx.beginPath(); ctx.moveTo(-146, -32); ctx.lineTo(-150, -24); ctx.stroke();
+    ctx.fillStyle = '#121C14'; ctx.beginPath(); ctx.moveTo(60, -74); ctx.lineTo(70, -71); ctx.lineTo(64, -69); ctx.lineTo(69, -66); ctx.lineTo(60, -66); ctx.closePath(); ctx.fill();   /* the snapped end */
+    ctx.strokeStyle = '#2A3A2E'; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(-12, -61); ctx.lineTo(12, -63); ctx.stroke(); ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+    fillCircle(ctx, 0, -62, 7, '#10181A'); fillCircle(ctx, 0, -62, 3, '#5A6A5E'); ctx.restore(); return;
+  }
   const ra = t * 30 * spin, bl = Math.cos(ra) * 214;
   ctx.fillStyle = 'rgba(20,30,24,' + (0.16 * spin) + ')'; ctx.beginPath(); ctx.ellipse(0, -62, 216, 9 + 3 * spin, 0, 0, TAU); ctx.fill();
   if (spin > 0.5){ ctx.strokeStyle = 'rgba(232,194,58,' + (0.3 * spin) + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(0, -62, 214, 8 + 3 * spin, 0, 0, TAU); ctx.stroke(); }
