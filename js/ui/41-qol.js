@@ -45,7 +45,7 @@ const Nav = {
     return true;
   },
   click(){ const a = document.activeElement; if (a && OV.contains(a) && (a.tagName === 'BUTTON' || a.tagName === 'SUMMARY') && !a.disabled){ a.click(); return true; } return false; },
-  back(){ const b = OV.querySelector('[data-a="resume"],[data-a="settings-back"],[data-a="gallery-back"],[data-a="menu"],[data-a="mini-back"],[data-a="town-close"],[data-a="fish-book-back"],[data-a="fish-sea-close"],[data-a="back"]'); if (b && !b.disabled){ b.click(); return true; } return false; },
+  back(){ const b = OV.querySelector('[data-a="resume"],[data-a="settings-back"],[data-a="addons-back"],[data-a="gallery-back"],[data-a="menu"],[data-a="mini-back"],[data-a="town-close"],[data-a="fish-book-back"],[data-a="fish-sea-close"],[data-a="back"]'); if (b && !b.disabled){ b.click(); return true; } return false; },
   overlayOpen(){ return OV.className.indexOf('on') >= 0 && G.state !== 'playing' && G.state !== 'cutscene'; }
 };
 
@@ -362,6 +362,7 @@ function showMenu(){
         galleryButtonHTML() +
         (typeof wardrobeButtonHTML === 'function' ? wardrobeButtonHTML() : '') +
         '<button class="btn ghost" data-a="help">Guide<small>How to play, and how it all works</small></button>' +
+        (typeof addonsButtonHTML === 'function' ? addonsButtonHTML() : '') +
         '<button class="btn ghost" data-a="settings">Settings<small>Sound, screen, touch</small></button>' +
         '</div>' +
       '</div>' +
@@ -670,6 +671,7 @@ function showPause(){
         '<button class="btn" data-a="resume">Back to it</button>' +
         '<button class="btn ghost" data-a="stats">Stats and cards<small>What your giraffe and each card is doing</small></button>' +
         '<button class="btn ghost" data-a="settings">Settings<small>Sound, screen, touch, controls</small></button>' +
+        (typeof addonsButtonHTML === 'function' ? addonsButtonHTML() : '') +
         '<button class="btn ghost" data-a="t-auto-live">Auto-kick: ' + (Settings.autoKick ? 'on' : 'off') + '</button>' +
         '<button class="btn ghost" data-a="t-mute-live">Sound: ' + (Settings.muted ? 'off' : 'on') + '</button>' +
         '<button class="btn ghost" data-a="t-gear-live">Gear on giraffe: ' + (Settings.showGear ? 'shown' : 'hidden') + '</button>' +
