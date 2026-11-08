@@ -5,6 +5,12 @@ var addonOff = { listed: addonsList().some(function(a){ return a.id === 'challen
 GR.showMenu(); addonOff.noButton = !document.querySelector('[data-a="challenge-open"]');
 addonOff.noGuide = GUIDE_TOPICS.filter(function(t){ return t.id === 'challenges'; }).every(function(t){ return !t.show(); });
 GR.handleAction('challenge-open'); addonOff.noOpen = !document.querySelector('#challengeBuilder') && !document.getElementById('cbStyle');
+history.replaceState(null,'',location.pathname+location.search+'#challenge='+encodeURIComponent(GRChallengeData.encode(GRChallengeData.templates[1].level)));
+GR.showMenu(); addonOff.linkOffer = !!document.getElementById('cbLinkOffer') && document.getElementById('cbLinkOffer').open;
+if (addonOff.linkOffer) document.querySelector('#cbLinkOffer [data-x="no"]').click();
+addonOff.offerGone = !document.getElementById('cbLinkOffer') && !addonOn('challenges');
+GR.showMenu(); addonOff.offerOnce = !document.getElementById('cbLinkOffer');
+history.replaceState(null,'',location.pathname+location.search);
 addonSet('challenges', true);
 (function(){
   var out={failed:[]},check=function(name,value){if(!value)out.failed.push(name);};
@@ -21,6 +27,30 @@ addonSet('challenges', true);
     check('original game style classes',find('h1').classList.contains('display')&&find('.cb-card').classList.contains('slab')&&Array.from(document.querySelectorAll('#challengeBuilder button')).every(function(b){return b.classList.contains('btn');}));
     addonSet('challenges',false);check('off closes the workshop',!document.querySelector('#challengeBuilder').open);GR.showMenu();check('off hides the button',!document.querySelector('[data-a="challenge-open"]'));
     addonSet('challenges',true);GR.showMenu();document.querySelector('[data-a="challenge-open"]').click();check('on again reopens',document.querySelector('#challengeBuilder').open);
+    /* tabs: one section at a time */
+    click('tab-waves');check('tab shows waves only',find('[data-tab="waves"].cb-card').offsetParent!==null&&find('[data-tab="recipe"].cb-card').offsetParent===null);
+    click('tab-arena');check('arena tab shows the canvas',find('#cbCanvas').offsetParent!==null);
+    /* drag to move with the Select tool, then Undo */
+    (function(){
+      var cv=find('#cbCanvas');find('#cbTemplates').value=String(GRChallengeData.templates.findIndex(function(t){return t.name==='Dusk garden';}));click('template');
+      click('tool-select');cv=find('#cbCanvas');var r=cv.getBoundingClientRect(),sx=r.width/960,sy=r.height/640;
+      var ev=function(type,x,y){cv.dispatchEvent(new PointerEvent(type,{bubbles:true,pointerId:7,clientX:r.left+x*sx,clientY:r.top+y*sy,isPrimary:true}));};
+      var before=Array.from(document.querySelectorAll('#challengeBuilder .cb-object-list span')).length;
+      var first=document.querySelector('#challengeBuilder [data-cb="select-0"]').textContent;
+      var m=/\((\d+), (\d+)\)/.exec(first),ox=+m[1],oy=+m[2];
+      ev('pointerdown',ox+5,oy+5);ev('pointermove',ox+5+100,oy+5);ev('pointerup',ox+5+100,oy+5);
+      var after=document.querySelector('#challengeBuilder [data-cb="select-0"]').textContent;
+      check('drag moves an object, snapped to the grid',after.indexOf('('+(Math.round((ox+100)/40)*40)+', '+(Math.round(oy/40)*40)+')')>=0);
+      click('undo');check('undo puts a dragged object back',document.querySelector('#challengeBuilder [data-cb="select-0"]').textContent===first);
+      click('tool-wall');
+    })();
+    /* drafts: saving again after an edit updates the same draft */
+    (function(){
+      localStorage.setItem(libraryKey,'[]');click('save');edit('title','Edited name');click('save');
+      var list=GRChallengeData.listDrafts();check('saving after an edit updates the draft',list.length===1&&list[0].title==='Edited name');
+      click('save-copy');check('save as copy adds one',GRChallengeData.listDrafts().length===2);
+      localStorage.setItem(libraryKey,'[]');click('tab-recipe');
+    })();
     check('share requires local clear',find('[data-cb="copy"]').disabled);
     importLevel(GRChallengeData.defaults());
     var original=find('[data-path="title"]').value;

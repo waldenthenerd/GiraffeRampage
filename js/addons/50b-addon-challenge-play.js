@@ -14,8 +14,16 @@ var GRChallengePlay = (function(){
     chaser:{hp:40,speed:65,r:15,damage:10,col:'#c65342'},
     runner:{hp:24,speed:110,r:11,damage:7,col:'#da9d3f'},
     brute:{hp:140,speed:35,r:23,damage:20,col:'#8d68a9'},
-    spitter:{hp:35,speed:48,r:14,damage:8,col:'#65a474'}
+    spitter:{hp:35,speed:48,r:14,damage:8,col:'#65a474'},
+    flyer:{hp:26,speed:92,r:13,damage:7,col:'#3b332b',fly:true},            /* flies over walls and hazards */
+    charger:{hp:80,speed:42,r:19,damage:16,col:'#8a6e52',charge:true},     /* stops, stamps, then dashes in a straight line */
+    splitter:{hp:60,speed:55,r:17,damage:8,col:'#66401f',split:3},          /* bursts into three grubs */
+    badger:{hp:120,speed:72,r:15,damage:12,col:'#2a2622',regen:10},         /* heals itself when left alone for two seconds */
+    grub:{hp:12,speed:100,r:8,damage:4,col:'#e6ce9c'}                       /* only from a splitter; not a recipe choice */
   };
+  /* each kind is drawn as a creature from the game (js/art/35h-draw-enemy.js) when that is loaded; the arena's own simple drawing is the fallback */
+  const LOOK={chaser:'hyena',runner:'cheetah',brute:'rhino',spitter:'baboon',flyer:'vulture',charger:'warthog',splitter:'termite',badger:'honeybadger',grub:'grub'};
+  const sfx=(name)=>{try{if(typeof SFX!=='undefined'&&SFX[name]&&!(typeof Settings!=='undefined'&&Settings.muted))SFX[name]();}catch(e){}};
   const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
   function overlaps(x,y,r,o){
     return Math.hypot(x-clamp(x,o.x,o.x+o.w),y-clamp(y,o.y,o.y+o.h)) < r;
@@ -72,6 +80,7 @@ var GRChallengePlay = (function(){
   }
   // The editor and playtest share this pure painter; visual randomness has its
   // own seed and cannot consume the combat generator or change a recipe.
+  const bgCache={key:null,canvas:null};
   function paintArena(ctx,level,options){
     options=options||{};
     const appearance=level.appearance||{},detail=appearance.detail===undefined?1:appearance.detail;
@@ -81,6 +90,11 @@ var GRChallengePlay = (function(){
     const ellipse=(x,y,rx,ry,color)=>{ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill();};
     ctx.save();
     try{
+    const scatter=(16+detail*12)*4+(30+detail*95)*3,key=options.cache?[theme,palette.join(),detail,appearance.time,level.seed].join('|'):null;
+    if(key&&bgCache.key===key&&bgCache.canvas){ctx.drawImage(bgCache.canvas,0,0);for(let n=0;n<scatter;n++)random();}
+    else{
+    const real=ctx;let off=null;
+    if(key){try{off=document.createElement('canvas');off.width=960;off.height=640;ctx=off.getContext('2d');if(!ctx)throw 0;}catch(e){off=null;ctx=real;}}
     ctx.fillStyle=palette[0];ctx.fillRect(0,0,960,640);
     const light=ctx.createLinearGradient(0,0,960,640);light.addColorStop(0,palette[1]+'77');light.addColorStop(1,palette[2]+'66');ctx.fillStyle=light;ctx.fillRect(0,0,960,640);
     for(let n=0;n<16+detail*12;n++){
@@ -113,6 +127,8 @@ var GRChallengePlay = (function(){
     }
     if(appearance.time==='sunset'){ctx.fillStyle='#b45f242b';ctx.fillRect(0,0,960,640);}
     else if(appearance.time==='night'){ctx.fillStyle='#211b3d77';ctx.fillRect(0,0,960,640);}
+    if(off){bgCache.key=key;bgCache.canvas=off;ctx=real;ctx.drawImage(off,0,0);}
+    }
     for(const o of level.objects){
       const x=o.x,y=o.y,w=o.w,h=o.h,cx=x+w/2,cy=y+h/2;
       if(o.kind==='wall'){
@@ -200,10 +216,10 @@ var GRChallengePlay = (function(){
     const pickups=level.objects.filter(o=>o.kind==='coin'||o.kind==='heal').map(o=>Object.assign({taken:false},o));
     const coins=pickups.filter(o=>o.kind==='coin');
     const p={x:480,y:320,r:15,hp:kit.hp,inv:0,attack:0,angle:-Math.PI/2};
-    let enemies=[],shots=[],time=0,kills=0,collected=0,heals=0,wave=0,wait=level.waves[0].delay,fx=[],waveBannerUntil=0;
+    let enemies=[],shots=[],time=0,kills=0,collected=0,heals=0,wave=0,wait=level.waves[0].delay,fx=[],waveBannerUntil=0,extra=0,hitSound=0;
     const totalEnemies=level.waves.reduce((n,w)=>n+w.enemies.reduce((sum,g)=>sum+g.count,0),0);
     let paused=false,ended=false,result=null,raf=0,last=0,carry=0,attackFlash=0,frameLive=true;
-    let target=null,keys=new Set(),pointer=null;
+    let target=null,keys=new Set(),pointer=null,pad={x:0,y:0,prev:[]};
     const previousFocus=document.activeElement;
     const dlg=document.createElement('dialog');
     dlg.id='challengePlay'; dlg.className='slab'; dlg.setAttribute('aria-label','Play challenge');
@@ -246,59 +262,133 @@ var GRChallengePlay = (function(){
         if(canStand(body.x,y,body.r))body.y=y;
       }
     }
+    /* finding the way round walls: a 24-pixel grid of the places a body of each size can stand, and, from the giraffe's square outwards, how many steps
+       each square is from her. A walker that cannot see her steps to the neighbouring square nearer to her. Worked out again when she changes square. */
+    const CELL=24,GW=40,GH=27,passBy={},flowBy={};
+    function passFor(r){
+      const k=Math.max(6,r-3);if(passBy[k])return passBy[k];
+      const a=new Uint8Array(GW*GH);for(let j=0;j<GH;j++)for(let i=0;i<GW;i++)a[j*GW+i]=canStand(i*CELL+12,Math.min(j*CELL+12,640-k),k)?1:0;
+      return passBy[k]=a;
+    }
+    function flowFor(r){
+      const k=Math.max(6,r-3),pc=clamp(Math.floor(p.x/CELL),0,GW-1)+clamp(Math.floor(p.y/CELL),0,GH-1)*GW,f=flowBy[k];
+      if(f&&f.from===pc)return f.dist;
+      const pass=passFor(r),dist=new Int16Array(GW*GH).fill(-1),q=[pc];dist[pc]=0;
+      for(let h=0;h<q.length;h++){
+        const c=q[h],ci=c%GW,cj=(c-ci)/GW;
+        for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){
+          if(!di&&!dj)continue;const ni=ci+di,nj=cj+dj;if(ni<0||nj<0||ni>=GW||nj>=GH)continue;
+          const n=nj*GW+ni;if(dist[n]>=0||!pass[n])continue;
+          if(di&&dj&&(!pass[cj*GW+ni]||!pass[nj*GW+ci]))continue;                 /* no cutting a wall's corner */
+          dist[n]=dist[c]+1;q.push(n);
+        }
+      }
+      flowBy[k]={from:pc,dist};return dist;
+    }
+    /* where a walker should head for: straight at her when nothing is in the way, else the next square on the way round */
+    function heading(e){
+      if(!blocks(e,p,walls))return {x:p.x,y:p.y};
+      const dist=flowFor(e.r),ci=clamp(Math.floor(e.x/CELL),0,GW-1),cj=clamp(Math.floor(e.y/CELL),0,GH-1),here=dist[cj*GW+ci];
+      let best=-1,bd=here>=0?here:1e9;
+      for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){
+        const ni=ci+di,nj=cj+dj;if((!di&&!dj)||ni<0||nj<0||ni>=GW||nj>=GH)continue;
+        const d=dist[nj*GW+ni];if(d>=0&&d<bd){bd=d;best=nj*GW+ni;}
+      }
+      return best<0?{x:p.x,y:p.y}:{x:(best%GW)*CELL+12,y:Math.floor(best/GW)*CELL+12};
+    }
+    /* creatures do not stand inside each other: each overlapping pair is pushed apart, half each, and never into a wall */
+    function separate(){
+      for(let i=0;i<enemies.length;i++){const a=enemies[i];
+        for(let j=i+1;j<enemies.length;j++){const b=enemies[j];
+          let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);const min=a.r+b.r;
+          if(d>=min)continue;
+          if(d<.01){dx=Math.cos(i*2.4+j);dy=Math.sin(i*2.4+j);d=1;}
+          const push=Math.min(4,(min-d)/2),ux=dx/d*push,uy=dy/d*push;
+          if(a.fly){a.x=clamp(a.x-ux,a.r,960-a.r);a.y=clamp(a.y-uy,a.r,640-a.r);}else move(a,-ux,-uy);
+          if(b.fly){b.x=clamp(b.x+ux,b.r,960-b.r);b.y=clamp(b.y+uy,b.r,640-b.r);}else move(b,ux,uy);
+        }
+      }
+    }
+    function makeEnemy(kind,x,y){
+      const f=FOES[kind];
+      return {kind,x,y,r:f.r,hp:f.hp*level.modifiers.enemyHp,max:f.hp*level.modifiers.enemyHp,fire:1+rng(),side:rng()<.5?-1:1,fly:!!f.fly,flash:0,ang:Math.atan2(p.y-y,p.x-x),seed:rng()*9,quiet:0,dash:0,windup:0,cool:1+rng()*2,dir:0};
+    }
     function spawnWave(){
       const recipe=level.waves[wave]; wave++;waveBannerUntil=time+1.6;
       for(const group of recipe.enemies){
         const f=FOES[group.kind];
         for(let n=0;n<group.count;n++){
           let x=480,y=320,found=false;
-          for(let tries=0;tries<100;tries++){
-            const z=.05+rng()*.9;
+          for(let tries=0;tries<146;tries++){
+            const z=tries<100?.05+rng()*.9:.05+(tries-100)*.02;              /* random spots first, then every spot the recipe check looks at */
             x=group.spawn==='west'?f.r+4:group.spawn==='east'?956-f.r:960*z;
             y=group.spawn==='north'?f.r+4:group.spawn==='south'?636-f.r:640*z;
-            if(canStand(x,y,f.r)){found=true;break;}
+            if(f.fly||canStand(x,y,f.r)){found=true;break;}
           }
           if(!found){ finish(false,'A spawn edge is blocked. Edit the walls and try again.');return; }
-          enemies.push({kind:group.kind,x,y,r:f.r,hp:f.hp*level.modifiers.enemyHp,max:f.hp*level.modifiers.enemyHp,fire:1+rng(),side:rng()<.5?-1:1});
+          enemies.push(makeEnemy(group.kind,x,y));
         }
       }
+      sfx('wave');
     }
     function finish(won,reason){
       if(ended)return;
       ended=true;target=null;keys.clear();pauseBtn.disabled=true;
       result={won,time:Math.round(time*100)/100,kills,coins:collected,heals,health:p.hp,waves:wave,fingerprint:GRChallengeData.fingerprint(level)};
-      status.textContent=(won?'Challenge cleared! ':'Try again! ')+(reason||'')+' '+result.time.toFixed(2)+'s · '+kills+' / '+totalEnemies+' defeated · '+collected+' collected · '+heals+' heals used · '+Math.ceil(p.hp)+' health left. No campaign rewards.';
+      sfx(won?'level':'over');
+      status.textContent=(won?'Challenge cleared! ':'Try again! ')+(reason||'')+' '+result.time.toFixed(2)+'s · '+kills+' / '+(totalEnemies+extra)+' defeated · '+collected+' collected · '+heals+' heals used · '+Math.ceil(p.hp)+' health left. No campaign rewards.';
       if(options.onFinish)options.onFinish(Object.assign({},result));
     }
-    function hurt(amount){ if(p.inv>0||ended)return;p.hp=Math.max(0,p.hp-amount);p.inv=.55;feedback(p.x,p.y,'−'+amount,'#cd8b65');if(!p.hp)finish(false,'Your giraffe ran out of health.'); }
+    function hurt(amount){ if(p.inv>0||ended)return;p.hp=Math.max(0,p.hp-amount);p.inv=.55;feedback(p.x,p.y,'−'+amount,'#cd8b65');sfx('hurt');if(!p.hp)finish(false,'Your giraffe ran out of health.'); }
     function step(dt){
       if(paused||ended)return;
       time+=dt;p.inv=Math.max(0,p.inv-dt);p.attack-=dt;attackFlash=Math.max(0,attackFlash-dt);for(const f of fx)f.life-=dt;fx=fx.filter(f=>f.life>0);
       let dx=(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0);
       let dy=(keys.has('s')||keys.has('arrowdown')?1:0)-(keys.has('w')||keys.has('arrowup')?1:0);
+      if(!dx&&!dy&&(pad.x||pad.y)){dx=pad.x;dy=pad.y;}
       if(!dx&&!dy&&target){dx=target.x-p.x;dy=target.y-p.y;if(Math.hypot(dx,dy)<4){dx=0;dy=0;}}
-      const len=Math.hypot(dx,dy);
+      const len=Math.hypot(dx,dy);p.moving=!!len;
       if(len){p.angle=Math.atan2(dy,dx);move(p,dx/len*kit.speed*(level.modifiers.playerSpeed||1)*dt,dy/len*kit.speed*(level.modifiers.playerSpeed||1)*dt);}
       if(!enemies.length&&wave<level.waves.length){wait-=dt;if(wait<=0)spawnWave();}
       if(ended)return;
       for(const e of enemies){
-        const f=FOES[e.kind],vx=p.x-e.x,vy=p.y-e.y,d=Math.hypot(vx,vy)||1;
-        const ox=e.x,oy=e.y;
-        if(e.kind!=='spitter'||d>220||blocks(e,p,walls)){
-          move(e,vx/d*f.speed*level.modifiers.speed*dt,vy/d*f.speed*level.modifiers.speed*dt);
-          if(Math.hypot(e.x-ox,e.y-oy)<.1)move(e,-vy/d*f.speed*level.modifiers.speed*dt*e.side,vx/d*f.speed*level.modifiers.speed*dt*e.side);
-        }
-        if(d<e.r+p.r)hurt(f.damage);
+        const f=FOES[e.kind],vx=p.x-e.x,vy=p.y-e.y,d=Math.hypot(vx,vy)||1,sp=f.speed*level.modifiers.speed;
+        const ox=e.x,oy=e.y;e.flash=Math.max(0,e.flash-dt);e.quiet+=dt;e.cool-=dt;
+        if(f.regen&&e.quiet>2&&e.hp<e.max)e.hp=Math.min(e.max,e.hp+f.regen*dt);
+        if(e.dash>0){                                                          /* a charger mid-dash keeps its line until it runs out or hits a wall */
+          e.dash-=dt;move(e,Math.cos(e.dir)*sp*7*dt,Math.sin(e.dir)*sp*7*dt);
+          if(Math.hypot(e.x-ox,e.y-oy)<.5)e.dash=0;
+        }else if(e.windup>0){
+          e.windup-=dt;if(e.windup<=0){e.dash=.45;e.cool=2.6;sfx('whoosh');}
+        }else if(f.charge&&e.cool<=0&&d<340&&!blocks(e,p,walls)){
+          e.windup=.55;e.dir=Math.atan2(vy,vx);e.ang=e.dir;
+        }else if(e.fly){                                                       /* over everything, straight at her */
+          e.x=clamp(e.x+vx/d*sp*dt,e.r,960-e.r);e.y=clamp(e.y+vy/d*sp*dt,e.r,640-e.r);e.ang=Math.atan2(vy,vx);
+        }else if(e.kind!=='spitter'||d>220||blocks(e,p,walls)){
+          const h=heading(e),hx=h.x-e.x,hy=h.y-e.y,hd=Math.hypot(hx,hy)||1;
+          move(e,hx/hd*sp*dt,hy/hd*sp*dt);
+          if(Math.hypot(e.x-ox,e.y-oy)<.1)move(e,-hy/hd*sp*dt*e.side,hx/hd*sp*dt*e.side);
+          if(Math.hypot(e.x-ox,e.y-oy)>.05)e.ang=Math.atan2(e.y-oy,e.x-ox);
+        }else e.ang=Math.atan2(vy,vx);
+        if(Math.hypot(p.x-e.x,p.y-e.y)<e.r+p.r)hurt(f.damage);
         e.fire-=dt;
         if(e.kind==='spitter'&&e.fire<=0&&d<450&&!blocks(e,p,walls)){
-          e.fire=2;shots.push({x:e.x,y:e.y,dx:vx/d*150,dy:vy/d*150,life:4});
+          e.fire=2;shots.push({x:e.x,y:e.y,dx:vx/d*150,dy:vy/d*150,life:4});sfx('spit');
         }
       }
+      separate();
       if(p.attack<=0){
-        const victim=enemies.filter(e=>Math.hypot(e.x-p.x,e.y-p.y)<kit.range+e.r&&!blocks(p,e,walls)).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0];
-        if(victim){victim.hp-=kit.damage;p.angle=Math.atan2(victim.y-p.y,victim.x-p.x);p.attack=kit.cooldown/(level.modifiers.attackRate||1);attackFlash=.13;feedback(victim.x,victim.y,'−'+kit.damage,'#e1bd7d');}
+        const victim=enemies.filter(e=>Math.hypot(e.x-p.x,e.y-p.y)<kit.range+e.r&&(e.fly||!blocks(p,e,walls))).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0];
+        if(victim){victim.hp-=kit.damage;victim.flash=.12;victim.quiet=0;p.angle=Math.atan2(victim.y-p.y,victim.x-p.x);p.attack=kit.cooldown/(level.modifiers.attackRate||1);attackFlash=.13;feedback(victim.x,victim.y,'−'+kit.damage,'#e1bd7d');if(time-hitSound>.08){hitSound=time;sfx('kick');}}
       }
-      const before=enemies.length;enemies=enemies.filter(e=>e.hp>0);kills+=before-enemies.length;
+      const before=enemies.length,born=[];
+      for(const e of enemies)if(e.hp<=0){
+        const sp=FOES[e.kind].split;
+        if(sp)for(let n=0;n<sp;n++){const a=n/sp*Math.PI*2+e.seed,g=makeEnemy('grub',e.x,e.y);move(g,Math.cos(a)*14,Math.sin(a)*14);born.push(g);}
+      }
+      enemies=enemies.filter(e=>e.hp>0);kills+=before-enemies.length;
+      if(before>enemies.length)sfx('kill');
+      if(born.length){enemies=enemies.concat(born);extra+=born.length;}
       if(before&&!enemies.length&&wave<level.waves.length)wait=level.waves[wave].delay;
       for(const s of shots){
         const old={x:s.x,y:s.y};s.x+=s.dx*dt;s.y+=s.dy*dt;s.life-=dt;
@@ -307,8 +397,8 @@ var GRChallengePlay = (function(){
       }
       shots=shots.filter(s=>s.life>0);
       for(const o of level.objects)if(o.kind==='hazard'&&overlaps(p.x,p.y,p.r,o))hurt(12);
-      for(const c of coins)if(!c.taken&&overlaps(p.x,p.y,p.r,c)){c.taken=true;collected++;feedback(c.x+c.w/2,c.y,'+1 coin','#e1bd7d');}
-      for(const c of pickups)if(c.kind==='heal'&&!c.taken&&!ended&&p.hp<kit.hp&&overlaps(p.x,p.y,p.r,c)){c.taken=true;heals++;const healed=Math.min(kit.hp-p.hp,kit.hp*.25);p.hp+=healed;feedback(c.x+c.w/2,c.y,'+'+healed+' health','#c2c58b');}
+      for(const c of coins)if(!c.taken&&overlaps(p.x,p.y,p.r,c)){c.taken=true;collected++;feedback(c.x+c.w/2,c.y,'+1 coin','#e1bd7d');sfx('coin');}
+      for(const c of pickups)if(c.kind==='heal'&&!c.taken&&!ended&&p.hp<kit.hp&&overlaps(p.x,p.y,p.r,c)){c.taken=true;heals++;const healed=Math.round(Math.min(kit.hp-p.hp,kit.hp*.25));p.hp+=healed;feedback(c.x+c.w/2,c.y,'+'+healed+' health','#c2c58b');sfx('pickupS');}
       const obj=level.objective;
       if(obj.type==='clear'&&wave===level.waves.length&&!enemies.length)finish(true,'Every wave defeated.');
       else if(obj.type==='survive'&&time>=obj.target)finish(true,'Survival target reached.');
@@ -316,9 +406,23 @@ var GRChallengePlay = (function(){
       else if(obj.type==='exit'&&level.objects.some(o=>o.kind==='exit'&&overlaps(p.x,p.y,p.r,o)))finish(true,'Exit reached.');
       if(!ended&&time>=300)finish(false,'Five-minute challenge limit reached.');
     }
+    /* a creature from the game, scaled to this arena's body size, with the arena's own health bar */
+    function drawCreature(e){
+      const type=LOOK[e.kind],def=ETYPES[type];if(!def)return false;
+      try{
+        ctx.save();ctx.translate(e.x,e.y);const k=e.r/def.r*1.15;ctx.scale(k,k);
+        drawEnemy(ctx,{portrait:true,def,type,x:0,y:0,r:def.r,ang:e.ang,flash:e.flash,state:e.windup>0?'wind':'idle',anim:time*7+e.seed,hp:1,maxHp:1,big:false,kx:0,ky:0,stunT:0,burnT:0,slowT:0,slowMul:1});
+        ctx.restore();
+      }catch(err){ctx.restore();return false;}
+      if(e.hp<e.max){ctx.fillStyle='#201e25';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2,4);ctx.fillStyle='#f5c766';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2*e.hp/e.max,4);}
+      return true;
+    }
     function draw(){
-      paintArena(ctx,Object.assign({},level,{objects:level.objects.filter(o=>o.kind!=='coin'&&o.kind!=='heal').concat(pickups.filter(o=>!o.taken))}),{grid:false,time});
+      paintArena(ctx,Object.assign({},level,{objects:level.objects.filter(o=>o.kind!=='coin'&&o.kind!=='heal').concat(pickups.filter(o=>!o.taken))}),{grid:false,time,cache:true});
+      const art=typeof drawEnemy==='function'&&typeof ETYPES!=='undefined';
       for(const e of enemies){
+        if(e.windup>0){ctx.strokeStyle='#fff2ab';ctx.lineWidth=3;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(e.x+Math.cos(e.dir)*160,e.y+Math.sin(e.dir)*160);ctx.stroke();ctx.setLineDash([]);}
+        if(art&&drawCreature(e))continue;
         const f=FOES[e.kind];ctx.fillStyle='#0003';ctx.beginPath();ctx.ellipse(e.x,e.y+9,e.r+2,e.r*.6,0,0,Math.PI*2);ctx.fill();
         ctx.save();ctx.translate(e.x,e.y);ctx.rotate(Math.atan2(p.y-e.y,p.x-e.x)+Math.PI/2);
         const stride=Math.sin(time*(e.kind==='runner'?18:10)+e.x*.03)*3;
@@ -338,6 +442,9 @@ var GRChallengePlay = (function(){
       }
       for(const s of shots){ctx.fillStyle='#d9f583';ctx.beginPath();ctx.arc(s.x,s.y,5,0,Math.PI*2);ctx.fill();}
       if(attackFlash){ctx.strokeStyle='#fff2ab';ctx.lineWidth=5;ctx.beginPath();ctx.arc(p.x,p.y,kit.range,p.angle-.55,p.angle+.55);ctx.stroke();}
+      let drawn=false;
+      if(typeof drawTopGiraffe==='function'){try{drawTopGiraffe(ctx,p.x,p.y,p.angle,.62,p.moving?time*12:0,{moving:!!p.moving,alpha:p.inv>0?.65:1});drawn=true;}catch(err){}}
+      if(!drawn){
       ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle+Math.PI/2);ctx.globalAlpha=p.inv>0?.65:1;
       const stride=Math.sin(time*12)*4;
       ctx.strokeStyle='#805232';ctx.lineWidth=5;
@@ -350,6 +457,7 @@ var GRChallengePlay = (function(){
       for(const side of [-1,1]){ctx.beginPath();ctx.ellipse(side*11,-32,5,3,side*.6,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(side*5,-37);ctx.lineTo(side*6,-43);ctx.stroke();ctx.fillStyle='#69452d';ctx.beginPath();ctx.arc(side*6,-43,2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#efc26b';}
       ctx.fillStyle='#9c693e';for(const spot of [[-6,1],[5,8],[-3,17],[2,-18]]){ctx.beginPath();ctx.arc(spot[0],spot[1],3,0,Math.PI*2);ctx.fill();}
       ctx.fillStyle='#222';ctx.fillRect(-7,-36,3,3);ctx.fillRect(4,-36,3,3);ctx.restore();
+      }
       for(const f of fx){ctx.save();ctx.globalAlpha=f.life/.6;ctx.fillStyle=f.color;ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.fillText(f.label,f.x,f.y-20-(.6-f.life)*25);ctx.restore();}
       if(level.modifiers.darkness){
         const shade=ctx.createRadialGradient(p.x,p.y,65,p.x,p.y,270);shade.addColorStop(0,'#10152100');shade.addColorStop(1,'#101521ec');ctx.fillStyle=shade;ctx.fillRect(0,0,960,640);
@@ -359,7 +467,7 @@ var GRChallengePlay = (function(){
       const objective=level.objective.type==='survive'?'Survive '+level.objective.target+'s':level.objective.type==='collect'?'Collect '+level.objective.target:level.objective.type==='exit'?'Reach the exit':'Clear all waves';
       hud.textContent='Health '+Math.ceil(p.hp)+' / '+kit.hp+' · '+time.toFixed(1)+'s · Wave '+Math.min(wave+(!enemies.length&&wave<level.waves.length?1:0),level.waves.length)+' / '+level.waves.length+' · '+kills+' defeated · '+collected+' collected — '+objective;
       hpMeter.bar.value=p.hp/kit.hp;hpMeter.text.textContent='Health '+Math.ceil(p.hp)+' / '+kit.hp;
-      const goal=level.objective.type==='clear'?kills/totalEnemies:level.objective.type==='survive'?time/level.objective.target:level.objective.type==='collect'?collected/level.objective.target:ended&&result.won?1:0;
+      const goal=level.objective.type==='clear'?kills/(totalEnemies+extra):level.objective.type==='survive'?time/level.objective.target:level.objective.type==='collect'?collected/level.objective.target:ended&&result.won?1:0;
       goalMeter.bar.value=clamp(goal,0,1);goalMeter.text.textContent=objective+' · '+Math.floor(clamp(goal,0,1)*100)+'%';
     }
     function setPause(value){if(ended)return;paused=value;keys.clear();target=null;pauseBtn.textContent=paused?'Resume':'Pause';last=0;draw();}
@@ -387,14 +495,27 @@ var GRChallengePlay = (function(){
       seconds=clamp(Number(seconds)||0,0,300);for(let n=0;n<Math.round(seconds*60);n++)step(1/60);draw();return snapshot();
     }
     function snapshot(){return {time,paused,ended,result:result&&Object.assign({},result),player:Object.assign({},p),wave,kills,coins:collected,heals,fx:fx.map(f=>Object.assign({},f)),pickups:pickups.map(o=>Object.assign({},o)),enemies:enemies.map(e=>Object.assign({},e)),shots:shots.map(s=>Object.assign({},s))};}
+    /* a controller: the left stick or the D-pad moves her, Start or B pauses, A retries once it is over */
+    function pollPad(){
+      let gp=null;try{const all=navigator.getGamepads?navigator.getGamepads():[];for(const g of all)if(g&&g.connected){gp=g;break;}}catch(e){}
+      if(!gp){pad.x=pad.y=0;return;}
+      const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),edge=i=>b(i)&&!pad.prev[i],dz=v=>Math.abs(v)<.22?0:v;
+      pad.x=dz(gp.axes[0]||0)||((b(15)?1:0)-(b(14)?1:0));pad.y=dz(gp.axes[1]||0)||((b(13)?1:0)-(b(12)?1:0));
+      if(edge(9)||edge(1))setPause(!paused);
+      if(ended&&edge(0))retryBtn.click();
+      pad.prev=gp.buttons.map(x=>!!x.pressed);
+    }
     function frame(now){
       if(!frameLive)return;
+      pollPad();
       if(last&&!paused&&!ended){carry+=Math.min((now-last)/1000,.1);while(carry>=1/60){step(1/60);carry-=1/60;}}
       last=now;draw();raf=requestAnimationFrame(frame);
     }
-    current={stop,snapshot,advance,destroy(){frameLive=false;cancelAnimationFrame(raf);document.removeEventListener('keydown',keydown,true);document.removeEventListener('keyup',keyup,true);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',visibility);dlg.close();dlg.remove();if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}};
+    /* what the music should do (js/addons/50c wraps Music.refresh with this) */
+    function mood(){return {theme:{savanna:'savanna',arctic:'frost',moon:'moon',forest:'jungle',desert:'savanna',swamp:'swamp',volcanic:'inferno'}[level.arena.theme]||'savanna',paused,ended,won:!!(result&&result.won),boss:enemies.some(e=>e.kind==='brute'||e.kind==='badger')};}
+    current={stop,snapshot,advance,mood,destroy(){frameLive=false;cancelAnimationFrame(raf);document.removeEventListener('keydown',keydown,true);document.removeEventListener('keyup',keyup,true);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',visibility);dlg.close();dlg.remove();if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}};
     dlg.showModal();canvas.focus();draw();raf=requestAnimationFrame(frame);return current;
   }
-  return {start,stop,paintArena,paintCustom,getPalette,getKit:id=>KITS[id]?Object.assign({},KITS[id]):null,getEnemy:id=>FOES[id]?Object.assign({},FOES[id]):null,snapshot:()=>current?current.snapshot():null,advance:s=>current?current.advance(s):null};
+  return {start,stop,paintArena,paintCustom,getPalette,getKit:id=>KITS[id]?Object.assign({},KITS[id]):null,getEnemy:id=>FOES[id]?Object.assign({},FOES[id]):null,snapshot:()=>current?current.snapshot():null,mood:()=>current?current.mood():null,advance:s=>current?current.advance(s):null};
 })();
 window.GRChallengePlay=GRChallengePlay;

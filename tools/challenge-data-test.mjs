@@ -79,10 +79,13 @@ check('near-limit code remains readable inside a longer share link', () => {
   const url='https://example.test/'+ 'x'.repeat(2000)+'#challenge='+encodeURIComponent(best);
   assert(url.length>24000 && url.length<28000);assert.equal(D.encode(D.decode(url)),best);
 });
+check('a walled-off entrance is caught while editing, not mid-playtest', () => {const l=D.defaults();l.objects=[0,1,2].map(i=>({kind:'wall',x:i*320,y:0,w:320,h:40}));assert.throws(()=>D.validate(l),/north entrance/);l.waves[0].enemies[0].kind='flyer';assert.doesNotThrow(()=>D.validate(l));l.waves[0].enemies[0].spawn='south';l.waves[0].enemies[0].kind='brute';assert.doesNotThrow(()=>D.validate(l));});
+check('the new enemy kinds are accepted', () => {const l=D.defaults();l.waves=[{delay:0,enemies:['flyer','charger','splitter','badger'].map(kind=>({kind,count:2,spawn:'east'}))}];assert.equal(D.validate(l).waves[0].enemies.length,4);const g=D.defaults();g.waves[0].enemies[0].kind='grub';assert.throws(()=>D.validate(g));});
 check('library saves without touching campaign key', () => {storage.set('giraffe_rampage_save_v1','untouched');D.saveDraft(D.defaults());assert.equal(D.listDrafts().length,1);assert.equal(storage.get('giraffe_rampage_save_v1'),'untouched');});
 check('identical draft replaces itself', () => {D.saveDraft(D.defaults());assert.equal(D.listDrafts().length,1);});
 check('library bounded without discarding old drafts', () => {for(let i=1;i<24;i++){const l=D.defaults();l.seed=i;D.saveDraft(l);}const l=D.defaults();l.seed=999;assert.throws(()=>D.saveDraft(l));assert.equal(D.listDrafts().length,24);});
 check('remove draft', () => {D.removeDraft(D.listDrafts()[0].id);assert.equal(D.listDrafts().length,23);});
+check('a draft kept under its own id is updated, not copied, after an edit', () => {storage.set(D.key,'[]');const id=D.newDraftId(),l=D.defaults();D.saveDraft(l,id);l.title='Renamed';D.saveDraft(l,id);const all=D.listDrafts();assert.equal(all.length,1);assert.equal(all[0].title,'Renamed');assert.equal(all[0].id,id);});
 check('corrupt library ignored', () => {storage.set(D.key,'not json');assert.equal(D.listDrafts().length,0);});
 check('invalid library entries discarded', () => {storage.set(D.key,JSON.stringify([{code:'oops'},null,{code:D.encode(D.defaults()),updated:1}]));assert.equal(D.listDrafts().length,1);});
 check('oversize library refused', () => {storage.set(D.key,' '.repeat(24000*24+1));assert.equal(D.listDrafts().length,0);});

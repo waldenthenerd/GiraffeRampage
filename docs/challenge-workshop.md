@@ -2,7 +2,24 @@
 
 Built by Codex on the branch `codex/challenge-builder`, and moved into the game as an **add-on** (id `challenges`): it is off until a player switches it on in **Add-ons**, and then the main menu has a **Challenge Workshop** button and the Guide a topic about it. The code is `js/addons/50a-addon-challenge-data.js`, `50b-addon-challenge-play.js` and `50c-addon-challenge-ui.js` (its stylesheet is inside the last one and is added to the page only when the workshop first opens). Switching the add-on off closes the workshop and any playtest. Nothing is published by this feature; drafts stay in the browser.
 
-What changed in the move: the files and their tests moved to the paths above, the menu button, the action and the Guide topic only appear while the add-on is on, and `css/challenge.css` became part of the UI file. The prototype's screenshots are not carried over. The notes below are Codex's.
+What changed in the move: the files and their tests moved to the paths above, the menu button, the action and the Guide topic only appear while the add-on is on, and `css/challenge.css` became part of the UI file. The prototype's screenshots are not carried over.
+
+## Improvements since the move
+
+1. Walkers find their way round walls (a flow field from the giraffe's square), and creatures keep apart instead of stacking on one spot.
+2. A walled-off entrance is caught by the recipe check, not mid-playtest; heals show whole numbers.
+3. A draft keeps its own id: Save draft updates the open draft, Save as copy makes a new one.
+4. A challenge link with the add-on off offers to switch it on (once per visit); with it on, the workshop opens on the level. Nothing plays by itself.
+5. The arena draws creatures from the game and her own top-down giraffe in her coat, hat and boots; the arena's simple drawings remain as a fallback.
+6. Four more enemy kinds: flyer (vulture, crosses walls), charger (warthog, dashes along a line it shows first), splitter (termite, bursts into three grubs) and badger (honey badger, heals when left alone).
+7. The game's sounds, and music: the biome's song during a playtest, harder with a brute or badger out, then the win or loss tune.
+8. A controller in the arena (stick or D-pad, Start or B pauses, A retries) and in the workshop (D-pad between controls, left and right change lists and numbers, A press, B close, LB and RB change tab, a cursor on the arena).
+9. Drag to move and drag the corner to resize with the Select tool; arrows and Enter on the focused arena place things at a cursor.
+10. Tabs (Recipe, Arena, Designs, Waves, Play & share); on a computer the arena sits beside its tools.
+11. The arena's ground is drawn once and reused (about 3.4 ms down to 0.24 ms a frame).
+12. Short screens (a phone held sideways) get a taller arena in a playtest.
+
+The notes below are Codex's.
 
 1. Main-menu workshop and an always-available Guide topic.
 2. Recipe editor: title, creator, opening message and reproducible seed.

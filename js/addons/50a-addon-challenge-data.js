@@ -10,6 +10,10 @@ addonRegister({ id: 'challenges', name: 'Challenge Workshop', tag: 'extra',
 // Challenge recipes are separate from campaign saves. Never execute imported data.
 var GRChallengeData = (function () {
   const KEY = 'giraffe_rampage_challenges_v1', MAX_CODE = 24000;
+  /* the enemy kinds a recipe may use, with each one's body radius (the arena, 50b, uses the same radii; a unit test checks they agree).
+     Flyers cross walls, so a blocked edge does not stop them. */
+  const KINDS = ['chaser', 'runner', 'brute', 'spitter', 'flyer', 'charger', 'splitter', 'badger'];
+  const KIND_R = { chaser: 15, runner: 11, brute: 23, spitter: 14, flyer: 13, charger: 19, splitter: 17, badger: 15 };
   const fail = message => { throw new Error(message); };
   const obj = (value, name) => value && typeof value === 'object' && !Array.isArray(value) ? value : fail(name + ' must be an object.');
   const num = (value, min, max, name, integer) => typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max && (!integer || Number.isInteger(value)) ? value : fail(name + ' must be ' + min + '–' + max + (integer ? ' (whole number).' : '.'));
@@ -69,7 +73,7 @@ var GRChallengeData = (function () {
       level.waves.push({ delay: num(wave.delay, 0, 30, 'Wave delay'), enemies: wave.enemies.map(group => {
         obj(group, 'Enemy group');
         const count = num(group.count, 1, 30, 'Enemy count', true); total += count;
-        return { kind: one(group.kind, ['chaser', 'runner', 'brute', 'spitter'], 'enemy'), count, spawn: one(group.spawn, ['north', 'east', 'south', 'west'], 'spawn direction') };
+        return { kind: one(group.kind, KINDS, 'enemy'), count, spawn: one(group.spawn, ['north', 'east', 'south', 'west'], 'spawn direction') };
       }) });
     }
     if (total > 240) fail('Use at most 240 enemies across the level.');
@@ -88,7 +92,23 @@ var GRChallengeData = (function () {
       if (level.objects.some(w => isSolid(level, w) && p.x < w.x + w.w && p.x + p.w > w.x && p.y < w.y + w.h && p.y + p.h > w.y)) fail('Pickups and exits cannot overlap a solid object.');
     }
     checkReachable(level);
+    checkSpawns(level);
     return level;
+  }
+  /* every entrance a wave uses must have room along its edge for that enemy, or the wave could not arrive (the arena tries the same spots) */
+  function checkSpawns(level) {
+    const walls = level.objects.filter(p => isSolid(level, p)), seen = {};
+    for (const wave of level.waves) for (const g of wave.enemies) {
+      const r = KIND_R[g.kind], key = g.spawn + r;
+      if (g.kind === 'flyer' || seen[key]) continue;
+      seen[key] = 1;
+      let room = false;
+      for (let i = 0; i <= 45 && !room; i++) {
+        const z = .05 + i * .02, x = g.spawn === 'west' ? r + 4 : g.spawn === 'east' ? 956 - r : 960 * z, y = g.spawn === 'north' ? r + 4 : g.spawn === 'south' ? 636 - r : 640 * z;
+        room = !walls.some(w => { const dx = x - Math.max(w.x, Math.min(x, w.x + w.w)), dy = y - Math.max(w.y, Math.min(y, w.y + w.h)); return dx * dx + dy * dy < r * r; });
+      }
+      if (!room) fail('The ' + g.spawn + ' entrance is walled off for the ' + g.kind + '. Leave a gap along that edge.');
+    }
   }
   function isSolid(level, item) { return item.kind === 'wall' || (item.kind === 'custom' && !!(level.customAssets || []).find(asset => asset.id === item.asset && asset.solid)); }
   // A small, conservative navigation grid includes player clearance. This catches
@@ -164,12 +184,16 @@ var GRChallengeData = (function () {
     try { const text = localStorage.getItem(KEY); if (!text || text.length > MAX_CODE * 24) return []; data = JSON.parse(text); } catch (_) { return []; }
     if (!Array.isArray(data)) return [];
     return data.slice(0, 24).flatMap(entry => {
-      try { obj(entry, 'Draft'); const level = decode(entry.code); return [{ id: fingerprint(level), title: level.title, updated: Number.isFinite(entry.updated) ? entry.updated : 0, code: encode(level) }]; }
+      try { obj(entry, 'Draft'); const level = decode(entry.code); return [{ id: draftId(entry.id) || fingerprint(level), title: level.title, updated: Number.isFinite(entry.updated) ? entry.updated : 0, code: encode(level) }]; }
       catch (_) { return []; }
     });
   }
-  function saveDraft(level) {
-    const clean = validate(level), id = fingerprint(clean), drafts = listDrafts(), entry = { id, title: clean.title, updated: Date.now(), code: encode(clean) };
+  /* a draft's own name on the shelf: the workshop keeps one for the recipe it has open, so saving it again after an edit replaces that draft instead of adding a copy.
+     Without one (older shelves, or a plain save) the id is the recipe's fingerprint, so an identical recipe still replaces itself. */
+  function draftId(id) { return typeof id === 'string' && /^d[a-z0-9]{6,20}$/.test(id) ? id : null; }
+  function newDraftId() { return 'd' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36); }
+  function saveDraft(level, keepId) {
+    const clean = validate(level), id = draftId(keepId) || fingerprint(clean), drafts = listDrafts(), entry = { id, title: clean.title, updated: Date.now(), code: encode(clean) };
     const existing = drafts.findIndex(d => d.id === id); if (existing !== -1) drafts.splice(existing, 1);
     if (drafts.length >= 24) fail('The challenge shelf is full. Remove a draft before saving another.');
     drafts.unshift(entry);
@@ -224,6 +248,6 @@ var GRChallengeData = (function () {
     l.waves = [{delay:0,enemies:[{kind:'chaser',count:5,spawn:'west'}]},{delay:2,enemies:[{kind:'runner',count:3,spawn:'south'},{kind:'spitter',count:2,spawn:'north'}]}];
     l.objects = [{kind:'custom',asset:'signal',x:120,y:100,w:100,h:140},{kind:'custom',asset:'signal',x:760,y:420,w:100,h:140},{kind:'rock',x:680,y:140,w:100,h:70},{kind:'wall',x:260,y:420,w:160,h:32},{kind:'heal',x:680,y:480,w:32,h:32}];
   });
-  return { key: KEY, defaults, validate, encode, decode, fingerprint, seeded, templates, isSolid, saveDraft, listDrafts, removeDraft };
+  return { key: KEY, kinds: KINDS.slice(), kindR: Object.assign({}, KIND_R), defaults, validate, encode, decode, fingerprint, seeded, templates, isSolid, saveDraft, listDrafts, removeDraft, newDraftId };
 }());
 window.GRChallengeData = GRChallengeData;

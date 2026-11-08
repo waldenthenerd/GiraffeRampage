@@ -3,16 +3,20 @@
    maker, wave director, playtest and sharing), its stylesheet (put in the page the first time it opens, so with the add-on off nothing of it is
    there), and the add-on's way in: a main-menu button, the "challenge-open" action and a Guide topic, each only while the add-on is on.
    Challenge Workshop is separate from the campaign, its saves and its progression. */
-const CB_CSS = "/* Workshop layout; colours, typography and buttons belong to the original game. */\n.cb-dialog{box-sizing:border-box;width:min(1180px,96vw);max-width:1180px;max-height:94dvh;margin:auto;padding:24px;border:1px solid var(--bark2);border-top:3px solid var(--hide);border-radius:6px;background:var(--night);color:var(--bone);font:inherit;line-height:1.5;overflow:auto;touch-action:pan-y;box-shadow:0 16px 70px #0009}\n.cb-dialog::backdrop{background:rgba(12,9,8,.86)}\n.cb-dialog *{box-sizing:border-box}\n.cb-dialog h1.display{font-size:34px;line-height:1.02;margin:4px 0;color:var(--sun)}\n.cb-dialog h2.display{font-size:23px;line-height:1.08;margin:0 0 16px;color:var(--bone)}\n.cb-dialog h3{margin:0;font-size:16px;color:var(--sun)}\n.cb-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--bark2);padding-bottom:16px}\n.cb-eyebrow{font-size:10px;letter-spacing:.12em;color:var(--hide);font-weight:700}\n.cb-intro{max-width:800px;color:var(--dust);font-size:14px}\n.cb-dialog p{margin:10px 0}\n.cb-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}\n.cb-card.slab{border-radius:6px;padding:18px;margin-bottom:16px}\n.cb-columns .cb-card{min-width:0}\n.cb-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}\n.cb-dialog label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--bone);min-width:0}\n.cb-wide{grid-column:1/-1}\n.cb-dialog input,.cb-dialog select,.cb-dialog textarea{font:inherit;font-size:14px;line-height:1.4;width:100%;min-height:42px;padding:8px 10px;border:1px solid var(--bark2);border-radius:3px;color:var(--bone);background:var(--night);user-select:text}\n.cb-dialog textarea{resize:vertical}\n.cb-dialog input:focus-visible,.cb-dialog select:focus-visible,.cb-dialog textarea:focus-visible,.cb-dialog canvas:focus-visible{outline:2px solid var(--bone);outline-offset:2px;border-color:var(--hide)}\n.cb-dialog input[type=checkbox]{min-height:22px;width:22px;accent-color:var(--hide)}\n.cb-dialog input[type=color]{padding:3px;cursor:pointer}\n.cb-dialog .cb-check{flex-direction:row;align-items:center;gap:9px}\n.cb-dialog .btn{width:auto;min-height:42px;white-space:normal}\n.cb-dialog .cb-primary{font-size:16px}\n.cb-dialog .btn[aria-pressed=true]{background:var(--bark2);border-color:var(--hide);color:var(--sun)}\n.cb-toolbar,.cb-tools,.cb-wave-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}\n.cb-toolbar{margin:12px 0}\n.cb-template{flex:1;min-width:150px;max-width:260px}\n.cb-help{font-size:12px;color:var(--dust)}\n.cb-summary{font-size:12px;padding:9px 12px;border:1px solid var(--bark2);border-left:3px solid var(--hide);background:var(--soil);color:var(--dust)}\n.cb-tools{margin-bottom:12px}\n.cb-dialog canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;border:2px solid var(--bark2);border-radius:3px;touch-action:none}\n.cb-coords{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin-top:10px}.cb-coords label{width:80px;flex:1;min-width:62px}\n.cb-wave{padding:14px;border:1px solid var(--bark2);background:var(--night);border-radius:4px;margin:12px 0}\n.cb-wave-head{margin-bottom:12px}.cb-wave-head h3{flex:1}.cb-wave>label{max-width:150px}\n.cb-group{display:grid;grid-template-columns:1fr 80px 1fr auto;align-items:end;gap:10px;margin:12px 0}.cb-group .btn{max-width:100px}\n.cb-draft{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--bark2)}.cb-draft span{flex:1;overflow-wrap:anywhere}\n.cb-object-list{display:flex;flex-wrap:wrap;gap:6px;max-height:140px;overflow:auto}\n.cb-object-list span{font-size:12px;display:flex;gap:4px;align-items:center;border:1px solid var(--bark2);border-radius:3px;padding:4px;color:var(--dust)}\n.cb-object-list .btn{min-height:32px;padding:4px;font-size:11px}\n.cb-selected{border-color:var(--hide)!important;background:var(--bark)}\n.cb-dialog details{border-top:1px solid var(--bark2);padding-top:10px;margin:8px 0}\n.cb-dialog summary{cursor:pointer;color:var(--sun);font-size:13px;padding:4px 0;min-height:32px}\n.cb-dialog summary:focus-visible{outline:2px solid var(--bone);outline-offset:2px}\n.cb-dialog details>.cb-fields{margin-top:10px}\n.cb-roster{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:12px;color:var(--dust)}\n.cb-roster b{color:var(--bone)}\n.cb-dialog #cbMakerCanvas{width:240px;max-width:100%;height:auto;aspect-ratio:4/3;margin:10px auto;border-color:var(--hide)}\n.cb-part{padding:12px;border:1px solid var(--bark2);border-radius:4px;margin:10px 0;background:var(--night)}\n.cb-part .cb-fields{grid-template-columns:1fr 1fr}.cb-part .cb-wave-head b{flex:1;color:var(--sun);font-size:13px}\n.cb-maker-top{display:grid;grid-template-columns:240px minmax(0,1fr);align-items:center;gap:20px}\n.cb-parts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}\n#cbNotice:not(:empty){padding:12px;border:1px solid var(--hide);background:var(--bark);border-radius:4px;margin:12px 0;color:var(--bone);overflow-wrap:anywhere}\n#cbNotice.cb-error{border-color:var(--blood);background:var(--soil);color:var(--bone)}\n#cbProof{color:var(--sun)}#cbCode{overflow-wrap:anywhere;font:13px/1.5 ui-monospace,monospace}\n#cbValidation{padding:8px 12px;border-left:3px solid var(--hide);font-size:12px;color:var(--dust);background:var(--soil)}\n#cbValidation.cb-error{border-color:var(--blood);color:var(--bone)}\n.cb-swatches{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}\n.cb-swatches span{display:flex;gap:5px;align-items:center;font-size:11px;color:var(--dust)}\n.cb-swatches i{display:inline-block;width:22px;height:22px;border:1px solid var(--dust);border-radius:3px}\n@media(max-width:700px){\n  .cb-dialog{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;padding:16px}\n  .cb-dialog h1.display{font-size:27px}.cb-dialog h2.display{font-size:22px}\n  .cb-columns{grid-template-columns:1fr;gap:0}.cb-card.slab{padding:14px}.cb-fields{gap:10px}\n  .cb-maker-top,.cb-parts-grid{grid-template-columns:1fr}.cb-maker-top{gap:8px}\n  .cb-dialog .btn{min-height:44px}.cb-group{grid-template-columns:1fr 70px;gap:8px}.cb-group .btn{max-width:none}\n  .cb-wave-head{gap:6px}.cb-wave-head h3{flex-basis:100%}.cb-toolbar>.btn{flex-grow:1}\n  .cb-toolbar .cb-template{max-width:none;flex-basis:100%}.cb-coords{flex-wrap:wrap}\n  .cb-object-list .btn{min-height:44px}.cb-dialog input,.cb-dialog select,.cb-dialog textarea{font-size:16px;min-height:44px}\n  .cb-eyebrow{font-size:10px;letter-spacing:.08em}.cb-head>.btn{flex:none}\n}\n";
+const CB_CSS = "@media(max-height:520px){#challengePlay{padding:8px 12px!important}#challengePlay h2{font-size:18px;margin:0 0 2px}#challengePlay>p{display:none}#challengePlay>section{margin:2px 0 4px!important}#challengePlay canvas{max-height:calc(100dvh - 128px)!important}#challengePlay>div button{min-height:36px!important}}.cb-status{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.cb-status>p{flex:1 1 280px;margin:0!important}.cb-dialog[data-tab]:not([data-tab=recipe]) .cb-intro,.cb-dialog[data-tab]:not([data-tab=recipe]) .cb-eyebrow{display:none}@media(min-width:960px){.cb-dialog[data-tab=arena] .cb-card[data-tab=arena]{display:grid!important;grid-template-columns:minmax(0,1fr) 300px;column-gap:18px;align-items:start}.cb-dialog[data-tab=arena] .cb-card[data-tab=arena]>*{grid-column:2}.cb-dialog[data-tab=arena] .cb-card[data-tab=arena]>#cbCanvas{grid-column:1;grid-row:1/span 30;max-height:calc(94dvh - 290px)}.cb-dialog[data-tab=arena] .cb-card[data-tab=arena] .cb-coords{grid-template-columns:1fr 1fr}}.cb-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}.cb-tabs .btn{margin:0}.cb-dialog[data-tab] .cb-columns{display:block}.cb-dialog[data-tab] .cb-card[data-tab]{display:none}.cb-dialog[data-tab=recipe] .cb-card[data-tab=recipe],.cb-dialog[data-tab=arena] .cb-card[data-tab=arena],.cb-dialog[data-tab=designs] .cb-card[data-tab=designs],.cb-dialog[data-tab=waves] .cb-card[data-tab=waves],.cb-dialog[data-tab=share] .cb-card[data-tab=share]{display:block}.cb-dialog[data-tab=arena] #cbCanvas{max-height:58vh;width:auto;max-width:100%;display:block;margin:0 auto}\n/* Workshop layout; colours, typography and buttons belong to the original game. */\n.cb-dialog{box-sizing:border-box;width:min(1180px,96vw);max-width:1180px;max-height:94dvh;margin:auto;padding:24px;border:1px solid var(--bark2);border-top:3px solid var(--hide);border-radius:6px;background:var(--night);color:var(--bone);font:inherit;line-height:1.5;overflow:auto;touch-action:pan-y;box-shadow:0 16px 70px #0009}\n.cb-dialog::backdrop{background:rgba(12,9,8,.86)}\n.cb-dialog *{box-sizing:border-box}\n.cb-dialog h1.display{font-size:34px;line-height:1.02;margin:4px 0;color:var(--sun)}\n.cb-dialog h2.display{font-size:23px;line-height:1.08;margin:0 0 16px;color:var(--bone)}\n.cb-dialog h3{margin:0;font-size:16px;color:var(--sun)}\n.cb-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--bark2);padding-bottom:16px}\n.cb-eyebrow{font-size:10px;letter-spacing:.12em;color:var(--hide);font-weight:700}\n.cb-intro{max-width:800px;color:var(--dust);font-size:14px}\n.cb-dialog p{margin:10px 0}\n.cb-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}\n.cb-card.slab{border-radius:6px;padding:18px;margin-bottom:16px}\n.cb-columns .cb-card{min-width:0}\n.cb-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}\n.cb-dialog label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--bone);min-width:0}\n.cb-wide{grid-column:1/-1}\n.cb-dialog input,.cb-dialog select,.cb-dialog textarea{font:inherit;font-size:14px;line-height:1.4;width:100%;min-height:42px;padding:8px 10px;border:1px solid var(--bark2);border-radius:3px;color:var(--bone);background:var(--night);user-select:text}\n.cb-dialog textarea{resize:vertical}\n.cb-dialog input:focus-visible,.cb-dialog select:focus-visible,.cb-dialog textarea:focus-visible,.cb-dialog canvas:focus-visible{outline:2px solid var(--bone);outline-offset:2px;border-color:var(--hide)}\n.cb-dialog input[type=checkbox]{min-height:22px;width:22px;accent-color:var(--hide)}\n.cb-dialog input[type=color]{padding:3px;cursor:pointer}\n.cb-dialog .cb-check{flex-direction:row;align-items:center;gap:9px}\n.cb-dialog .btn{width:auto;min-height:42px;white-space:normal}\n.cb-dialog .cb-primary{font-size:16px}\n.cb-dialog .btn[aria-pressed=true]{background:var(--bark2);border-color:var(--hide);color:var(--sun)}\n.cb-toolbar,.cb-tools,.cb-wave-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}\n.cb-toolbar{margin:12px 0}\n.cb-template{flex:1;min-width:150px;max-width:260px}\n.cb-help{font-size:12px;color:var(--dust)}\n.cb-summary{font-size:12px;padding:9px 12px;border:1px solid var(--bark2);border-left:3px solid var(--hide);background:var(--soil);color:var(--dust)}\n.cb-tools{margin-bottom:12px}\n.cb-dialog canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;border:2px solid var(--bark2);border-radius:3px;touch-action:none}\n.cb-coords{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin-top:10px}.cb-coords label{width:80px;flex:1;min-width:62px}\n.cb-wave{padding:14px;border:1px solid var(--bark2);background:var(--night);border-radius:4px;margin:12px 0}\n.cb-wave-head{margin-bottom:12px}.cb-wave-head h3{flex:1}.cb-wave>label{max-width:150px}\n.cb-group{display:grid;grid-template-columns:1fr 80px 1fr auto;align-items:end;gap:10px;margin:12px 0}.cb-group .btn{max-width:100px}\n.cb-draft{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--bark2)}.cb-draft span{flex:1;overflow-wrap:anywhere}\n.cb-object-list{display:flex;flex-wrap:wrap;gap:6px;max-height:140px;overflow:auto}\n.cb-object-list span{font-size:12px;display:flex;gap:4px;align-items:center;border:1px solid var(--bark2);border-radius:3px;padding:4px;color:var(--dust)}\n.cb-object-list .btn{min-height:32px;padding:4px;font-size:11px}\n.cb-selected{border-color:var(--hide)!important;background:var(--bark)}\n.cb-dialog details{border-top:1px solid var(--bark2);padding-top:10px;margin:8px 0}\n.cb-dialog summary{cursor:pointer;color:var(--sun);font-size:13px;padding:4px 0;min-height:32px}\n.cb-dialog summary:focus-visible{outline:2px solid var(--bone);outline-offset:2px}\n.cb-dialog details>.cb-fields{margin-top:10px}\n.cb-roster{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:12px;color:var(--dust)}\n.cb-roster b{color:var(--bone)}\n.cb-dialog #cbMakerCanvas{width:240px;max-width:100%;height:auto;aspect-ratio:4/3;margin:10px auto;border-color:var(--hide)}\n.cb-part{padding:12px;border:1px solid var(--bark2);border-radius:4px;margin:10px 0;background:var(--night)}\n.cb-part .cb-fields{grid-template-columns:1fr 1fr}.cb-part .cb-wave-head b{flex:1;color:var(--sun);font-size:13px}\n.cb-maker-top{display:grid;grid-template-columns:240px minmax(0,1fr);align-items:center;gap:20px}\n.cb-parts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}\n#cbNotice:not(:empty){padding:12px;border:1px solid var(--hide);background:var(--bark);border-radius:4px;margin:12px 0;color:var(--bone);overflow-wrap:anywhere}\n#cbNotice.cb-error{border-color:var(--blood);background:var(--soil);color:var(--bone)}\n#cbProof{color:var(--sun)}#cbCode{overflow-wrap:anywhere;font:13px/1.5 ui-monospace,monospace}\n#cbValidation{padding:8px 12px;border-left:3px solid var(--hide);font-size:12px;color:var(--dust);background:var(--soil)}\n#cbValidation.cb-error{border-color:var(--blood);color:var(--bone)}\n.cb-swatches{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}\n.cb-swatches span{display:flex;gap:5px;align-items:center;font-size:11px;color:var(--dust)}\n.cb-swatches i{display:inline-block;width:22px;height:22px;border:1px solid var(--dust);border-radius:3px}\n@media(max-width:700px){\n  .cb-dialog{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;padding:16px}\n  .cb-dialog h1.display{font-size:27px}.cb-dialog h2.display{font-size:22px}\n  .cb-columns{grid-template-columns:1fr;gap:0}.cb-card.slab{padding:14px}.cb-fields{gap:10px}\n  .cb-maker-top,.cb-parts-grid{grid-template-columns:1fr}.cb-maker-top{gap:8px}\n  .cb-dialog .btn{min-height:44px}.cb-group{grid-template-columns:1fr 70px;gap:8px}.cb-group .btn{max-width:none}\n  .cb-wave-head{gap:6px}.cb-wave-head h3{flex-basis:100%}.cb-toolbar>.btn{flex-grow:1}\n  .cb-toolbar .cb-template{max-width:none;flex-basis:100%}.cb-coords{flex-wrap:wrap}\n  .cb-object-list .btn{min-height:44px}.cb-dialog input,.cb-dialog select,.cb-dialog textarea{font-size:16px;min-height:44px}\n  .cb-eyebrow{font-size:10px;letter-spacing:.08em}.cb-head>.btn{flex:none}\n}\n";
 function cbStyle(){ if (document.getElementById('cbStyle')) return; const s = document.createElement('style'); s.id = 'cbStyle'; s.textContent = CB_CSS; document.head.appendChild(s); }
 var GRChallengeUI = (function(){
   let level, dialog, tool='wall', undo=[], redo=[], proof='', oldFocus, lastResult=null;
   let grid=true,checker=true,selected=-1,px=160,py=160,pw=40,ph=40,maker=0;
+  let tab='recipe',draftId=null,drag=null,cursor={x:480,y:320},padLoop=0,padPrev=[],padRep=0,padDir=false;
+  const TABS=[['recipe','1. Recipe'],['arena','2. Arena'],['designs','Designs'],['waves','3. Waves'],['share','4. Play & share']];
   const D=()=>window.GRChallengeData;
   const clone=x=>JSON.parse(JSON.stringify(x));
   const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const options=(values,current)=>values.map(v=>'<option value="'+esc(v)+'"'+(v===current?' selected':'')+'>'+esc(v)+'</option>').join('');
   const button=(action,text,extra='')=>'<button type="button" data-cb="'+action+'" '+(extra.includes('class="')?extra.replace('class="','class="btn sm '):'class="btn ghost sm" '+extra)+'>'+text+'</button>';
+  const ROLES={chaser:'A hyena. Steady pursuer that finds its way round walls; herds the player toward hazards.',runner:'A cheetah. Fast and fragile; use another entrance for a flank.',brute:'A rhino. Slow and durable; leave room to circle.',spitter:'A baboon. Keeps its distance and throws; walls provide cover.',
+    flyer:'A vulture. Flies straight over walls and hazards, and can be hit over a wall too.',charger:'A warthog. Stops, stamps, then dashes along a line it shows you first; sidestep it.',splitter:'A termite. Bursts into three fast grubs when beaten.',badger:'A honey badger. Tough, and heals itself if left alone for two seconds.'};
   function remember(){undo.push(clone(level));if(undo.length>60)undo.shift();redo=[];proof='';lastResult=null;}
   function note(text,bad=false){const n=dialog.querySelector('#cbNotice');n.textContent=text;n.classList.toggle('cb-error',bad);}
   function validate(){return D().validate(level);}
@@ -37,7 +41,7 @@ var GRChallengeUI = (function(){
     level.waves.forEach((w,i)=>{const n=dialog.querySelector('#cbWaveSummary'+i);if(n)n.textContent=waveDescription(w);});
     drawSwatches();
     const roster=dialog.querySelector('.cb-roster');
-    if(roster&&window.GRChallengePlay.getEnemy){roster.replaceChildren();Object.entries({chaser:'Steady pursuer; herds the player toward hazards.',runner:'Fast and fragile; use another entrance for a flank.',brute:'Slow and durable; leave room to circle.',spitter:'Keeps its distance and shoots; walls provide cover.'}).forEach(([kind,role])=>{const e=window.GRChallengePlay.getEnemy(kind),p=document.createElement('p');p.textContent=kind+' · '+Math.round(e.hp*level.modifiers.enemyHp)+' HP · '+Math.round(e.speed*level.modifiers.speed)+' speed · '+e.damage+' damage per hit. '+role;roster.append(p);});}
+    if(roster&&window.GRChallengePlay.getEnemy){roster.replaceChildren();Object.entries(ROLES).forEach(([kind,role])=>{const e=window.GRChallengePlay.getEnemy(kind),p=document.createElement('p');p.textContent=kind+' · '+Math.round(e.hp*level.modifiers.enemyHp)+' HP · '+Math.round(e.speed*level.modifiers.speed)+' speed · '+e.damage+' damage per hit. '+role;roster.append(p);});}
     const verified=valid&&proof===D().fingerprint(level);
     dialog.querySelector('#cbProof').textContent=verified?'Cleared locally — this exact recipe is ready to share.':'Play and clear this exact recipe to unlock sharing. Changes reset the local clear.';
     dialog.querySelectorAll('[data-cb="copy"],[data-cb="link"]').forEach(b=>b.disabled=!verified);
@@ -52,7 +56,7 @@ var GRChallengeUI = (function(){
     Object.entries(colors).forEach(([name,color])=>{const sw=document.createElement('span'),chip=document.createElement('i');chip.style.backgroundColor=color;sw.append(chip,document.createTextNode(name+' '+color));host.append(sw);});
   }
   function budget(){
-    const weights={chaser:1,runner:1.2,brute:3.5,spitter:1.5};
+    const weights={chaser:1,runner:1.2,brute:3.5,spitter:1.5,flyer:1.3,charger:2.6,splitter:2.4,badger:3};
     const n=level.waves.reduce((a,w)=>a+w.enemies.reduce((b,g)=>b+g.count*weights[g.kind],0),0)*level.modifiers.enemyHp*level.modifiers.speed;
     return 'Enemy budget: '+Math.round(n)+' weighted points ('+(n<25?'light':n<80?'mixed':'heavy')+'). Rough composition estimate only—not a difficulty rating. Walls, timing and your kit can change the challenge.';
   }
@@ -79,8 +83,8 @@ var GRChallengeUI = (function(){
     dialog.innerHTML='<header class="cb-head"><div><span class="cb-eyebrow">CREATE · CLEAR · SHARE</span><h1 id="cbTitle">Challenge Workshop</h1></div>'+button('close','Close','aria-label="Close challenge workshop"')+'</header>'+
       '<p class="cb-intro">Build a little rampage. Give it a twist. Dare a friend to beat it. This prototype uses its own arena and fixed kits; campaign gear, progress and rewards stay untouched.</p>'+
       '<div id="cbNotice" role="status" aria-live="polite"></div>'+
-      '<nav class="cb-toolbar" aria-label="Workshop actions">'+button('new','New level')+'<label class="cb-template">Start from a recipe<select id="cbTemplates">'+D().templates.map((t,i)=>'<option value="'+i+'">'+esc(t.name)+'</option>').join('')+'</select></label>'+button('template','Use recipe')+button('save','Save draft')+button('undo','Undo')+button('redo','Redo')+'</nav>'+
-      '<p id="cbSummary" class="cb-summary"></p><p id="cbValidation" role="status" aria-live="polite"></p><div class="cb-columns"><section class="cb-card" aria-labelledby="cbRecipe"><h2 id="cbRecipe">1. Your recipe</h2><div class="cb-fields">'+
+      '<nav class="cb-toolbar" aria-label="Workshop actions">'+button('new','New level')+'<label class="cb-template">Start from a recipe<select id="cbTemplates">'+D().templates.map((t,i)=>'<option value="'+i+'">'+esc(t.name)+'</option>').join('')+'</select></label>'+button('template','Use recipe')+button('save','Save draft')+button('save-copy','Save as copy')+button('undo','Undo')+button('redo','Redo')+'</nav>'+
+      '<nav class="cb-tabs" role="tablist" aria-label="Workshop sections">'+TABS.map(t=>'<button type="button" role="tab" data-cb="tab-'+t[0]+'" class="btn sm'+(tab===t[0]?'':' ghost')+'" aria-selected="'+(tab===t[0])+'">'+t[1]+'</button>').join('')+'</nav>'+'<div class="cb-status"><p id="cbSummary" class="cb-summary"></p><p id="cbValidation" role="status" aria-live="polite"></p></div><div class="cb-columns"><section class="cb-card" aria-labelledby="cbRecipe"><h2 id="cbRecipe">1. Your recipe</h2><div class="cb-fields">'+
       field('Level name','title',level.title,'text','maxlength="60"')+field('Creator','author',level.author,'text','maxlength="32"')+
       '<label class="cb-wide">Opening message<textarea data-path="description" maxlength="280" rows="2">'+esc(level.description)+'</textarea></label>'+
       field('Seed','seed',level.seed,'number','min="0" max="4294967295" step="1"')+select('Arena','arena.theme',['savanna','arctic','moon','forest','desert','swamp','volcanic'],level.arena.theme)+
@@ -98,16 +102,15 @@ var GRChallengeUI = (function(){
       '<div class="cb-coords"><label>X<input id="cbX" data-editor="x" type="number" value="'+px+'" min="0" max="920" step="40"></label><label>Y<input id="cbY" data-editor="y" type="number" value="'+py+'" min="0" max="600" step="40"></label><label>Width<input id="cbWidth" data-editor="w" type="number" value="'+pw+'" min="40" max="320" step="40"></label><label>Height<input id="cbHeight" data-editor="h" type="number" value="'+ph+'" min="40" max="320" step="40"></label></div><div class="cb-toolbar">'+button('place','Place at coordinates')+button('apply','Move / resize selected',selected<0?'disabled':'')+button('clone','Duplicate selected',selected<0?'disabled':'')+button('grid','Grid '+(grid?'on':'off'),'aria-pressed="'+grid+'"')+'</div>'+
       '<p id="cbObjectInfo" class="cb-help"></p><details><summary>Layout recipes (replace arena objects)</summary><div class="cb-toolbar">'+button('layout-courtyard','Courtyard')+button('layout-slalom','Slalom')+button('layout-fire','Ring of fire')+'</div></details>'+
       '<p class="cb-help">Tap to place on a 40-unit grid. Select an object to move, resize or duplicate it. Gold marker = player start. Trees, rocks and banners are decorative, not walls. Heal pickups restore 25% health. Keep entrances clear.</p><div class="cb-object-list">'+level.objects.map((o,i)=>'<span class="'+(selected===i?'cb-selected':'')+'">'+button('select-'+i,esc(objectLabel(o))+' ('+o.x+', '+o.y+')','aria-pressed="'+(selected===i)+'"')+button('object-'+i,'Remove','aria-label="Remove '+esc(objectLabel(o))+' at '+o.x+', '+o.y+'"')+'</span>').join('')+'</div></section></div><section class="cb-card" aria-label="Custom object designer">'+makerHTML()+'</section>'+
-      '<section class="cb-card" aria-labelledby="cbWaves"><h2 id="cbWaves">3. Direct the waves</h2><p id="cbBudget" class="cb-help"></p><p class="cb-help">Each delay is measured after the preceding wave is cleared. Maximum 12 waves, four groups each and 240 enemies total.</p><div class="cb-toolbar">Quick wave: '+button('preset-swarm','Swarm')+button('preset-ambush','Ambush')+button('preset-finale','Brute finale')+'</div><details><summary>Meet the enemies</summary><div class="cb-roster"><p><b>Chaser</b> · Steady pursuer; useful for herding the player toward a hazard.</p><p><b>Runner</b> · Fast and fragile; use a different entrance to create a flank.</p><p><b>Brute</b> · Slow, durable and hard-hitting; leave room to circle around.</p><p><b>Spitter</b> · Keeps its distance and shoots; walls provide cover.</p></div></details>'+level.waves.map(waveHTML).join('')+button('add-wave','Add wave',''+(level.waves.length>=12?'disabled':''))+'</section>'+
+      '<section class="cb-card" aria-labelledby="cbWaves"><h2 id="cbWaves">3. Direct the waves</h2><p id="cbBudget" class="cb-help"></p><p class="cb-help">Each delay is measured after the preceding wave is cleared. Maximum 12 waves, four groups each and 240 enemies total.</p><div class="cb-toolbar">Quick wave: '+button('preset-swarm','Swarm')+button('preset-ambush','Ambush')+button('preset-finale','Brute finale')+'</div><details><summary>Meet the enemies</summary><div class="cb-roster">'+Object.entries(ROLES).map(([k,r])=>'<p><b>'+k+'</b> · '+r+'</p>').join('')+'</div></details>'+level.waves.map(waveHTML).join('')+button('add-wave','Add wave',''+(level.waves.length>=12?'disabled':''))+'</section>'+
       '<section class="cb-card cb-launch"><h2>4. Clear it. Then share it.</h2><p id="cbProof"></p><p id="cbShareInfo" class="cb-help"></p><p class="cb-help">A local clear is a design check, not tamper-proof online verification. Imported codes never carry trusted completion claims. No campaign currency is awarded.</p><div class="cb-toolbar">'+button('play','Playtest level','class="cb-primary"')+button('copy','Get share code')+button('link','Get share link')+'</div><label>Share code or link<textarea id="cbCode" rows="3" maxlength="40000" spellcheck="false" placeholder="Paste a GRC1: code or challenge link to import. Exported codes also appear here if copying is unavailable."></textarea></label><div class="cb-toolbar">'+button('import','Import / remix')+button('hash','Read level from this page’s link')+'</div></section>'+
       '<section class="cb-card"><h2>Saved recipes</h2><p class="cb-help">Up to 24 drafts, stored only in this browser, separate from your campaign save. Export a cleared recipe for a portable backup. Drafts do not sync to the cloud.</p><div id="cbDrafts"></div></section>';
     dialog.querySelectorAll('h1,h2').forEach(h=>h.classList.add('display'));
-    dialog.querySelectorAll('.cb-card').forEach(s=>s.classList.add('slab'));
+    dialog.querySelectorAll('.cb-card').forEach((s,i)=>{s.classList.add('slab');s.dataset.tab=['recipe','arena','designs','waves','share','share'][i]||'share';});
+    dialog.dataset.tab=tab;if(tab==='designs'){const m=dialog.querySelector('#cbMaker');if(m)m.open=true;}
     dialog.querySelectorAll('details').forEach(d=>d.open=openDetails.includes(d.id||d.querySelector('summary')?.textContent));
     dialog.querySelector('#cbTemplates').value=chosen;
-    dialog.querySelector('#cbCanvas').addEventListener('pointerdown',e=>{
-      e.preventDefault();const r=e.currentTarget.getBoundingClientRect();try{place((e.clientX-r.left)*960/r.width,(e.clientY-r.top)*640/r.height);}catch(err){note(err.message,true);}
-    });
+    wireCanvas(dialog.querySelector('#cbCanvas'));
     draftList();updateSummary();paint();paintMaker();
   }
   function makerHTML(){
@@ -129,12 +132,14 @@ var GRChallengeUI = (function(){
   }
   function waveHTML(w,i){
     return '<div class="cb-wave"><div class="cb-wave-head"><h3>Wave '+(i+1)+'</h3>'+button('up-'+i,'↑','aria-label="Move wave '+(i+1)+' earlier" '+(!i?'disabled':''))+button('down-'+i,'↓','aria-label="Move wave '+(i+1)+' later" '+(i===level.waves.length-1?'disabled':''))+button('dup-'+i,'Duplicate',level.waves.length>=12?'disabled':'')+button('delwave-'+i,'Remove',level.waves.length<=1?'disabled':'')+'</div><p id="cbWaveSummary'+i+'" class="cb-help"></p>'+
-      field('Delay in seconds','waves.'+i+'.delay',w.delay,'number','min="0" max="30"')+w.enemies.map((g,j)=>'<div class="cb-group">'+select('Enemy','waves.'+i+'.enemies.'+j+'.kind',['chaser','runner','brute','spitter'],g.kind)+field('Count','waves.'+i+'.enemies.'+j+'.count',g.count,'number','min="1" max="30"')+select('Entrance','waves.'+i+'.enemies.'+j+'.spawn',['north','east','south','west'],g.spawn)+button('delgroup-'+i+'-'+j,'Remove group',w.enemies.length<=1?'disabled':'')+'</div>').join('')+button('group-'+i,'Add enemy group',w.enemies.length>=4?'disabled':'')+'</div>';
+      field('Delay in seconds','waves.'+i+'.delay',w.delay,'number','min="0" max="30"')+w.enemies.map((g,j)=>'<div class="cb-group">'+select('Enemy','waves.'+i+'.enemies.'+j+'.kind',D().kinds,g.kind)+field('Count','waves.'+i+'.enemies.'+j+'.count',g.count,'number','min="1" max="30"')+select('Entrance','waves.'+i+'.enemies.'+j+'.spawn',['north','east','south','west'],g.spawn)+button('delgroup-'+i+'-'+j,'Remove group',w.enemies.length<=1?'disabled':'')+'</div>').join('')+button('group-'+i,'Add enemy group',w.enemies.length>=4?'disabled':'')+'</div>';
   }
   function paint(){
     const canvas=dialog.querySelector('#cbCanvas');if(!canvas)return;const c=canvas.getContext('2d');
-    try{window.GRChallengePlay.paintArena(c,level,{grid:grid,time:0});}catch(e){note('Finish the current shape or colour edit to refresh the arena preview.',true);}
-    const object=level.objects[selected];if(object){c.strokeStyle='#EFE6D4';c.lineWidth=3;c.setLineDash([7,4]);c.strokeRect(object.x,object.y,object.w,object.h);c.setLineDash([]);}
+    try{window.GRChallengePlay.paintArena(c,level,{grid:grid,time:0,cache:true});}catch(e){note('Finish the current shape or colour edit to refresh the arena preview.',true);}
+    const object=level.objects[selected];if(object){c.strokeStyle='#EFE6D4';c.lineWidth=3;c.setLineDash([7,4]);c.strokeRect(object.x,object.y,object.w,object.h);c.setLineDash([]);
+      if(tool==='select'){c.fillStyle='#F2B33D';c.strokeStyle='#241B15';c.lineWidth=2;c.fillRect(object.x+object.w-12,object.y+object.h-12,14,14);c.strokeRect(object.x+object.w-12,object.y+object.h-12,14,14);}}
+    if(document.activeElement===canvas){c.strokeStyle='#F2B33D';c.lineWidth=3;c.strokeRect(cursor.x+2,cursor.y+2,Math.max(36,pw-4),Math.max(36,ph-4));}
     c.beginPath();c.arc(480,320,22,0,Math.PI*2);c.fillStyle='#F2B33D';c.fill();c.strokeStyle='#3A2B20';c.lineWidth=3;c.stroke();
     c.fillStyle='#7A4A21';[[470,314],[483,308],[485,323],[473,327]].forEach(p=>c.fillRect(p[0],p[1],5,5));
     c.fillStyle='#241B15';c.textAlign='center';c.font='bold 18px sans-serif';c.fillText('START',480,362);
@@ -163,6 +168,45 @@ var GRChallengeUI = (function(){
     }
     render();
   }
+  function canvasPoint(cv,e){const r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)*960/r.width,y:(e.clientY-r.top)*640/r.height};}
+  function hitObject(pt){for(let i=level.objects.length-1;i>=0;i--){const o=level.objects[i];if(pt.x>=o.x&&pt.x<o.x+o.w&&pt.y>=o.y&&pt.y<o.y+o.h)return i;}return -1;}
+  function nearCorner(o,pt){return o&&pt.x>o.x+o.w-18&&pt.x<o.x+o.w+6&&pt.y>o.y+o.h-18&&pt.y<o.y+o.h+6;}
+  function startClear(o){return !((D().isSolid(level,o)||o.kind==='hazard')&&o.x<504&&o.x+o.w>456&&o.y<344&&o.y+o.h>296);}
+  function wireCanvas(cv){
+    cv.addEventListener('pointerdown',e=>{
+      e.preventDefault();const pt=canvasPoint(cv,e);cursor={x:Math.floor(pt.x/40)*40,y:Math.floor(pt.y/40)*40};
+      if(tool==='select'){
+        const sel=level.objects[selected],i=nearCorner(sel,pt)?selected:hitObject(pt);
+        if(i>=0){const o=level.objects[i];let okBefore=true;try{D().validate(level);}catch(err){okBefore=false;}
+          drag={i,size:i===selected&&nearCorner(o,pt),dx:pt.x-o.x,dy:pt.y-o.y,orig:clone(o),pid:e.pointerId,moved:false,okBefore};selected=i;try{cv.setPointerCapture(e.pointerId);}catch(err){}paint();return;}
+      }
+      try{place(pt.x,pt.y);}catch(err){note(err.message,true);}
+    });
+    cv.addEventListener('pointermove',e=>{
+      const pt=canvasPoint(cv,e);
+      if(!drag||drag.pid!==e.pointerId){cv.style.cursor=tool==='select'?(nearCorner(level.objects[selected],pt)?'nwse-resize':hitObject(pt)>=0?'move':'default'):tool==='erase'?'not-allowed':'crosshair';return;}
+      const o=level.objects[drag.i];
+      if(drag.size){o.w=Math.max(40,Math.min(320,960-o.x,Math.round((pt.x-o.x)/40)*40));o.h=Math.max(40,Math.min(320,640-o.y,Math.round((pt.y-o.y)/40)*40));}
+      else{o.x=Math.max(0,Math.min(960-o.w,Math.round((pt.x-drag.dx)/40)*40));o.y=Math.max(0,Math.min(640-o.h,Math.round((pt.y-drag.dy)/40)*40));}
+      drag.moved=drag.moved||o.x!==drag.orig.x||o.y!==drag.orig.y||o.w!==drag.orig.w||o.h!==drag.orig.h;paint();
+    });
+    const drop=e=>{
+      if(!drag||drag.pid!==e.pointerId)return;const d=drag;drag=null;const o=level.objects[d.i];
+      if(!d.moved){selectObject(d.i);return;}
+      let why='';if(!startClear(o))why='Leave breathing room around the player start.';
+      else if(d.okBefore){try{D().validate(level);}catch(err){why=err.message;}}
+      const now=clone(o);Object.assign(o,d.orig);
+      if(why){note(why+' The object went back where it was.',true);paint();return;}
+      remember();Object.assign(level.objects[d.i],now);px=now.x;py=now.y;pw=now.w;ph=now.h;render();note((d.size?'Resized ':'Moved ')+objectLabel(now)+'. Undo puts it back.');
+    };
+    cv.addEventListener('pointerup',drop);cv.addEventListener('pointercancel',e=>{if(drag&&drag.pid===e.pointerId){Object.assign(level.objects[drag.i],drag.orig);drag=null;paint();}});
+    cv.addEventListener('keydown',e=>{
+      const k=e.key,mv={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[k];
+      if(mv){e.preventDefault();cursor.x=Math.max(0,Math.min(920,cursor.x+mv[0]*40));cursor.y=Math.max(0,Math.min(600,cursor.y+mv[1]*40));paint();}
+      else if(k==='Enter'||k===' '){e.preventDefault();try{place(cursor.x+1,cursor.y+1);}catch(err){note(err.message,true);}dialog.querySelector('#cbCanvas').focus();}
+    });
+    cv.addEventListener('focus',paint);cv.addEventListener('blur',paint);
+  }
   function selectObject(i){selected=i;const o=level.objects[i];px=o.x;py=o.y;pw=o.w;ph=o.h;if(o.kind==='custom')maker=level.customAssets.findIndex(a=>a.id===o.asset);render();}
   function layoutPreset(name){
     const shapes={courtyard:[[160,160,80,240],[720,160,80,240],[320,120,320,40],[320,480,320,40]],slalom:[[240,80,80,280],[560,280,80,280]],fire:[[240,160,160,40],[560,160,160,40],[240,440,160,40],[560,440,160,40]]};
@@ -180,10 +224,10 @@ var GRChallengeUI = (function(){
     let drafts;try{drafts=D().listDrafts();}catch(e){note(e.message,true);return;}
     if(!drafts.length){list.textContent='No saved recipes yet.';return;}
     drafts.forEach(d=>{const row=document.createElement('div');row.className='cb-draft';const title=document.createElement('span');title.textContent=d.title;row.append(title);
-      [['Open',()=>{try{setLevel(D().decode(d.code));note('Opened draft. Clear this recipe to enable sharing.');}catch(e){note(e.message,true);}}],['Delete',()=>{if(window.confirm('Delete this local draft?')){try{D().removeDraft(d.id);draftList();}catch(e){note(e.message,true);}}}]].forEach(([text,fn])=>{const b=document.createElement('button');b.type='button';b.className='btn ghost sm';b.textContent=text;b.onclick=fn;row.append(b);});list.append(row);});
+      [['Open',()=>{try{setLevel(D().decode(d.code));draftId=/^d[a-z0-9]{6,20}$/.test(d.id)?d.id:null;note('Opened draft. Saving updates it. Clear this recipe to enable sharing.');}catch(e){note(e.message,true);}}],['Delete',()=>{if(window.confirm('Delete this local draft?')){try{D().removeDraft(d.id);draftList();}catch(e){note(e.message,true);}}}]].forEach(([text,fn])=>{const b=document.createElement('button');b.type='button';b.className='btn ghost sm';b.textContent=text;b.onclick=fn;row.append(b);});list.append(row);});
   }
   function importCode(code){
-    const next=D().decode(code);setLevel(next);note('Imported “'+next.title+'” by '+(next.author||'an unnamed creator')+'. Edit it to remix; a new local clear is needed before sharing.');
+    const next=D().decode(code);setLevel(next);draftId=null;note('Imported “'+next.title+'” by '+(next.author||'an unnamed creator')+'. Edit it to remix; a new local clear is needed before sharing.');
   }
   async function share(link){
     const valid=validate();if(proof!==D().fingerprint(valid))throw Error('Clear this exact recipe before sharing.');
@@ -203,9 +247,11 @@ var GRChallengeUI = (function(){
   function action(a){
     try{
       if(a==='close'){close();return;}
-      if(a==='new'){if(window.confirm('Start a new level? Save a draft first if you want to keep this recipe.'))setLevel(D().defaults());return;}
-      if(a==='template'){setLevel(D().templates[Number(dialog.querySelector('#cbTemplates').value)].level);note('Recipe loaded. Make it your own.');return;}
-      if(a==='save'){D().saveDraft(validate());draftList();note('Draft saved in this browser.');return;}
+      if(a.startsWith('tab-')){showTab(a.slice(4));return;}
+      if(a==='new'){if(window.confirm('Start a new level? Save a draft first if you want to keep this recipe.')){setLevel(D().defaults());draftId=null;}return;}
+      if(a==='template'){setLevel(D().templates[Number(dialog.querySelector('#cbTemplates').value)].level);draftId=null;note('Recipe loaded. Make it your own.');return;}
+      if(a==='save'){const had=draftId;draftId=draftId||D().newDraftId();D().saveDraft(validate(),draftId);draftList();note(had?'Draft updated in this browser.':'Saved as a new draft in this browser.');return;}
+      if(a==='save-copy'){draftId=D().newDraftId();D().saveDraft(validate(),draftId);draftList();note('Saved as a new copy. Saving again now updates the copy.');return;}
       if(a==='undo'){if(undo.length){redo.push(clone(level));level=undo.pop();proof='';render();}return;}
       if(a==='redo'){if(redo.length){undo.push(clone(level));level=redo.pop();proof='';render();}return;}
       if(a==='play'){play();return;}
@@ -279,6 +325,40 @@ var GRChallengeUI = (function(){
       else return;render();
     }catch(e){note(e.message||'That recipe could not be loaded.',true);}
   }
+  function showTab(t){
+    if(!TABS.some(x=>x[0]===t))return;tab=t;dialog.dataset.tab=t;
+    dialog.querySelectorAll('[data-cb^="tab-"]').forEach(b=>{const on=b.dataset.cb==='tab-'+t;b.classList.toggle('ghost',!on);b.setAttribute('aria-selected',String(on));});
+    if(t==='designs'){const m=dialog.querySelector('#cbMaker');if(m)m.open=true;}
+    if(t==='arena')paint();
+  }
+  /* a controller in the workshop: the stick or D-pad moves between controls (or the cursor on the focused arena), left and right change a list or a number,
+     A presses (or places on the arena), B closes, LB and RB change tab */
+  function padTick(){
+    if(!dialog||!dialog.open){padLoop=0;return;}
+    padLoop=requestAnimationFrame(padTick);
+    if(document.getElementById('challengePlay'))return;
+    let gp=null;try{for(const g of (navigator.getGamepads?navigator.getGamepads():[]))if(g&&g.connected){gp=g;break;}}catch(e){}
+    if(!gp)return;
+    const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),edge=i=>b(i)&&!padPrev[i];
+    const ax=Math.abs(gp.axes[0]||0)>.5?Math.sign(gp.axes[0]):0,ay=Math.abs(gp.axes[1]||0)>.5?Math.sign(gp.axes[1]):0;
+    const mx=(b(15)?1:0)-(b(14)?1:0)||ax,my=!mx?((b(13)?1:0)-(b(12)?1:0)||ay):0,cur=document.activeElement;
+    if(mx||my){padRep-=1/60;if(!padDir||padRep<=0){padRep=padDir?.13:.38;padDir=true;padMove(cur,mx,my);}}else{padDir=false;padRep=0;}
+    if(edge(0)){if(cur&&cur.id==='cbCanvas'){try{place(cursor.x+1,cursor.y+1);}catch(e){note(e.message,true);}dialog.querySelector('#cbCanvas').focus();}else if(cur&&dialog.contains(cur)&&(cur.tagName==='BUTTON'||cur.tagName==='SUMMARY'||cur.type==='checkbox'))cur.click();else padMove(null,0,1);}
+    if(edge(1))close();
+    if(edge(4)||edge(5)){const i=TABS.findIndex(t=>t[0]===tab);showTab(TABS[(i+(edge(5)?1:TABS.length-1))%TABS.length][0]);}
+    padPrev=gp.buttons.map(x=>!!x.pressed);
+  }
+  function padMove(cur,mx,my){
+    if(cur&&cur.id==='cbCanvas'){cursor.x=Math.max(0,Math.min(920,cursor.x+mx*40));cursor.y=Math.max(0,Math.min(600,cursor.y+my*40));paint();return;}
+    if(cur&&mx&&cur.tagName==='SELECT'){cur.selectedIndex=Math.max(0,Math.min(cur.options.length-1,cur.selectedIndex+mx));cur.dispatchEvent(new Event('change',{bubbles:true}));return;}
+    if(cur&&mx&&cur.type==='number'){const st=Number(cur.step)||1,v=Number(cur.value)+mx*st,lo=cur.min===''?-1e9:Number(cur.min),hi=cur.max===''?1e9:Number(cur.max);cur.value=String(Math.round(Math.max(lo,Math.min(hi,v))*1000)/1000);cur.dispatchEvent(new Event('change',{bubbles:true}));return;}
+    const list=Array.from(dialog.querySelectorAll('button,input,select,textarea,summary,canvas[tabindex]')).filter(el=>!el.disabled&&el.getClientRects().length&&el.getBoundingClientRect().width>0);
+    if(!list.length)return;
+    if(!cur||!dialog.contains(cur)||list.indexOf(cur)<0){list[0].focus();return;}
+    const cr=cur.getBoundingClientRect(),cx=cr.left+cr.width/2,cy=cr.top+cr.height/2;let best=null,bs=1e9;
+    for(const el of list){if(el===cur)continue;const r=el.getBoundingClientRect(),ex=r.left+r.width/2-cx,ey=r.top+r.height/2-cy,along=ex*mx+ey*my;if(along<=2)continue;const sc=along+Math.abs(ex*my-ey*mx)*2.2;if(sc<bs){bs=sc;best=el;}}
+    if(best){best.focus();try{best.scrollIntoView({block:'nearest'});}catch(e){}}
+  }
   function open(){
     if(dialog?.open)return;cbStyle();oldFocus=document.activeElement;
     if(!level)level=clone((D().templates.find(t=>t.level.objects.some(o=>o.kind==='tree'||o.kind==='banner'))||{level:D().defaults()}).level);
@@ -291,12 +371,28 @@ var GRChallengeUI = (function(){
       dialog.addEventListener('keydown',e=>{e.stopPropagation();});dialog.addEventListener('keyup',e=>{e.stopPropagation();});
     }
     render();dialog.showModal();dialog.querySelector('[data-cb="close"]').focus();
+    if(!padLoop)padLoop=requestAnimationFrame(padTick);
     if(window.location.hash.includes('challenge='))note('This link includes a challenge. Choose “Read level from this page’s link” to review it. Nothing runs automatically.');
   }
   function close(){if(dialog){dialog.close();oldFocus?.focus();}}
-  return {open,close,importFromHash(){open();action('hash');}};
+  return {open,close,importFromHash(){open();action('hash');},isOpen(){return !!(dialog&&dialog.open);},tab(t){if(t)showTab(t);return tab;}};
 })();
 window.GRChallengeUI=GRChallengeUI;
+/* the offer shown for a challenge link while the add-on is off */
+function challengeLinkOffer(){
+  const d = document.createElement('dialog'); d.id = 'cbLinkOffer'; d.className = 'panel slab';
+  d.style.cssText = 'max-width:440px;width:calc(100% - 32px);padding:22px;color:var(--bone);font:inherit';
+  d.innerHTML = '<h2 class="head" style="margin-top:0">A challenge for you</h2><p class="sub">This link carries a level made in the <b>Challenge Workshop</b>, an add-on that is switched off. Switch it on to look at the level? Nothing plays by itself, and it never touches your progress.</p>' +
+    '<div class="row" style="justify-content:flex-end;gap:10px;margin-top:14px"><button type="button" class="btn sm ghost" data-x="no">Not now</button><button type="button" class="btn sm" data-x="yes">Switch it on and open</button></div>';
+  document.body.appendChild(d);
+  d.addEventListener('click', function(e){
+    const b = e.target.closest('[data-x]'); if (!b) return;
+    d.close(); d.remove();
+    if (b.dataset.x === 'yes'){ addonSet('challenges', true); SFX.click(); GRChallengeUI.importFromHash(); }
+  });
+  d.addEventListener('cancel', function(){ d.remove(); });
+  d.showModal();
+}
 /* the way in, only while the add-on is on: with it off the menu, the actions and the Guide are exactly as before */
 (function(){
   const baseTownButton = townButtonHTML;
@@ -308,6 +404,36 @@ window.GRChallengeUI=GRChallengeUI;
   handleAction = function(a){
     if (a === 'challenge-open'){ if (addonOn('challenges')){ SFX.click(); GRChallengeUI.open(); } else SFX.deny(); return; }
     return baseAction.apply(this, arguments);
+  };
+  /* a playtest gets its own music: the biome's song, harder while a brute or a badger is out, quieter when paused, then the win or loss tune */
+  const baseMusic = Music.refresh;
+  Music.refresh = function(){
+    const r = baseMusic.apply(this, arguments);
+    const m = addonOn('challenges') && GRChallengePlay.mood ? GRChallengePlay.mood() : null;
+    if (m && this.want){ this.want.theme = m.ended ? (m.won ? 'victory' : 'defeat') : m.theme; this.want.lvl = m.ended ? (m.won ? 1 : 0) : m.paused ? 0 : m.boss ? 2 : 1; this.want.shift = 0; this.want.dense = false; }
+    return r;
+  };
+  /* while the workshop or a playtest is open the game's own controller handling stands aside (the workshop reads the controller itself) */
+  const basePoll = Pad.poll;
+  Pad.poll = function(){
+    if (addonOn('challenges') && (GRChallengeUI.isOpen() || document.getElementById('challengePlay'))){
+      try { const gps = navigator.getGamepads ? navigator.getGamepads() : []; let gp = null; for (let i = 0; i < gps.length; i++) if (gps[i] && gps[i].connected){ gp = gps[i]; break; } this.prev = gp ? gp.buttons.map(function(x){ return !!x.pressed; }) : []; } catch (e) {}
+      return;
+    }
+    return basePoll.apply(this, arguments);
+  };
+  /* someone opened a challenge link: with the add-on on, the workshop opens on it (nothing plays by itself); with it off, the game offers to switch it on */
+  let linkSeen = false;
+  const baseMenu = showMenu;
+  showMenu = function(){
+    const r = baseMenu.apply(this, arguments);
+    try {
+      if (!linkSeen && !G.splash && /[#&]challenge=GRC1/.test(window.location.hash)){
+        linkSeen = true;
+        if (addonOn('challenges')) GRChallengeUI.importFromHash(); else challengeLinkOffer();
+      }
+    } catch (e) {}
+    return r;
   };
   GUIDE_TOPICS.push({ id: 'challenges', title: 'Challenge Workshop', show: function(){ return addonOn('challenges'); }, html: function(){
     return '<p>Open Challenge Workshop from the main menu to build a separate, small arena challenge. Choose waves, place objects, set an objective and pick a fixed starting kit. These challenges do not use campaign equipment and cannot award campaign progress.</p><p>Save drafts in this browser, or clear the exact recipe to copy a share code or link. Friends with the add-on on can paste it into Import / remix. A local clear is not online anti-cheat verification. Editing a recipe resets its sharing check. Drafts do not travel with cloud saves.</p><p>It is an add-on: switch it on or off on the Add-ons page.</p>';

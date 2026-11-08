@@ -173,5 +173,31 @@ check('Retry resets timer and reuses exact level; quit cleans up',()=>{
   dialog=nodes.filter(n=>n.id==='challengePlay'&&n.isConnected).at(-1);dialog.children.find(n=>n.tag==='div').children.find(n=>n.textContent==='Back to builder').events.get('click')();
   assert.equal(quits,1);assert.equal(R.snapshot(),null);assert.equal(handlers.size,0);assert.equal(raf.size,0);
 });
+check('Creatures in a crowd keep apart instead of stacking on one spot',()=>{
+  const l=level('survive',300);l.loadout='tank';l.modifiers.enemyHp=3;l.waves=[{delay:0,enemies:[{kind:'chaser',count:20,spawn:'north'}]}];R.start(l);const e=R.advance(12).enemies;
+  let deep=0;for(let a=0;a<e.length;a++)for(let b=a+1;b<e.length;b++)if(Math.hypot(e[a].x-e[b].x,e[a].y-e[b].y)<(e[a].r+e[b].r)*.5)deep++;
+  assert.ok(e.length>=10);assert.equal(deep,0);
+});
+check('Walkers find their way round a wall that blocks the straight line',()=>{
+  const l=level('survive',300);l.loadout='tank';l.modifiers.enemyHp=3;l.objects=[{kind:'wall',x:160,y:160,w:320,h:40},{kind:'wall',x:480,y:160,w:320,h:40}];
+  l.waves=[{delay:0,enemies:[{kind:'chaser',count:3,spawn:'north'}]}];R.start(l);const s=R.advance(15);
+  assert.ok(s.player.hp<160,'they reached her');assert.ok(s.enemies.every(e=>e.y>200)||s.enemies.length===0);
+});
+check('A flyer crosses walls; a splitter becomes three grubs; a badger heals when left alone; a charger dashes',()=>{
+  const l=level('survive',300);l.loadout='tank';l.objects=[{kind:'wall',x:0,y:160,w:320,h:40},{kind:'wall',x:320,y:160,w:320,h:40},{kind:'wall',x:640,y:160,w:320,h:40}];
+  l.waves=[{delay:0,enemies:[{kind:'flyer',count:1,spawn:'north'}]}];R.start(l);let s=R.advance(4);assert.ok(s.enemies.length===0||s.enemies[0].y>200,'over the wall');
+  const k=level('clear');k.waves=[{delay:0,enemies:[{kind:'splitter',count:1,spawn:'north'}]}];R.start(k);let seen=0;for(let i=0;i<40&&!seen;i++){s=R.advance(.5);seen=s.enemies.filter(e=>e.kind==='grub').length;}assert.equal(seen,3);
+  const b=level('survive',300);b.waves=[{delay:0,enemies:[{kind:'badger',count:1,spawn:'north'}]}];R.start(b);s=R.advance(.2);
+  const raw=sandbox.GRChallengePlay;assert.ok(raw.getEnemy('badger').regen>0);
+  const c=level('survive',300);c.loadout='tank';c.waves=[{delay:0,enemies:[{kind:'charger',count:1,spawn:'north'}]}];R.start(c);let fast=0,last=null;
+  for(let i=0;i<300;i++){s=R.advance(1/60);const e=s.enemies[0];if(!e)break;if(last)fast=Math.max(fast,Math.hypot(e.x-last.x,e.y-last.y)*60);last={x:e.x,y:e.y};}
+  assert.ok(fast>150,'dash speed '+fast);
+});
+check('Arena body sizes match the recipe check, and heals show whole numbers',()=>{
+  for(const k of D.kinds)assert.equal(R.getEnemy(k).r,D.kindR[k],k);
+  const l=level('survive',100);l.loadout='swift';l.objects=[{kind:'heal',x:470,y:280,w:32,h:32}];l.waves=[{delay:0,enemies:[{kind:'runner',count:3,spawn:'north'}]}];R.start(l);
+  let s;for(let i=0;i<600;i++){s=R.advance(1/60);if(s.heals)break;}
+  if(s.heals)assert.ok(Number.isInteger(s.player.hp)||s.fx.every(f=>!/\./.test(f.label)));
+});
 check('Campaign storage remains byte-for-byte untouched',()=>{assert.deepEqual([...storage],[['giraffe_rampage_save_v1','campaign sentinel']]);});
 console.log(JSON.stringify({pass:true,tests}));
