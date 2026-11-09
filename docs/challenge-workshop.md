@@ -28,7 +28,8 @@ What changed in the move: the files and their tests moved to the paths above, th
 5. Playtest effects: footstep dust, hit sparks and rings, kill puffs in the creature's colour, coin sparkle, heal pluses, a swept kick, thrown seeds with trails, a dash trail, flyers drawn above the walkers with their shadow on the ground, a shake and red edges when hurt, a slow red pulse at low health.
 6. A wave ribbon that names what is coming ("3 hyenas from the north · 2 vultures over the walls").
 7. An end card with the run's numbers and a gold, silver or bronze medal by health left (the medal is in the result too).
-8. Editor: a see-through preview of what you are about to place (red with the reason if it would be refused), erase and select outlines, tool icons painted in the recipe's biome, and creature pictures in the roster and on each wave row.
+8. No boxes: walls have uneven, rounded outlines, and stone, ice, adobe and mossy walls are packed irregular stones; hazards are uneven patches; the heal pickup is a tied cloth pouch; the exit is a ring of standing stones. Each still fills the same rectangle the game uses for collision, so what you see is what blocks you.
+9. Editor: a see-through preview of what you are about to place (red with the reason if it would be refused), erase and select outlines, tool icons painted in the recipe's biome, and creature pictures in the roster and on each wave row.
 
 The notes below are Codex's.
 
