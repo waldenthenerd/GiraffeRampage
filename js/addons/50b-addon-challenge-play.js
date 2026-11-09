@@ -83,6 +83,8 @@ var GRChallengePlay = (function(){
   /* ---- the arena's things, one at a time, in the biome's own materials. `t` is the playtest clock (0 in the editor, so the editor holds still);
      small variations come from a hash of the object's place, never from the fight's random numbers. ---- */
   const hsh=(n)=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s);};
+  const hexA=(hex,a)=>{const n=parseInt(String(hex).slice(1,7),16);return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+Math.max(0,a).toFixed(3)+')';};
+  const HAZ_TINT={savanna:'#7a5430',arctic:'#4a7a94',moon:'#50e6be',forest:'#3e4a24',desert:'#b08250',swamp:'#5f8a30',volcanic:'#ff7a30'};
   /* an organic outline inside the box x,y,w,h: `sq` is how square it is (2 is an ellipse, 8 nearly a rounded box) and `rough` how far each point may
      sink inward, so the shape never leaves the box the game collides with. The path is left open for the caller to fill, stroke or clip. */
   function blobPath(ctx,x,y,w,h,seed,sq,rough){
@@ -173,7 +175,7 @@ var GRChallengePlay = (function(){
       }
       if(detail){ctx.strokeStyle=L.edge;ctx.lineWidth=1.2;blobPath(ctx,x+3,y+3,w-6,h-6,seed+5,5,wr*.6);ctx.stroke();}
       }finally{ctx.restore();}
-      ctx.strokeStyle='#241b15aa';ctx.lineWidth=2;blobPath(ctx,x,y,w,h,seed,5,wr);ctx.stroke();
+      blobPath(ctx,x,y,w,h,seed,5,wr);ctx.strokeStyle='#241b1522';ctx.lineWidth=5;ctx.stroke();ctx.strokeStyle='#241b1566';ctx.lineWidth=1.4;ctx.stroke();
       const edgeIn=Math.min(wr,6);                                             /* how far the uneven outline may sit inside the box */
       if(theme==='arctic'){
         ctx.fillStyle='#ffffff';for(let s=wr;s<w-wr;s+=9)ellipse(x+s,y+edgeIn*.5+1,6+3*hsh(seed+s),3+1.5*hsh(seed+s*3),'#ffffff');
@@ -215,8 +217,15 @@ var GRChallengePlay = (function(){
           for(let k=0;k<3;k++){const sx=px+Math.cos(a+k*2)*5,sy=py+Math.sin(a+k*2)*5;line([sx,sy,sx+Math.cos(a+k*2)*3,sy+Math.sin(a+k*2)*3],'#e8d8b0',1);}
           if(hsh(seed+i*9)>.6)ellipse(px+3,py-3,2,2,'#c83a2a');}
       }
+      /* a soft edge: inside the patch the last few pixels fade toward the ground's own colour ... */
+      const lum=hex=>{const n=parseInt(String(hex).slice(1,7),16);return ((n>>16&255)*.3+(n>>8&255)*.59+(n&255)*.11)/255;},gap=Math.abs(lum(palette[0])-lum(HAZ_TINT[theme]||'#7a5430'));
+      const passes=gap>.35?6:4,al=.14+gap*.12;                                 /* the starker the patch against the ground, the wider and stronger the blend */
+      for(let i=0;i<passes;i++){ctx.strokeStyle=hexA(palette[0],al);ctx.lineWidth=3+i*4;blobPath(ctx,x,y,w,h,seed,3.2,hr);ctx.stroke();}
       }finally{ctx.restore();}
-      const pulse=.55+.25*Math.sin(t*4);ctx.strokeStyle='rgba(223,133,78,'+pulse.toFixed(3)+')';ctx.lineWidth=2;ctx.setLineDash([6,4]);blobPath(ctx,x+1,y+1,w-2,h-2,seed,3.2,hr);ctx.stroke();ctx.setLineDash([]);
+      /* ... and outside it, a halo of the hazard's own colour bleeds a little into the ground, with a faint warm glow that breathes instead of a hard dashed line */
+      const tint=HAZ_TINT[theme]||HAZ_TINT.savanna;
+      for(let i=0;i<4;i++){ctx.strokeStyle=hexA(tint,.13-i*.025);ctx.lineWidth=2+i*3;blobPath(ctx,x,y,w,h,seed,3.2,hr);ctx.stroke();}
+      const pulse=.18+.12*Math.sin(t*4);ctx.strokeStyle='rgba(240,150,90,'+pulse.toFixed(3)+')';ctx.lineWidth=1.5;blobPath(ctx,x+1,y+1,w-2,h-2,seed,3.2,hr);ctx.stroke();
     }else if(o.kind==='coin'){
       const r=Math.min(w,h)*.4,spin=t?Math.max(.18,Math.abs(Math.cos(t*3+seed))):1,bob=t?Math.sin(t*2.4+seed)*1.5:0;
       ellipse(cx+2,cy+r*.75,r*.9,r*.35,'#39261a44');
