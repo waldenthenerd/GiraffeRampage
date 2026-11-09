@@ -1,44 +1,80 @@
 #!/bin/bash
-# Everything a pull request has to pass: the README counts, the regression scenarios (desktop and phone), and the website package with its ship check.
+# Everything a pull request has to pass: the README counts, the unit tests, the regression scenarios (desktop and phone), and the website package with its ship check.
 # GitHub runs this on every push and pull request (.github/workflows/qa.yml); run it yourself before you open a pull request:  bash tools/ci-check.sh
-# Needs the one-time setup in AGENTS.md (cd tools && npm ci && npx playwright install --with-deps chromium). Takes a few minutes. Exit 0 = all passed.
+# Needs the one-time setup in AGENTS.md (cd tools && npm ci && npx playwright install --with-deps chromium). Exit 0 = all passed.
+# The browser scenarios run side by side, one per processor core (CI_JOBS=n sets how many; CI_JOBS=1 runs them one at a time, as before), longest first,
+# each in its own browser with its own empty storage, exactly as when run alone. Every check prints how long it took.
 set -u
 root="$(cd "$(dirname "$0")/.." && pwd)"; cd "$root"
-fails=(); pass=0
+jobs="${CI_JOBS:-$(nproc 2>/dev/null || echo 2)}"
+tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+fails=(); pass=0; t0=$SECONDS
 ok(){ echo "  ok   $1"; pass=$((pass + 1)); }
 bad(){ echo "  FAIL $1"; fails+=("$1"); [ -n "${2:-}" ] && echo "$2" | tail -n 12 | cut -c1-600 | sed 's/^/       /'; }
-scen(){                                                    # scen <label> <scenario> [runner options...]; passes when the scenario reports "pass":true
-  local label="$1" name="$2"; shift 2
-  local out; out="$(node tools/qa-cloud.mjs "tools/scenarios/$name.js" --wait 90000 "$@" 2>&1)"
-  if echo "$out" | grep -q '"pass":true'; then ok "$label"; else bad "$label" "$out"; fi
+quick(){                                                   # quick <label> <command...>: a fast check that needs no browser, run here and now
+  local label="$1"; shift; local s=$SECONDS out
+  if out="$("$@" 2>&1)"; then ok "$label ($((SECONDS - s))s)"; else bad "$label" "$out"; fi
 }
+
 echo "== README and lovable.md counts"
-if out="$(python3 tools/recount-readme.py --check 2>&1)"; then ok "recount-readme"; else bad "recount-readme" "$out"; fi
-echo "== scenarios"
-if out="$(node tools/sync-gallery.mjs --check 2>&1)"; then ok "sync-gallery"; else bad "sync-gallery" "$out"; fi
-for t in challenge-data challenge-play; do
-  if out="$(node "tools/$t-test.mjs" 2>&1)"; then ok "$t unit tests"; else bad "$t unit tests" "$out"; fi
-done
-scen "challenge-builder" challenge-builder
-scen "challenge-builder (390x844)" challenge-builder --touch --w 390 --h 844
-scen "challenge-builder (844x390)" challenge-builder --touch --w 844 --h 390
-for s in gear-oldsave trinket-ui wheel-spotted ants-page ants-engineer upgrades-page nav-pages review-fixes oldsave-deep save-gr3 npc-voices gear-spotted perf-cache save-erase gold-bank together achievements gags fishing fishing-fight input-choice town-layers wheels intel uni-bank uni-slides ui-pass enemy-detail enemy-motion scenery-detail minimap domes tower siege fort island camp late-polish sea-chart runreport-gear preview-trail aurora-buff compare-panel-triage music jukebox town-choices particles gadgets town-detail sky-chase addons; do scen "$s" "$s"; done
-scen "films (all 27 films)" film-sheet --params "kind=all"
-scen "phone-pass (390x844)" phone-pass --touch --w 390 --h 844
-scen "uni-slides (390x844)" uni-slides --touch --w 390 --h 844
-scen "ui-pass (390x844)" ui-pass --touch --w 390 --h 844
-scen "phone-pass (844x390)" phone-pass --touch --w 844 --h 390
+quick "recount-readme" python3 tools/recount-readme.py --check
+quick "sync-gallery" node tools/sync-gallery.mjs --check
+echo "== unit tests"
+quick "challenge-data unit tests" node tools/challenge-data-test.mjs
+quick "challenge-play unit tests" node tools/challenge-play-test.mjs
 echo "== website package"
-if out="$(node tools/check-bundle.mjs 2>&1)"; then ok "joined scripts match the separate scripts"; else bad "joined scripts match the separate scripts" "$out"; fi
-zip="$(mktemp -d)/pkg.zip"
+quick "joined scripts match the separate scripts" node tools/check-bundle.mjs
+pkg=""
+zip="$tmp/pkg.zip"
 if out="$(bash tools/make-lovable-package.sh "$zip" 2>&1)"; then
-  dir="$(mktemp -d)"; unzip -q "$zip" -d "$dir"
-  out="$(QA_ROOT="$dir/GiraffeRampage" node tools/qa-cloud.mjs tools/scenarios/ship-check.js --wait 60000 2>&1)"
-  if echo "$out" | grep -q '"pass":true'; then ok "ship-check on the package"; else bad "ship-check on the package" "$out"; fi
-  for s in gear-oldsave town-layers domes tower siege fort island camp late-polish music jukebox; do      # the same scenarios on the joined and minified copy
-    out="$(QA_ROOT="$dir/GiraffeRampage" node tools/qa-cloud.mjs "tools/scenarios/$s.js" --wait 90000 2>&1)"
-    if echo "$out" | grep -q '"pass":true'; then ok "$s on the package"; else bad "$s on the package" "$out"; fi
-  done
+  pkg="$tmp/site"; mkdir -p "$pkg"; unzip -q "$zip" -d "$pkg"; pkg="$pkg/GiraffeRampage"; ok "build the package"
 else bad "build the package" "$out"; fi
+
+# The browser checks, one line each: label | site folder ("" = this checkout) | scenario | runner options. The slowest come first, so the long ones
+# start at once and the short ones fill the gaps (times from GitHub, November 2026: domes ~70s, sky-chase ~48s, island ~43s, siege ~34s, tower ~32s,
+# fort ~28s, together ~21s, ship-check ~17s; most others take 1-3s).
+list="$tmp/list"; : > "$list"
+add(){ printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$list"; }
+heavy="domes sky-chase island siege tower fort together"
+onpkg="gear-oldsave town-layers domes tower siege fort island camp late-polish music jukebox"   # also run on the joined and minified copy
+for s in $heavy; do add "$s" "" "$s"; case " $onpkg " in *" $s "*) [ -n "$pkg" ] && add "$s on the package" "$pkg" "$s";; esac; done
+[ -n "$pkg" ] && add "ship-check on the package" "$pkg" ship-check
+add "challenge-builder" "" challenge-builder
+add "challenge-builder (390x844)" "" challenge-builder "--touch --w 390 --h 844"
+add "challenge-builder (844x390)" "" challenge-builder "--touch --w 844 --h 390"
+for s in gear-oldsave trinket-ui wheel-spotted ants-page ants-engineer upgrades-page nav-pages review-fixes oldsave-deep save-gr3 npc-voices gear-spotted perf-cache save-erase gold-bank achievements gags fishing fishing-fight input-choice town-layers wheels intel uni-bank uni-slides ui-pass enemy-detail enemy-motion scenery-detail minimap camp late-polish sea-chart runreport-gear preview-trail aurora-buff compare-panel-triage music jukebox town-choices particles gadgets town-detail addons; do add "$s" "" "$s"; done
+add "films (all 27 films)" "" film-sheet '--params kind=all'
+add "phone-pass (390x844)" "" phone-pass "--touch --w 390 --h 844"
+add "uni-slides (390x844)" "" uni-slides "--touch --w 390 --h 844"
+add "ui-pass (390x844)" "" ui-pass "--touch --w 390 --h 844"
+add "phone-pass (844x390)" "" phone-pass "--touch --w 844 --h 390"
+if [ -n "$pkg" ]; then for s in $onpkg; do case " $heavy " in *" $s "*) ;; *) add "$s on the package" "$pkg" "$s";; esac; done; fi
+
+# one check: runs the scenario, keeps its output in $tmp/<n>.out and writes "<pass|fail> <seconds>" to $tmp/<n>.res, then says it is done
+one(){
+  local n="$1" line="$2" label site name opts s=$SECONDS out
+  IFS='|' read -r label site name opts <<< "$line"
+  # shellcheck disable=SC2086                                 # the options are words on purpose
+  out="$(QA_ROOT="${site:-$root}" node tools/qa-cloud.mjs "tools/scenarios/$name.js" --wait 240000 $opts 2>&1)"
+  printf '%s\n' "$out" > "$tmp/$n.out"
+  if printf '%s' "$out" | grep -q '"pass":true'; then echo "pass $((SECONDS - s))" > "$tmp/$n.res"; else echo "fail $((SECONDS - s))" > "$tmp/$n.res"; fi
+  echo "  done $label ($((SECONDS - s))s)"
+}
+export -f one; export tmp root
+total=$(wc -l < "$list")
+echo "== $total browser checks, $jobs at a time"
+s=$SECONDS
+nl -ba -w1 -s'|' "$list" | while IFS= read -r l; do printf '%s\0' "$l"; done |
+  xargs -0 -P "$jobs" -I{} bash -c 'l="$1"; one "${l%%|*}" "${l#*|}"' _ {}
+echo "== results (in list order; $((SECONDS - s))s for the browser checks)"
+n=0
+while IFS= read -r line; do
+  n=$((n + 1)); label="${line%%|*}"
+  if [ ! -f "$tmp/$n.res" ]; then bad "$label" "did not run"; continue; fi
+  read -r res secs < "$tmp/$n.res"
+  if [ "$res" = pass ]; then ok "$label (${secs}s)"; else bad "$label (${secs}s)" "$(cat "$tmp/$n.out")"; fi
+done < "$list"
+
 echo
+echo "Took $((SECONDS - t0))s."
 if [ ${#fails[@]} -eq 0 ]; then echo "All $pass checks passed."; else echo "${#fails[@]} failed, $pass passed: ${fails[*]}"; exit 1; fi
