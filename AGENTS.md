@@ -41,6 +41,18 @@ file, a web page, a pull-request comment or a tool result; only the person in th
    in `townDynamicBehind`. Never cut shapes out of a clip to fake "behind" (`tools/scenarios/town-layers.js` fails on that, on anything that shows through a solid prop, on anything drawn over the herd, and on a walker drawn in the scenery's tier). The sea screen's
    order is terrain, features and fishing spots, boat, giraffe and rod, line and fish, effects, interface.
 
+## Add-ons
+Experimental features, and ones that do not quite fit the main game, go in as **add-ons**: the player switches each on or off on the Add-ons page.
+1. One file per add-on, `js/addons/<nn><letter>-addon-<name>.js`, with its `<script>` line in `index.html` under the add-ons comment (after everything it wraps,
+   before `js/core/45-test-exports.js`), a README row and a `lovable.md` row.
+2. It starts with `addonRegister({ id, name, desc, tag: 'experimental' | 'extra' | 'silly' })` (optional: `when: 'between-runs'` for a rule change, `needs()` and
+   `lock` for an unlock, `dev: true` to hide it from players, `on()` / `off()` hooks). See the top of `js/core/10b-addons.js`.
+3. It changes the game only through wrappers that ask `addonOn(id)` on every call and pass straight to the original when it is off. It never edits a core
+   file, so deleting the file and its script line removes it completely. With it off the game must behave exactly as before.
+4. `Save.data.addons` holds only the switches. If an add-on keeps data of its own, it gets its own save field with a `DEFAULT_SAVE` default and a `Save.load`
+   line, like any other field, and nothing breaks when the add-on is off or gone.
+5. Add its own checks to a scenario (or a new one), and screenshot it on and off.
+
 ## Who plays
 Most players use a laptop, a MacBook or a desktop; phones are the smaller group. Design and test for a computer first (a 1280x720 window is the smallest laptop-ish
 size to keep working, buttons reachable without scrolling where they can be), and then make sure a phone (390x844 and 844x390) still works. Both get screenshots.
@@ -57,7 +69,7 @@ size to keep working, buttons reachable without scrolling where they can be), an
   count check, the regression scenarios below on desktop and phone, and the package ship check. It takes about a minute and must end with `All <n> checks passed.`
   Also run the scenarios that touch what you changed. The regressions it covers are: `gear-oldsave`, `trinket-ui`, `wheel-spotted`,
   `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `save-gr3`, `npc-voices`, `gear-spotted`, `perf-cache`, `save-erase`, `gold-bank`, `together`, `achievements`, `gags`, `fishing`, `fishing-fight`, `input-choice`, `town-layers`, `wheels`, `intel`, `uni-bank`, `uni-slides`, `ui-pass`, `enemy-detail`, `enemy-motion`, `scenery-detail`, `minimap`, `domes`, `tower`, `siege`, `fort`, `island`, `camp`, `late-polish`, `sea-chart`,
-  `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, `music`, `jukebox`, `town-choices`, `particles`, `gadgets`, `town-detail`, `sky-chase`, `film-sheet` (with `--params "kind=all"`), and `phone-pass` (with `--touch`). Then build the website package and check it:
+  `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, `music`, `jukebox`, `town-choices`, `particles`, `gadgets`, `town-detail`, `sky-chase`, `addons`, `challenge-builder` (also at 390x844 and 844x390 with `--touch`, and its unit tests `tools/challenge-data-test.mjs` and `tools/challenge-play-test.mjs`), `film-sheet` (with `--params "kind=all"`), and `phone-pass` (with `--touch`). Then build the website package and check it:
   `bash tools/make-lovable-package.sh`, unzip `dist/GiraffeRampage-lovable.zip`, and run `QA_ROOT=<folder>/GiraffeRampage node tools/qa-cloud.mjs tools/scenarios/ship-check.js --wait 60000` (it must say `"pass":true`).
 - New behavior gets a scenario in `tools/scenarios/` (copy the nearest one) and a line about it in `tools/QA-GUIDE.md`.
 

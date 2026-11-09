@@ -69,7 +69,8 @@
     var coin = townCoin(), gold1, gold2; Fg.phase = 'idle'; clearInterval(Fg.iv); Fg.iv = 0;
     function goldFor(peak){ pier(); cast('sardine'); hook(); Fg.str = 0.5; Fg.peak = peak; Fg.prog = 1; Fg.ten = 0.3; Fg.hold = true; fightTick(0.03); return Fg.last; }
     var cleanL = goldFor(0.5), dirtyL = goldFor(0.95);
-    out.cleanPays = !!cleanL && cleanL.clean === true && !!dirtyL && dirtyL.clean === false && cleanL.scl === dirtyL.scl + 1 && /clean fight/.test(fishCatchHTML(cleanL));
+    out.cleanPays = !!cleanL && cleanL.clean === true && !!dirtyL && dirtyL.clean === false && cleanL.scl - (cleanL.rec ? 1 : 0) === dirtyL.scl - (dirtyL.rec ? 1 : 0) + 1 &&        /* a new length record adds a scale of its own, whichever catch it falls on */
+       /clean fight/.test(fishCatchHTML(cleanL));
 
     /* 5 conditions */
     var keepH = Town.fixHour, keepW = Town.fixWeather;
