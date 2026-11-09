@@ -32,6 +32,20 @@ What changed in the move: the files and their tests moved to the paths above, th
 9. Soft edges: a hazard fades into the ground (its edge blends toward the ground's colour inside, and a halo of its own colour bleeds out, wider where the two contrast most), with a faint breathing glow instead of a dashed line; walls have a soft double edge instead of one hard dark line.
 10. Editor: a see-through preview of what you are about to place (red with the reason if it would be refused), erase and select outlines, tool icons painted in the recipe's biome, and creature pictures in the roster and on each wave row.
 
+## More options
+
+Every option below is optional in a recipe: a recipe or share code made before them reads exactly as it always played (the start in the middle, no time limit, every multiplier 1, hazards 12 damage, heals 25%, waves that wait for a clear, no elites). A copy of the game older than this cannot open a recipe that uses one of the new choices; it says the theme, object or option is unknown.
+
+1. Three more arenas: beach (sand, shells, rock pools with sea urchins, leaning palms, crabs), cave (pebbles, glowing crystal beds, giant glowing mushrooms, drips of light) and meadow (flowers, hedges, nettle patches with a bees' nest, blossom trees).
+2. Player start: the middle, any edge or any corner. The recipe check keeps 24 pixels round it clear of walls, crates, hazards and spikes, and checks every pickup can be reached from it.
+3. Four new objects: water (walkers, her included, at half speed; flyers pass over), boost pads (60% faster for 1.5 seconds), crates (solid until she kicks them apart; creatures find new routes after) and spikes (up for 1.2 seconds in every 2.4, each set on its own beat, with a warning glint).
+4. A Hunt objective (defeat a number of creatures), and a time limit for any objective but Survive.
+5. Three more kits: striker (slow, heavy kicks), ranger (the longest reach) and glass (very fast, very fragile).
+6. New modifiers: enemy damage, player health, player damage, health regained per second, hazard damage per touch, heal size and the light radius of limited visibility.
+7. Dawn light, and fog, wind (streaks and tumbling leaves, sand or snow by biome) and storm (heavy rain with lightning flashes) weather.
+8. Waves: a wave can arrive on a timer (counted from when the wave before it began) instead of waiting for the arena to clear. Each group can be elite (a quarter bigger, 2.2 times the health, hits 1.3 times as hard, a gold crown and ring), can come one at a time (one every so many seconds), and can enter from a random open edge.
+9. Three more layout recipes (Moat, Crate maze, Spike gauntlet), three more quick waves (Trickle, Surround, Elite guard) and four more starter recipes (Tide pool dash, Crystal cavern, Meadow stampede, Crate yard).
+
 The notes below are Codex's.
 
 1. Main-menu workshop and an always-available Guide topic.
