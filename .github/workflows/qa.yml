@@ -1,4 +1,6 @@
 # Runs tools/ci-check.sh on every push and pull request: README counts, the regression scenarios (desktop and phone), the website package and its ship check.
+# The browser checks are split into three shares that run at the same time on three machines (CI_SHARD); each machine also runs its share side by side.
+# The job named "qa" passes only when all three shares pass.
 # To make it block merges: Settings > Rules > the main ruleset > "Require status checks to pass" > add "QA / qa".
 name: QA
 on:
@@ -10,9 +12,14 @@ concurrency:
   group: qa-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
-  qa:
+  share:
+    name: share ${{ matrix.share }} of 3
     runs-on: ubuntu-24.04            # pinned: Playwright 1.56 cannot install its browser dependencies on Ubuntu 26, which ubuntu-latest became in October 2026
-    timeout-minutes: 30
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false                # every share finishes, so one run shows every failure
+      matrix:
+        share: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,5 +32,14 @@ jobs:
         run: |
           npm ci
           npx playwright install --with-deps chromium
-      - name: Run the checks
+      - name: Run this share of the checks
         run: bash tools/ci-check.sh
+        env:
+          CI_SHARD: ${{ matrix.share }}/3
+  qa:
+    needs: share
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: All three shares passed
+        run: '[ "${{ needs.share.result }}" = success ] || { echo "a share failed or was cancelled: ${{ needs.share.result }}"; exit 1; }'

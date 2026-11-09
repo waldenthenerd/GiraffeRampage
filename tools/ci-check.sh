@@ -3,10 +3,16 @@
 # GitHub runs this on every push and pull request (.github/workflows/qa.yml); run it yourself before you open a pull request:  bash tools/ci-check.sh
 # Needs the one-time setup in AGENTS.md (cd tools && npm ci && npx playwright install --with-deps chromium). Exit 0 = all passed.
 # The browser scenarios run side by side, one per processor core (CI_JOBS=n sets how many; CI_JOBS=1 runs them one at a time, as before), longest first,
-# each in its own browser with its own empty storage, exactly as when run alone. Every check prints how long it took.
+# each in its own browser with its own empty storage, exactly as when run alone. Every check prints how long it took. The scenarios that measure time
+# (a drawing budget, a frame-time comparison) run afterwards one at a time on a quiet machine, so their budgets mean what they say.
+# CI_SHARD=i/n runs only the i-th of n shares of the browser checks (GitHub runs the shares on separate machines at once; the quick checks run in
+# share 1). The shares are dealt out longest first, back and forth, so they take about as long as each other.
 set -u
 root="$(cd "$(dirname "$0")/.." && pwd)"; cd "$root"
 jobs="${CI_JOBS:-$(nproc 2>/dev/null || echo 2)}"
+shard="${CI_SHARD:-1/1}"; si="${shard%/*}"; sn="${shard#*/}"
+case "$si$sn" in *[!0-9]*|'') echo "CI_SHARD must look like 2/3"; exit 2;; esac
+[ "$si" -ge 1 ] && [ "$si" -le "$sn" ] || { echo "CI_SHARD must look like 2/3"; exit 2; }
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 fails=(); pass=0; t0=$SECONDS
 ok(){ echo "  ok   $1"; pass=$((pass + 1)); }
@@ -16,14 +22,17 @@ quick(){                                                   # quick <label> <comm
   if out="$("$@" 2>&1)"; then ok "$label ($((SECONDS - s))s)"; else bad "$label" "$out"; fi
 }
 
-echo "== README and lovable.md counts"
-quick "recount-readme" python3 tools/recount-readme.py --check
-quick "sync-gallery" node tools/sync-gallery.mjs --check
-echo "== unit tests"
-quick "challenge-data unit tests" node tools/challenge-data-test.mjs
-quick "challenge-play unit tests" node tools/challenge-play-test.mjs
+[ "$sn" -gt 1 ] && echo "== share $si of $sn"
+if [ "$si" -eq 1 ]; then
+  echo "== README and lovable.md counts"
+  quick "recount-readme" python3 tools/recount-readme.py --check
+  quick "sync-gallery" node tools/sync-gallery.mjs --check
+  echo "== unit tests"
+  quick "challenge-data unit tests" node tools/challenge-data-test.mjs
+  quick "challenge-play unit tests" node tools/challenge-play-test.mjs
+  quick "joined scripts match the separate scripts" node tools/check-bundle.mjs
+fi
 echo "== website package"
-quick "joined scripts match the separate scripts" node tools/check-bundle.mjs
 pkg=""
 zip="$tmp/pkg.zip"
 if out="$(bash tools/make-lovable-package.sh "$zip" 2>&1)"; then
@@ -33,8 +42,9 @@ else bad "build the package" "$out"; fi
 # The browser checks, one line each: label | site folder ("" = this checkout) | scenario | runner options. The slowest come first, so the long ones
 # start at once and the short ones fill the gaps (times from GitHub, November 2026: domes ~70s, sky-chase ~48s, island ~43s, siege ~34s, tower ~32s,
 # fort ~28s, together ~21s, ship-check ~17s; most others take 1-3s).
-list="$tmp/list"; : > "$list"
-add(){ printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$list"; }
+list="$tmp/list"; : > "$list"; alone="$tmp/alone"; : > "$alone"
+timed=" ants-engineer enemy-detail enemy-motion particles perf-cache scenery-detail save-gr3 "     # these time themselves: run one at a time at the end
+add(){ case "$timed" in *" $3 "*) [ -z "$2" ] && { printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$alone"; return; };; esac; printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$list"; }
 heavy="domes sky-chase island siege tower fort together"
 onpkg="gear-oldsave town-layers domes tower siege fort island camp late-polish music jukebox"   # also run on the joined and minified copy
 for s in $heavy; do add "$s" "" "$s"; case " $onpkg " in *" $s "*) [ -n "$pkg" ] && add "$s on the package" "$pkg" "$s";; esac; done
@@ -61,11 +71,17 @@ one(){
   echo "  done $label ($((SECONDS - s))s)"
 }
 export -f one; export tmp root
-total=$(wc -l < "$list")
-echo "== $total browser checks, $jobs at a time"
-s=$SECONDS
-nl -ba -w1 -s'|' "$list" | while IFS= read -r l; do printf '%s\0' "$l"; done |
-  xargs -0 -P "$jobs" -I{} bash -c 'l="$1"; one "${l%%|*}" "${l#*|}"' _ {}
+# this machine's share: the i-th of every n checks, dealt back and forth (1 2 3 3 2 1 ...) down each list
+mine(){ awk -v i="$si" -v n="$sn" '{ r = int((NR - 1) / n); p = (NR - 1) % n; if (r % 2) p = n - 1 - p; if (p == i - 1) print }' "$1"; }
+mine "$list" > "$list.mine"; mine "$alone" > "$alone.mine"; mv "$list.mine" "$list"; mv "$alone.mine" "$alone"
+nshared=$(wc -l < "$list"); cat "$alone" >> "$list"
+if [ -n "${CI_LIST:-}" ]; then cut -d'|' -f1 "$list"; exit 0; fi           # CI_LIST=1: only say which browser checks this share would run
+run(){ nl -ba -w1 -s'|' "$list" | sed -n "$1,$2p" | while IFS= read -r l; do printf '%s\0' "$l"; done |
+  xargs -0 -P "$3" -I{} bash -c 'l="$1"; one "${l%%|*}" "${l#*|}"' _ {}; }
+echo "== $nshared browser checks, $jobs at a time"
+s=$SECONDS; run 1 "$nshared" "$jobs"
+echo "== $(wc -l < "$alone") checks that time themselves, one at a time"
+run $((nshared + 1)) '$' 1
 echo "== results (in list order; $((SECONDS - s))s for the browser checks)"
 n=0
 while IFS= read -r line; do
