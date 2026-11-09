@@ -9,7 +9,7 @@ What changed in the move: the files and their tests moved to the paths above, th
 1. Walkers find their way round walls (a flow field from the giraffe's square), and creatures keep apart instead of stacking on one spot.
 2. A walled-off entrance is caught by the recipe check, not mid-playtest; heals show whole numbers.
 3. A draft keeps its own id: Save draft updates the open draft, Save as copy makes a new one.
-4. A challenge link with the add-on off offers to switch it on (once per visit); with it on, the workshop opens on the level. Nothing plays by itself.
+4. Sharing is by code only: a share code is the cleared recipe packed with the game's GR3 compressor (`GRC3:`, about a third to under half the length of the old `GRC1:` code). Old `GRC1:` codes still import; links are refused with a pointer to the code, and nothing is read from the page's address.
 5. The arena draws creatures from the game and her own top-down giraffe in her coat, hat and boots; the arena's simple drawings remain as a fallback.
 6. Four more enemy kinds: flyer (vulture, crosses walls), charger (warthog, dashes along a line it shows first), splitter (termite, bursts into three grubs) and badger (honey badger, heals when left alone).
 7. The game's sounds, and music: the biome's song during a playtest, harder with a brute or badger out, then the win or loss tune.

@@ -156,14 +156,27 @@ var GRChallengeData = (function () {
     if (code.length > MAX_CODE) fail('This design is too large to share. Remove a few custom shapes or arena objects and try again.');
     return code;
   }
+  /* Share codes: "GRC3:" + the recipe packed with the game's GR3 compressor (GRSave in js/core/01b-savepack.js). If GR3 ever could not give the text
+     back exactly, the code falls back to the plain GRC1 form below. Packing takes a moment, so drafts keep the quick GRC1 form; GRC1 codes made before still import.
+     Codes are only ever pasted in: there are no share links, and nothing is read from the page's address. */
+  function packer() { const g = typeof window !== 'undefined' && window.GRSave; if (!g || typeof g.encode !== 'function' || typeof g.decode !== 'function') fail('Share codes need the game’s save packer, which is not loaded.'); return g; }
+  function shareCode(level) {
+    const clean = validate(level), packed = packer().encode(clean);
+    const code = typeof packed === 'string' && packed.startsWith('GR3:') ? 'GRC3:' + packed.slice(4) : encode(clean);
+    if (code.length > MAX_CODE) fail('This design is too large to share. Remove a few custom shapes or arena objects and try again.');
+    return code;
+  }
   function decode(input) {
-    if (typeof input !== 'string' || input.length > MAX_CODE + 4000) fail('Challenge code or link is missing or too long.');
-    let code = input.trim();
-    if (!code.startsWith('GRC1:')) {
-      try { const url = new URL(code); code = new URLSearchParams(url.hash.slice(1)).get('challenge') || url.searchParams.get('challenge') || ''; }
-      catch (_) { fail('Paste a GRC1 challenge code or challenge link.'); }
-    }
+    if (typeof input !== 'string' || input.length > MAX_CODE + 4000) fail('Share code is missing or too long.');
+    let code = input.replace(/\s+/g, '');                                     /* a code pasted across lines still reads */
     if (code.length > MAX_CODE) fail('Challenge code is too long.');
+    if (code.startsWith('GRC3:')) {
+      if (!/^GRC3:[\x23-\x5b\x5d-\x7e]+$/.test(code)) fail('That share code is malformed.');               /* only GR3's own characters */
+      let raw = null; try { raw = packer().decode('GR3:' + code.slice(5)); } catch (_) { raw = null; }
+      if (!raw || typeof raw !== 'object') fail('That share code is damaged or incomplete. Copy the whole code and try again.');
+      return validate(raw);
+    }
+    if (!code.startsWith('GRC1:')) fail(/^https?:/i.test(code) ? 'Links are not used any more: ask for the share code (it starts with GRC3:) and paste that.' : 'Paste a share code: it starts with GRC3: (older GRC1: codes work too).');
     const parts = /^GRC1:([a-f0-9]{8}):([A-Za-z0-9_-]+)$/.exec(code);
     if (!parts) fail('That challenge code is malformed or uses a newer format.');
     let json;
@@ -248,6 +261,6 @@ var GRChallengeData = (function () {
     l.waves = [{delay:0,enemies:[{kind:'chaser',count:5,spawn:'west'}]},{delay:2,enemies:[{kind:'runner',count:3,spawn:'south'},{kind:'spitter',count:2,spawn:'north'}]}];
     l.objects = [{kind:'custom',asset:'signal',x:120,y:100,w:100,h:140},{kind:'custom',asset:'signal',x:760,y:420,w:100,h:140},{kind:'rock',x:680,y:140,w:100,h:70},{kind:'wall',x:260,y:420,w:160,h:32},{kind:'heal',x:680,y:480,w:32,h:32}];
   });
-  return { key: KEY, kinds: KINDS.slice(), kindR: Object.assign({}, KIND_R), defaults, validate, encode, decode, fingerprint, seeded, templates, isSolid, saveDraft, listDrafts, removeDraft, newDraftId };
+  return { key: KEY, kinds: KINDS.slice(), kindR: Object.assign({}, KIND_R), defaults, validate, encode, decode, shareCode, fingerprint, seeded, templates, isSolid, saveDraft, listDrafts, removeDraft, newDraftId };
 }());
 window.GRChallengeData = GRChallengeData;

@@ -4,14 +4,18 @@ import vm from 'node:vm';
 const storage = new Map();
 const localStorage = { getItem: k => storage.get(k) ?? null, setItem: (k,v) => storage.set(k,String(v)) };
 const ctx = vm.createContext({ addonRegister: () => {}, window: {}, TextEncoder, TextDecoder, Uint8Array, URL, URLSearchParams, btoa, atob, localStorage });
-vm.runInContext(fs.readFileSync(new URL('../js/addons/50a-addon-challenge-data.js', import.meta.url), 'utf8'), ctx);
+ctx.window.localStorage = localStorage; ctx.self = ctx.window;
+for (const f of ['../js/core/01b-savepack.js', '../js/addons/50a-addon-challenge-data.js']) vm.runInContext(fs.readFileSync(new URL(f, import.meta.url), 'utf8'), ctx);
+if (!ctx.window.GRSave && ctx.GRSave) ctx.window.GRSave = ctx.GRSave;
 const D = ctx.window.GRChallengeData;
 let checks = 0;
 function check(name, fn) { fn(); checks++; console.log('PASS ' + name); }
 function clone(value) { return JSON.parse(JSON.stringify(value)); }
 check('default recipe round trip', () => assert.deepEqual(clone(D.decode(D.encode(D.defaults()))), clone(D.defaults())));
 check('Unicode text round trip', () => { const l = D.defaults(); l.title = '長頸鹿 🦒'; assert.equal(D.decode(D.encode(l)).title, l.title); });
-check('share link round trip', () => assert.equal(D.decode('https://example.test/play#challenge=' + encodeURIComponent(D.encode(D.defaults()))).title, D.defaults().title));
+check('share links are refused, with a pointer to the code', () => assert.throws(() => D.decode('https://example.test/play#challenge=' + encodeURIComponent(D.encode(D.defaults()))), /share code/));
+check('GR3 share code round trip, smaller than the plain code, across line breaks', () => { for (const t of D.templates) { const c = D.shareCode(t.level); assert.ok(c.startsWith('GRC3:'), t.name); assert.ok(c.length < D.encode(t.level).length * .75, t.name + ' ' + c.length + '/' + D.encode(t.level).length); assert.deepEqual(clone(D.decode(c)), clone(t.level)); assert.deepEqual(clone(D.decode(c.slice(0, 40) + '\n' + c.slice(40))), clone(t.level)); } });
+check('damaged or foreign GR3 share codes are refused', () => { const c = D.shareCode(D.templates[5].level); for (const bad of [c.slice(0, -3), c.slice(0, 20) + (c[20] === 'a' ? 'b' : 'a') + c.slice(21), 'GRC3:' + 'x'.repeat(60), 'GRC3:ab"c', 'GRC3:'+ ctx.window.GRSave.encode({ v: 1, title: 'not a recipe' }).slice(4)]) assert.throws(() => D.decode(bad)); });
 check('corruption rejected', () => { const c = D.encode(D.defaults()); assert.throws(() => D.decode(c.slice(0,-5) + 'aaaaa')); });
 check('unknown version rejected', () => { const l=D.defaults(); l.v=2; assert.throws(() => D.validate(l)); });
 check('malformed and oversize codes rejected', () => { for(const s of ['', 'GRC1:bad', 'x'.repeat(24001), 'javascript:alert(1)']) assert.throws(() => D.decode(s)); });
@@ -66,7 +70,7 @@ check('custom shape must stay inside canvas', () => {const l=customLevel();l.cus
 check('custom asset count capped at eight', () => {const l=customLevel();l.customAssets=Array.from({length:9},(_,i)=>({...clone(l.customAssets[0]),id:'asset'+i}));assert.throws(()=>D.validate(l));});
 check('custom object strips unknown executable fields', () => {const l=customLevel();l.customAssets[0].script='alert(1)';l.customAssets[0].parts[0].onclick='alert(1)';l.objects[0].html='<script>';const v=D.validate(l);assert(!('script' in v.customAssets[0]));assert(!('onclick' in v.customAssets[0].parts[0]));assert(!('html' in v.objects[0]));});
 check('oversize custom recipe fails before generating unreadable code', () => {const l=customLevel();l.customAssets=Array.from({length:8},(_,i)=>({id:'custom'+i,name:'x'.repeat(32),solid:false,parts:Array.from({length:12},()=>({shape:'triangle',x:1.1234567890123456,y:1.1234567890123456,w:50.12345678901234,h:50.12345678901234,color:'#ffffff',rotation:179.12345678901234}))}));l.objects=Array.from({length:48},()=>({kind:'custom',asset:'custom0',x:123.4567890123,y:123.4567890123,w:123.4567890123,h:123.4567890123}));assert.throws(()=>D.encode(l),/too large/);});
-check('near-limit code remains readable inside a longer share link', () => {
+check('near-limit plain code still reads back', () => {
   let best='';const l=customLevel();
   for(let parts=8;parts<=12;parts++) {
     l.customAssets=Array.from({length:8},(_,i)=>({id:'custom'+i,name:'x'.repeat(32),solid:false,parts:Array.from({length:parts},()=>({shape:'triangle',x:1.1234567890123456,y:1.1234567890123456,w:50.12345678901234,h:50.12345678901234,color:'#ffffff',rotation:179.12345678901234}))}));
@@ -76,8 +80,7 @@ check('near-limit code remains readable inside a longer share link', () => {
     }
   }
   assert(best.length>23500 && best.length<=24000);
-  const url='https://example.test/'+ 'x'.repeat(2000)+'#challenge='+encodeURIComponent(best);
-  assert(url.length>24000 && url.length<28000);assert.equal(D.encode(D.decode(url)),best);
+  assert.equal(D.encode(D.decode(best)),best);
 });
 check('a walled-off entrance is caught while editing, not mid-playtest', () => {const l=D.defaults();l.objects=[0,1,2].map(i=>({kind:'wall',x:i*320,y:0,w:320,h:40}));assert.throws(()=>D.validate(l),/north entrance/);l.waves[0].enemies[0].kind='flyer';assert.doesNotThrow(()=>D.validate(l));l.waves[0].enemies[0].spawn='south';l.waves[0].enemies[0].kind='brute';assert.doesNotThrow(()=>D.validate(l));});
 check('the new enemy kinds are accepted', () => {const l=D.defaults();l.waves=[{delay:0,enemies:['flyer','charger','splitter','badger'].map(kind=>({kind,count:2,spawn:'east'}))}];assert.equal(D.validate(l).waves[0].enemies.length,4);const g=D.defaults();g.waves[0].enemies[0].kind='grub';assert.throws(()=>D.validate(g));});

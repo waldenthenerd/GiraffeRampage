@@ -35,7 +35,7 @@ var GRChallengeUI = (function(){
     let valid=true,reason='',codeLength=0;try{codeLength=D().encode(validate()).length;}catch(e){valid=false;reason=e.message;}
     dialog.querySelector('#cbValidation').textContent=valid?'Recipe checks pass. A playtest is still needed to check the fun and pacing.':reason;
     dialog.querySelector('#cbValidation').classList.toggle('cb-error',!valid);
-    dialog.querySelector('#cbShareInfo').textContent=valid?'Share recipe: '+codeLength.toLocaleString()+' characters · '+(proof===D().fingerprint(level)?'export ready':'clear this exact recipe to export')+'.':'Sharing unavailable: finish the recipe checks above.';
+    dialog.querySelector('#cbShareInfo').textContent=valid?(proof===D().fingerprint(level)?'Cleared: ready for a share code.':'Clear this exact recipe to get a share code.'):'Sharing unavailable: finish the recipe checks above.';
     dialog.querySelector('#cbToolHelp').textContent=toolHelp();
     dialog.querySelector('#cbObjectInfo').textContent=objectInfo();
     dialog.querySelector('#cbBiomeHelp').textContent=biomeHelp();
@@ -45,7 +45,7 @@ var GRChallengeUI = (function(){
     if(roster&&window.GRChallengePlay.getEnemy){roster.replaceChildren();Object.entries(ROLES).forEach(([kind,role])=>{const e=window.GRChallengePlay.getEnemy(kind),p=document.createElement('p'),pic=document.createElement('canvas');pic.width=pic.height=56;pic.className='cb-face';p.append(pic);try{window.GRChallengePlay.portrait(pic.getContext('2d'),kind,28,28,54,1);}catch(err){}p.append(document.createTextNode(kind+' · '+Math.round(e.hp*level.modifiers.enemyHp)+' HP · '+Math.round(e.speed*level.modifiers.speed)+' speed · '+e.damage+' damage per hit. '+role));roster.append(p);});}
     const verified=valid&&proof===D().fingerprint(level);
     dialog.querySelector('#cbProof').textContent=verified?'Cleared locally — this exact recipe is ready to share.':'Play and clear this exact recipe to unlock sharing. Changes reset the local clear.';
-    dialog.querySelectorAll('[data-cb="copy"],[data-cb="link"]').forEach(b=>b.disabled=!verified);
+    dialog.querySelectorAll('[data-cb="copy"]').forEach(b=>b.disabled=!verified);
     dialog.querySelector('[data-cb="undo"]').disabled=!undo.length;
     dialog.querySelector('[data-cb="redo"]').disabled=!redo.length;
   }
@@ -104,7 +104,7 @@ var GRChallengeUI = (function(){
       '<p id="cbObjectInfo" class="cb-help"></p><details><summary>Layout recipes (replace arena objects)</summary><div class="cb-toolbar">'+button('layout-courtyard','Courtyard')+button('layout-slalom','Slalom')+button('layout-fire','Ring of fire')+'</div></details>'+
       '<p class="cb-help">Tap to place on a 40-unit grid. Select an object to move, resize or duplicate it. Gold marker = player start. Trees, rocks and banners are decorative, not walls. Heal pickups restore 25% health. Keep entrances clear.</p><div class="cb-object-list">'+level.objects.map((o,i)=>'<span class="'+(selected===i?'cb-selected':'')+'">'+button('select-'+i,esc(objectLabel(o))+' ('+o.x+', '+o.y+')','aria-pressed="'+(selected===i)+'"')+button('object-'+i,'Remove','aria-label="Remove '+esc(objectLabel(o))+' at '+o.x+', '+o.y+'"')+'</span>').join('')+'</div></section></div><section class="cb-card" aria-label="Custom object designer">'+makerHTML()+'</section>'+
       '<section class="cb-card" aria-labelledby="cbWaves"><h2 id="cbWaves">3. Direct the waves</h2><p id="cbBudget" class="cb-help"></p><p class="cb-help">Each delay is measured after the preceding wave is cleared. Maximum 12 waves, four groups each and 240 enemies total.</p><div class="cb-toolbar">Quick wave: '+button('preset-swarm','Swarm')+button('preset-ambush','Ambush')+button('preset-finale','Brute finale')+'</div><details><summary>Meet the enemies</summary><div class="cb-roster">'+Object.entries(ROLES).map(([k,r])=>'<p><b>'+k+'</b> · '+r+'</p>').join('')+'</div></details>'+level.waves.map(waveHTML).join('')+button('add-wave','Add wave',''+(level.waves.length>=12?'disabled':''))+'</section>'+
-      '<section class="cb-card cb-launch"><h2>4. Clear it. Then share it.</h2><p id="cbProof"></p><p id="cbShareInfo" class="cb-help"></p><p class="cb-help">A local clear is a design check, not tamper-proof online verification. Imported codes never carry trusted completion claims. No campaign currency is awarded.</p><div class="cb-toolbar">'+button('play','Playtest level','class="cb-primary"')+button('copy','Get share code')+button('link','Get share link')+'</div><label>Share code or link<textarea id="cbCode" rows="3" maxlength="40000" spellcheck="false" placeholder="Paste a GRC1: code or challenge link to import. Exported codes also appear here if copying is unavailable."></textarea></label><div class="cb-toolbar">'+button('import','Import / remix')+button('hash','Read level from this page’s link')+'</div></section>'+
+      '<section class="cb-card cb-launch"><h2>4. Clear it. Then share it.</h2><p id="cbProof"></p><p id="cbShareInfo" class="cb-help"></p><p class="cb-help">A local clear is a design check, not tamper-proof online verification. Imported codes never carry trusted completion claims. No campaign currency is awarded.</p><div class="cb-toolbar">'+button('play','Playtest level','class="cb-primary"')+button('copy','Copy share code')+'</div><label>Share code<textarea id="cbCode" rows="3" maxlength="40000" spellcheck="false" placeholder="Paste a friend’s share code here (it starts with GRC3:; older GRC1: codes work too). Your own code also appears here when you copy it."></textarea></label><div class="cb-toolbar">'+button('import','Import / remix')+'</div></section>'+
       '<section class="cb-card"><h2>Saved recipes</h2><p class="cb-help">Up to 24 drafts, stored only in this browser, separate from your campaign save. Export a cleared recipe for a portable backup. Drafts do not sync to the cloud.</p><div id="cbDrafts"></div></section>';
     dialog.querySelectorAll('h1,h2').forEach(h=>h.classList.add('display'));
     dialog.querySelectorAll('.cb-card').forEach((s,i)=>{s.classList.add('slab');s.dataset.tab=['recipe','arena','designs','waves','share','share'][i]||'share';});
@@ -270,13 +270,16 @@ var GRChallengeUI = (function(){
   function importCode(code){
     const next=D().decode(code);setLevel(next);draftId=null;note('Imported “'+next.title+'” by '+(next.author||'an unnamed creator')+'. Edit it to remix; a new local clear is needed before sharing.');
   }
-  async function share(link){
+  /* the share code: the exact cleared recipe, packed small with the game's GR3 compressor (it takes a moment); there are no links */
+  async function share(){
     const valid=validate();if(proof!==D().fingerprint(valid))throw Error('Clear this exact recipe before sharing.');
-    const code=D().encode(valid),url=new URL(window.location.href);url.hash='challenge='+encodeURIComponent(code);
-    const value=link?url.href:code;dialog.querySelector('#cbCode').value=value;
-    try{await navigator.clipboard.writeText(value);note((link?'Share link':'Challenge code')+' copied.');}
-    catch(e){dialog.querySelector('#cbCode').focus();dialog.querySelector('#cbCode').select();note('Ready below. Select and copy the text to share.');}
+    note('Packing the share code…');await new Promise(r=>setTimeout(r,30));
+    const code=D().shareCode(valid),plain=D().encode(valid).length;dialog.querySelector('#cbCode').value=code;
+    const size=code.length.toLocaleString()+' characters'+(code.startsWith('GRC3:')&&plain>code.length?' (packed to '+Math.round(code.length/plain*100)+'% of the plain recipe)':'');
+    try{await navigator.clipboard.writeText(code);note('Share code copied: '+size+'. Your friend pastes it into Import / remix.');}
+    catch(e){dialog.querySelector('#cbCode').focus();dialog.querySelector('#cbCode').select();note('Share code ready below ('+size+'). Select it and copy it.');}
   }
+
   function showAgain(){if(dialog&&!dialog.open){dialog.showModal();dialog.querySelector('[data-cb="play"]').focus();}}
   function play(){
     const valid=validate(),fp=D().fingerprint(valid);dialog.close();
@@ -296,9 +299,8 @@ var GRChallengeUI = (function(){
       if(a==='undo'){if(undo.length){redo.push(clone(level));level=undo.pop();proof='';render();}return;}
       if(a==='redo'){if(redo.length){undo.push(clone(level));level=redo.pop();proof='';render();}return;}
       if(a==='play'){play();return;}
-      if(a==='copy'||a==='link'){share(a==='link').catch(e=>note(e.message,true));return;}
+      if(a==='copy'){share().catch(e=>note(e.message,true));return;}
       if(a==='import'){importCode(dialog.querySelector('#cbCode').value);return;}
-      if(a==='hash'){if(!window.location.hash.includes('challenge='))throw Error('This page link has no challenge code. Paste a friend’s code above.');importCode(window.location.href);return;}
       if(a==='checker'){checker=!checker;const b=dialog.querySelector('[data-cb="checker"]');b.textContent='Checkerboard '+(checker?'on':'off');b.setAttribute('aria-pressed',String(checker));paintMaker();return;}
       if(a==='biome-colors'){const candidate=clone(level);candidate.appearance.palette='biome';const colors=window.GRChallengePlay.getPalette(candidate);remember();level.appearance.colors=colors;level.appearance.palette='custom';render();return;}
       if(a.startsWith('asset-')){
@@ -413,27 +415,11 @@ var GRChallengeUI = (function(){
     }
     render();dialog.showModal();dialog.querySelector('[data-cb="close"]').focus();
     if(!padLoop)padLoop=requestAnimationFrame(padTick);
-    if(window.location.hash.includes('challenge='))note('This link includes a challenge. Choose “Read level from this page’s link” to review it. Nothing runs automatically.');
   }
   function close(){if(dialog){dialog.close();oldFocus?.focus();}}
-  return {open,close,importFromHash(){open();action('hash');},isOpen(){return !!(dialog&&dialog.open);},tab(t){if(t)showTab(t);return tab;}};
+  return {open,close,level(){return level;},isOpen(){return !!(dialog&&dialog.open);},tab(t){if(t)showTab(t);return tab;}};
 })();
 window.GRChallengeUI=GRChallengeUI;
-/* the offer shown for a challenge link while the add-on is off */
-function challengeLinkOffer(){
-  const d = document.createElement('dialog'); d.id = 'cbLinkOffer'; d.className = 'panel slab';
-  d.style.cssText = 'max-width:440px;width:calc(100% - 32px);padding:22px;color:var(--bone);font:inherit';
-  d.innerHTML = '<h2 class="head" style="margin-top:0">A challenge for you</h2><p class="sub">This link carries a level made in the <b>Challenge Workshop</b>, an add-on that is switched off. Switch it on to look at the level? Nothing plays by itself, and it never touches your progress.</p>' +
-    '<div class="row" style="justify-content:flex-end;gap:10px;margin-top:14px"><button type="button" class="btn sm ghost" data-x="no">Not now</button><button type="button" class="btn sm" data-x="yes">Switch it on and open</button></div>';
-  document.body.appendChild(d);
-  d.addEventListener('click', function(e){
-    const b = e.target.closest('[data-x]'); if (!b) return;
-    d.close(); d.remove();
-    if (b.dataset.x === 'yes'){ addonSet('challenges', true); SFX.click(); GRChallengeUI.importFromHash(); }
-  });
-  d.addEventListener('cancel', function(){ d.remove(); });
-  d.showModal();
-}
 /* the way in, only while the add-on is on: with it off the menu, the actions and the Guide are exactly as before */
 (function(){
   const baseTownButton = townButtonHTML;
@@ -463,20 +449,7 @@ function challengeLinkOffer(){
     }
     return basePoll.apply(this, arguments);
   };
-  /* someone opened a challenge link: with the add-on on, the workshop opens on it (nothing plays by itself); with it off, the game offers to switch it on */
-  let linkSeen = false;
-  const baseMenu = showMenu;
-  showMenu = function(){
-    const r = baseMenu.apply(this, arguments);
-    try {
-      if (!linkSeen && !G.splash && /[#&]challenge=GRC1/.test(window.location.hash)){
-        linkSeen = true;
-        if (addonOn('challenges')) GRChallengeUI.importFromHash(); else challengeLinkOffer();
-      }
-    } catch (e) {}
-    return r;
-  };
   GUIDE_TOPICS.push({ id: 'challenges', title: 'Challenge Workshop', show: function(){ return addonOn('challenges'); }, html: function(){
-    return '<p>Open Challenge Workshop from the main menu to build a separate, small arena challenge. Choose waves, place objects, set an objective and pick a fixed starting kit. These challenges do not use campaign equipment and cannot award campaign progress.</p><p>Save drafts in this browser, or clear the exact recipe to copy a share code or link. Friends with the add-on on can paste it into Import / remix. A local clear is not online anti-cheat verification. Editing a recipe resets its sharing check. Drafts do not travel with cloud saves.</p><p>It is an add-on: switch it on or off on the Add-ons page.</p>';
+    return '<p>Open Challenge Workshop from the main menu to build a separate, small arena challenge. Choose waves, place objects, set an objective and pick a fixed starting kit. These challenges do not use campaign equipment and cannot award campaign progress.</p><p>Save drafts in this browser, or clear the exact recipe to copy a share code. Friends with the add-on on paste it into Import / remix. A local clear is not online anti-cheat verification. Editing a recipe resets its sharing check. Drafts do not travel with cloud saves.</p><p>It is an add-on: switch it on or off on the Add-ons page.</p>';
   } });
 })();

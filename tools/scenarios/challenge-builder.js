@@ -5,11 +5,9 @@ var addonOff = { listed: addonsList().some(function(a){ return a.id === 'challen
 GR.showMenu(); addonOff.noButton = !document.querySelector('[data-a="challenge-open"]');
 addonOff.noGuide = GUIDE_TOPICS.filter(function(t){ return t.id === 'challenges'; }).every(function(t){ return !t.show(); });
 GR.handleAction('challenge-open'); addonOff.noOpen = !document.querySelector('#challengeBuilder') && !document.getElementById('cbStyle');
+/* sharing is by code only: a challenge in the page's address does nothing */
 history.replaceState(null,'',location.pathname+location.search+'#challenge='+encodeURIComponent(GRChallengeData.encode(GRChallengeData.templates[1].level)));
-GR.showMenu(); addonOff.linkOffer = !!document.getElementById('cbLinkOffer') && document.getElementById('cbLinkOffer').open;
-if (addonOff.linkOffer) document.querySelector('#cbLinkOffer [data-x="no"]').click();
-addonOff.offerGone = !document.getElementById('cbLinkOffer') && !addonOn('challenges');
-GR.showMenu(); addonOff.offerOnce = !document.getElementById('cbLinkOffer');
+GR.showMenu(); addonOff.noLinkOffer = !document.getElementById('cbLinkOffer') && !document.querySelector('#challengeBuilder');
 history.replaceState(null,'',location.pathname+location.search);
 addonSet('challenges', true);
 (function(){
@@ -20,6 +18,8 @@ addonSet('challenges', true);
   function click(a){var b=find('[data-cb="'+a+'"]');if(!b)throw Error('Missing action '+a);b.click();}
   function edit(path,value,inputOnly){var el=find('[data-path="'+path+'"]');el.value=value;el.dispatchEvent(new Event(inputOnly?'input':'change',{bubbles:true}));}
   function importLevel(l){find('#cbCode').value=GRChallengeData.encode(l);click('import');}
+  /* the Copy button packs after a short wait (timers do not run in this test page), so the scenario makes the same code the same way */
+  function await_share(){var v=GRChallengeData.validate(JSON.parse(JSON.stringify(GRChallengeUI.level())));find('#cbCode').value=GRChallengeData.shareCode(v);}
   function returnToBuilder(){var b=Array.from(document.querySelectorAll('#challengePlay button')).find(function(n){return n.textContent==='Back to builder';});if(!b)throw Error('No play return button');b.click();}
   try{
     GR.showMenu();document.querySelector('[data-a="challenge-open"]').click();
@@ -74,11 +74,14 @@ addonSet('challenges', true);
     var result=GRChallengePlay.advance(1.1);check('survival win',result.ended&&result.result.won);returnToBuilder();
     check('return opens builder',document.querySelector('#challengeBuilder').open);
     check('exact local clear unlocks sharing',!find('[data-cb="copy"]').disabled);
-    click('copy');var code=find('#cbCode').value,shared=GRChallengeData.decode(code);check('shared recipe roundtrip',shared.seed===4294967295);
+    check('no link buttons',!find('[data-cb="link"]')&&!find('[data-cb="hash"]'));
+    await_share();var code=find('#cbCode').value,shared=GRChallengeData.decode(code);check('shared recipe roundtrip',shared.seed===4294967295);
+    check('share code is GR3-packed and smaller',/^GRC3:/.test(code)&&code.length<GRChallengeData.encode(shared).length);
     check('environment and balance options roundtrip',shared.appearance.time==='night'&&shared.appearance.weather==='drizzle'&&shared.appearance.detail===2&&shared.modifiers.playerSpeed===1.4&&shared.modifiers.attackRate===1.5);
     edit('title','Uncommitted input edit',true);check('input immediately revokes proof before blur',find('[data-cb="copy"]').disabled);
-    click('play');GRChallengePlay.advance(1.1);returnToBuilder();click('link');
-    check('share URL decodes',GRChallengeData.decode(find('#cbCode').value).title==='Uncommitted input edit');
+    click('play');GRChallengePlay.advance(1.1);returnToBuilder();await_share();
+    check('new share code after the edit',GRChallengeData.decode(find('#cbCode').value).title==='Uncommitted input edit');
+    find('#cbCode').value='https://example.test/#challenge='+encodeURIComponent(find('#cbCode').value);click('import');check('a link is refused',find('#cbNotice').classList.contains('cb-error')&&/share code/.test(find('#cbNotice').textContent));
     click('add-wave');check('wave edit revokes proof',find('[data-cb="copy"]').disabled);
     importLevel(GRChallengeData.defaults());edit('title','UI object editing');click('tool-tree');find('#cbWidth').value='120';find('#cbHeight').value='80';find('#cbX').value='920';find('#cbY').value='600';click('place');
     check('placement dimensions clamp inside arena',find('.cb-object-list').textContent.includes('tree (840, 560)'));
@@ -104,7 +107,7 @@ addonSet('challenges', true);
     click('select-0');find('#cbWidth').value='120';click('apply');click('clone');
     find('#cbX').value='480';find('#cbY').value='320';find('#cbWidth').value='40';find('#cbHeight').value='40';click('place');check('custom solid spawn guard',find('#cbNotice').textContent.includes('breathing room'));
     click('asset-delete');check('in-use asset deletion refused',find('#cbNotice').textContent.includes('in use')&&!!find('[data-path="customAssets.0.name"]'));
-    click('play');GRChallengePlay.advance(1.1);returnToBuilder();click('copy');
+    click('play');GRChallengePlay.advance(1.1);returnToBuilder();await_share();
     var customShared=GRChallengeData.decode(find('#cbCode').value);
     check('custom art biome palette roundtrip',customShared.arena.theme==='forest'&&customShared.appearance.palette==='custom'&&customShared.appearance.colors.ground==='#bb8866'&&customShared.customAssets[0].name==='Golden lantern'&&customShared.customAssets[0].parts.length===2&&customShared.customAssets[0].parts[1].rotation===30&&customShared.objects.length===2&&customShared.objects[0].w===120&&customShared.objects[1].asset===customShared.customAssets[0].id);
     check('layer fill and outline roundtrip',customShared.customAssets[0].parts[1].opacity===0.6&&customShared.customAssets[0].parts[1].stroke==='#654321'&&customShared.customAssets[0].parts[1].strokeWidth===2&&customShared.customAssets[0].parts[0].opacity===1&&customShared.customAssets[0].parts[0].strokeWidth===0);
@@ -116,7 +119,7 @@ addonSet('challenges', true);
     ['lantern','crate','crystal'].forEach(function(kind){click('asset-starter-'+kind);check(kind+' starter added',find('#cbMakerCanvas')&& !find('#cbValidation').classList.contains('cb-error'));});
     edit('title','UI detail actions',true);click('save');var detailDraft=GRChallengeData.decode(GRChallengeData.listDrafts().find(function(d){return d.title==='UI detail actions';}).code);
     check('layer actions and starter designs persist',detailDraft.customAssets.length===4&&detailDraft.customAssets[0].parts.length===3&&detailDraft.customAssets[0].parts[1].x===25&&detailDraft.customAssets[0].parts[1].y===25&&detailDraft.customAssets[0].parts[1].rotation===-30&&detailDraft.customAssets.some(function(a){return a.name==='Timber crate'&&a.solid;}));
-    check('share recipe length visible',/characters/.test(find('#cbShareInfo').textContent));
+    check('share status says what to do',/share code/.test(find('#cbShareInfo').textContent));
     check('enemy stats and wave summary visible',find('.cb-roster').textContent.includes('HP')&&find('#cbWaveSummary0').textContent.includes('enemies'));
     check('campaign state isolated',JSON.stringify(Save.data)===campaign&&localStorage.getItem(GRSave.key)===stored&&G.state===state);
     var r=document.querySelector('#challengeBuilder').getBoundingClientRect();check('fits viewport',r.width<=innerWidth+1&&r.height<=innerHeight+1);
