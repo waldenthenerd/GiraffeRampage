@@ -28,7 +28,7 @@ function showAddons(){
   const rows = all.length ? all.map(addonRowHTML).join('')
     : '<div class="addonempty">No add-ons yet. New and experimental features will appear here, each with a switch of its own, so you can try them and turn them off again.</div>';
   setOverlay(
-    '<div class="panel slab wide" style="max-width:560px">' +
+    '<div class="panel slab wide addonspanel" style="max-width:560px">' +
       '<h2 class="head">Add-ons</h2>' +
       '<p class="sub">Optional features that sit beside the main game: experiments, extras and silly things. Each one is off until you switch it on, and changes save as you make them. While any is on, the HUD and the run report say so.</p>' +
       '<div class="addonlist">' + rows + '</div>' +

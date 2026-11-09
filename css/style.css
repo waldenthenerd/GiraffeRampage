@@ -55,6 +55,7 @@ body{
 .addontag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid;border-radius:6px;padding:0 5px;margin-left:6px;vertical-align:2px}
 .addonrow small em{display:block;font-style:normal;color:var(--sun);margin-top:2px}
 .addonrow.locked{opacity:.6}
+@media (max-height:520px){.addonspanel{padding-top:12px;padding-bottom:12px}.addonspanel .head{margin:0 0 4px}.addonspanel>.sub{display:none}.addonlist{max-height:calc(100dvh - 120px)}.addonspanel .row{margin-top:8px!important}}
 .addonempty{padding:18px 12px;text-align:center;color:var(--dust);border:1px dashed rgba(255,255,255,.18);border-radius:10px;margin-top:6px}
 .chaptag.jungle{color:#7FD65A}
 .chaptag.city{color:#E8B84A}
