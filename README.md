@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 241 | 74,347 | 6.18 MiB (6,485,060 bytes) |
+| JavaScript (`js/`) | 241 | 74,359 | 6.19 MiB (6,486,108 bytes) |
 | Styles (`css/`) | 6 | 1,842 | 173 KiB (177,418 bytes) |
 | Page (`index.html`) | 1 | 292 | 15.0 KiB (15,312 bytes) |
-| **Whole game** | **248** | **76,481** | **6.37 MiB (6,677,790 bytes)** |
+| **Whole game** | **248** | **76,493** | **6.37 MiB (6,678,838 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **75,880 lines, 6.32 MiB (6,630,808 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 241 | 74,347 | 6.18 MiB (6,485,060 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **75,892 lines, 6.32 MiB (6,631,856 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 241 | 74,359 | 6.19 MiB (6,486,108 bytes) |
 | Styles (`css/`) | 6 | 1,842 | 173 KiB (177,418 bytes) |
 | Page (`index.html`) | 1 | 292 | 15.0 KiB (15,312 bytes) |
-| **Whole game** | **248** | **76,481** | **6.37 MiB (6,677,790 bytes)** |
+| **Whole game** | **248** | **76,493** | **6.37 MiB (6,678,838 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -85,8 +85,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 |---|---|---|
 | `js/core/00-icons.js` | 98 | The icon table (41 outlined icons drawn for this game) and the icon helpers. Runs outside strict mode, as it always did. |
 | `js/core/00b-icons-custom.js` | 154 | Every icon in the game other than the 41 in `00-icons.js` is drawn here (24x24 outlines in the same style, written `'@t-x-name'`). The old filled icon table is gone; `ICON_MIGRATE` maps the old names to the new pictures so an old name still resolves. To add an icon, put its path here and use it as `icon`. |
-| `js/core/01-core.js` | 382 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. Save fields `chapter14Complete` (13.5, the Domes), `chapter15Complete` (14, the Tower) and `chapter16Complete` (15, the Siege), and `siegeHeldBest` and `siegeFlawless` (how many waves of the Siege she held, and whether all 25); `chapter17Complete` (16, Fort Shortneck), `fortChaosBest`, `fortBadges` (a bit for each of the eight chaos levels reached, for good) and `fortBestWave`. |
-| `js/core/01b-savepack.js` | 522 | Save compression: the save is stored as a JSON string holding `GR3:` + base 91 text of a context-mixing / arithmetic-coded copy of its JSON, primed with a frozen sample save (roughly a quarter of the GR2 size); each write is stored as `GR2:` (Base64 of LZW) at once and repacked as GR3 a few seconds later. GR2 and old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `flush`, `stats`). Format in the file header and in `lovable.md`. |
+| `js/core/01-core.js` | 383 | Utilities, audio synthesis (with the limiter, voice cap and stereo placement), spatial grid, save/meta data, global game state. Save fields `chapter14Complete` (13.5, the Domes), `chapter15Complete` (14, the Tower) and `chapter16Complete` (15, the Siege), and `siegeHeldBest` and `siegeFlawless` (how many waves of the Siege she held, and whether all 25); `chapter17Complete` (16, Fort Shortneck), `fortChaosBest`, `fortBadges` (a bit for each of the eight chaos levels reached, for good) and `fortBestWave`. |
+| `js/core/01b-savepack.js` | 533 | Save compression: the save is stored as a JSON string holding `GR3:` + base 91 text of a context-mixing / arithmetic-coded copy of its JSON, primed with a frozen sample save (roughly a quarter of the GR2 size); each write is stored as `GR2:` (Base64 of LZW) at once and repacked as GR3 a few seconds later on a menu-like screen (`WRITE3` is on), and an older GR2 or plain JSON save is repacked the same way, unchanged, after it loads (`adopt`). GR2 and old plain JSON saves are still read. Exposes `window.GRSave` (`encode`, `decode`, `read`, `flush`, `stats`). Format in the file header and in `lovable.md`. |
 | `js/audio/02-music.js` | 350 | Which music plays where (`Music.refresh`: the chapter, its boss, a boss at half health, the town by day, night and in the Burrows, the screens, the films, the minigames), the old theme table (`MUSIC_THEMES`, still the list of places), the key climbing through a chapter, the run's tempo, the low-health muffle, the fade between songs and the stingers. The sequencer in it is replaced by the band (`02e`-`02g`). |
 | `js/audio/02b-ambience.js` | 135 | Extra sounds (card pick, wave clear, heartbeat, heavy thump), the per-chapter ambient bed that follows the weather, gamepad rumble. |
 | `js/audio/02c-audio-mix.js` | 334 | Sound design on top of the synth: a reverb that follows the place (`MIX_ENV`), a hit sound per element, a death sound per kind of creature, an attack sound per kind of enemy (`Mix.variant`), boss roar, death and half-health growl, footsteps by ground, the music stingers, and the ambience extras (thunder with a delay, sweeping wind gusts, far-off calls). |

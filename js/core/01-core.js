@@ -225,6 +225,7 @@ const Save = {
   load(){
     let d = null, raw = null;
     try { raw = window.localStorage.getItem(SAVE_KEY); if (raw) d = GRPack.decode(raw); } catch (e) { d = null; }      /* packed (js/core/01b-savepack.js) or an older plain JSON save */
+    if (d && typeof d === 'object' && !Array.isArray(d)) try { GRPack.adopt(raw, d); } catch (e) {}                 /* a GR2 or plain JSON save is repacked as GR3 a little later, exactly as it is */
     if (!d || typeof d !== 'object' || Array.isArray(d)){
       d = null;                                                                   /* a damaged or foreign save is ignored, not half-used... */
       if (raw){                                                                   /* ...but the next write would overwrite it for good, so keep the raw text aside first (the first copy is kept, never replaced) */

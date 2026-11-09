@@ -359,8 +359,9 @@ either way; the point is the cloud row and the localStorage are smaller, and pho
 
 ### The newer format: GR3
 
-From the release that sets `WRITE3 = true`, `GR3:` replaces GR2 as what the save rests as. `Save.write()` always stores GR2 (fast, synchronous) and the **same text** is repacked as GR3 about four
-seconds later (not during a run), or at once when the page is hidden or closed. The repack is only stored if nothing else wrote in between and if decoding
+This version sets `WRITE3 = true`: `GR3:` replaces GR2 as what the save rests as. `Save.write()` always stores GR2 (fast, synchronous) and the **same text** is repacked as GR3 about four
+seconds later, on a menu-like screen only (never in a run, at sea, in town or in a minigame), or at once when the page is hidden or closed. A save stored before this (GR2, or plain JSON
+from long ago) is repacked the same way a few seconds after it loads, exactly as it was, so every save comes to rest as GR3; GR2 and plain JSON are still read forever. The repack is only stored if nothing else wrote in between and if decoding
 it gives the identical text; otherwise the GR2 copy stays. The value is still a JSON string literal, `"GR3:..."`.
 
 After `GR3:` comes **base 91** text (the printable ASCII characters except `"` and `\`: `#` to `~` without `\`; four bytes become five characters, a last
