@@ -66,7 +66,10 @@ size to keep working, buttons reachable without scrolling where they can be), an
 - Headless frames are throttled and timers do not fire: drive the game with `GR.step(dt)` loops and call tick functions by hand. The scenario format, the
   `GR` and `QA` API and a description of every scenario are in `tools/QA-GUIDE.md`.
 - **Before you open a pull request run `bash tools/ci-check.sh`.** It is the same script GitHub runs on every push and pull request (`.github/workflows/qa.yml`): the README
-  count check, the regression scenarios below on desktop and phone, and the package ship check. It takes about a minute and must end with `All <n> checks passed.`
+  count check, the regression scenarios below on desktop and phone, and the package ship check. It must end with `All <n> checks passed.`
+  It runs the browser checks side by side, one per processor core (about 6 minutes on 4 cores; `CI_JOBS=1` runs them one at a time), and GitHub splits them over three
+  machines (`CI_SHARD=i/n` runs one share; `CI_LIST=1` only lists a share's checks). A scenario that measures time (a drawing budget, a frame-time comparison)
+  goes in the `timed` list in `tools/ci-check.sh`, so it runs alone on a quiet machine after the others.
   Also run the scenarios that touch what you changed. The regressions it covers are: `gear-oldsave`, `trinket-ui`, `wheel-spotted`,
   `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `save-gr3`, `npc-voices`, `gear-spotted`, `perf-cache`, `save-erase`, `gold-bank`, `together`, `achievements`, `gags`, `fishing`, `fishing-fight`, `input-choice`, `town-layers`, `wheels`, `intel`, `uni-bank`, `uni-slides`, `ui-pass`, `enemy-detail`, `enemy-motion`, `scenery-detail`, `minimap`, `domes`, `tower`, `siege`, `fort`, `island`, `camp`, `late-polish`, `sea-chart`,
   `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, `music`, `jukebox`, `town-choices`, `particles`, `gadgets`, `town-detail`, `sky-chase`, `addons`, `challenge-builder` (also at 390x844 and 844x390 with `--touch`, and its unit tests `tools/challenge-data-test.mjs` and `tools/challenge-play-test.mjs`), `film-sheet` (with `--params "kind=all"`), and `phone-pass` (with `--touch`). Then build the website package and check it:
