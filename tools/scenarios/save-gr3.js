@@ -34,6 +34,15 @@ try {
   /* a flush with nothing new, or after another writer, leaves storage alone */
   out.flushIdle = GRSave.flush() === false;
   Save.write(); localStorage.setItem(KEY, '{"gold":5}'); out.flushStale = GRSave.flush() === false && localStorage.getItem(KEY) === '{"gold":5}';
+  /* 3b. every save comes to rest as GR3: an old GR2 save and an old plain JSON save, once loaded, are repacked as GR3 exactly as they were; a GR3 save is left alone */
+  out.autoOn = GRPack.auto === true;
+  localStorage.setItem(KEY, JSON.stringify(fast)); Save.load();
+  out.gr2Pending = GRPack.pending() === true;
+  var t1 = performance.now(); out.gr2Flushed = GRSave.flush() === true; out.repackMs = Math.round(performance.now() - t1);
+  out.gr2NowGr3 = /^"GR3:/.test(localStorage.getItem(KEY)) && JSON.stringify(GRSave.read()) === JSON.stringify(GRSave.decode(fast)) && Save.data.gold === 48213977;
+  var plain = JSON.stringify({ gold: 4242, best: 12, meta: {}, chapter3Complete: true }); localStorage.setItem(KEY, plain); Save.load();
+  out.plainNowGr3 = GRSave.flush() === true && /^"GR3:/.test(localStorage.getItem(KEY)) && JSON.stringify(GRSave.read()) === plain && Save.data.gold === 4242 && Save.data.chapter3Complete === true;
+  Save.load(); out.gr3Left = GRPack.pending() === false && GRSave.flush() === false;
   /* 4. old formats still read */
   out.readsGr2 = GRSave.decode(fast).gold === 48213977 && GRSave.decode(JSON.stringify(fast)).gold === 48213977;
   out.readsPlain = GRSave.decode('{"gold":777}').gold === 777;
@@ -50,6 +59,6 @@ try {
   /* 6. the model's tables are not kept after a call (memory): repeated encodes give the same text */
   out.stable = GRSave.encode(gold) === GOLDEN && GRSave.encode(gold) === GOLDEN;
 } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
-out.pass = !!(out.golden && out.goldenReads && out.alphabet && out.bigGr3 && out.bigRound && out.smaller && out.writeIsFast && out.flushed && out.nowGr3 && out.loadedSame && out.flushIdle && out.flushStale &&
+out.pass = !!(out.golden && out.goldenReads && out.alphabet && out.bigGr3 && out.bigRound && out.smaller && out.writeIsFast && out.flushed && out.nowGr3 && out.loadedSame && out.flushIdle && out.flushStale && out.autoOn && out.gr2Pending && out.gr2Flushed && out.gr2NowGr3 && out.plainNowGr3 && out.gr3Left &&
   out.readsGr2 && out.readsPlain && out.flipNull && out.cutNull && out.lieNull && out.fast && out.keptAside && out.stable && !out.errs.length);
 QA.done(out);

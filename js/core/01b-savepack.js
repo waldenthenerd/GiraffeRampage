@@ -448,21 +448,32 @@ const GRPack = (function(){
     return readCode3(m, str);
   }
   /* Writing. Save.write() runs often, and the GR3 model takes a few hundred milliseconds, so a write is stored at once in GR2 (fast) and the same text is
-     repacked as GR3 later: after a quiet moment (not in the middle of a run), or as soon as the page is hidden. If anything else was written in between,
-     or the repack does not give the text back, the GR2 copy simply stays. */
-  const WRITE3 = false;                                                       /* false: read GR3 but only write GR2 by itself (the first release, so every copy of the game can read GR3 before any writes it); flush() still repacks on demand */
+     repacked as GR3 later: after a quiet moment on a menu-like screen (never in a run, at sea, in town or a minigame), or as soon as the page is hidden.
+     If anything else was written in between, or the repack does not give the text back, the GR2 copy simply stays.
+     A save that was stored before this (GR2, or plain JSON from long ago) is handed over by Save.load with adopt(), and repacked the same way, unchanged:
+     every save comes to rest as GR3, and GR2 and plain JSON are still read forever. */
+  const WRITE3 = true;                                                        /* on since the release after GR3 reading shipped, so copies of the game that read GR3 came first */
+  const QUIET = ['menu', 'shop', 'help', 'paused', 'dead', 'victory', 'bestiary'];   /* screens where a few hundred milliseconds of packing cannot be felt */
   let pendingJson = null, lastFast = null, timer = 0;
+  function schedule(ms){ if (!WRITE3) return; clearTimeout(timer); timer = setTimeout(function(){ upgrade(false); }, ms); }
   function wrote(raw){
     if (!pendingJson) return;
     lastFast = raw;
-    if (!WRITE3) return;
-    clearTimeout(timer); timer = setTimeout(function(){ upgrade(false); }, 4000);
+    schedule(4000);
+  }
+  /* a save read at load time that is not GR3 yet: remember exactly what it holds (before anything sanitizes it), and repack that */
+  function adopt(raw, obj){
+    try {
+      if (typeof raw !== 'string' || !obj || typeof obj !== 'object' || /^"?GR3:/.test(raw.trim())) return false;
+      pendingJson = JSON.stringify(obj); lastFast = raw; schedule(6000);
+      return true;
+    } catch (e) { return false; }
   }
   function upgrade(force){
     timer = 0;
     try {
       if (!lastFast) return false;
-      if (!force && typeof G !== 'undefined' && (G.state === 'playing' || G.state === 'sail')){ timer = setTimeout(function(){ upgrade(false); }, 8000); return false; }
+      if (!force && typeof G !== 'undefined' && G.state && QUIET.indexOf(G.state) < 0){ schedule(8000); return false; }
       const ls = window.localStorage;
       if (ls.getItem(SAVE_KEY) !== lastFast) { lastFast = null; return false; }           /* something else wrote since: leave it alone */
       const code = encode3(pendingJson);
@@ -505,7 +516,7 @@ const GRPack = (function(){
       return JSON.parse(new TextDecoder().decode(raw));
     } catch (e) { return null; }
   }
-  return { encode: encode, encodeFast: encodeFast, wrote: wrote, flush: function(){ return upgrade(true); }, decode: decode, MAGIC: MAGIC, MAGIC3: MAGIC3 };
+  return { encode: encode, encodeFast: encodeFast, wrote: wrote, adopt: adopt, flush: function(){ return upgrade(true); }, pending: function(){ return !!lastFast; }, auto: WRITE3, decode: decode, MAGIC: MAGIC, MAGIC3: MAGIC3 };
 })();
 
 window.GRSave = {
