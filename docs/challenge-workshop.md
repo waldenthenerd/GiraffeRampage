@@ -19,6 +19,17 @@ What changed in the move: the files and their tests moved to the paths above, th
 11. The arena's ground is drawn once and reused (about 3.4 ms down to 0.24 ms a frame).
 12. Short screens (a phone held sideways) get a taller arena in a playtest.
 
+## Detail pass
+
+1. Objects in each biome's own materials: walls (stone, ice blocks with icicles, metal panels, log palisade, adobe, mossy stone, basalt with glowing seams) and hazards (bramble, thin ice, glowing crater, mushroom patch, quicksand, acid bog, lava).
+2. Things that move in a playtest: coins spin and glint, heals bob and glow, exits are swirling portals with lamps, banners ripple, trees sway, lava and seams breathe.
+3. The arena's rim, and the edges waves come from marked with chevrons and a count; they light up just before a wave arrives from them.
+4. Small life by biome and time of day: butterflies, fireflies at night, dust, bubbles and dragonflies, embers, ice glints.
+5. Playtest effects: footstep dust, hit sparks and rings, kill puffs in the creature's colour, coin sparkle, heal pluses, a swept kick, thrown seeds with trails, a dash trail, flyers drawn above the walkers with their shadow on the ground, a shake and red edges when hurt, a slow red pulse at low health.
+6. A wave ribbon that names what is coming ("3 hyenas from the north · 2 vultures over the walls").
+7. An end card with the run's numbers and a gold, silver or bronze medal by health left (the medal is in the result too).
+8. Editor: a see-through preview of what you are about to place (red with the reason if it would be refused), erase and select outlines, tool icons painted in the recipe's biome, and creature pictures in the roster and on each wave row.
+
 The notes below are Codex's.
 
 1. Main-menu workshop and an always-available Guide topic.

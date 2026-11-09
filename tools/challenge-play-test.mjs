@@ -199,5 +199,21 @@ check('Arena body sizes match the recipe check, and heals show whole numbers',()
   let s;for(let i=0;i<600;i++){s=R.advance(1/60);if(s.heals)break;}
   if(s.heals)assert.ok(Number.isInteger(s.player.hp)||s.fx.every(f=>!/\./.test(f.label)));
 });
+check('Every object kind paints in every biome, balanced, with biome-specific walls and hazards, and still when time moves',()=>{
+  const kinds=['wall','hazard','coin','heal','exit','tree','rock','banner'],walls=new Set(),haz=new Set();
+  for(const theme of ['savanna','arctic','moon','forest','desert','swamp','volcanic']){
+    const l=level();l.arena.theme=theme;
+    for(const kind of kinds)for(const time of [0,1.7]){const c=recordingCanvas();R.paintObject(c.ctx,l,{kind,x:100,y:100,w:120,h:80},{time});assert.equal(c.depth(),0,kind+' '+theme);assert.ok(c.calls.length>4);
+      if(time===0&&kind==='wall')walls.add(JSON.stringify(c.calls));if(time===0&&kind==='hazard')haz.add(JSON.stringify(c.calls));}
+  }
+  assert.equal(walls.size,7);assert.equal(haz.size,7);
+  const l=level();l.waves=[{delay:0,enemies:[{kind:'chaser',count:2,spawn:'north'},{kind:'runner',count:1,spawn:'east'}]}];
+  const a=recordingCanvas();R.paintArena(a.ctx,l,{time:1,live:true,entrances:{north:1}});assert.equal(a.depth(),0);assert.ok(a.calls.some(v=>v[0]==='fillText'&&v[1]==='×2'));
+});
+check('A won run earns a medal by health left; a lost run none',()=>{
+  const l=level('survive',1);R.start(l);let s=R.advance(2);assert.equal(s.result.medal,'gold');
+  const k=level('survive',300);k.waves=[{delay:0,enemies:[{kind:'brute',count:6,spawn:'north'}]}];k.modifiers.enemyHp=3;R.start(k);s=R.advance(300);assert.equal(s.result.won,false);assert.equal(s.result.medal,null);
+  for(const kind of D.kinds){const c=recordingCanvas();R.portrait(c.ctx,kind,20,20,40,0);assert.equal(c.depth(),0);}
+});
 check('Campaign storage remains byte-for-byte untouched',()=>{assert.deepEqual([...storage],[['giraffe_rampage_save_v1','campaign sentinel']]);});
 console.log(JSON.stringify({pass:true,tests}));
