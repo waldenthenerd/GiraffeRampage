@@ -66,10 +66,13 @@ size to keep working, buttons reachable without scrolling where they can be), an
 - Headless frames are throttled and timers do not fire: drive the game with `GR.step(dt)` loops and call tick functions by hand. The scenario format, the
   `GR` and `QA` API and a description of every scenario are in `tools/QA-GUIDE.md`.
 - **Before you open a pull request run `bash tools/ci-check.sh`.** It is the same script GitHub runs on every push and pull request (`.github/workflows/qa.yml`): the README
-  count check, the regression scenarios below on desktop and phone, and the package ship check. It must end with `All <n> checks passed.`
-  It runs the browser checks side by side, one per processor core (about 6 minutes on 4 cores; `CI_JOBS=1` runs them one at a time), and GitHub splits them over three
-  machines (`CI_SHARD=i/n` runs one share; `CI_LIST=1` only lists a share's checks). A scenario that measures time (a drawing budget, a frame-time comparison)
-  goes in the `timed` list in `tools/ci-check.sh`, so it runs alone on a quiet machine after the others.
+  count check, the regression scenarios below on desktop and phone, the package ship check, and the coverage record (no check may go missing). It must end
+  with `All <n> checks passed.` It runs the browser checks in one browser, side by side, one per processor core (about 3 minutes on 4 cores; `CI_JOBS=1` runs
+  them one at a time), drawing only some of the frames, and GitHub splits them over six machines plus one for the timed checks (`CI_SHARD=i/n` runs one share;
+  `CI_LIST=1` only lists a share's checks), then runs the whole suite again drawing every frame after each push to main. A scenario that measures time (a drawing
+  budget, a frame-time comparison) goes in the `timed` list in `tools/ci-check.sh`, so it runs alone on a quiet machine, drawing every frame. A long scenario can be
+  split into parts (`QA.part`, the `parts=` list). How all of that works, and what a scenario must do for it, is in `tools/QA-GUIDE.md`. While you work,
+  `--only <words>`, `--changed` and `--fail-fast` run less; the whole run is still required before a pull request.
   Also run the scenarios that touch what you changed. The regressions it covers are: `gear-oldsave`, `trinket-ui`, `wheel-spotted`,
   `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `save-gr3`, `npc-voices`, `gear-spotted`, `perf-cache`, `save-erase`, `gold-bank`, `together`, `achievements`, `gags`, `fishing`, `fishing-fight`, `input-choice`, `town-layers`, `wheels`, `intel`, `uni-bank`, `uni-slides`, `ui-pass`, `enemy-detail`, `enemy-motion`, `scenery-detail`, `minimap`, `domes`, `tower`, `siege`, `fort`, `island`, `camp`, `late-polish`, `sea-chart`,
   `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, `music`, `jukebox`, `town-choices`, `particles`, `gadgets`, `town-detail`, `sky-chase`, `addons`, `challenge-builder` (also at 390x844 and 844x390 with `--touch`, and its unit tests `tools/challenge-data-test.mjs` and `tools/challenge-play-test.mjs`), `film-sheet` (with `--params "kind=all"`), and `phone-pass` (with `--touch`). Then build the website package and check it:

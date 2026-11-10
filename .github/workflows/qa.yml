@@ -100,7 +100,7 @@ jobs:
       - name: The coverage record still has every check
         run: node tools/coverage.mjs check tools/coverage-baseline.txt cov/coverage-*.txt
       - name: How long each check took (copy into tools/ci-times.tsv to rebalance the shares)
-        run: cat cov/results-*/times.tsv | sort -t$'\t' -k2 -rn | head -n 40
+        run: cat cov/results-*/times.tsv | sort -t$'\t' -k2 -rn | sed 's/^/time\t/'
   every-frame:
     name: whole suite, every frame drawn
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

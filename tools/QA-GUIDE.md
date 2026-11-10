@@ -40,6 +40,28 @@ QA.done({ state: G.state, wave: G.wave, hp: P.hp, enemies: G.enemies.length });
 
 Keep a scenario under about 700 `GR.step` calls. The final state is what the screenshot shows.
 
+### How CI runs it: sampled drawing, its own random numbers, parts
+- **Drawing.** `bash tools/ci-check.sh` runs scenarios with `--draw sampled`: a frame that `GR.step` makes is drawn when it is the 8th since the last
+  drawn one, or when the state, wave, chapter, boss, screen on top or film changed; the frames in between still place the camera (`renderCamera`),
+  and the slow-device governor is told each of them cost what the last drawn frame did, so the detail steps down just as with every frame drawn.
+  `GR.render()` always draws, and so does everything after `QA.done` (the screenshot). If your scenario reads pixels from the canvas after
+  `GR.step`, call `GR.render()` first. `--draw all` (the default for a single `qa-cloud.mjs` run) draws every frame; GitHub runs the whole suite
+  that way after each push to main. `QA.draw` says how many frames were drawn and skipped.
+- **Random numbers.** Drawing has its own seeded stream, so how many frames are drawn never changes what the game does. Even so, a check should not
+  pass by luck of the numbers: wait past the longest random delay, compare a shot that is not a critical hit, pick the object you need by what it
+  is rather than by its place in a list.
+- **Parts.** A long scenario can be split: wrap its sections in `if (QA.part(1)){ ... }`, `if (QA.part(2)){ ... }` and finish with
+  `out.failed = QA.need(out, need)`. With `--params part=2/3` only that part runs and only the keys it set are needed; without `part=` everything
+  runs as one check. Split only where a section sets up its own state (a fresh save, a new run); declare helper functions outside the parts; if a
+  later part relies on something an earlier one leaves behind (a setting), set it at the top of the part when `QA.parted`. The parts are listed in
+  `parts=` in `tools/ci-check.sh` and run as "name (part i of n)".
+- **Coverage.** `tools/coverage.mjs` records every check and the keys of its result (a scenario's parts count as one), and `ci-check.sh` compares
+  that with `tools/coverage-baseline.txt`. A new check or key is fine; a missing one fails the run. When a check is removed on purpose, take its
+  lines out of the baseline in the same pull request (`CI_COVERAGE=x.txt bash tools/ci-check.sh` writes the record of a whole run).
+- **The runner.** `tools/qa-batch.mjs` runs a list in one browser, a fresh context per check (its own empty storage), and `--inline` puts the game's
+  scripts into the page, each still its own `<script>` with a `sourceURL` (one request instead of 250). Both it and `qa-cloud.mjs` take
+  `--draw` and `--inline`; their shared code is `tools/qa-lib.mjs`.
+
 ### Useful things
 
 - **States** (`G.state`): `menu`, `playing`, `levelup`, `paused`, `dead`, `victory`, `shop`, `help`, `cutscene`, `transform`, `chaptertrans`, `miniask` (the popup after a chapter), `mini` (a minigame), `forage`, `scout`, `mscout`.
