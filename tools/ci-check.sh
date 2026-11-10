@@ -8,6 +8,7 @@
 # budget, a frame-time comparison) run afterwards one at a time on a quiet machine, so their budgets mean what they say.
 # Only some of the frames the scenarios step through are drawn (draw=sampled, see the harness in tools/qa.html): what the game does is the same, and
 # every scene is still drawn. CI_DRAW=all draws every frame (GitHub does that after each push to main); the timed checks always draw every frame.
+# The game's scripts are inlined into the page, each still its own script (tools/qa-lib.mjs); CI_INLINE=0 loads them as files, as the game does.
 # At the end the coverage record (tools/coverage.mjs) is compared with tools/coverage-baseline.txt, so a check that went missing fails the run.
 #
 # For a quicker look while you work (the whole run is still the one that counts before a pull request):
@@ -64,7 +65,12 @@ fi
 # The browser checks, one line each: label | site folder ("" = this checkout) | scenario | runner options.
 list="$tmp/list"; : > "$list"; alone="$tmp/alone"; : > "$alone"
 timed=" ants-engineer enemy-detail enemy-motion particles perf-cache scenery-detail save-gr3 "     # these time themselves: run one at a time at the end
-add(){ case "$timed" in *" $3 "*) [ -z "$2" ] && { printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$alone"; return; };; esac; printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$list"; }
+add1(){ case "$timed" in *" $3 "*) [ -z "$2" ] && { printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$alone"; return; };; esac; printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$list"; }
+# the long scenarios are split into parts (QA.part in the scenario, part=i/n), each its own check, so no one check holds up a share; the coverage
+# record joins a scenario's parts back together (tools/coverage.mjs)
+parts=" domes:2 island:3 tower:3 siege:2 fort:3 sky-chase:2 "
+add(){ local n="${parts#* $3:}"; [ "$n" = "$parts" ] && { add1 "$@"; return; }; n="${n%% *}"
+  for i in $(seq 1 "$n"); do add1 "$1 (part $i of $n)" "$2" "$3" "${4:+$4 }--params part=$i/$n"; done; }
 onpkg="gear-oldsave town-layers domes tower siege fort island camp late-polish music jukebox"   # also run on the joined and minified copy
 for s in domes sky-chase island siege tower fort together; do add "$s" "" "$s"; done
 add "ship-check on the package" "$pkg" ship-check
@@ -101,7 +107,8 @@ deal "$list" > "$list.mine"; deal "$alone" > "$alone.mine"; mv "$list.mine" "$li
 nshared=$(wc -l < "$list"); cat "$alone" >> "$list"
 if [ -n "${CI_LIST:-}" ]; then cut -d'|' -f1 "$list"; exit 0; fi           # CI_LIST=1: only say which browser checks this share would run
 
-batch(){ nl -ba -w1 -s'|' "$list" | sed -n "$1,$2p" | awk -F'|' -v d="$3" 'BEGIN{OFS="|"} { $5 = $5 " --draw " d; print }' > "$tmp/batch"
+inl=""; [ "${CI_INLINE:-1}" = 1 ] && inl=" --inline"      # the game's scripts inlined into the page (tools/qa-lib.mjs); CI_INLINE=0 loads them one by one
+batch(){ nl -ba -w1 -s'|' "$list" | sed -n "$1,$2p" | awk -F'|' -v d="$3" -v x="$inl" 'BEGIN{OFS="|"} { $5 = $5 " --draw " d x; print }' > "$tmp/batch"
   [ -s "$tmp/batch" ] && node tools/qa-batch.mjs "$tmp/batch" "$tmp" --jobs "$4" ${failfast:+--fail-fast}; }
 echo "== $nshared browser checks, $jobs at a time (drawing: $draw)"
 s=$SECONDS; batch 1 "$nshared" "$draw" "$jobs"

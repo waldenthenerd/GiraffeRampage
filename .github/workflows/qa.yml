@@ -2,7 +2,8 @@
 # The website package is built once (job "package") and handed to the others. The browser checks are split into six shares that run at the same
 # time on six machines (CI_SHARD; tools/ci-times.tsv says how long each check takes, so the shares come out even), and the checks that time themselves
 # run on a seventh machine of their own, one at a time (CI_PART=timed). The shares draw only some of the frames (tools/qa.html, draw=sampled);
-# after a push to main, job "every-frame" runs the whole suite again drawing every frame, so a drawing error the sampled run could miss is still caught.
+# after a push to main, job "every-frame" runs the whole suite again drawing every frame and loading the game's scripts one by one (the shares inline
+# them into the page), so a drawing error the sampled run could miss is still caught.
 # The job named "qa" passes only when every share passes and their joined coverage record still has every check in tools/coverage-baseline.txt.
 # To make it block merges: Settings > Rules > the main ruleset > "Require status checks to pass" > add "QA / qa".
 name: QA
@@ -129,4 +130,5 @@ jobs:
         env:
           CI_SHARD: ${{ matrix.share }}/3
           CI_DRAW: all
+          CI_INLINE: 0
           CI_PKG: dist/pkg.zip

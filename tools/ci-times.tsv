@@ -1,1 +1,89 @@
 # how long each browser check takes on GitHub, in seconds (label, a tab, seconds); tools/ci-check.sh deals the shares by it. Copy new times from the "qa" job.
+enemy-detail	17.7
+music	12.9
+domes on the package (part 2 of 2)	11.7
+siege (part 2 of 2)	11.6
+domes (part 2 of 2)	11.4
+siege on the package (part 2 of 2)	10.3
+perf-cache	9.7
+island on the package (part 3 of 3)	9.3
+music on the package	9.1
+island (part 3 of 3)	9.0
+island on the package (part 2 of 3)	8.9
+tower on the package (part 2 of 3)	8.8
+tower (part 3 of 3)	8.8
+sky-chase (part 2 of 2)	8.8
+town-layers on the package	8.6
+tower (part 2 of 3)	8.6
+island (part 2 of 3)	8.4
+town-layers	8.2
+sky-chase (part 1 of 2)	8.0
+tower on the package (part 3 of 3)	7.8
+fort on the package (part 3 of 3)	7.7
+fort (part 3 of 3)	7.5
+enemy-motion	7.5
+domes (part 1 of 2)	7.1
+together	6.8
+gadgets	6.8
+siege on the package (part 1 of 2)	6.6
+scenery-detail	6.4
+minimap	6.3
+domes on the package (part 1 of 2)	6.3
+films (all 27 films)	6.2
+challenge-builder	6.2
+siege (part 1 of 2)	5.8
+wheels	5.7
+ship-check on the package	5.3
+challenge-builder (390x844)	5.1
+challenge-builder (844x390)	4.9
+phone-pass (844x390)	4.8
+fort on the package (part 2 of 3)	4.8
+addons	4.7
+phone-pass (390x844)	4.6
+fort (part 2 of 3)	4.4
+island on the package (part 1 of 3)	3.8
+tower (part 1 of 3)	3.7
+town-detail	3.6
+tower on the package (part 1 of 3)	3.5
+fort on the package (part 1 of 3)	3.4
+island (part 1 of 3)	3.3
+fort (part 1 of 3)	3.3
+uni-slides (390x844)	2.7
+uni-slides	2.7
+town-choices	2.7
+oldsave-deep	2.6
+nav-pages	2.6
+fishing-fight	2.4
+fishing	2.3
+camp	2.2
+particles	2.1
+gear-oldsave	2.1
+camp on the package	2.0
+aurora-buff	2.0
+late-polish	1.9
+sea-chart	1.8
+save-gr3	1.8
+review-fixes	1.8
+late-polish on the package	1.8
+jukebox	1.8
+gags	1.8
+compare-panel-triage	1.8
+runreport-gear	1.7
+jukebox on the package	1.7
+ants-page	1.7
+ui-pass	1.5
+trinket-ui	1.5
+preview-trail	1.5
+achievements	1.5
+wheel-spotted	1.4
+upgrades-page	1.4
+gear-spotted	1.4
+gear-oldsave on the package	1.4
+ants-engineer	1.4
+ui-pass (390x844)	1.3
+gold-bank	1.3
+uni-bank	1.2
+intel	1.2
+input-choice	1.2
+save-erase	1.1
+npc-voices	1.1

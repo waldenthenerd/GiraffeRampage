@@ -298,6 +298,13 @@
       var js = JSON.stringify({ done: QA.result !== null, result: QA.result, errors: QA.errors, logs: QA.logs }); pre.textContent = js; try { console.log('QA_JSON:' + js); } catch (e) {}
     } };
   q.forEach(function(v, k){ QA.params[k] = v; });
+  /* part=i/n: run only the i-th part of a scenario that is split into parts (tools/ci-check.sh runs each part as its own check, side by side).
+     A scenario marks its parts with if (QA.part(k)) { ... }, and checks what it needs with QA.need(out, keys): in a part, only the keys that part
+     set. Without part= every part runs, as one check. tools/coverage.mjs joins the parts' keys, so a key no part sets is still missed. */
+  var pp = /^(\d+)\/(\d+)$/.exec(q.get('part') || '');
+  QA.parted = pp ? { i: +pp[1], n: +pp[2] } : null;
+  QA.part = function(k){ return !QA.parted || QA.parted.i === k; };
+  QA.need = function(out, keys){ return keys.filter(function(k){ return QA.parted ? (k in out && out[k] !== true) : out[k] !== true; }); };
   /* the game's own frame loop is stopped: the scenario steps and renders the game itself, so the screenshot shows exactly its end state */
   var realRAF = window.requestAnimationFrame.bind(window);
   window.requestAnimationFrame = function(){ return 0; };

@@ -10,21 +10,33 @@ export const here = path.dirname(fileURLToPath(import.meta.url));
 export const repo = path.resolve(here, '..');
 
 // The QA page: the real index.html of that copy plus the harness block that lives in qa.html (single source of truth for the QA object).
-export function qaPage(root) {
+// inline: every <script src> becomes a <script> holding that file, in the same place and order, with a sourceURL so errors still name the file.
+// The page then loads in one request instead of two hundred and fifty (about a second less a check). A file that is missing becomes a script that
+// throws, so the check fails as it would on a 404. GitHub's every-frame run after a push to main loads the files one by one, as the game does.
+export function qaPage(root, inline) {
   const qaHtml = fs.readFileSync(path.join(here, 'qa.html'), 'utf8');
   const m = qaHtml.match(/<script>\s*\/\* QA harness[\s\S]*?<\/script>/);
   if (!m) throw new Error('could not find the QA harness block in tools/qa.html');
-  return fs.readFileSync(path.join(root, 'index.html'), 'utf8').replace('</body>', m[0] + '\n</body>');
+  let page = fs.readFileSync(path.join(root, 'index.html'), 'utf8').replace('</body>', m[0] + '\n</body>');
+  if (inline) page = page.replace(/<script src="([^"?#:]+\.js)"><\/script>/g, (all, src) => {
+    const f = path.join(root, src);
+    if (!f.startsWith(root) || !fs.existsSync(f)) return '<script>throw new Error(' + JSON.stringify('missing script: ' + src) + ');</script>';
+    const code = fs.readFileSync(f, 'utf8');
+    if (/<\/script/i.test(code)) return all;                                        /* cannot be inlined as it is: load it as a file */
+    return '<script>' + code + '\n//# sourceURL=' + src + '\n</script>';
+  });
+  return page;
 }
 
 const types = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.woff2': 'font/woff2', '.txt': 'text/plain' };
 // One server for one copy of the game. /qa-full.html is the QA page; /__scenario.js?f=<absolute path> is a scenario (any file under tools/scenarios,
 // or the one file given as `only`). The game's files are read once and kept, since every check asks for the same two hundred of them.
 export async function serve(root, only) {
-  const page = qaPage(root), mem = new Map(), scen = path.join(repo, 'tools', 'scenarios') + path.sep;
+  const pages = {}, mem = new Map(), scen = path.join(repo, 'tools', 'scenarios') + path.sep;
+  const pageFor = inline => pages[inline ? 1 : 0] || (pages[inline ? 1 : 0] = qaPage(root, inline));
   const server = http.createServer((req, res) => {
     const [p, qs] = req.url.split('?'), u = decodeURIComponent(p);
-    if (u === '/' || u === '/qa-full.html') { res.writeHead(200, { 'content-type': 'text/html' }); return res.end(page); }
+    if (u === '/' || u === '/qa-full.html') { res.writeHead(200, { 'content-type': 'text/html' }); return res.end(pageFor(new URLSearchParams(qs || '').get('inline') === '1')); }
     if (u === '/__scenario.js') {
       const f = only || path.resolve(new URLSearchParams(qs || '').get('f') || '');
       if (!(f === only || f.startsWith(scen)) || !fs.existsSync(f)) { res.writeHead(404); return res.end(); }
@@ -61,7 +73,7 @@ export async function launch() {
 export function options(words) {
   const opt = (n, d) => { const i = words.indexOf('--' + n); return i >= 0 ? words[i + 1] : d; };
   return { w: +opt('w', 1280), h: +opt('h', 720), scale: +opt('scale', 1), wait: +opt('wait', 20000), seed: opt('seed', '12345'), params: opt('params', ''),
-    shot: opt('shot', ''), touch: words.includes('--touch'), draw: opt('draw', process.env.QA_DRAW || 'all'), profile: words.includes('--profile'), heap: words.includes('--heap') };
+    shot: opt('shot', ''), touch: words.includes('--touch'), draw: opt('draw', process.env.QA_DRAW || 'all'), inline: words.includes('--inline') || process.env.QA_INLINE === '1', profile: words.includes('--profile'), heap: words.includes('--heap') };
 }
 
 // One check: a fresh context and page, the scenario, its result as the JSON line the runner prints. `hooks.before(ctx, pg)` / `hooks.after(pg)` let
@@ -76,7 +88,7 @@ export async function runCheck(browser, port, scenarioAbs, o, hooks = {}) {
   const pg = await ctx.newPage();
   const pageErrors = [];
   pg.on('pageerror', e => pageErrors.push(String(e)));
-  const url = `http://127.0.0.1:${port}/qa-full.html?s=${encodeURIComponent('/__scenario.js?f=' + scenarioAbs)}&seed=${o.seed}&draw=${o.draw}${o.params ? '&' + o.params : ''}`;
+  const url = `http://127.0.0.1:${port}/qa-full.html?s=${encodeURIComponent('/__scenario.js?f=' + scenarioAbs)}&seed=${o.seed}&draw=${o.draw}${o.inline ? '&inline=1' : ''}${o.params ? '&' + o.params : ''}`;
   if (hooks.before) await hooks.before(ctx, pg);
   await pg.goto(url);
   let out = null;
