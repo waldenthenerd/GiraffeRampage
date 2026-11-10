@@ -14,6 +14,18 @@ var GRChallengeData = (function () {
      Flyers cross walls, so a blocked edge does not stop them. */
   const KINDS = ['chaser', 'runner', 'brute', 'spitter', 'flyer', 'charger', 'splitter', 'badger'];
   const KIND_R = { chaser: 15, runner: 11, brute: 23, spitter: 14, flyer: 13, charger: 19, splitter: 17, badger: 15 };
+  /* the choices a recipe may make. Every field added after the first version is optional: a recipe without it reads as the game always played it. */
+  const THEMES = ['savanna', 'arctic', 'moon', 'forest', 'desert', 'swamp', 'volcanic', 'beach', 'cave', 'meadow'];
+  const OBJECTIVES = ['clear', 'survive', 'collect', 'exit', 'hunt'];
+  const LOADOUTS = ['balanced', 'swift', 'tank', 'striker', 'ranger', 'glass'];
+  const TIMES = ['day', 'dawn', 'sunset', 'night'], WEATHERS = ['clear', 'drizzle', 'snow', 'fog', 'wind', 'storm'];
+  const SPAWNS = ['north', 'east', 'south', 'west', 'random'];
+  const OBJECT_KINDS = ['wall', 'hazard', 'coin', 'exit', 'tree', 'rock', 'banner', 'heal', 'custom', 'water', 'boost', 'crate', 'spikes'];
+  /* where she starts: the middle, an edge or a corner (the arena keeps 48 pixels round it clear of walls and hazards) */
+  const STARTS = { center: [480, 320], north: [480, 110], south: [480, 530], west: [130, 320], east: [830, 320], northwest: [130, 110], northeast: [830, 110], southwest: [130, 530], southeast: [830, 530] };
+  function startOf(level) { const s = STARTS[(level && level.arena && level.arena.start) || 'center'] || STARTS.center; return { x: s[0], y: s[1] }; }
+  function nearStart(level, p) { const s = startOf(level); return p.x < s.x + 24 && p.x + p.w > s.x - 24 && p.y < s.y + 24 && p.y + p.h > s.y - 24; }
+  const opt = (value, fallback) => value === undefined ? fallback : value;
   const fail = message => { throw new Error(message); };
   const obj = (value, name) => value && typeof value === 'object' && !Array.isArray(value) ? value : fail(name + ' must be an object.');
   const num = (value, min, max, name, integer) => typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max && (!integer || Number.isInteger(value)) ? value : fail(name + ' must be ' + min + '–' + max + (integer ? ' (whole number).' : '.'));
@@ -27,10 +39,10 @@ var GRChallengeData = (function () {
   }
   function defaults() {
     return { v: 1, title: 'My first rampage', author: '', description: 'A little challenge for a friend.', seed: 7081,
-      arena: { width: 960, height: 640, theme: 'savanna' }, objective: { type: 'clear', target: 1 }, loadout: 'balanced',
+      arena: { width: 960, height: 640, theme: 'savanna', start: 'center' }, objective: { type: 'clear', target: 1, limit: 0 }, loadout: 'balanced',
       appearance: { time: 'day', weather: 'clear', detail: 1, palette: 'biome', colors: { ground: '#a89958', accent: '#c9b979', foliage: '#6a7944' } }, customAssets: [],
-      modifiers: { speed: 1, enemyHp: 1, darkness: false, playerSpeed: 1, attackRate: 1 },
-      waves: [{ delay: 0, enemies: [{ kind: 'chaser', count: 5, spawn: 'north' }] }], objects: [] };
+      modifiers: { speed: 1, enemyHp: 1, darkness: false, playerSpeed: 1, attackRate: 1, enemyDamage: 1, playerHp: 1, playerDamage: 1, regen: 0, hazardDamage: 12, healAmount: 25, lightRadius: 270 },
+      waves: [{ delay: 0, after: 'cleared', enemies: [{ kind: 'chaser', count: 5, spawn: 'north', elite: false, stagger: 0 }] }], objects: [] };
   }
   // Whitelist-copy every field: extra properties cannot become runtime configuration.
   function validate(raw) {
@@ -41,11 +53,13 @@ var GRChallengeData = (function () {
     const colors = look.colors === undefined ? {} : obj(look.colors, 'Palette colours');
     if (a.width !== 960 || a.height !== 640) fail('Arena must be 960 × 640.');
     const level = { v: 1, title: str(r.title, 60, 'Title', true), author: str(r.author, 32, 'Author'), description: str(r.description, 280, 'Description'),
-      seed: num(r.seed, 0, 4294967295, 'Seed', true), arena: { width: 960, height: 640, theme: one(a.theme, ['savanna', 'arctic', 'moon', 'forest', 'desert', 'swamp', 'volcanic'], 'theme') },
-      objective: { type: one(o.type, ['clear', 'survive', 'collect', 'exit'], 'objective'), target: num(o.target, 1, 300, 'Objective target', true) },
-      loadout: one(r.loadout, ['balanced', 'swift', 'tank'], 'loadout'),
-      appearance: { time: one(look.time === undefined ? 'day' : look.time, ['day', 'sunset', 'night'], 'time of day'), weather: one(look.weather === undefined ? 'clear' : look.weather, ['clear', 'drizzle', 'snow'], 'weather'), detail: num(look.detail === undefined ? 1 : look.detail, 0, 2, 'Scenery detail', true), palette: one(look.palette === undefined ? 'biome' : look.palette, ['biome', 'autumn', 'pastel', 'dusk', 'custom'], 'palette'), colors: { ground: color(colors.ground === undefined ? '#a89958' : colors.ground, 'Ground colour'), accent: color(colors.accent === undefined ? '#c9b979' : colors.accent, 'Accent colour'), foliage: color(colors.foliage === undefined ? '#6a7944' : colors.foliage, 'Foliage colour') } },
-      modifiers: { speed: num(m.speed, .5, 2, 'Speed'), enemyHp: num(m.enemyHp, .5, 3, 'Enemy health'), darkness: m.darkness, playerSpeed: num(m.playerSpeed === undefined ? 1 : m.playerSpeed, .5, 2, 'Player speed'), attackRate: num(m.attackRate === undefined ? 1 : m.attackRate, .5, 2, 'Attack rate') }, customAssets: [], waves: [], objects: [] };
+      seed: num(r.seed, 0, 4294967295, 'Seed', true), arena: { width: 960, height: 640, theme: one(a.theme, THEMES, 'theme'), start: one(opt(a.start, 'center'), Object.keys(STARTS), 'start position') },
+      objective: { type: one(o.type, OBJECTIVES, 'objective'), target: num(o.target, 1, 300, 'Objective target', true), limit: num(opt(o.limit, 0), 0, 300, 'Time limit', true) },
+      loadout: one(r.loadout, LOADOUTS, 'loadout'),
+      appearance: { time: one(look.time === undefined ? 'day' : look.time, TIMES, 'time of day'), weather: one(look.weather === undefined ? 'clear' : look.weather, WEATHERS, 'weather'), detail: num(look.detail === undefined ? 1 : look.detail, 0, 2, 'Scenery detail', true), palette: one(look.palette === undefined ? 'biome' : look.palette, ['biome', 'autumn', 'pastel', 'dusk', 'custom'], 'palette'), colors: { ground: color(colors.ground === undefined ? '#a89958' : colors.ground, 'Ground colour'), accent: color(colors.accent === undefined ? '#c9b979' : colors.accent, 'Accent colour'), foliage: color(colors.foliage === undefined ? '#6a7944' : colors.foliage, 'Foliage colour') } },
+      modifiers: { speed: num(m.speed, .5, 2, 'Speed'), enemyHp: num(m.enemyHp, .5, 3, 'Enemy health'), darkness: m.darkness, playerSpeed: num(m.playerSpeed === undefined ? 1 : m.playerSpeed, .5, 2, 'Player speed'), attackRate: num(m.attackRate === undefined ? 1 : m.attackRate, .5, 2, 'Attack rate'),
+        enemyDamage: num(opt(m.enemyDamage, 1), .5, 3, 'Enemy damage'), playerHp: num(opt(m.playerHp, 1), .5, 3, 'Player health'), playerDamage: num(opt(m.playerDamage, 1), .5, 3, 'Player damage'),
+        regen: num(opt(m.regen, 0), 0, 5, 'Health regeneration'), hazardDamage: num(opt(m.hazardDamage, 12), 0, 40, 'Hazard damage', true), healAmount: num(opt(m.healAmount, 25), 10, 100, 'Heal amount', true), lightRadius: num(opt(m.lightRadius, 270), 120, 420, 'Light radius', true) }, customAssets: [], waves: [], objects: [] };
     if (typeof m.darkness !== 'boolean') fail('Darkness must be on or off.');
     const assets = r.customAssets === undefined ? [] : r.customAssets;
     if (!Array.isArray(assets) || assets.length > 8) fail('Use at most eight custom object designs.');
@@ -70,20 +84,22 @@ var GRChallengeData = (function () {
     for (const wave of r.waves) {
       obj(wave, 'Wave');
       if (!Array.isArray(wave.enemies) || !wave.enemies.length || wave.enemies.length > 4) fail('Use 1–4 enemy groups per wave.');
-      level.waves.push({ delay: num(wave.delay, 0, 30, 'Wave delay'), enemies: wave.enemies.map(group => {
+      level.waves.push({ delay: num(wave.delay, 0, 30, 'Wave delay'), after: one(opt(wave.after, 'cleared'), ['cleared', 'timer'], 'wave timing'), enemies: wave.enemies.map(group => {
         obj(group, 'Enemy group');
         const count = num(group.count, 1, 30, 'Enemy count', true); total += count;
-        return { kind: one(group.kind, KINDS, 'enemy'), count, spawn: one(group.spawn, ['north', 'east', 'south', 'west'], 'spawn direction') };
+        const elite = opt(group.elite, false); if (typeof elite !== 'boolean') fail('Elite must be on or off.');
+        return { kind: one(group.kind, KINDS, 'enemy'), count, spawn: one(group.spawn, SPAWNS, 'spawn direction'), elite, stagger: num(opt(group.stagger, 0), 0, 3, 'Spawn spacing') };
       }) });
     }
     if (total > 240) fail('Use at most 240 enemies across the level.');
+    if (level.objective.type === 'hunt' && level.objective.target > total) fail('The hunt target is more creatures than the waves bring (' + total + ').');
     if (!Array.isArray(r.objects) || r.objects.length > 48) fail('Use at most 48 arena objects.');
     for (const item of r.objects) {
       obj(item, 'Arena object');
-      const p = { kind: one(item.kind, ['wall', 'hazard', 'coin', 'exit', 'tree', 'rock', 'banner', 'heal', 'custom'], 'arena object'), x: num(item.x, 0, 944, 'Object x'), y: num(item.y, 0, 624, 'Object y'), w: num(item.w, 16, 320, 'Object width'), h: num(item.h, 16, 320, 'Object height') };
+      const p = { kind: one(item.kind, OBJECT_KINDS, 'arena object'), x: num(item.x, 0, 944, 'Object x'), y: num(item.y, 0, 624, 'Object y'), w: num(item.w, 16, 320, 'Object width'), h: num(item.h, 16, 320, 'Object height') };
       if (p.kind === 'custom') { if (!assetIds.has(item.asset)) fail('A custom object refers to a missing design.'); p.asset = item.asset; }
       if (p.x + p.w > 960 || p.y + p.h > 640) fail('Keep objects inside the arena.');
-      if ((isSolid(level, p) || p.kind === 'hazard') && p.x < 504 && p.x + p.w > 456 && p.y < 344 && p.y + p.h > 296) fail('Keep the central player start clear.');
+      if ((isSolid(level, p) || p.kind === 'hazard' || p.kind === 'spikes') && nearStart(level, p)) fail('Keep the player start clear.');
       level.objects.push(p);
     }
     if (level.objective.type === 'collect' && level.objects.filter(p => p.kind === 'coin').length < level.objective.target) fail('Place enough coins for the collection target.');
@@ -98,19 +114,23 @@ var GRChallengeData = (function () {
   /* every entrance a wave uses must have room along its edge for that enemy, or the wave could not arrive (the arena tries the same spots) */
   function checkSpawns(level) {
     const walls = level.objects.filter(p => isSolid(level, p)), seen = {};
+    const open = (side, r) => {
+      for (let i = 0; i <= 45; i++) {
+        const z = .05 + i * .02, x = side === 'west' ? r + 4 : side === 'east' ? 956 - r : 960 * z, y = side === 'north' ? r + 4 : side === 'south' ? 636 - r : 640 * z;
+        if (!walls.some(w => { const dx = x - Math.max(w.x, Math.min(x, w.x + w.w)), dy = y - Math.max(w.y, Math.min(y, w.y + w.h)); return dx * dx + dy * dy < r * r; })) return true;
+      }
+      return false;
+    };
     for (const wave of level.waves) for (const g of wave.enemies) {
-      const r = KIND_R[g.kind], key = g.spawn + r;
+      const r = Math.round(KIND_R[g.kind] * (g.elite ? 1.25 : 1)), key = g.spawn + r;
       if (g.kind === 'flyer' || seen[key]) continue;
       seen[key] = 1;
-      let room = false;
-      for (let i = 0; i <= 45 && !room; i++) {
-        const z = .05 + i * .02, x = g.spawn === 'west' ? r + 4 : g.spawn === 'east' ? 956 - r : 960 * z, y = g.spawn === 'north' ? r + 4 : g.spawn === 'south' ? 636 - r : 640 * z;
-        room = !walls.some(w => { const dx = x - Math.max(w.x, Math.min(x, w.x + w.w)), dy = y - Math.max(w.y, Math.min(y, w.y + w.h)); return dx * dx + dy * dy < r * r; });
-      }
-      if (!room) fail('The ' + g.spawn + ' entrance is walled off for the ' + g.kind + '. Leave a gap along that edge.');
+      /* a random entrance needs one open edge; the arena only picks among the open ones */
+      const room = g.spawn === 'random' ? ['north', 'east', 'south', 'west'].some(side => open(side, r)) : open(g.spawn, r);
+      if (!room) fail(g.spawn === 'random' ? 'Every edge is walled off for the ' + g.kind + '. Leave a gap along one edge.' : 'The ' + g.spawn + ' entrance is walled off for the ' + g.kind + '. Leave a gap along that edge.');
     }
   }
-  function isSolid(level, item) { return item.kind === 'wall' || (item.kind === 'custom' && !!(level.customAssets || []).find(asset => asset.id === item.asset && asset.solid)); }
+  function isSolid(level, item) { return item.kind === 'wall' || item.kind === 'crate' || (item.kind === 'custom' && !!(level.customAssets || []).find(asset => asset.id === item.asset && asset.solid)); }
   // A small, conservative navigation grid includes player clearance. This catches
   // sealed rooms without claiming to prove that combat can be beaten.
   function checkReachable(level) {
@@ -122,7 +142,7 @@ var GRChallengeData = (function () {
       const dx = Math.max(w.x - x, 0, x - w.x - w.w), dy = Math.max(w.y - y, 0, y - w.y - w.h);
       return dx * dx + dy * dy < radius * radius;
     });
-    const seen = new Uint8Array(cols * rows), queue = [38 * cols + 58];
+    const st = startOf(level), seen = new Uint8Array(cols * rows), queue = [Math.round((st.y - 16) / step) * cols + Math.round((st.x - 16) / step)];
     seen[queue[0]] = 1;
     const reached = new Set();
     for (let head = 0; head < queue.length; head++) {
@@ -287,6 +307,39 @@ var GRChallengeData = (function () {
     l.waves = [{delay:0,enemies:[{kind:'chaser',count:5,spawn:'west'}]},{delay:2,enemies:[{kind:'runner',count:3,spawn:'south'},{kind:'spitter',count:2,spawn:'north'}]}];
     l.objects = [{kind:'custom',asset:'signal',x:120,y:100,w:100,h:140},{kind:'custom',asset:'signal',x:760,y:420,w:100,h:140},{kind:'rock',x:680,y:140,w:100,h:70},{kind:'wall',x:260,y:420,w:160,h:32},{kind:'heal',x:680,y:480,w:32,h:32}];
   });
-  return { key: KEY, recordsKey: RECORDS, record, saveResult, kinds: KINDS.slice(), kindR: Object.assign({}, KIND_R), defaults, validate, encode, decode, shareCode, fingerprint, seeded, templates, isSolid, saveDraft, listDrafts, removeDraft, newDraftId };
+  const G = (kind, count, spawn, elite, stagger) => ({ kind, count, spawn, elite: !!elite, stagger: stagger || 0 });
+  template('Tide pool dash', l => {
+    l.description = 'Six coins scattered between the rock pools. The water slows you, the pads speed you up, and the wind never stops.';
+    l.arena.theme = 'beach'; l.arena.start = 'west'; l.appearance = { time: 'day', weather: 'wind', detail: 2 }; l.loadout = 'swift';
+    l.objective = { type: 'collect', target: 6, limit: 90 };
+    l.waves = [{ delay: 0, after: 'cleared', enemies: [G('runner', 4, 'east'), G('chaser', 4, 'random', false, 1)] }, { delay: 12, after: 'timer', enemies: [G('flyer', 4, 'north'), G('chaser', 4, 'south', false, .5)] }];
+    l.objects = [{kind:'water',x:240,y:80,w:160,h:120},{kind:'water',x:560,y:400,w:200,h:120},{kind:'water',x:600,y:120,w:120,h:80},{kind:'hazard',x:360,y:440,w:120,h:80},{kind:'boost',x:240,y:280,w:120,h:80},{kind:'boost',x:480,y:240,w:80,h:120},
+      {kind:'tree',x:40,y:40,w:80,h:120},{kind:'tree',x:840,y:480,w:80,h:120},{kind:'rock',x:800,y:240,w:100,h:80},
+      {kind:'coin',x:300,y:120,w:24,h:24},{kind:'coin',x:660,y:150,w:24,h:24},{kind:'coin',x:880,y:80,w:24,h:24},{kind:'coin',x:640,y:440,w:24,h:24},{kind:'coin',x:200,y:540,w:24,h:24},{kind:'coin',x:880,y:380,w:24,h:24}];
+  });
+  template('Crystal cavern', l => {
+    l.description = 'Dark tunnels, glowing crystals and spikes that breathe. Kick through the crates to find the way out.';
+    l.arena.theme = 'cave'; l.appearance = { time: 'night', weather: 'fog', detail: 2 }; l.loadout = 'tank';
+    l.modifiers.darkness = true; l.modifiers.lightRadius = 240; l.modifiers.regen = 1; l.objective = { type: 'exit', target: 1, limit: 0 };
+    l.waves = [{ delay: 1, after: 'cleared', enemies: [G('chaser', 5, 'random', false, 1.5)] }, { delay: 2, after: 'cleared', enemies: [G('spitter', 2, 'east'), G('badger', 1, 'west', true)] }];
+    l.objects = [{kind:'wall',x:600,y:40,w:40,h:240},{kind:'wall',x:600,y:400,w:40,h:200},{kind:'crate',x:600,y:280,w:40,h:40},{kind:'crate',x:600,y:360,w:40,h:40},{kind:'spikes',x:680,y:280,w:80,h:120},
+      {kind:'hazard',x:200,y:120,w:120,h:80},{kind:'tree',x:120,y:420,w:100,h:120},{kind:'tree',x:760,y:80,w:90,h:110},{kind:'rock',x:300,y:460,w:110,h:80},{kind:'heal',x:200,y:300,w:32,h:32},{kind:'exit',x:840,y:480,w:56,h:56}];
+  });
+  template('Meadow stampede', l => {
+    l.description = 'Waves on a timer, elites with crowns, and two minutes to bring down thirty creatures. The heavy kick hits hard but slowly.';
+    l.arena.theme = 'meadow'; l.appearance = { time: 'dawn', weather: 'clear', detail: 2 }; l.loadout = 'striker'; l.modifiers.healAmount = 40;
+    l.objective = { type: 'hunt', target: 30, limit: 120 };
+    l.waves = [{ delay: 0, after: 'cleared', enemies: [G('chaser', 8, 'random', false, .5)] }, { delay: 10, after: 'timer', enemies: [G('runner', 6, 'east', false, .5), G('charger', 1, 'west', true)] },
+      { delay: 10, after: 'timer', enemies: [G('splitter', 3, 'north'), G('chaser', 6, 'south', false, .5)] }, { delay: 12, after: 'timer', enemies: [G('brute', 1, 'random', true), G('chaser', 8, 'random', false, .75)] }];
+    l.objects = [{kind:'wall',x:160,y:160,w:120,h:40},{kind:'wall',x:680,y:440,w:120,h:40},{kind:'tree',x:80,y:440,w:100,h:120},{kind:'tree',x:780,y:80,w:100,h:120},{kind:'tree',x:440,y:40,w:80,h:100},{kind:'heal',x:160,y:300,w:32,h:32},{kind:'heal',x:760,y:300,w:32,h:32},{kind:'banner',x:460,y:520,w:40,h:80}];
+  });
+  template('Crate yard', l => {
+    l.description = 'Start in the south corner of a storm-lashed yard full of crates. Break your own paths, and beat the crowned honey badger.';
+    l.arena.start = 'southwest'; l.appearance = { time: 'sunset', weather: 'storm', detail: 2 }; l.loadout = 'ranger'; l.modifiers.enemyDamage = 1.2;
+    l.objective = { type: 'clear', target: 1, limit: 150 };
+    l.waves = [{ delay: 1, after: 'cleared', enemies: [G('chaser', 6, 'north', false, .5), G('runner', 3, 'east')] }, { delay: 3, after: 'cleared', enemies: [G('badger', 1, 'north', true), G('spitter', 2, 'east')] }];
+    l.objects = [240,400,560,720].flatMap((x, i) => [{kind:'crate',x,y:160+(i%2)*40,w:80,h:80},{kind:'crate',x:x-40,y:360-(i%2)*40,w:80,h:80}]).concat([{kind:'spikes',x:440,y:480,w:80,h:80},{kind:'boost',x:240,y:520,w:120,h:80},{kind:'heal',x:840,y:520,w:32,h:32},{kind:'rock',x:820,y:60,w:100,h:70}]);
+  });
+  return { key: KEY, recordsKey: RECORDS, record, saveResult, kinds: KINDS.slice(), kindR: Object.assign({}, KIND_R), themes: THEMES.slice(), objectives: OBJECTIVES.slice(), loadouts: LOADOUTS.slice(), times: TIMES.slice(), weathers: WEATHERS.slice(), spawns: SPAWNS.slice(), objectKinds: OBJECT_KINDS.slice(), starts: Object.keys(STARTS), startOf, nearStart, defaults, validate, encode, decode, shareCode, fingerprint, seeded, templates, isSolid, saveDraft, listDrafts, removeDraft, newDraftId };
 }());
 window.GRChallengeData = GRChallengeData;

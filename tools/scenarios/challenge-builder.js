@@ -148,6 +148,24 @@ addonSet('challenges', true);
     check('campaign state isolated',JSON.stringify(Save.data)===campaign&&localStorage.getItem(GRSave.key)===stored&&G.state===state);
     var r=document.querySelector('#challengeBuilder').getBoundingClientRect();check('fits viewport',r.width<=innerWidth+1&&r.height<=innerHeight+1);
     check('enemy speed labelled honestly',find('[data-path="modifiers.speed"]').parentNode.textContent.includes('Enemy speed'));
+    /* the options added after the first version: start, objective, kit, modifiers, new objects, layouts, wave timing, elites, spacing, random entrances */
+    importLevel(GRChallengeData.defaults());edit('title','UI new options');
+    edit('arena.theme','cave');edit('arena.start','northeast');check('start position chosen',GRChallengeUI.level().arena.start==='northeast');
+    check('new tools listed',['water','boost','crate','spikes'].every(function(k){return !!find('[data-cb="tool-'+k+'"]');}));
+    click('tool-crate');find('#cbX').value='160';find('#cbY').value='160';find('#cbWidth').value='80';find('#cbHeight').value='80';click('place');check('crate placed',find('.cb-object-list').textContent.includes('crate (160, 160)'));
+    click('tool-spikes');find('#cbX').value='800';find('#cbY').value='80';find('#cbWidth').value='80';find('#cbHeight').value='80';click('place');check('spikes refused on the moved start',find('#cbNotice').textContent.includes('breathing room'));
+    edit('objective.type','hunt');edit('objective.target','3');edit('objective.limit','60');check('hunt and time limit described',/Defeat 3/.test(find('#cbGoal').textContent)&&/Time limit: 60/.test(find('#cbGoal').textContent));
+    edit('loadout','ranger');edit('modifiers.regen','2');edit('modifiers.playerHp','1.5');check('kit text uses the new multipliers',/120 HP/.test(find('#cbKit').textContent)&&/heals 2 HP/.test(find('#cbKit').textContent));
+    edit('appearance.weather','storm');edit('appearance.time','dawn');
+    var elite=find('[data-path="waves.0.enemies.0.elite"]');elite.checked=true;elite.dispatchEvent(new Event('change',{bubbles:true}));
+    edit('waves.0.enemies.0.stagger','0.5');edit('waves.0.enemies.0.spawn','random');
+    click('add-wave');edit('waves.1.after','timer');check('wave summary names elites, spacing, random edges and the timer',/elite/.test(find('#cbWaveSummary0').textContent)&&/one every 0.5s/.test(find('#cbWaveSummary0').textContent)&&/any edge/.test(find('#cbWaveSummary0').textContent)&&/after the wave before it began/.test(find('#cbWaveSummary1').textContent));
+    click('save');var opts=GRChallengeData.decode(GRChallengeData.listDrafts().find(function(d){return d.title==='UI new options';}).code);
+    check('new options persist',opts.arena.theme==='cave'&&opts.arena.start==='northeast'&&opts.objective.type==='hunt'&&opts.objective.limit===60&&opts.loadout==='ranger'&&opts.modifiers.regen===2&&opts.appearance.weather==='storm'&&opts.waves[0].enemies[0].elite===true&&opts.waves[0].enemies[0].stagger===0.5&&opts.waves[1].after==='timer'&&opts.objects.some(function(o){return o.kind==='crate';}));
+    click('play');var hunted=GRChallengePlay.advance(60);check('hunt playtest ends',hunted.ended);returnToBuilder();
+    ['moat','crates','gauntlet'].forEach(function(name){click('layout-'+name);check('new layout '+name,find('#cbNotice').textContent.includes('Applied layout recipe'));});
+    var wavesBefore=document.querySelectorAll('#challengeBuilder .cb-wave').length;click('preset-trickle');click('preset-surround');click('preset-guard');check('new wave presets append',document.querySelectorAll('#challengeBuilder .cb-wave').length===wavesBefore+3);
+    if(QA.params.view==='options'){find('#cbTemplates').value=String(GRChallengeData.templates.findIndex(function(t){return t.name===(QA.params.t||'Crate yard');}));click('template');click('tab-arena');find('#cbCanvas').scrollIntoView({block:'center'});}
     if(QA.params.view==='showcase'){
       var decorated=GRChallengeData.templates.findIndex(function(t){return t.level.objects.some(function(o){return o.kind==='tree'||o.kind==='banner';});});
       find('#cbTemplates').value=String(Math.max(0,decorated));click('template');document.querySelector('#challengeBuilder').scrollTop=0;

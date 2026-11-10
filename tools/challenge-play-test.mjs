@@ -207,13 +207,14 @@ check('Arena body sizes match the recipe check, and heals show whole numbers',()
   if(s.heals)assert.ok(Number.isInteger(s.player.hp)||s.fx.every(f=>!/\./.test(f.label)));
 });
 check('Every object kind paints in every biome, balanced, with biome-specific walls and hazards, and still when time moves',()=>{
-  const kinds=['wall','hazard','coin','heal','exit','tree','rock','banner'],walls=new Set(),haz=new Set();
-  for(const theme of ['savanna','arctic','moon','forest','desert','swamp','volcanic']){
+  const kinds=['wall','hazard','coin','heal','exit','tree','rock','banner','water','boost','crate','spikes'],walls=new Set(),haz=new Set();
+  for(const theme of D.themes){
     const l=level();l.arena.theme=theme;
     for(const kind of kinds)for(const time of [0,1.7]){const c=recordingCanvas();R.paintObject(c.ctx,l,{kind,x:100,y:100,w:120,h:80},{time});assert.equal(c.depth(),0,kind+' '+theme);assert.ok(c.calls.length>4);
       if(time===0&&kind==='wall')walls.add(JSON.stringify(c.calls));if(time===0&&kind==='hazard')haz.add(JSON.stringify(c.calls));}
   }
-  assert.equal(walls.size,7);assert.equal(haz.size,7);
+  assert.equal(walls.size,D.themes.length);assert.equal(haz.size,D.themes.length);
+  for(const time of D.times)for(const weather of D.weathers){const l2=level();l2.appearance={time,weather,detail:2};const c=recordingCanvas();R.paintArena(c.ctx,l2,{time:2.5,live:true});assert.equal(c.depth(),0,time+' '+weather);}
   const l=level();l.waves=[{delay:0,enemies:[{kind:'chaser',count:2,spawn:'north'},{kind:'runner',count:1,spawn:'east'}]}];
   const a=recordingCanvas();R.paintArena(a.ctx,l,{time:1,live:true,entrances:{north:1}});assert.equal(a.depth(),0);assert.ok(a.calls.some(v=>v[0]==='fillText'&&v[1]==='×2'));
 });
@@ -222,5 +223,38 @@ check('A won run earns a medal by health left; a lost run none',()=>{
   const k=level('survive',300);k.waves=[{delay:0,enemies:[{kind:'brute',count:6,spawn:'north'}]}];k.modifiers.enemyHp=3;R.start(k);s=R.advance(300);assert.equal(s.result.won,false);assert.equal(s.result.medal,null);
   for(const kind of D.kinds){const c=recordingCanvas();R.portrait(c.ctx,kind,20,20,40,0);assert.equal(c.depth(),0);}
 });
+/* the options added after the first version */
+const quiet=(type='survive',target=100)=>{const l=level(type,target);l.waves=[{delay:30,enemies:[{kind:'chaser',count:1,spawn:'north'}]}];return l;};
+check('She starts where the recipe says',()=>{for(const at of D.starts){const l=quiet();l.arena.start=at;R.start(l);const s=R.snapshot(),st=D.startOf(l);assert.equal(s.player.x,st.x,at);assert.equal(s.player.y,st.y,at);}});
+check('Kit multipliers, regeneration and the heal size',()=>{
+  const l=quiet();l.modifiers.playerHp=2;R.start(l);assert.equal(R.snapshot().player.hp,200);
+  const h=quiet();h.modifiers.regen=4;h.modifiers.hazardDamage=40;h.objects=[{kind:'hazard',x:520,y:280,w:80,h:80}];R.start(h);key('d');R.advance(.3);key('d',true);key('a');R.advance(.5);key('a',true);const hurt=R.snapshot().player.hp;assert.ok(hurt<=70,'hurt '+hurt);R.advance(5);assert.ok(R.snapshot().player.hp>hurt+15);
+  const z=quiet();z.modifiers.hazardDamage=0;z.objects=[{kind:'hazard',x:520,y:280,w:80,h:80}];R.start(z);key('d');R.advance(1);key('d',true);assert.equal(R.snapshot().player.hp,100);
+  for(const kit of D.loadouts)assert.ok(R.getKit(kit).hp>0,kit);
+});
+check('Water slows her, a boost pad speeds her up',()=>{
+  const go=objs=>{const l=quiet();l.objects=objs;R.start(l);key('d');R.advance(.6);key('d',true);return R.snapshot().player.x-480;};
+  const plain=go([]),wet=go([{kind:'water',x:440,y:280,w:240,h:80}]),fast=go([{kind:'boost',x:480,y:300,w:40,h:40}]);
+  assert.ok(wet<plain*.7,'wet '+wet+' plain '+plain);assert.ok(fast>plain*1.3,'fast '+fast);
+});
+check('Spikes hurt only while up, and crates break under her kicks',()=>{
+  const l=quiet();l.objects=[{kind:'spikes',x:520,y:280,w:80,h:80}];R.start(l);key('d');R.advance(.25);key('d',true);let low=100;for(let i=0;i<180;i++){low=Math.min(low,R.advance(1/60).player.hp);}assert.ok(low<100);
+  const c=quiet();c.objects=[{kind:'crate',x:520,y:280,w:40,h:80}];R.start(c);assert.equal(R.snapshot().crates.length,1);const s=R.advance(4);assert.equal(s.crates.length,0);
+  key('d');R.advance(.8);key('d',true);assert.ok(R.snapshot().player.x>560,'walks through the gap');
+});
+check('Elites, spaced-out groups, timed waves and random entrances',()=>{
+  const l=level('clear');                                                    /* not survival, whose waves keep their own clock (at least 10 seconds apart) */l.waves=[{delay:0,enemies:[{kind:'brute',count:1,spawn:'north',elite:true},{kind:'chaser',count:4,spawn:'random',stagger:1}]},{delay:2,after:'timer',enemies:[{kind:'runner',count:2,spawn:'east'}]}];
+  R.start(l);let s=R.advance(1/60);const elite=s.enemies.find(e=>e.kind==='brute');assert.ok(elite.elite);assert.equal(elite.max,140*2.2);assert.equal(elite.r,Math.round(23*1.25));
+  assert.equal(s.queued,3);s=R.advance(1.5);assert.equal(s.queued,2);s=R.advance(.6);assert.equal(s.wave,2,'the timed wave came while the first was alive');assert.ok(s.enemies.some(e=>e.kind==='runner'));
+  const edges=new Set();for(let seed=1;seed<12;seed++){const r=level('survive',100);r.seed=seed;r.waves=[{delay:0,enemies:[{kind:'chaser',count:6,spawn:'random'}]}];R.start(r);for(const e of R.advance(1/60).enemies)edges.add(e.y<40?'n':e.y>600?'s':e.x<40?'w':'e');}
+  assert.ok(edges.size>=3,'random edges '+[...edges]);
+  const v=level('survive',100);v.loadout='tank';v.modifiers.enemyHp=3;v.waves=[{delay:0,enemies:[{kind:'brute',count:1,spawn:'north'}]},{delay:2,after:'timer',enemies:[{kind:'runner',count:1,spawn:'east'}]}];
+  R.start(v);s=R.advance(5);assert.equal(s.wave,1,'a survival challenge keeps its own clock, even for a wave set to a timer');assert.equal(R.advance(5.2).wave,2);
+});
+check('Hunt wins at its count; a time limit loses',()=>{
+  const h=level('hunt',2);h.waves=[{delay:0,enemies:[{kind:'chaser',count:3,spawn:'north'}]}];R.start(h);const s=R.advance(60);assert.equal(s.result.won,true);assert.ok(s.kills>=2&&s.kills<3);
+  const t=quiet('collect',1);t.objective.limit=3;t.objects=[{kind:'coin',x:40,y:40,w:24,h:24}];R.start(t);const u=R.advance(4);assert.equal(u.result.won,false);assert.ok(u.time<3.1);
+});
+check('Every starter recipe plays',()=>{for(const t of D.templates){R.start(t.level);const s=R.advance(6);assert.ok(s.time>0,t.name);}});
 check('Campaign storage remains byte-for-byte untouched',()=>{assert.deepEqual([...storage],[['giraffe_rampage_save_v1','campaign sentinel']]);});
 console.log(JSON.stringify({pass:true,tests}));

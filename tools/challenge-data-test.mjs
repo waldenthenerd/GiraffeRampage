@@ -115,4 +115,39 @@ check('damaged or oversize best records are ignored', () => {
 });
 check('library storage failures reported', () => {const original=localStorage.setItem;localStorage.setItem=()=>{throw new Error('quota');};assert.throws(()=>D.saveDraft(D.defaults()));assert.throws(()=>D.removeDraft('none'));localStorage.setItem=original;});
 check('code checksum mutation rejected', () => {const c=D.encode(D.defaults());assert.throws(()=>D.decode(c.replace(/^GRC1:./,'GRC1:f')===c?c.replace(/^GRC1:./,'GRC1:0'):c.replace(/^GRC1:./,'GRC1:f')));});
+/* the options added after the first version: an older recipe reads exactly as before, and every new choice is checked */
+check('a first-version recipe gets the old behaviour for every new option', () => {
+  const old={v:1,title:'Old',author:'',description:'',seed:5,arena:{width:960,height:640,theme:'savanna'},objective:{type:'clear',target:1},loadout:'balanced',modifiers:{speed:1,enemyHp:1,darkness:false},waves:[{delay:0,enemies:[{kind:'chaser',count:2,spawn:'north'}]}],objects:[{kind:'wall',x:40,y:40,w:40,h:40}]};
+  const v=D.validate(old);assert.equal(v.arena.start,'center');assert.equal(v.objective.limit,0);assert.equal(v.waves[0].after,'cleared');assert.equal(v.waves[0].enemies[0].elite,false);assert.equal(v.waves[0].enemies[0].stagger,0);
+  assert.deepEqual([v.modifiers.enemyDamage,v.modifiers.playerHp,v.modifiers.playerDamage,v.modifiers.regen,v.modifiers.hazardDamage,v.modifiers.healAmount,v.modifiers.lightRadius],[1,1,1,0,12,25,270]);
+  /* a GRC1 code written by the first version (its JSON has none of the new fields) still imports */
+  const json=JSON.stringify(old);let h=2166136261;for(let i=0;i<json.length;i++){h^=json.charCodeAt(i);h=Math.imul(h,16777619);}
+  const code='GRC1:'+(h>>>0).toString(16).padStart(8,'0')+':'+Buffer.from(json).toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  assert.equal(D.decode(code).title,'Old');assert.equal(D.decode(code).arena.start,'center');
+});
+check('every new choice is accepted, and an unknown one refused', () => {
+  for(const theme of D.themes){const l=D.defaults();l.arena.theme=theme;D.validate(l);}
+  for(const loadout of D.loadouts){const l=D.defaults();l.loadout=loadout;D.validate(l);}
+  for(const time of D.times)for(const weather of D.weathers){const l=D.defaults();l.appearance.time=time;l.appearance.weather=weather;D.validate(l);}
+  for(const kind of ['water','boost','crate','spikes']){const l=D.defaults();l.objects=[{kind,x:80,y:80,w:80,h:80}];D.validate(l);}
+  const bad=[l=>l.arena.theme='lava',l=>l.arena.start='middle',l=>l.loadout='laser',l=>l.appearance.weather='hail',l=>l.waves[0].after='soon',l=>l.waves[0].enemies[0].spawn='up',l=>l.waves[0].enemies[0].elite='yes',l=>l.waves[0].enemies[0].stagger=9,l=>l.modifiers.regen=9,l=>l.modifiers.hazardDamage=2.5,l=>l.objective.limit=999,l=>l.objects=[{kind:'lava',x:0,y:0,w:40,h:40}]];
+  for(const f of bad){const l=D.defaults();f(l);assert.throws(()=>D.validate(l),f.toString());}
+});
+check('the hunt target must fit the waves; a crate is solid; spikes keep off the start', () => {
+  const h=D.defaults();h.objective={type:'hunt',target:6};assert.throws(()=>D.validate(h),/hunt target/);h.objective.target=5;D.validate(h);
+  const c=D.defaults();c.objects=[{kind:'crate',x:440,y:280,w:80,h:80}];assert.throws(()=>D.validate(c),/start clear/);
+  const s=D.defaults();s.objects=[{kind:'spikes',x:440,y:280,w:80,h:80}];assert.throws(()=>D.validate(s),/start clear/);
+  const w=D.defaults();w.objects=[{kind:'water',x:440,y:280,w:80,h:80}];D.validate(w);
+});
+check('a moved start is kept clear and pickups are reached from it', () => {
+  const l=D.defaults();l.arena.start='northwest';l.objects=[{kind:'wall',x:120,y:80,w:40,h:40}];assert.throws(()=>D.validate(l),/start clear/);
+  l.objects=[{kind:'wall',x:0,y:200,w:320,h:40},{kind:'wall',x:280,y:0,w:40,h:200},{kind:'coin',x:600,y:400,w:24,h:24}];assert.throws(()=>D.validate(l),/sealed/);
+  l.arena.start='center';D.validate(l);
+});
+check('a random entrance needs just one open edge', () => {
+  const l=D.defaults();l.waves[0].enemies[0].spawn='random';
+  const edge=(x,y,w,h)=>({kind:'wall',x,y,w,h});l.objects=[edge(0,0,320,40),edge(320,0,320,40),edge(640,0,320,40),edge(0,600,320,40),edge(320,600,320,40),edge(640,600,320,40),edge(0,40,40,280),edge(0,320,40,280)];
+  D.validate(l);l.objects.push(edge(920,40,40,280),edge(920,320,40,280));assert.throws(()=>D.validate(l),/Every edge/);
+});
+check('new options survive a share code', () => {const t=D.templates.find(x=>x.name==='Meadow stampede').level,back=D.decode(D.shareCode(t));assert.equal(JSON.stringify(back),JSON.stringify(D.validate(t)));});
 console.log(JSON.stringify({pass:true,checks}));
