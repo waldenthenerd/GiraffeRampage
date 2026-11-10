@@ -89,7 +89,15 @@ while IFS= read -r line; do
   if [ ! -f "$tmp/$n.res" ]; then bad "$label" "did not run"; continue; fi
   read -r res secs < "$tmp/$n.res"
   if [ "$res" = pass ]; then ok "$label (${secs}s)"; else bad "$label (${secs}s)" "$(cat "$tmp/$n.out")"; fi
+  printf '%s\t%s\n' "$label" "$tmp/$n.out" >> "$tmp/manifest"
 done < "$list"
+
+# the coverage record (tools/coverage.mjs): every check and every key it reports. CI_COVERAGE=<file> keeps it (GitHub joins the shares' records);
+# a whole run (no CI_SHARD) compares it with tools/coverage-baseline.txt here, so a lost check fails the run.
+rec="${CI_COVERAGE:-$tmp/coverage.txt}"
+node tools/coverage.mjs record "$tmp/manifest" > "$rec"
+if [ -n "${CI_RESULTS:-}" ]; then mkdir -p "$CI_RESULTS"; while IFS=$'\t' read -r l f; do printf '%s\t%s\n' "$l" "$(tail -n 1 "$f")"; done < "$tmp/manifest" > "$CI_RESULTS/results.tsv"; fi   # CI_RESULTS=<dir>: keep each check's result line, to compare two runs
+if [ "$sn" -eq 1 ] && [ -f tools/coverage-baseline.txt ]; then quick "coverage record matches the baseline" node tools/coverage.mjs check tools/coverage-baseline.txt "$rec"; fi
 
 echo
 echo "Took $((SECONDS - t0))s."
