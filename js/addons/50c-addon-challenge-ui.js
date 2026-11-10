@@ -272,7 +272,7 @@ var GRChallengeUI = (function(){
     if(!drafts.length){list.textContent='No saved recipes yet.';return;}
     drafts.forEach(d=>{const row=document.createElement('div');row.className='cb-draft';const title=document.createElement('span');title.textContent=d.title;
       const best=D().record(d.fingerprint),mark=document.createElement('small');mark.className='cb-best';mark.textContent=best?medalWords(best):'Not cleared yet';row.append(title,mark);
-      [['Open',()=>{try{setLevel(D().decode(d.code));draftId=/^d[a-z0-9]{6,20}$/.test(d.id)?d.id:null;note('Opened draft. Saving updates it. '+(isCleared(d.fingerprint)?'This exact recipe is cleared, so it can be shared.':'Clear this recipe to enable sharing.'));}catch(e){note(e.message,true);}}],['Delete',()=>{if(window.confirm('Delete this local draft?')){try{D().removeDraft(d.id);draftList();}catch(e){note(e.message,true);}}}]].forEach(([text,fn])=>{const b=document.createElement('button');b.type='button';b.className='btn ghost sm';b.textContent=text;b.onclick=fn;row.append(b);});list.append(row);});
+      [['Open',()=>{try{setLevel(D().decode(d.code));draftId=/^d[a-z0-9]{6,20}$/.test(d.id)?d.id:null;note('Opened draft. Saving updates it. '+(isCleared(d.fingerprint)?'This exact recipe is cleared, so it can be shared.':'Clear this recipe to enable sharing.'));}catch(e){note(e.message,true);}}],['Delete',e=>{ask('Delete the draft “'+d.title+'” from this browser? This cannot be undone.','Delete draft',()=>{try{D().removeDraft(d.id);draftList();note('Draft deleted.');}catch(err){note(err.message,true);}},row,e.currentTarget);}]].forEach(([text,fn])=>{const b=document.createElement('button');b.type='button';b.className='btn ghost sm';b.textContent=text;b.onclick=fn;row.append(b);});list.append(row);});
   }
   function importCode(code){
     const next=D().decode(code),best=D().record(D().fingerprint(next));setLevel(next);draftId=null;
@@ -301,7 +301,7 @@ var GRChallengeUI = (function(){
       if(a==='close'){close();return;}
       if(a.startsWith('tab-')){showTab(a.slice(4));return;}
       if(a==='new'){ask('Start a new level? This recipe is replaced; save a draft first if you want to keep it.','Start new level',()=>{setLevel(D().defaults());draftId=null;note('New level started.');});return;}
-      if(a==='ask-yes'||a==='ask-no'){const run=a==='ask-yes'&&asking;asking=null;dialog.querySelector('#cbAsk')?.remove();if(run)run();else dialog.querySelector('[data-cb="new"]')?.focus();return;}
+      if(a==='ask-yes'||a==='ask-no'){const run=a==='ask-yes'&&asking;asking=null;dialog.querySelector('#cbAsk')?.remove();const back=askFrom;askFrom=null;if(run)run();else (back&&back.isConnected?back:dialog.querySelector('[data-cb="new"]'))?.focus();return;}
       if(a==='template'){setLevel(D().templates[Number(dialog.querySelector('#cbTemplates').value)].level);draftId=null;note('Recipe loaded. Make it your own.');return;}
       if(a==='save'){const had=draftId;draftId=draftId||D().newDraftId();D().saveDraft(validate(),draftId);draftList();note(had?'Draft updated in this browser.':'Saved as a new draft in this browser.');return;}
       if(a==='save-copy'){draftId=D().newDraftId();D().saveDraft(validate(),draftId);draftList();note('Saved as a new copy. Saving again now updates the copy.');return;}
@@ -377,13 +377,14 @@ var GRChallengeUI = (function(){
       else return;render();
     }catch(e){note(e.message||'That recipe could not be loaded.',true);}
   }
-  /* a question asked inside the workshop instead of the browser's own confirm box: it sits under the toolbar until it is answered, and goes away with the next redraw */
-  let asking=null;
-  function ask(text,yes,run){
-    dialog.querySelector('#cbAsk')?.remove();asking=run;
+  /* a question asked inside the workshop instead of the browser's own confirm box: it sits under the toolbar (or under `after`, such as a draft's row) until it
+     is answered, and goes away with the next redraw; Keep editing puts the focus back on `from`, the button that asked */
+  let asking=null,askFrom=null;
+  function ask(text,yes,run,after,from){
+    dialog.querySelector('#cbAsk')?.remove();asking=run;askFrom=from||null;
     const box=document.createElement('div');box.id='cbAsk';box.className='cb-ask';box.setAttribute('role','alertdialog');box.setAttribute('aria-labelledby','cbAskText');
     box.innerHTML='<p id="cbAskText"></p><div class="cb-toolbar">'+button('ask-yes',esc(yes),'class="cb-primary"')+button('ask-no','Keep editing')+'</div>';
-    box.querySelector('p').textContent=text;dialog.querySelector('.cb-toolbar').after(box);box.querySelector('[data-cb="ask-no"]').focus();
+    box.querySelector('p').textContent=text;(after||dialog.querySelector('.cb-toolbar')).after(box);box.querySelector('[data-cb="ask-no"]').focus();
   }
   function showTab(t){
     if(!TABS.some(x=>x[0]===t))return;tab=t;dialog.dataset.tab=t;

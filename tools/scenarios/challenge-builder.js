@@ -84,6 +84,14 @@ addonSet('challenges', true);
     check('best medal and time kept',!!best&&best.medal==='gold'&&best.time>0&&find('#cbBest').textContent.includes('Gold medal')&&find('#cbNotice').textContent.includes('best'));
     var shelfRow=Array.from(document.querySelectorAll('#challengeBuilder .cb-draft')).find(function(r){return r.textContent.includes(level.title);});
     check('draft shelf shows the medal',!!shelfRow&&shelfRow.querySelector('.cb-best').textContent.includes('Gold medal'));
+    /* deleting a draft asks under its row: Keep editing keeps it, Delete draft removes it, never with the browser's confirm box */
+    click('save-copy');var drafts=GRChallengeData.listDrafts().length,copyRow=document.querySelector('#challengeBuilder .cb-draft');
+    Array.from(copyRow.querySelectorAll('button')).find(function(b){return b.textContent==='Delete';}).click();
+    check('deleting a draft asks under its row',!!find('#cbAsk')&&copyRow.nextElementSibling===find('#cbAsk')&&find('#cbAsk').textContent.includes('Delete the draft')&&confirms===0);
+    click('ask-no');check('keep editing keeps the draft',!find('#cbAsk')&&GRChallengeData.listDrafts().length===drafts);
+    copyRow=document.querySelector('#challengeBuilder .cb-draft');Array.from(copyRow.querySelectorAll('button')).find(function(b){return b.textContent==='Delete';}).click();click('ask-yes');
+    check('delete draft removes it',GRChallengeData.listDrafts().length===drafts-1&&confirms===0);
+    shelfRow=Array.from(document.querySelectorAll('#challengeBuilder .cb-draft')).find(function(r){return r.textContent.includes(level.title);});
     importLevel(GRChallengeData.defaults());check('another recipe is not cleared',find('[data-cb="copy"]').disabled&&find('#cbBest').textContent.includes('No medal'));
     Array.from(shelfRow.querySelectorAll('button')).find(function(b){return b.textContent==='Open';}).click();
     check('opening the cleared draft keeps it cleared',!find('[data-cb="copy"]').disabled&&find('#cbNotice').textContent.includes('is cleared'));
