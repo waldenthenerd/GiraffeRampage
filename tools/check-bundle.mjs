@@ -32,7 +32,7 @@ function serve(dir, indexText) {
   const srv = http.createServer((q, r) => {
     let u = q.url.split('?')[0]; if (u === '/') u = '/index.html';
     if (u === '/index.html' && indexText) { r.writeHead(200, { 'content-type': 'text/html' }); return r.end(indexText); }
-    const f = path.join(dir, u); if (!f.startsWith(dir) || !fs.existsSync(f)) { r.writeHead(404); return r.end(); }
+    const f = path.join(dir, u); if (!f.startsWith(dir) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); }      /* a folder (the local add-on loader asks for addons/) is not a file */
     r.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream' }); r.end(fs.readFileSync(f));
   });
   return new Promise(res => srv.listen(0, '127.0.0.1', () => res(srv)));
