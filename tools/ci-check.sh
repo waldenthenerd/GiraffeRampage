@@ -55,7 +55,7 @@ pkg=""
 if [ "$part" != timed ] && [ -z "${CI_LIST:-}" ]; then
   echo "== website package"
   zip="$tmp/pkg.zip"
-  if [ -n "${CI_PKG:-}" ]; then cp "$CI_PKG" "$zip" && ok "the package built by the package job"
+  if [ -n "${CI_PKG:-}" ]; then cp "$CI_PKG" "$zip" && ok "the package built while the browser installed (CI_PKG)"
   elif out="$(bash tools/make-lovable-package.sh "$zip" 2>&1)"; then ok "build the package"
   else bad "build the package" "$out"; zip=""; fi
   if [ -n "$zip" ] && [ -f "$zip" ]; then pkg="$tmp/site"; mkdir -p "$pkg"; unzip -q "$zip" -d "$pkg"; pkg="$pkg/GiraffeRampage"; fi
@@ -102,7 +102,8 @@ if [ -n "$only" ]; then pick "$only" "$list" > "$list.p"; pick "$only" "$alone" 
 # Both lists are dealt the same way, and within a share the checks keep the longest-first order.
 deal(){ awk -F'|' -v i="$si" -v n="$sn" 'NR == FNR { split($0, t, "\t"); T[t[1]] = t[2]; next }
   { s = ($1 in T) ? T[$1] : 3; print s "\t" FNR "\t" $0 }' tools/ci-times.tsv "$1" | sort -t$'\t' -k1,1gr -k2,2n |
-  awk -F'\t' -v i="$si" -v n="$sn" '{ b = 1; for (k = 2; k <= n; k++) if (load[k] < load[b]) b = k; load[b] += $1; if (b == i) print $3 }'; }
+  awk -F'\t' -v i="$si" -v n="$sn" -v q="$quick1" 'BEGIN{ load[1] = q } { b = 1; for (k = 2; k <= n; k++) if (load[k] < load[b]) b = k; load[b] += $1; if (b == i) print $3 }'; }
+quick1=0; [ "$part" != timed ] && quick1=17                   # share 1 also runs the quick checks (about 17 s on GitHub), so it starts that far behind
 deal "$list" > "$list.mine"; deal "$alone" > "$alone.mine"; mv "$list.mine" "$list"; mv "$alone.mine" "$alone"
 nshared=$(wc -l < "$list"); cat "$alone" >> "$list"
 if [ -n "${CI_LIST:-}" ]; then cut -d'|' -f1 "$list"; exit 0; fi           # CI_LIST=1: only say which browser checks this share would run
