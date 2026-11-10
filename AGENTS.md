@@ -52,6 +52,7 @@ Experimental features, and ones that do not quite fit the main game, go in as **
 4. `Save.data.addons` holds only the switches. If an add-on keeps data of its own, it gets its own save field with a `DEFAULT_SAVE` default and a `Save.load`
    line, like any other field, and nothing breaks when the add-on is off or gone.
 5. Add its own checks to a scenario (or a new one), and screenshot it on and off.
+6. Players can write their own add-ons and drop them into the top-level `addons/` folder (`js/core/49-local-addons.js`, guide in README.md, "Building your own add-on"). Keep `addonRegister`, `addonOn` and `addonWrap` working the same way, since those files depend on them, and keep the loader limited to `localhost`.
 
 ## Who plays
 Most players use a laptop, a MacBook or a desktop; phones are the smaller group. Design and test for a computer first (a 1280x720 window is the smallest laptop-ish
@@ -69,7 +70,7 @@ size to keep working, buttons reachable without scrolling where they can be), an
   count check, the regression scenarios below on desktop and phone, and the package ship check. It takes about a minute and must end with `All <n> checks passed.`
   Also run the scenarios that touch what you changed. The regressions it covers are: `gear-oldsave`, `trinket-ui`, `wheel-spotted`,
   `ants-page`, `ants-engineer`, `upgrades-page`, `nav-pages`, `review-fixes`, `oldsave-deep`, `save-gr3`, `npc-voices`, `gear-spotted`, `perf-cache`, `save-erase`, `gold-bank`, `together`, `achievements`, `gags`, `fishing`, `fishing-fight`, `input-choice`, `town-layers`, `wheels`, `intel`, `uni-bank`, `uni-slides`, `ui-pass`, `enemy-detail`, `enemy-motion`, `scenery-detail`, `minimap`, `domes`, `tower`, `siege`, `fort`, `island`, `camp`, `late-polish`, `sea-chart`,
-  `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, `music`, `jukebox`, `town-choices`, `particles`, `gadgets`, `town-detail`, `sky-chase`, `addons`, `challenge-builder` (also at 390x844 and 844x390 with `--touch`, and its unit tests `tools/challenge-data-test.mjs` and `tools/challenge-play-test.mjs`), `film-sheet` (with `--params "kind=all"`), and `phone-pass` (with `--touch`). Then build the website package and check it:
+  `runreport-gear`, `preview-trail`, `aurora-buff`, `compare-panel-triage`, `music`, `jukebox`, `town-choices`, `particles`, `gadgets`, `town-detail`, `sky-chase`, `addons`, `local-addons`, `challenge-builder` (also at 390x844 and 844x390 with `--touch`, and its unit tests `tools/challenge-data-test.mjs` and `tools/challenge-play-test.mjs`), `film-sheet` (with `--params "kind=all"`), and `phone-pass` (with `--touch`). Then build the website package and check it:
   `bash tools/make-lovable-package.sh`, unzip `dist/GiraffeRampage-lovable.zip`, and run `QA_ROOT=<folder>/GiraffeRampage node tools/qa-cloud.mjs tools/scenarios/ship-check.js --wait 60000` (it must say `"pass":true`).
 - New behavior gets a scenario in `tools/scenarios/` (copy the nearest one) and a line about it in `tools/QA-GUIDE.md`.
 
