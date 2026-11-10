@@ -1,0 +1,1 @@
+# how long each browser check takes on GitHub, in seconds (label, a tab, seconds); tools/ci-check.sh deals the shares by it. Copy new times from the "qa" job.

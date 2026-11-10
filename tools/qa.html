@@ -289,7 +289,7 @@
   var q = new URLSearchParams(location.search);
   window.QA = { params: {}, errors: [], result: null, logs: [],
     log: function(){ QA.logs.push(Array.prototype.slice.call(arguments).map(String).join(' ')); },
-    done: function(r){ QA.result = r; QA.flush(); QA.hold(); },
+    done: function(r){ QA.result = r; QA.flush(); QA.hold(); try { if (window.__qaDone) window.__qaDone(); } catch (e) {} },     /* __qaDone: the runner hears at once (tools/qa-lib.mjs) */
     /* after the scenario: keep drawing the final state (and nothing else changes), so a screenshot shows it */
     hold: function(){ if (QA._held) return; QA._held = true; (function l(){ try { GR.render(); } catch (e) {} realRAF(l); })(); },
     flush: function(){
@@ -306,8 +306,41 @@
   /* the same random numbers every run, so a screenshot run matches the data run */
   var s = (parseInt(q.get('seed'), 10) || 12345) >>> 0;
   Math.random = function(){ s = (s + 0x6D2B79F5) >>> 0; var t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  /* drawing has its own random numbers, so how many frames are drawn never changes what the game does (a shake, a sparkle's place) */
+  var ds = (s ^ 0x9E3779B9) >>> 0, inDraw = 0, simRandom = Math.random;
+  var drawRandom = function(){ ds = (ds + 0x6D2B79F5) >>> 0; var t = ds; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  Math.random = function(){ return inDraw ? drawRandom() : simRandom(); };
+  /* draw=sampled (what tools/ci-check.sh asks for): a frame that GR.step makes is drawn when it is the 8th since the last drawn one, or when the
+     state, the wave, the chapter, the boss or the screen on top changed since then; the others only place the camera, which the game reads. A call
+     to GR.render() always draws, and so does every frame after QA.done. draw=all (the default) draws every frame, as the game does. */
+  QA.draw = { mode: q.get('draw') === 'sampled' ? 'sampled' : 'all', drawn: 0, skipped: 0, ms: 0 };
+  function wrapRender(){
+    if (typeof render !== 'function' || render.__qa) return;
+    var base = render, n = 0, last = '', skippedNow = false, drawMsNow = 0;
+    var drawn = function(){ var t0 = performance.now(); inDraw++; try { return base.apply(this, arguments); } finally { inDraw--; var dt = performance.now() - t0; QA.draw.ms += dt; drawMsNow += dt; } };
+    var stepRender = function(){
+      if (QA.draw.mode === 'sampled' && !QA._held){
+        var k = G.state + '|' + G.wave + '|' + G.chapter + '|' + (G.boss ? 1 : 0) + '|' + (G.subScreen || '') + '|' + (G.cut ? G.cut.kind : '');
+        if (k === last && ++n < 8){ QA.draw.skipped++; skippedNow = true; if (typeof renderCamera === 'function') renderCamera(); return; }
+        /* the frames not drawn would each have made scenery pictures for 3 ms (SDC, js/scenery/36o-scenery-detail.js); this one makes them all */
+        if (n > 0 && typeof SDC !== 'undefined' && window.G){ SDC.frame = G.time; SDC.ms = -3 * n; }
+        n = 0; last = k;
+      }
+      QA.draw.drawn++; return drawn.apply(this, arguments);
+    };
+    stepRender.__qa = true; window.render = stepRender;
+    /* the slow-device governor (js/core/44c-perf.js) times each frame; a frame not drawn is told it cost what the last drawn one did, so the
+       governor lowers and raises the detail just as it does when every frame is drawn */
+    if (typeof Perf !== 'undefined' && Perf.cost && !Perf.cost.__qa){
+      var baseCost = Perf.cost, lastDraw = 0;
+      Perf.cost = function(ms, dt){ if (skippedNow) ms += lastDraw; else lastDraw = drawMsNow; skippedNow = false; drawMsNow = 0; return baseCost.call(this, ms, dt); };
+      Perf.cost.__qa = true;
+    }
+    if (window.GR) GR.render = drawn;
+  }
   window.addEventListener('load', function(){
     var f = q.get('s');
+    wrapRender();
     if (!f){ QA.flush(); return; }
     var sc = document.createElement('script'); sc.src = f;
     sc.onerror = function(){ QA.errors.push('could not load scenario ' + f); QA.flush(); };

@@ -50,9 +50,9 @@
         var p = kv[1] === 'zone' ? { x: 0, y: 0, rx: 120, ry: 80, rot: 0, seed: 0.3, def: o } : { x: 0, y: 0, s: 1, rot: 0, seed: 0.3, def: o, r: o.r || 20 };
         all++; try { var ops = sdGen(o, kv[1], p); if (ops) made++; else if (kv[1] !== 'decal') errs.push(o.id + ' made nothing'); } catch (e) { errs.push(o.id + ': ' + e.message); } }); }); });
     out.defs = { all: all, made: made, errs: errs.slice(0, 6) };
-    /* off: the drawing is exactly the original */
+    /* off: the drawing is exactly the original (the first prop that has small parts: which prop comes first depends on the random numbers) */
     startRun(1, 1); for (var s2 = 0; s2 < 3; s2++) GR.step(1 / 30);
-    var p0 = SCEN.props[0], c1 = document.createElement('canvas'); c1.width = c1.height = 300; var x1 = c1.getContext('2d'), c2 = document.createElement('canvas'); c2.width = c2.height = 300; var x2 = c2.getContext('2d');
+    var p0 = SCEN.props.filter(function(p){ return p.def && p.def._sdBase; })[0], c1 = document.createElement('canvas'); c1.width = c1.height = 300; var x1 = c1.getContext('2d'), c2 = document.createElement('canvas'); c2.width = c2.height = 300; var x2 = c2.getContext('2d');
     SD.off = true; x1.setTransform(1, 0, 0, 1, 150, 150); p0.def.draw(x1, p0, 1); x2.setTransform(1, 0, 0, 1, 150, 150); p0.def._sdBase.call(p0.def, x2, p0, 1); SD.off = false;
     var d1 = x1.getImageData(0, 0, 300, 300).data, d2 = x2.getImageData(0, 0, 300, 300).data, same = true; for (var q = 0; q < d1.length; q++) if (d1[q] !== d2[q]){ same = false; break; }
     out.offSame = same;

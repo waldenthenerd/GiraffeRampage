@@ -1,6 +1,9 @@
 # Runs tools/ci-check.sh on every push and pull request: README counts, the regression scenarios (desktop and phone), the website package and its ship check.
-# The browser checks are split into three shares that run at the same time on three machines (CI_SHARD); each machine also runs its share side by side.
-# The job named "qa" passes only when all three shares pass.
+# The website package is built once (job "package") and handed to the others. The browser checks are split into six shares that run at the same
+# time on six machines (CI_SHARD; tools/ci-times.tsv says how long each check takes, so the shares come out even), and the checks that time themselves
+# run on a seventh machine of their own, one at a time (CI_PART=timed). The shares draw only some of the frames (tools/qa.html, draw=sampled);
+# after a push to main, job "every-frame" runs the whole suite again drawing every frame, so a drawing error the sampled run could miss is still caught.
+# The job named "qa" passes only when every share passes and their joined coverage record still has every check in tools/coverage-baseline.txt.
 # To make it block merges: Settings > Rules > the main ruleset > "Require status checks to pass" > add "QA / qa".
 name: QA
 on:
@@ -11,13 +14,93 @@ permissions:
 concurrency:
   group: qa-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
+env:
+  PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.pw-browsers
 jobs:
-  share:
-    name: share ${{ matrix.share }} of 3
+  package:
+    name: website package
     runs-on: ubuntu-24.04            # pinned: Playwright 1.56 cannot install its browser dependencies on Ubuntu 26, which ubuntu-latest became in October 2026
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the website package
+        run: bash tools/make-lovable-package.sh dist/pkg.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: dist/pkg.zip
+          retention-days: 3
+  share:
+    name: ${{ matrix.share == 'timed' && 'timed checks' || format('share {0} of 6', matrix.share) }}
+    needs: package
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false                # every share finishes, so one run shows every failure
+      matrix:
+        share: [1, 2, 3, 4, 5, 6, timed]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - uses: actions/cache@v4
+        id: pw
+        with:
+          path: .pw-browsers
+          key: pw-${{ runner.os }}-${{ hashFiles('tools/package-lock.json') }}
+      - name: Install the test runner and Chromium
+        working-directory: tools
+        run: |
+          npm ci
+          if [ "${{ steps.pw.outputs.cache-hit }}" = true ]; then npx playwright install-deps chromium; else npx playwright install --with-deps chromium; fi
+      - uses: actions/download-artifact@v4
+        with:
+          name: package
+          path: dist
+      - name: Run this share of the checks
+        run: bash tools/ci-check.sh
+        env:
+          CI_SHARD: ${{ matrix.share == 'timed' && '1/1' || format('{0}/6', matrix.share) }}
+          CI_PART: ${{ matrix.share == 'timed' && 'timed' || 'shared' }}
+          CI_PKG: dist/pkg.zip
+          CI_COVERAGE: coverage-${{ matrix.share }}.txt
+          CI_RESULTS: results-${{ matrix.share }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.share }}
+          path: |
+            coverage-${{ matrix.share }}.txt
+            results-${{ matrix.share }}/times.tsv
+          retention-days: 7
+  qa:
+    needs: share
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every share passed
+        run: '[ "${{ needs.share.result }}" = success ] || { echo "a share failed or was cancelled: ${{ needs.share.result }}"; exit 1; }'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: cov
+          merge-multiple: true
+      - name: The coverage record still has every check
+        run: node tools/coverage.mjs check tools/coverage-baseline.txt cov/coverage-*.txt
+      - name: How long each check took (copy into tools/ci-times.tsv to rebalance the shares)
+        run: cat cov/results-*/times.tsv | sort -t$'\t' -k2 -rn | head -n 40
+  every-frame:
+    name: whole suite, every frame drawn
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
       matrix:
         share: [1, 2, 3]
     steps:
@@ -27,19 +110,23 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: tools/package-lock.json
+      - uses: actions/cache@v4
+        id: pw
+        with:
+          path: .pw-browsers
+          key: pw-${{ runner.os }}-${{ hashFiles('tools/package-lock.json') }}
       - name: Install the test runner and Chromium
         working-directory: tools
         run: |
           npm ci
-          npx playwright install --with-deps chromium
-      - name: Run this share of the checks
+          if [ "${{ steps.pw.outputs.cache-hit }}" = true ]; then npx playwright install-deps chromium; else npx playwright install --with-deps chromium; fi
+      - uses: actions/download-artifact@v4
+        with:
+          name: package
+          path: dist
+      - name: Run this share, drawing every frame
         run: bash tools/ci-check.sh
         env:
           CI_SHARD: ${{ matrix.share }}/3
-  qa:
-    needs: share
-    if: always()
-    runs-on: ubuntu-24.04
-    steps:
-      - name: All three shares passed
-        run: '[ "${{ needs.share.result }}" = success ] || { echo "a share failed or was cancelled: ${{ needs.share.result }}"; exit 1; }'
+          CI_DRAW: all
+          CI_PKG: dist/pkg.zip

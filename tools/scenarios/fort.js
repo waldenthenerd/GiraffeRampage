@@ -120,7 +120,8 @@
     /* explosions: a fuel tank goes up a moment after it falls, hurts the creatures in the way and the neighbours (a chain), and never hurts her */
     begin(); var t1 = bk('tank', 0), t2 = bk('tank', 1), t3 = bk('tank', 2), tm = mid(t1); put(tm.x - 300, tm.y);
     spawnEnemy('hyena', tm.x + 50, tm.y + 160, G.wave); var ev = G.enemies[0]; ev.hp = ev.maxHp = 100; var hp0 = P.hp; var ch0 = G.ft.chaos;
-    kill(t1); out.fuse = FT.fuse.length === 1 && !t2.collapsed; steps(8); out.boom = !G.enemies.length || ev.dead || ev.hp < 100;
+    kill(t1); out.fuse = FT.fuse.length === 1 && !t2.collapsed; var ex = ev.x, ey = ev.y; for (var hs = 0; hs < 12; hs++){ if (!ev.dead){ ev.x = ex; ev.y = ey; } steps(1); }     /* 0.4 s, past the longest fuse (0.16 to 0.3 s); the hyena held where it stands, in the way */
+    out.boom = !G.enemies.length || ev.dead || ev.hp < 100;
     t2.hp = 50; t3.hp = 50; kill(t1); t1.collapsed = false; t1.hp = t1.maxHp; kill(t1); steps(30);
     out.chain = t2.collapsed === true && t3.collapsed === true && G.ft.chaos > ch0 + t1.chaos + t2.chaos; out.safe = P.hp === hp0;
     out.rubbleFire = t1.fire > 0 || t1.smoke > 0;

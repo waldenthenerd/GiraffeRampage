@@ -59,7 +59,8 @@
     tap('KeyJ'); check('toLeft', Sky.gun === 'left' && Sky.sw > 0); Sky.shots.length = 0; steps(3); check('swapPause', Sky.shots.length === 0);
     steps(14); check('leftFires', Sky.shots.length > 0 && Sky.shots.every(function(b){ return b.vx < 0 && b.vy === 0; }));
     tap('KeyL'); steps(16); Sky.shots.length = 0; steps(8); check('rightFires', Sky.gun === 'right' && Sky.shots.length > 0 && Sky.shots.every(function(b){ return b.vx > 0; }));
-    var d0 = Sky.shots[0] ? Sky.shots[0].dmg : 0; tap('KeyK'); steps(16); Sky.shots.length = 0; steps(8); check('doorHarder', Sky.gun === 'nose' && Sky.shots[0] && d0 > Sky.shots[0].dmg * 1.2);
+    function plain(){ return Sky.shots.filter(function(b){ return !b.crit; })[0]; }        /* a shot that is not a critical hit (one in twenty is, by chance) */
+    var r0 = plain(), d0 = r0 ? r0.dmg : 0; tap('KeyK'); steps(16); Sky.shots.length = 0; steps(8); var n0 = plain(); check('doorHarder', Sky.gun === 'nose' && !!n0 && d0 > n0.dmg * 1.2);
     var a0 = Save.data.skyAim; tap('KeyI'); check('aimKey', Save.data.skyAim === !a0); tap('KeyI'); check('aimBack', Save.data.skyAim === a0);
     check('keys', DEFAULT_KEYS.skyLeft === 'KeyJ' && DEFAULT_KEYS.skyNose === 'KeyK' && DEFAULT_KEYS.skyRight === 'KeyL' && KEY_ACTIONS.some(function(a){ return a[0] === 'skyAim'; }));
     /* ---- a wave, and the upgrade after wave 2 ---- */
