@@ -22,7 +22,7 @@ done
 scen "challenge-builder" challenge-builder
 scen "challenge-builder (390x844)" challenge-builder --touch --w 390 --h 844
 scen "challenge-builder (844x390)" challenge-builder --touch --w 844 --h 390
-for s in gear-oldsave trinket-ui wheel-spotted ants-page ants-engineer upgrades-page nav-pages review-fixes oldsave-deep save-gr3 npc-voices gear-spotted perf-cache save-erase gold-bank together achievements gags fishing fishing-fight input-choice town-layers wheels intel uni-bank uni-slides ui-pass enemy-detail enemy-motion scenery-detail minimap domes tower siege fort island camp late-polish sea-chart runreport-gear preview-trail aurora-buff compare-panel-triage music jukebox town-choices particles gadgets town-detail sky-chase addons; do scen "$s" "$s"; done
+for s in gear-oldsave trinket-ui wheel-spotted ants-page ants-engineer upgrades-page nav-pages review-fixes oldsave-deep save-gr3 npc-voices gear-spotted perf-cache save-erase gold-bank together achievements gags fishing fishing-fight input-choice town-layers wheels intel uni-bank uni-slides ui-pass enemy-detail enemy-motion scenery-detail minimap domes tower siege fort island camp late-polish sea-chart runreport-gear preview-trail aurora-buff compare-panel-triage music jukebox town-choices particles gadgets town-detail sky-chase addons speedrun; do scen "$s" "$s"; done
 scen "films (all 27 films)" film-sheet --params "kind=all"
 scen "phone-pass (390x844)" phone-pass --touch --w 390 --h 844
 scen "uni-slides (390x844)" uni-slides --touch --w 390 --h 844
