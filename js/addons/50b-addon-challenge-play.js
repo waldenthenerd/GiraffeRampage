@@ -444,6 +444,9 @@ var GRChallengePlay = (function(){
     const p={x:480,y:320,r:15,hp:kit.hp,inv:0,attack:0,angle:-Math.PI/2};
     let enemies=[],shots=[],time=0,kills=0,collected=0,heals=0,wave=0,wait=level.waves[0].delay,fx=[],waveBannerUntil=0,extra=0,hitSound=0;
     const totalEnemies=level.waves.reduce((n,w)=>n+w.enemies.reduce((sum,g)=>sum+g.count,0),0);
+    /* in a survival challenge the waves never run dry: each comes its delay after the one before arrived (at least SURVIVE_GAP seconds apart), or its delay
+       after the arena is cleared if that is sooner, and after the last wave the list starts again. Past SURVIVE_CROWD creatures out, the clock waits. */
+    const survive=level.objective.type==='survive',SURVIVE_GAP=10,SURVIVE_CROWD=80,at=i=>level.waves[i%level.waves.length],due=()=>survive||wave<level.waves.length;
     let paused=false,ended=false,result=null,raf=0,last=0,carry=0,attackFlash=0,frameLive=true;
     /* looks only: dust, sparks, puffs and the shake. They use Math.random, never the recipe's seeded numbers, and are not part of a snapshot. */
     let parts=[],shake=0,hurtFlash=0,dustT=0,hitAt=null;
@@ -453,10 +456,10 @@ var GRChallengePlay = (function(){
         parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-(kind==='plus'?40:0),life:kind==='ring'?.35:.45+Math.random()*.35,max:0,size:size*(.6+Math.random()*.6),color,kind:kind||'dot'});parts[parts.length-1].max=parts[parts.length-1].life;}
     }
     function ring(x,y,color,size){if(parts.length>=260)parts.shift();parts.push({x,y,vx:0,vy:0,life:.35,max:.35,size,color,kind:'ring'});}
-    function waveWords(i){const w=level.waves[i];if(!w)return '';return w.enemies.map(g=>g.count+' '+NAMES[g.kind]+(g.count>1?'s':'')+(g.kind==='flyer'?' over the walls':' from the '+g.spawn)).join(' · ');}
+    function waveWords(i){const w=i>=0&&at(i);if(!w)return '';return w.enemies.map(g=>g.count+' '+NAMES[g.kind]+(g.count>1?'s':'')+(g.kind==='flyer'?' over the walls':' from the '+g.spawn)).join(' · ');}
     function glowDirs(){
-      const i=!enemies.length&&wave<level.waves.length?wave:time<waveBannerUntil?wave-1:-1,out={};
-      if(i>=0&&level.waves[i])for(const g of level.waves[i].enemies)out[g.spawn]=1;return out;
+      const i=due()&&(!enemies.length||survive&&wait<2)?wave:time<waveBannerUntil?wave-1:-1,out={};
+      if(i>=0)for(const g of at(i).enemies)out[g.spawn]=1;return out;
     }
     let target=null,keys=new Set(),pointer=null,pad={x:0,y:0,prev:[]};
     const previousFocus=document.activeElement;
@@ -553,7 +556,7 @@ var GRChallengePlay = (function(){
       return {kind,x,y,r:f.r,hp:f.hp*level.modifiers.enemyHp,max:f.hp*level.modifiers.enemyHp,fire:1+rng(),side:rng()<.5?-1:1,fly:!!f.fly,flash:0,ang:Math.atan2(p.y-y,p.x-x),seed:rng()*9,quiet:0,dash:0,windup:0,cool:1+rng()*2,dir:0};
     }
     function spawnWave(){
-      const recipe=level.waves[wave]; wave++;waveBannerUntil=time+1.6;
+      const recipe=at(wave); wave++;waveBannerUntil=time+1.6;if(survive)wait=Math.max(SURVIVE_GAP,at(wave).delay);
       for(const group of recipe.enemies){
         const f=FOES[group.kind];
         for(let n=0;n<group.count;n++){
@@ -593,7 +596,7 @@ var GRChallengePlay = (function(){
       if(parts.length&&parts[0].life<=0)parts=parts.filter(q=>q.life>0);
       if(len){dustT-=dt;if(dustT<=0){dustT=.11;burst(p.x-Math.cos(p.angle)*12,p.y-Math.sin(p.angle)*12,1,level.arena.theme==='arctic'?'#ffffff':'#d8c8a0',20,4,'dust');}}
       if(len){p.angle=Math.atan2(dy,dx);move(p,dx/len*kit.speed*(level.modifiers.playerSpeed||1)*dt,dy/len*kit.speed*(level.modifiers.playerSpeed||1)*dt);}
-      if(!enemies.length&&wave<level.waves.length){wait-=dt;if(wait<=0)spawnWave();}
+      if(survive?enemies.length<SURVIVE_CROWD:!enemies.length&&wave<level.waves.length){wait-=dt;if(wait<=0)spawnWave();}
       if(ended)return;
       for(const e of enemies){
         const f=FOES[e.kind],vx=p.x-e.x,vy=p.y-e.y,d=Math.hypot(vx,vy)||1,sp=f.speed*level.modifiers.speed;
@@ -634,7 +637,7 @@ var GRChallengePlay = (function(){
       enemies=enemies.filter(e=>e.hp>0);kills+=before-enemies.length;
       if(before>enemies.length)sfx('kill');
       if(born.length){enemies=enemies.concat(born);extra+=born.length;burst(born[0].x,born[0].y,8,'#e6ce9c',120,3,'dot');}
-      if(before&&!enemies.length&&wave<level.waves.length)wait=level.waves[wave].delay;
+      if(before&&!enemies.length&&due())wait=survive?Math.min(wait,at(wave).delay):level.waves[wave].delay;
       for(const s of shots){
         const old={x:s.x,y:s.y};s.x+=s.dx*dt;s.y+=s.dy*dt;s.life-=dt;
         if(blocks(old,s,walls))s.life=0;
@@ -732,8 +735,8 @@ var GRChallengePlay = (function(){
       if(level.modifiers.darkness){
         const shade=ctx.createRadialGradient(p.x,p.y,65,p.x,p.y,270);shade.addColorStop(0,'#10152100');shade.addColorStop(1,'#101521ec');ctx.fillStyle=shade;ctx.fillRect(0,0,960,640);
       }
-      if(!paused&&!ended&&(time<waveBannerUntil||(!enemies.length&&wave<level.waves.length))){
-        const counting=!enemies.length&&wave<level.waves.length,title=counting?'Wave '+(wave+1)+' in '+Math.max(0,wait).toFixed(1)+'s':'Wave '+wave+' / '+level.waves.length,sub=waveWords(counting?wave:wave-1);
+      if(!paused&&!ended&&(time<waveBannerUntil||(!enemies.length&&due()))){
+        const counting=!enemies.length&&due(),title=counting?'Wave '+(wave+1)+' in '+Math.max(0,wait).toFixed(1)+'s':'Wave '+wave+(survive?'':' / '+level.waves.length),sub=waveWords(counting?wave:wave-1);
         ctx.font='13px sans-serif';const m=ctx.measureText?ctx.measureText(sub):null,bw=Math.max(300,Math.min(900,(m&&m.width||440)+80));
         ctx.save();ctx.translate(480,14);ctx.fillStyle='#241b15e6';ctx.beginPath();ctx.moveTo(-bw/2,0);ctx.lineTo(bw/2,0);ctx.lineTo(bw/2-14,27);ctx.lineTo(bw/2,54);ctx.lineTo(-bw/2,54);ctx.lineTo(-bw/2+14,27);ctx.closePath();ctx.fill();
         ctx.strokeStyle='#f2b33d';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#f2b33d';ctx.font='bold 19px sans-serif';ctx.textAlign='center';ctx.fillText(title,0,23);
@@ -755,7 +758,7 @@ var GRChallengePlay = (function(){
         ctx.restore();
       }
       const objective=level.objective.type==='survive'?'Survive '+level.objective.target+'s':level.objective.type==='collect'?'Collect '+level.objective.target:level.objective.type==='exit'?'Reach the exit':'Clear all waves';
-      hud.textContent='Health '+Math.ceil(p.hp)+' / '+kit.hp+' · '+time.toFixed(1)+'s · Wave '+Math.min(wave+(!enemies.length&&wave<level.waves.length?1:0),level.waves.length)+' / '+level.waves.length+' · '+kills+' defeated · '+collected+' collected — '+objective;
+      hud.textContent='Health '+Math.ceil(p.hp)+' / '+kit.hp+' · '+time.toFixed(1)+'s · Wave '+(survive?wave+(enemies.length?0:1):Math.min(wave+(!enemies.length&&wave<level.waves.length?1:0),level.waves.length)+' / '+level.waves.length)+' · '+kills+' defeated · '+collected+' collected — '+objective;
       hpMeter.bar.value=p.hp/kit.hp;hpMeter.text.textContent='Health '+Math.ceil(p.hp)+' / '+kit.hp;
       const goal=level.objective.type==='clear'?kills/(totalEnemies+extra):level.objective.type==='survive'?time/level.objective.target:level.objective.type==='collect'?collected/level.objective.target:ended&&result.won?1:0;
       goalMeter.bar.value=clamp(goal,0,1);goalMeter.text.textContent=objective+' · '+Math.floor(clamp(goal,0,1)*100)+'%';

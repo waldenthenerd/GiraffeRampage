@@ -9,7 +9,7 @@ addonRegister({ id: 'challenges', name: 'Challenge Workshop', tag: 'extra',
 
 // Challenge recipes are separate from campaign saves. Never execute imported data.
 var GRChallengeData = (function () {
-  const KEY = 'giraffe_rampage_challenges_v1', MAX_CODE = 24000;
+  const KEY = 'giraffe_rampage_challenges_v1', RECORDS = 'giraffe_rampage_challenge_records_v1', MAX_CODE = 24000;
   /* the enemy kinds a recipe may use, with each one's body radius (the arena, 50b, uses the same radii; a unit test checks they agree).
      Flyers cross walls, so a blocked edge does not stop them. */
   const KINDS = ['chaser', 'runner', 'brute', 'spitter', 'flyer', 'charger', 'splitter', 'badger'];
@@ -197,7 +197,7 @@ var GRChallengeData = (function () {
     try { const text = localStorage.getItem(KEY); if (!text || text.length > MAX_CODE * 24) return []; data = JSON.parse(text); } catch (_) { return []; }
     if (!Array.isArray(data)) return [];
     return data.slice(0, 24).flatMap(entry => {
-      try { obj(entry, 'Draft'); const level = decode(entry.code); return [{ id: draftId(entry.id) || fingerprint(level), title: level.title, updated: Number.isFinite(entry.updated) ? entry.updated : 0, code: encode(level) }]; }
+      try { obj(entry, 'Draft'); const level = decode(entry.code), fp = fingerprint(level); return [{ id: draftId(entry.id) || fp, title: level.title, updated: Number.isFinite(entry.updated) ? entry.updated : 0, code: encode(level), fingerprint: fp }]; }
       catch (_) { return []; }
     });
   }
@@ -216,6 +216,32 @@ var GRChallengeData = (function () {
   function removeDraft(id) {
     const drafts = listDrafts().filter(entry => entry.id !== id);
     try { localStorage.setItem(KEY, JSON.stringify(drafts)); } catch (_) { fail('This browser could not update the challenge shelf.'); }
+  }
+  /* best results, one per exact recipe (its fingerprint), in their own browser storage beside the shelf (never the campaign save): the best medal and
+     the fastest winning time, which may come from different runs. Only wins count, a record is only read back if it looks right, and the 200 most
+     recently improved are kept. A record means this browser cleared that exact recipe; an imported code never brings one with it. */
+  const MEDALS = ['bronze', 'silver', 'gold'];
+  const isFp = fp => typeof fp === 'string' && /^[a-f0-9]{8}$/.test(fp);
+  function readRecords() {
+    try { const text = localStorage.getItem(RECORDS); if (!text || text.length > 60000) return {}; const data = JSON.parse(text); return data && typeof data === 'object' && !Array.isArray(data) ? data : {}; }
+    catch (_) { return {}; }
+  }
+  function cleanRecord(r) {
+    if (!r || typeof r !== 'object' || !MEDALS.includes(r.medal) || typeof r.time !== 'number' || !(r.time > 0 && r.time <= 300)) return null;
+    return { medal: r.medal, time: r.time, updated: Number.isFinite(r.updated) ? r.updated : 0 };
+  }
+  function record(fp) { if (!isFp(fp)) return null; const all = readRecords(), r = cleanRecord(Object.prototype.hasOwnProperty.call(all, fp) ? all[fp] : null); return r && { medal: r.medal, time: r.time }; }
+  /* takes a finished run from the arena; returns the record as it now stands, with which parts this run improved, or null for a loss */
+  function saveResult(result) {
+    if (!result || result.won !== true || !isFp(result.fingerprint) || !cleanRecord({ medal: result.medal, time: result.time })) return null;
+    const all = {}, raw = readRecords();
+    for (const fp of Object.keys(raw)) { const r = isFp(fp) && cleanRecord(raw[fp]); if (r) all[fp] = r; }
+    const old = all[result.fingerprint], medal = old && MEDALS.indexOf(old.medal) >= MEDALS.indexOf(result.medal) ? old.medal : result.medal, time = old ? Math.min(old.time, result.time) : result.time;
+    all[result.fingerprint] = { medal, time, updated: Date.now() };
+    const keep = Object.keys(all).sort((a, b) => all[b].updated - all[a].updated).slice(0, 200), out = {};
+    for (const fp of keep) out[fp] = all[fp];
+    try { localStorage.setItem(RECORDS, JSON.stringify(out)); } catch (_) {}
+    return { medal, time, newMedal: !old || medal !== old.medal, newTime: !old || time < old.time };
   }
   const templates = [];
   function template(name, change) { const level = defaults(); level.title = name; change(level); templates.push({ name, level: validate(level) }); }
@@ -261,6 +287,6 @@ var GRChallengeData = (function () {
     l.waves = [{delay:0,enemies:[{kind:'chaser',count:5,spawn:'west'}]},{delay:2,enemies:[{kind:'runner',count:3,spawn:'south'},{kind:'spitter',count:2,spawn:'north'}]}];
     l.objects = [{kind:'custom',asset:'signal',x:120,y:100,w:100,h:140},{kind:'custom',asset:'signal',x:760,y:420,w:100,h:140},{kind:'rock',x:680,y:140,w:100,h:70},{kind:'wall',x:260,y:420,w:160,h:32},{kind:'heal',x:680,y:480,w:32,h:32}];
   });
-  return { key: KEY, kinds: KINDS.slice(), kindR: Object.assign({}, KIND_R), defaults, validate, encode, decode, shareCode, fingerprint, seeded, templates, isSolid, saveDraft, listDrafts, removeDraft, newDraftId };
+  return { key: KEY, recordsKey: RECORDS, record, saveResult, kinds: KINDS.slice(), kindR: Object.assign({}, KIND_R), defaults, validate, encode, decode, shareCode, fingerprint, seeded, templates, isSolid, saveDraft, listDrafts, removeDraft, newDraftId };
 }());
 window.GRChallengeData = GRChallengeData;
