@@ -68,7 +68,7 @@ size to keep working, buttons reachable without scrolling where they can be), an
 - **Before you open a pull request run `bash tools/ci-check.sh`.** It is the same script GitHub runs on every push and pull request (`.github/workflows/qa.yml`): the README
   count check, the regression scenarios below on desktop and phone, the package ship check, and the coverage record (no check may go missing). It must end
   with `All <n> checks passed.` It runs the browser checks in one browser, side by side, one per processor core (about 3 minutes on 4 cores; `CI_JOBS=1` runs
-  them one at a time), drawing only some of the frames, and GitHub splits them over six machines plus one for the timed checks (`CI_SHARD=i/n` runs one share;
+  them one at a time), drawing only some of the frames, and GitHub splits them over six machines plus two for the timed checks (`CI_SHARD=i/n` runs one share;
   `CI_LIST=1` only lists a share's checks), then runs the whole suite again drawing every frame after each push to main. A scenario that measures time (a drawing
   budget, a frame-time comparison) goes in the `timed` list in `tools/ci-check.sh`, so it runs alone on a quiet machine, drawing every frame. A long scenario can be
   split into parts (`QA.part`, the `parts=` list). How all of that works, and what a scenario must do for it, is in `tools/QA-GUIDE.md`. While you work,

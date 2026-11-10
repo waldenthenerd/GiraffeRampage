@@ -108,7 +108,8 @@ nshared=$(wc -l < "$list"); cat "$alone" >> "$list"
 if [ -n "${CI_LIST:-}" ]; then cut -d'|' -f1 "$list"; exit 0; fi           # CI_LIST=1: only say which browser checks this share would run
 
 inl=""; [ "${CI_INLINE:-1}" = 1 ] && inl=" --inline"      # the game's scripts inlined into the page (tools/qa-lib.mjs); CI_INLINE=0 loads them one by one
-batch(){ nl -ba -w1 -s'|' "$list" | sed -n "$1,$2p" | awk -F'|' -v d="$3" -v x="$inl" 'BEGIN{OFS="|"} { $5 = $5 " --draw " d x; print }' > "$tmp/batch"
+batch(){ [ "$2" != '$' ] && [ "$2" -lt "$1" ] && return 0                 # an empty range (sed would still print line $1)
+  nl -ba -w1 -s'|' "$list" | sed -n "$1,$2p" | awk -F'|' -v d="$3" -v x="$inl" 'BEGIN{OFS="|"} { $5 = $5 " --draw " d x; print }' > "$tmp/batch"
   [ -s "$tmp/batch" ] && node tools/qa-batch.mjs "$tmp/batch" "$tmp" --jobs "$4" ${failfast:+--fail-fast}; }
 echo "== $nshared browser checks, $jobs at a time (drawing: $draw)"
 s=$SECONDS; batch 1 "$nshared" "$draw" "$jobs"
