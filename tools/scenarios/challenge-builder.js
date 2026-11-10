@@ -12,7 +12,8 @@ history.replaceState(null,'',location.pathname+location.search);
 addonSet('challenges', true);
 (function(){
   var out={failed:[]},check=function(name,value){if(!value)out.failed.push(name);};
-  var libraryKey='giraffe_rampage_challenges_v1',previous=localStorage.getItem(libraryKey);
+  var libraryKey='giraffe_rampage_challenges_v1',previous=localStorage.getItem(libraryKey),recordsKey=GRChallengeData.recordsKey,previousRecords=localStorage.getItem(recordsKey);
+  var confirms=0,realConfirm=window.confirm;window.confirm=function(){confirms++;return true;};
   var campaign=JSON.stringify(Save.data),stored=localStorage.getItem(GRSave.key),state=G.state;
   function find(q){return document.querySelector('#challengeBuilder '+q);}
   function click(a){var b=find('[data-cb="'+a+'"]');if(!b)throw Error('Missing action '+a);b.click();}
@@ -63,6 +64,10 @@ addonSet('challenges', true);
     click('tool-wall');find('#cbX').value='160';find('#cbY').value='160';find('#cbWidth').value='40';find('#cbHeight').value='40';click('place');check('coordinate placement',find('.cb-object-list').textContent.includes('wall (160, 160)'));
     click('undo');check('undo placement',!find('.cb-object-list').textContent.includes('wall (160, 160)'));click('redo');
     find('#cbTemplates').value='0';click('template');check('template loads',find('[data-path="title"]').value===GRChallengeData.templates[0].level.title);
+    /* New level asks inside the workshop, never with the browser's confirm box */
+    edit('title','Keep this one');click('new');check('new level asks in the workshop',!!find('#cbAsk')&&find('#cbAsk').textContent.includes('Start a new level')&&confirms===0);
+    click('ask-no');check('keep editing keeps the recipe',!find('#cbAsk')&&find('[data-path="title"]').value==='Keep this one');
+    click('new');click('ask-yes');check('start new level replaces the recipe',!find('#cbAsk')&&find('[data-path="title"]').value===GRChallengeData.defaults().title&&confirms===0);
     var before=find('[data-path="title"]').value;find('#cbCode').value='GRC1:broken';click('import');
     check('bad import preserves editor',find('[data-path="title"]').value===before&&find('#cbNotice').classList.contains('cb-error'));
     var level=GRChallengeData.defaults();level.title='UI survival check';level.seed=4294967295;level.objective={type:'survive',target:1};level.waves[0].enemies[0].count=1;
@@ -74,11 +79,30 @@ addonSet('challenges', true);
     var result=GRChallengePlay.advance(1.1);check('survival win',result.ended&&result.result.won);returnToBuilder();
     check('return opens builder',document.querySelector('#challengeBuilder').open);
     check('exact local clear unlocks sharing',!find('[data-cb="copy"]').disabled);
+    /* the best medal and time are kept per exact recipe and shown in the workshop, on the shelf and for an imported code */
+    var clearedRecipe=JSON.parse(JSON.stringify(GRChallengeUI.level())),best=GRChallengeData.record(GRChallengeData.fingerprint(clearedRecipe));
+    check('best medal and time kept',!!best&&best.medal==='gold'&&best.time>0&&find('#cbBest').textContent.includes('Gold medal')&&find('#cbNotice').textContent.includes('best'));
+    var shelfRow=Array.from(document.querySelectorAll('#challengeBuilder .cb-draft')).find(function(r){return r.textContent.includes(level.title);});
+    check('draft shelf shows the medal',!!shelfRow&&shelfRow.querySelector('.cb-best').textContent.includes('Gold medal'));
+    /* deleting a draft asks under its row: Keep editing keeps it, Delete draft removes it, never with the browser's confirm box */
+    click('save-copy');var drafts=GRChallengeData.listDrafts().length,copyRow=document.querySelector('#challengeBuilder .cb-draft');
+    Array.from(copyRow.querySelectorAll('button')).find(function(b){return b.textContent==='Delete';}).click();
+    check('deleting a draft asks under its row',!!find('#cbAsk')&&copyRow.nextElementSibling===find('#cbAsk')&&find('#cbAsk').textContent.includes('Delete the draft')&&confirms===0);
+    click('ask-no');check('keep editing keeps the draft',!find('#cbAsk')&&GRChallengeData.listDrafts().length===drafts);
+    copyRow=document.querySelector('#challengeBuilder .cb-draft');Array.from(copyRow.querySelectorAll('button')).find(function(b){return b.textContent==='Delete';}).click();click('ask-yes');
+    check('delete draft removes it',GRChallengeData.listDrafts().length===drafts-1&&confirms===0);
+    shelfRow=Array.from(document.querySelectorAll('#challengeBuilder .cb-draft')).find(function(r){return r.textContent.includes(level.title);});
+    importLevel(GRChallengeData.defaults());check('another recipe is not cleared',find('[data-cb="copy"]').disabled&&find('#cbBest').textContent.includes('No medal'));
+    Array.from(shelfRow.querySelectorAll('button')).find(function(b){return b.textContent==='Open';}).click();
+    check('opening the cleared draft keeps it cleared',!find('[data-cb="copy"]').disabled&&find('#cbNotice').textContent.includes('is cleared'));
+    importLevel(GRChallengeData.defaults());importLevel(clearedRecipe);
+    check('an imported code shows your best on it',find('#cbNotice').textContent.includes('Gold medal')&&!find('[data-cb="copy"]').disabled);
     check('no link buttons',!find('[data-cb="link"]')&&!find('[data-cb="hash"]'));
     await_share();var code=find('#cbCode').value,shared=GRChallengeData.decode(code);check('shared recipe roundtrip',shared.seed===4294967295);
     check('share code is GR3-packed and smaller',/^GRC3:/.test(code)&&code.length<GRChallengeData.encode(shared).length);
     check('environment and balance options roundtrip',shared.appearance.time==='night'&&shared.appearance.weather==='drizzle'&&shared.appearance.detail===2&&shared.modifiers.playerSpeed===1.4&&shared.modifiers.attackRate===1.5);
     edit('title','Uncommitted input edit',true);check('input immediately revokes proof before blur',find('[data-cb="copy"]').disabled);
+    click('undo');check('undo back to the cleared recipe is cleared again',!find('[data-cb="copy"]').disabled);click('redo');check('redo to the changed recipe is not',find('[data-cb="copy"]').disabled);
     click('play');GRChallengePlay.advance(1.1);returnToBuilder();await_share();
     check('new share code after the edit',GRChallengeData.decode(find('#cbCode').value).title==='Uncommitted input edit');
     find('#cbCode').value='https://example.test/#challenge='+encodeURIComponent(find('#cbCode').value);click('import');check('a link is refused',find('#cbNotice').classList.contains('cb-error')&&/share code/.test(find('#cbNotice').textContent));
@@ -112,7 +136,7 @@ addonSet('challenges', true);
     check('custom art biome palette roundtrip',customShared.arena.theme==='forest'&&customShared.appearance.palette==='custom'&&customShared.appearance.colors.ground==='#bb8866'&&customShared.customAssets[0].name==='Golden lantern'&&customShared.customAssets[0].parts.length===2&&customShared.customAssets[0].parts[1].rotation===30&&customShared.objects.length===2&&customShared.objects[0].w===120&&customShared.objects[1].asset===customShared.customAssets[0].id);
     check('layer fill and outline roundtrip',customShared.customAssets[0].parts[1].opacity===0.6&&customShared.customAssets[0].parts[1].stroke==='#654321'&&customShared.customAssets[0].parts[1].strokeWidth===2&&customShared.customAssets[0].parts[0].opacity===1&&customShared.customAssets[0].parts[0].strokeWidth===0);
     var checkerButton=find('[data-cb="checker"]'),checkerWas=checkerButton.getAttribute('aria-pressed');click('checker');check('checkerboard is editor-only',checkerButton.getAttribute('aria-pressed')!==checkerWas&&!find('[data-cb="copy"]').disabled);
-    edit('customAssets.0.parts.1.color','#ffcc77',true);check('shape edit revokes sharing proof',find('[data-cb="copy"]').disabled);click('undo');check('shape undo keeps proof revoked',find('[data-cb="copy"]').disabled);
+    edit('customAssets.0.parts.1.color','#ffcc77',true);check('shape edit revokes sharing proof',find('[data-cb="copy"]').disabled);click('undo');check('shape undo back to the cleared recipe is cleared again',!find('[data-cb="copy"]').disabled);
     ['center','mirror','duplicate'].forEach(function(action){click('play');GRChallengePlay.advance(1.1);returnToBuilder();check('clear ready before '+action,!find('[data-cb="copy"]').disabled);click('asset-'+action+'-1');check(action+' revokes clear',find('[data-cb="copy"]').disabled);});
     edit('customAssets.0.parts.1.w','101',true);check('inline validity reports bad shape',find('#cbValidation').classList.contains('cb-error')&&find('#cbValidation').textContent.length>10);edit('customAssets.0.parts.1.w','50',true);check('inline validity recovers',!find('#cbValidation').classList.contains('cb-error'));
     click('biome-colors');var forestColors=GRChallengePlay.getPalette({arena:{theme:'forest'},appearance:{palette:'biome'}});check('biome colours copied from biome not custom palette',find('[data-path="appearance.palette"]').value==='custom'&&find('[data-path="appearance.colors.ground"]').value===forestColors.ground);
@@ -154,6 +178,8 @@ addonSet('challenges', true);
   finally{
     if(window.GRChallengePlay)GRChallengePlay.stop();
     if(previous===null)localStorage.removeItem(libraryKey);else localStorage.setItem(libraryKey,previous);
+    if(previousRecords===null)localStorage.removeItem(recordsKey);else localStorage.setItem(recordsKey,previousRecords);
+    window.confirm=realConfirm;
     if(!document.querySelector('#challengeBuilder')?.open)GRChallengeUI.open();
   }
   out.addonOff=addonOff;Object.keys(addonOff).forEach(function(k){if(!addonOff[k])out.failed.push('add-on off: '+k);});

@@ -180,18 +180,25 @@ check('Creatures in a crowd keep apart instead of stacking on one spot',()=>{
 });
 check('Walkers find their way round a wall that blocks the straight line',()=>{
   const l=level('survive',300);l.loadout='tank';l.modifiers.enemyHp=3;l.objects=[{kind:'wall',x:160,y:160,w:320,h:40},{kind:'wall',x:480,y:160,w:320,h:40}];
-  l.waves=[{delay:0,enemies:[{kind:'chaser',count:3,spawn:'north'}]}];R.start(l);const s=R.advance(15);
+  l.waves=[{delay:0,enemies:[{kind:'chaser',count:3,spawn:'north'}]},{delay:30,enemies:[{kind:'chaser',count:1,spawn:'north'}]}];R.start(l);const s=R.advance(15);   /* the timed second wave is 30 s off */
   assert.ok(s.player.hp<160,'they reached her');assert.ok(s.enemies.every(e=>e.y>200)||s.enemies.length===0);
 });
 check('A flyer crosses walls; a splitter becomes three grubs; a badger heals when left alone; a charger dashes',()=>{
   const l=level('survive',300);l.loadout='tank';l.objects=[{kind:'wall',x:0,y:160,w:320,h:40},{kind:'wall',x:320,y:160,w:320,h:40},{kind:'wall',x:640,y:160,w:320,h:40}];
-  l.waves=[{delay:0,enemies:[{kind:'flyer',count:1,spawn:'north'}]}];R.start(l);let s=R.advance(4);assert.ok(s.enemies.length===0||s.enemies[0].y>200,'over the wall');
+  l.waves=[{delay:0,enemies:[{kind:'flyer',count:1,spawn:'north'}]}];R.start(l);let s=R.advance(4);assert.ok(s.kills>0||s.enemies[0].y>200,'over the wall');   /* beaten means it reached her (a survival arena then fills again) */
   const k=level('clear');k.waves=[{delay:0,enemies:[{kind:'splitter',count:1,spawn:'north'}]}];R.start(k);let seen=0;for(let i=0;i<40&&!seen;i++){s=R.advance(.5);seen=s.enemies.filter(e=>e.kind==='grub').length;}assert.equal(seen,3);
   const b=level('survive',300);b.waves=[{delay:0,enemies:[{kind:'badger',count:1,spawn:'north'}]}];R.start(b);s=R.advance(.2);
   const raw=sandbox.GRChallengePlay;assert.ok(raw.getEnemy('badger').regen>0);
   const c=level('survive',300);c.loadout='tank';c.waves=[{delay:0,enemies:[{kind:'charger',count:1,spawn:'north'}]}];R.start(c);let fast=0,last=null;
   for(let i=0;i<300;i++){s=R.advance(1/60);const e=s.enemies[0];if(!e)break;if(last)fast=Math.max(fast,Math.hypot(e.x-last.x,e.y-last.y)*60);last={x:e.x,y:e.y};}
   assert.ok(fast>150,'dash speed '+fast);
+});
+check('A survival challenge keeps its waves coming on a timer and starts the list again; other objectives wait for a clear arena',()=>{
+  const l=level('survive',60);l.loadout='tank';l.modifiers.enemyHp=.5;l.modifiers.speed=.5;l.waves=[{delay:0,enemies:[{kind:'brute',count:1,spawn:'north'}]},{delay:4,enemies:[{kind:'chaser',count:1,spawn:'south'}]}];
+  R.start(l);let s=R.advance(9.9);assert.equal(s.wave,1);assert.ok(s.enemies.length>=1,'the brute is still out');s=R.advance(.2);assert.equal(s.wave,2,'the next wave came on the timer');
+  s=R.advance(10.1);assert.ok(s.wave>=3,'the list starts again after the last wave');assert.ok(s.enemies.some(e=>e.kind==='brute'));
+  const c=level('clear');c.loadout='tank';c.modifiers=l.modifiers;c.waves=l.waves;R.start(c);s=R.advance(12);assert.equal(s.wave,1);assert.equal(s.enemies.length,1);
+  const e=level('survive',60);e.loadout='swift';e.waves=[{delay:0,enemies:[{kind:'runner',count:1,spawn:'north'}]}];R.start(e);s=R.advance(9);assert.ok(s.wave>=2,'a cleared survival arena fills again at once');
 });
 check('Arena body sizes match the recipe check, and heals show whole numbers',()=>{
   for(const k of D.kinds)assert.equal(R.getEnemy(k).r,D.kindR[k],k);
@@ -236,11 +243,13 @@ check('Spikes hurt only while up, and crates break under her kicks',()=>{
   key('d');R.advance(.8);key('d',true);assert.ok(R.snapshot().player.x>560,'walks through the gap');
 });
 check('Elites, spaced-out groups, timed waves and random entrances',()=>{
-  const l=level('survive',100);l.waves=[{delay:0,enemies:[{kind:'brute',count:1,spawn:'north',elite:true},{kind:'chaser',count:4,spawn:'random',stagger:1}]},{delay:2,after:'timer',enemies:[{kind:'runner',count:2,spawn:'east'}]}];
+  const l=level('clear');                                                    /* not survival, whose waves keep their own clock (at least 10 seconds apart) */l.waves=[{delay:0,enemies:[{kind:'brute',count:1,spawn:'north',elite:true},{kind:'chaser',count:4,spawn:'random',stagger:1}]},{delay:2,after:'timer',enemies:[{kind:'runner',count:2,spawn:'east'}]}];
   R.start(l);let s=R.advance(1/60);const elite=s.enemies.find(e=>e.kind==='brute');assert.ok(elite.elite);assert.equal(elite.max,140*2.2);assert.equal(elite.r,Math.round(23*1.25));
   assert.equal(s.queued,3);s=R.advance(1.5);assert.equal(s.queued,2);s=R.advance(.6);assert.equal(s.wave,2,'the timed wave came while the first was alive');assert.ok(s.enemies.some(e=>e.kind==='runner'));
   const edges=new Set();for(let seed=1;seed<12;seed++){const r=level('survive',100);r.seed=seed;r.waves=[{delay:0,enemies:[{kind:'chaser',count:6,spawn:'random'}]}];R.start(r);for(const e of R.advance(1/60).enemies)edges.add(e.y<40?'n':e.y>600?'s':e.x<40?'w':'e');}
   assert.ok(edges.size>=3,'random edges '+[...edges]);
+  const v=level('survive',100);v.loadout='tank';v.modifiers.enemyHp=3;v.waves=[{delay:0,enemies:[{kind:'brute',count:1,spawn:'north'}]},{delay:2,after:'timer',enemies:[{kind:'runner',count:1,spawn:'east'}]}];
+  R.start(v);s=R.advance(5);assert.equal(s.wave,1,'a survival challenge keeps its own clock, even for a wave set to a timer');assert.equal(R.advance(5.2).wave,2);
 });
 check('Hunt wins at its count; a time limit loses',()=>{
   const h=level('hunt',2);h.waves=[{delay:0,enemies:[{kind:'chaser',count:3,spawn:'north'}]}];R.start(h);const s=R.advance(60);assert.equal(s.result.won,true);assert.ok(s.kills>=2&&s.kills<3);

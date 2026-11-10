@@ -92,6 +92,27 @@ check('a draft kept under its own id is updated, not copied, after an edit', () 
 check('corrupt library ignored', () => {storage.set(D.key,'not json');assert.equal(D.listDrafts().length,0);});
 check('invalid library entries discarded', () => {storage.set(D.key,JSON.stringify([{code:'oops'},null,{code:D.encode(D.defaults()),updated:1}]));assert.equal(D.listDrafts().length,1);});
 check('oversize library refused', () => {storage.set(D.key,' '.repeat(24000*24+1));assert.equal(D.listDrafts().length,0);});
+check('best results are kept per exact recipe: best medal, fastest win, wins only, nothing for a loss', () => {
+  const fp=D.fingerprint(D.defaults());assert.equal(D.record(fp),null);
+  assert.equal(D.saveResult({won:false,fingerprint:fp,medal:null,time:20}),null);assert.equal(D.record(fp),null);
+  let r=D.saveResult({won:true,fingerprint:fp,medal:'silver',time:30});assert.equal(r.medal,'silver');assert.equal(r.newMedal,true);assert.equal(r.newTime,true);
+  r=D.saveResult({won:true,fingerprint:fp,medal:'bronze',time:20});assert.equal(r.medal,'silver');assert.equal(r.time,20);assert.equal(r.newMedal,false);assert.equal(r.newTime,true);
+  r=D.saveResult({won:true,fingerprint:fp,medal:'gold',time:25});assert.equal(r.medal,'gold');assert.equal(r.time,20);assert.equal(r.newMedal,true);assert.equal(r.newTime,false);
+  assert.deepEqual(clone(D.record(fp)),{medal:'gold',time:20});assert.equal(D.record('d1234567'),null);assert.equal(D.record('__proto__'),null);
+  assert.equal(D.saveResult({won:true,fingerprint:'nope',medal:'gold',time:5}),null);assert.equal(D.saveResult({won:true,fingerprint:fp,medal:'platinum',time:5}),null);
+  assert.ok(D.listDrafts().every(d=>/^[a-f0-9]{8}$/.test(d.fingerprint)));assert.equal(storage.get('giraffe_rampage_save_v1'),'untouched');
+});
+check('damaged or oversize best records are ignored', () => {
+  const fp=D.fingerprint(D.defaults());storage.set(D.recordsKey,'not json');assert.equal(D.record(fp),null);
+  storage.set(D.recordsKey,JSON.stringify({[fp]:{medal:'gold',time:-1}}));assert.equal(D.record(fp),null);
+  storage.set(D.recordsKey,JSON.stringify({[fp]:{medal:'gold',time:'9'}}));assert.equal(D.record(fp),null);
+  storage.set(D.recordsKey,' '.repeat(60001));assert.equal(D.record(fp),null);
+  storage.set(D.recordsKey,JSON.stringify({junk:1,[fp]:{medal:'bronze',time:9}}));D.saveResult({won:true,fingerprint:fp,medal:'silver',time:12});
+  assert.deepEqual(Object.keys(JSON.parse(storage.get(D.recordsKey))),[fp]);assert.deepEqual(clone(D.record(fp)),{medal:'silver',time:9});
+  const many={};for(let i=0;i<230;i++)many[(0x10000000+i).toString(16)]={medal:'gold',time:5,updated:i};storage.set(D.recordsKey,JSON.stringify(many));
+  D.saveResult({won:true,fingerprint:fp,medal:'gold',time:3});const kept=JSON.parse(storage.get(D.recordsKey));assert.equal(Object.keys(kept).length,200);assert.ok(kept[fp]&&!kept['10000000']);
+  storage.delete(D.recordsKey);
+});
 check('library storage failures reported', () => {const original=localStorage.setItem;localStorage.setItem=()=>{throw new Error('quota');};assert.throws(()=>D.saveDraft(D.defaults()));assert.throws(()=>D.removeDraft('none'));localStorage.setItem=original;});
 check('code checksum mutation rejected', () => {const c=D.encode(D.defaults());assert.throws(()=>D.decode(c.replace(/^GRC1:./,'GRC1:f')===c?c.replace(/^GRC1:./,'GRC1:0'):c.replace(/^GRC1:./,'GRC1:f')));});
 /* the options added after the first version: an older recipe reads exactly as before, and every new choice is checked */
