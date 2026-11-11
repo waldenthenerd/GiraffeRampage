@@ -1,4 +1,5 @@
-/* speedrun: the Speedrun Timer add-on (js/addons/50d-addon-speedrun.js) and the "suggest an add-on" box on the Add-ons page.
+/* speedrun: the Speedrun Timer add-on (js/addons/50d-addon-speedrun.js) and the "suggest an add-on" box on the Add-ons page. A beaten best flashes
+   that split green in the clock with a chime (a first time does not).
    Run: node tools/qa-cloud.mjs tools/scenarios/speedrun.js --wait 60000 [--shot x.png --params "view=hud|report|page"] */
 GR.handleAction('splash-go'); Ach.check = function(){ return []; };
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
@@ -22,7 +23,9 @@ try {
   hideOverlay(); G.state = 'menu';
   /* on: the clock shows the run, the wave and the chapter */
   out.switched = addonSet('speedrun', true) && addonOn('speedrun');
+  var chimes = 0, tone0 = SFX.tone; SFX.tone = function(type, f0){ if (type === 'triangle' && f0 === 784) chimes++; return tone0.apply(this, arguments); };
   run([20, 15, 7]);
+  out.firstQuiet = SR.pb === null && chimes === 0 && !document.getElementById('srTimer').classList.contains('pb');      /* a first time is a best, but a quiet one */
   out.clock = vis() && /0:42\.0/.test(txt()) && /Wave 3/.test(txt()) && /Chapter 1/.test(txt());
   out.splits = SR.splits.length === 2 && Math.abs(SR.splits[0].sec - 20) < 1e-6 && Math.abs(SR.splits[1].sec - 15) < 1e-6;
   gameOver();
@@ -33,6 +36,11 @@ try {
   /* a second run: wave 1 faster (a new best), wave 2 slower (+2.0 behind) */
   run([18, 17, 5]);
   out.deltaLive = /Wave 3/.test(txt());
+  /* beating a best: the split flashes green in the clock with a chime, then goes */
+  var tm = document.getElementById('srTimer');
+  out.pbFlash = !!SR.pb && SR.pb.kind === 'w' && SR.pb.n === 1 && Math.abs(SR.pb.d + 2) < 1e-6 && chimes === 1 && tm.classList.contains('pb') && /Wave 1 best!/.test(txt()) && /0:18\.0/.test(txt()) && /\u22122\.0/.test(txt()) && !!tm.querySelector('.r.pb .ahead');
+  SR.pb.at -= SR_PB_SHOW + 1; updateHUD(); out.pbGone = !tm.classList.contains('pb') && !/best!/.test(txt());
+  SFX.tone = tone0;
   gameOver(); b = bests();
   out.newBest = b.s0.w[1] === 18 && b.s0.w[2] === 15;
   html = runReportHTML(G.lastRun, true); out.deltas = /\+2\.0/.test(html) && /best/.test(html) && /1 new best wave/.test(html);
@@ -61,7 +69,7 @@ try {
   out.suggest = !!a && a.getAttribute('href') === 'https://github.com/waldenthenerd/GiraffeRampage' && a.target === '_blank' && /suggest it on GitHub/i.test(document.querySelector('.addonsuggest').textContent);
   out.row = !!document.querySelector('[data-a="addon-t-speedrun"]');
   hideOverlay(); G.state = 'menu';
-  out.pass = out.errs.length === 0 && ['registered', 'offNoClock', 'offNoReport', 'switched', 'clock', 'splits', 'saved', 'report', 'reportHTML', 'deltaLive', 'newBest', 'deltas', 'chapterBest', 'chapterLine', 'partWay', 'speeds', 'resumed', 'offAgain', 'suggest', 'row'].every(function(k){ return out[k] === true; });
+  out.pass = out.errs.length === 0 && ['registered', 'offNoClock', 'offNoReport', 'switched', 'firstQuiet', 'pbFlash', 'pbGone', 'clock', 'splits', 'saved', 'report', 'reportHTML', 'deltaLive', 'newBest', 'deltas', 'chapterBest', 'chapterLine', 'partWay', 'speeds', 'resumed', 'offAgain', 'suggest', 'row'].every(function(k){ return out[k] === true; });
 
   var v = QA.params.view;
   if (v === 'page') showAddons();
