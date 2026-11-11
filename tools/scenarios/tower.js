@@ -10,6 +10,7 @@
   function killAll(){ G.enemies.slice().forEach(function(e){ if (!e.dead) damageEnemy(e, 1e18, { noCrit: true, quiet: true }); }); noLevels(); }
   function godMode(){ P.invuln = 1e9; P.hp = P.maxHp = 1e12; G.rerolls = 0; }
   try {
+    if (QA.part(1)){
     /* the chapter table: the old chapters, the Domes and the Tower are all as they should be */
     out.table = chapterOf(325) === 13 && chapterOf(326) === 14 && chapterOf(335) === 14 && chapterOf(336) === TOWER_CHAPTER && chapterOf(360) === TOWER_CHAPTER && chapterWaveOf(336) === 1 && chapterWaveOf(360) === 25 &&
       chapterWaveOf(335) === 10 && TOWER_LAST_WAVE === 360 && SIEGE_LAST_WAVE === 385 && TOTAL_CHAPTERS === 19 && chapterLabel(15) === '14' && chapterLabel(14) === '13.5' && chapterFirstWave(15) === 336 && chapterFirstWave(14) === 326 &&
@@ -58,6 +59,8 @@
     out.finds = best < 120;
     out.findsD = Math.round(d0) + ' -> ' + Math.round(best);
 
+    }
+    if (QA.part(2)){
     /* every ordinary kind and every boss: spawn, run all its states for a while, no NaN, nobody inside a wall */
     freshSave(); Save.data.chapter14Complete = true; startRun(15, 339); steps(5); godMode(); G.waveState = 'idle'; G.spawnQueue = [];
     var ok = true, bad = [], kinds = ['hyena', 'grub', 'jackal', 'cheetah', 'warthog', 'rhino', 'baboon', 'honeybadger', 'vulture', 'mamba', 'termite', 'ember'];
@@ -80,6 +83,8 @@
     out.bossBehaviour = bossOk && made['lion:memowind'] > 0 && made['matriarch:meeting'] > 0 && made['buffalo:coinwind'] > 0 && made['crocodile:flaskwind'] > 0 && made['wildfire:chartwind'] > 0;
     out.bossDetail = JSON.stringify(made).slice(0, 300);
 
+    }
+    if (QA.part(3)){
     /* the floors, one wave each: clear a floor, the elevator opens, walking into it swaps the floor, and the next wave comes in */
     freshSave(); Save.data.chapter14Complete = true; startRun(15); steps(10); G.introFX = null; G.banner = null; godMode(); G.rerolls = 0;
     out.floor1 = G.wave === 336 && TW.n === 1 && TW.floor.name === 'Lobby' && G.tower === true && G.biome === 'tower' && Math.abs(P.x - TW.floor.start.x) < 40;
@@ -153,9 +158,10 @@
     /* Play together: the Tower is on the list and a round builds on its floors */
     freshSave(); Save.data.chapter14Complete = true; out.togetherList = coChapters().indexOf(15) >= 0;
     coStart('arena', 15); steps(30, 1 / 30); out.together = Co.on && G.chapter === TOWER_CHAPTER && G.tower === true && !!TW.floor && G.buildings.length > 10 && Co.pl[0].x === Co.pl[0].x; coEnd(true);
+    }
   } catch (e) { out.err = String(e && e.stack || e); }
   var need = ['table', 'bossWaves', 'tuneRising', 'cast', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'plans', 'giraffeBlocked', 'shotStops', 'finds', 'kindsOk', 'bossBehaviour', 'floor1', 'spawns', 'liftOpens', 'rideStarts', 'rideDone', 'nextWave', 'bossFloor', 'bossEndsFloor', 'lastFloor', 'endFilm', 'endOffer', 'endVictory', 'rushDef', 'rushLocked', 'rushOpen', 'rushStart', 'rushLanes', 'rushFloor', 'rushHit', 'rushStars', 'rushCoat', 'rushTotals', 'vial', 'vialOnce', 'menuLocked', 'menuOpen', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runSaved', 'restored', 'xpPays', 'togetherList', 'together', 'bestiary', 'victoryText'];
-  out.failed = need.filter(function(k){ return out[k] !== true; });
+  out.failed = QA.need(out, need);
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);
 })();

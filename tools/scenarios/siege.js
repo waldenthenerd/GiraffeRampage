@@ -9,6 +9,7 @@
   function godMode(){ P.invuln = 1e9; P.hp = P.maxHp = 1e12; G.rerolls = 0; }
   function steps(n, dt){ for (var i = 0; i < n; i++){ GR.step(dt || 1 / 30); noLevels(); } }
   try {
+    if (QA.part(1)){
     /* the chapter table */
     out.table = SIEGE_CHAPTER === 16 && SIEGE_FIRST_WAVE === 361 && SIEGE_WAVES === 25 && SIEGE_LAST_WAVE === 385 && TOTAL_CHAPTERS === 19 && chapterLabel(16) === '15' &&
       chapterOf(360) === TOWER_CHAPTER && chapterOf(361) === SIEGE_CHAPTER && chapterOf(385) === SIEGE_CHAPTER && chapterWaveOf(361) === 1 && chapterWaveOf(385) === 25 &&
@@ -136,6 +137,8 @@
     try { var cv1 = document.createElement('canvas'); cv1.width = 800; cv1.height = 600; var cx1 = cv1.getContext('2d'); SGM.men[0].hp = 30; SGM.men[1].state = 'down'; SGM.posts[0].hp = 50; SGM.posts[1].abandoned = true; SGM.tracers.push({ x1: 0, y1: 0, x2: 50, y2: 50, t: 0.1 });
       G.camX = 1800; G.camY = 1550; drawGroundSiege(cx1, 1800, 1550, 1600, 1200); drawGiraffeGroup(cx1); out.mDraws = true; } catch (e4) { out.mDraws = false; out.mDrawErr = String(e4 && e4.stack || e4).slice(0, 300); }
     SGM.men[0].hp = 100; SGM.men[1].state = 'post'; SGM.posts[0].hp = 100; SGM.posts[1].abandoned = false;
+    }
+    if (QA.part(2)){
     /* the creatures: all twelve kinds run for two seconds without a bad number or a stand inside a building, and each boss makes something in each of its attacks */
     freshSave(); Save.data.chapter15Complete = true; startRun(16, 365); steps(5); godMode(); G.waveState = 'idle'; G.spawnQueue = []; SGM.men.forEach(function(m2){ m2.state = 'down'; m2.hp = 0; });
     var kk = ['hyena', 'grub', 'jackal', 'cheetah', 'warthog', 'rhino', 'baboon', 'honeybadger', 'vulture', 'mamba', 'termite', 'ember'], aiOk = true, aiBad = [];
@@ -298,6 +301,7 @@
       if (QA.params.tier2) G.wave = 377;
       if (QA.params.story){ G.sg.line = { who: 'mc', text: 'We traced their signal. Every machine is calling home to the same place, deep under the waterhole.', t: 3, dur: 99 }; }
     }
+    }
     /* the picture: --params "view=square|market|harbor|park|roofs|launch|south|hall|lighthouse" */
     var at = { square: [2100, 1700], market: [2100, 600], harbor: [700, 1700], park: [3500, 1600], roofs: [3500, 600], launch: [3500, 2650], south: [2100, 2650], nw: [700, 600], hall: [2100, 1250], lighthouse: [700, 1450], mission: [3400, 2350], post: [2700, 500], library: [1700, 520], militia: [1800, 1640] };
     if (QA.params.view === 'menu'){ G.state = 'menu'; Save.data.chapter15Complete = true; setMenuChapter(16); showMenu(); for (var mm = 0; mm < 4; mm++) GR.step(1 / 30); drawMenuPreview(); QA.done(out); return; }
@@ -347,7 +351,7 @@
     G.wave = 385; out.flags = true;
   } catch (e) { out.err = String(e && e.stack || e); }
   var need = ['filmNote', 'filmScarred', 'filmReplay', 'rwNoCache', 'rwDmg', 'rwPlayer', 'rwSan', 'rwStreak', 'rwDiscount', 'rwRun', 'rwTier2', 'rwReset', 'rwRank', 'rwReload', 'rwTough', 'rwRevive', 'rwOnce', 'rwKill', 'rwOffer', 'rwTake', 'rwOffer2', 'rwDue', 'rwRepair', 'rwWalls', 'rwJam', 'rwPosts', 'rwHosp', 'rwRifle', 'rwChest', 'rwTier2Flag', 'rwMarket2', 'rwHarbor2', 'rwRoofs2', 'rwMissile2', 'rwSnap', 'rwRestore', 'rwOld', 'evTable', 'evMix', 'evHatch', 'evFronts', 'crates', 'crMarket', 'crHarbor', 'crPark', 'crRoofs', 'crMissileWaits', 'crMissile', 'crRefill', 'scars', 'scarCap', 'wearDraws', 'bossCollateral', 'bossBomb', 'bossAcid', 'bossHunter', 'jam', 'fastReload', 'sayQueued', 'radio', 'openingSay', 'finaleSay', 'nightDraws', 'rowBoss', 'table', 'bossWaves', 'tune', 'cast', 'bestiary', 'uniqueLooks', 'saveDefault', 'saveSane', 'wardLen', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'starts', 'spawns', 'keys5', 'solid', 'inside', 'noOverlap', 'startOpen', 'gatesReach', 'keysReach', 'openShare', 'blocked', 'dStart', 'dHurt', 'dWreck', 'dLeftAlone', 'dPass', 'dCooldown', 'dSapper', 'dHunter', 'dWalks', 'dRepair', 'dHeld', 'dNotHeld', 'dFinale', 'dSave', 'dSave2', 'dDraws', 'mStart', 'mSpot', 'mOneShot', 'mReload', 'mHeavy', 'mBoss', 'mRange', 'mHurt', 'mHurtCd', 'mShot', 'mDown', 'mDownQuiet', 'mUp', 'mHealHurt', 'pAbandon', 'pFoot', 'pMend', 'mDraws', 'kindsOk', 'bossBehaviour', 'artDraws', 'menuFilm', 'filmsDraw', 'gallery', 'lastWave', 'endFilm', 'endVictory', 'victoryText', 'bestName', 'bestKill', 'bestHtml', 'report', 'gagRobots', 'ach', 'ach2', 'guideLocked', 'guideOpen', 'coLocked', 'coOpen', 'together', 'togetherHeal', 'snapHeld', 'restoreHeld', 'restoreOld'];
-  out.failed = need.filter(function(k){ return out[k] !== true; });
+  out.failed = QA.need(out, need);
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);
 })();

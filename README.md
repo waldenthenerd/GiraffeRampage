@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 241 | 74,634 | 6.23 MiB (6,527,781 bytes) |
+| JavaScript (`js/`) | 241 | 74,641 | 6.23 MiB (6,528,197 bytes) |
 | Styles (`css/`) | 6 | 1,842 | 173 KiB (177,418 bytes) |
 | Page (`index.html`) | 1 | 292 | 15.0 KiB (15,312 bytes) |
-| **Whole game** | **248** | **76,768** | **6.41 MiB (6,720,511 bytes)** |
+| **Whole game** | **248** | **76,775** | **6.41 MiB (6,720,927 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **76,167 lines, 6.36 MiB (6,673,529 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 241 | 74,634 | 6.23 MiB (6,527,781 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **76,174 lines, 6.36 MiB (6,673,945 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 241 | 74,641 | 6.23 MiB (6,528,197 bytes) |
 | Styles (`css/`) | 6 | 1,842 | 173 KiB (177,418 bytes) |
 | Page (`index.html`) | 1 | 292 | 15.0 KiB (15,312 bytes) |
-| **Whole game** | **248** | **76,768** | **6.41 MiB (6,720,511 bytes)** |
+| **Whole game** | **248** | **76,775** | **6.41 MiB (6,720,927 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -176,7 +176,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/scenery/36h-scenery-area51-mars.js` | 438 | Scenery definitions: area51-mars (see js/scenery/36a-scenery-core.js for the format). Chapter 12 Area 51 and chapter 13 Mars; everything is inside one function so it adds no globals, and the runway, hangars, hatch and Mars base are kept clear of scenery. |
 | `js/scenery/36n-scenery-domes.js` | 137 | Scenery and the floor of the Domes (chapter 14): frosted steel plates, veins of glowing crystal root, frozen crates, seed pods, grow-lamps, vents breathing fog, falling flakes, and the dome's own rim of mylar panels. `drawGroundDome`, `buildGroundDome`, `buildDomeWorld`. |
 | `js/scenery/36o-scenery-detail.js` | 282 | **Scenery detail.** Wraps the `draw` of every prop, landmark, ground decal and terrain patch of every chapter with a layer of many small parts, from nine families chosen by the object's id (foliage rings and grass blades, rock and ice facets, bark and growth rings, panel seams and rivets, strata and grains, glowing cracks, reef polyps). Each object's own drawing is read once into a mask (shape, colours, centre, axis, foot), the parts are laid out once per object (seeded by its seed, a few ms a frame at most) as a display list, and a frame replays the list. Off when effects are off (`SD.off` switches it off in tests). Each object's still parts are drawn from one picture made at the scale they are seen at (`SDC`, up to 20 megapixels, a few ms a frame to make); the glints and embers are replayed live. |
-| `js/core/37-frame-transitions.js` | 413 | Frame composition, transform sequence, chapter transitions. |
+| `js/core/37-frame-transitions.js` | 420 | Frame composition, transform sequence, chapter transitions. |
 | `js/ui/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
 | `js/ui/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
 | `js/game/40-fusion.js` | 890 | Card fusion: combos, the machine screen, the film. |
@@ -356,7 +356,8 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 - `tools/qa-run.ps1 -Scenario file.js [-Shot out.png] [-Params "a=1&b=2"] [-W 1280 -H 720] [-WaitMs 20000]` runs a scenario script in the real game inside headless Edge (`tools/qa.html` is the harness) and prints its `QA.done(...)` result and any script errors as JSON, with an optional screenshot. `tools/QA-GUIDE.md` explains how to write scenarios. Run them one at a time.
 - `bash tools/make-lovable-package.sh` builds the website ZIP (`dist/GiraffeRampage-lovable.zip`) with `tools/build-site.mjs`: the scripts of `index.html` (minus `js/dev/`) are minified one by one with terser, joined in order into about seven `js/game-<n>-<hash>.js` files (never mixing strict and non-strict files), the six stylesheets become one `css/game-<hash>.css`, and `index.html` is rewritten to match. A top-level `const` or `let` that some other file tests with `typeof` is joined as a `var`, because a separate script that has not run yet looks like "not there" while a joined one would throw. The source is never changed. On a slow link (about 200 KB/s, gzip) the first load fell from about 9 s to 6 s, and the package is 9 requests instead of 199.
 - `node tools/check-bundle.mjs` loads the game as separate scripts and as the joined (unminified) website copy and compares every global the scripts define; CI runs it, so a change that would make the joined copy behave differently is caught before it ships.
-- `bash tools/ci-check.sh` runs everything a pull request must pass (README counts, the regression scenarios on desktop and phone, the website package and its ship check); GitHub runs it on every push and pull request (`.github/workflows/qa.yml`). `.claude/hooks/session-start.sh` gets a Claude Code cloud session's test runner ready.
+- `bash tools/ci-check.sh` runs everything a pull request must pass (README counts, the regression scenarios on desktop and phone, the website package and its ship check, and the coverage record against `tools/coverage-baseline.txt`); GitHub runs it on every push and pull request, in six shares plus the timed checks (`.github/workflows/qa.yml`), and once more after each push to main drawing every frame. While you work, `--only <words>`, `--changed` and `--fail-fast` run less; the whole run is the one that counts. How CI draws, splits long scenarios into parts and records coverage is in `tools/QA-GUIDE.md`.
+- `node tools/qa-batch.mjs <list> <out-dir> --jobs N` runs a list of scenarios in one browser, a fresh context each (what `ci-check.sh` uses); `tools/qa-lib.mjs` is what it shares with `qa-cloud.mjs`; `node tools/coverage.mjs record|check|merge` makes and compares the coverage record; `tools/ci-times.tsv` holds each check's time on GitHub, to deal the shares evenly.
 - `python3 tools/recount-readme.py` recounts this README's per-file line counts and totals and the script count in `lovable.md`; run it after every change to `js/`, `css/` or `index.html`.
 - `node tools/qa-cloud.mjs file.js [--shot out.png] [--params "a=1&b=2"] [--wait 20000]` is the same runner for Linux/cloud/macOS (Playwright Chromium, loads the full script list from `index.html`; setup: `cd tools && npm install && npx playwright install --with-deps chromium`). `CLAUDE.md` at the top level holds the standing rules for Claude sessions.
 

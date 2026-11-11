@@ -168,18 +168,17 @@
 
   /* a few songs drawn to sound: real sound, no clipping, nothing broken */
   var jobs = [['savanna', 'chorus'], ['inferno', 'chorus'], ['minigame', 'chorus'], ['boss10', 'chorus'], ['moon', 'verse'], ['longneck', 'chorus'], ['city', 'chorus'], ['swamp', 'solo'], ['venus', 'solo'], ['jungle', 'break'], ['frost', 'bridge']], res = {};
-  (function next(i){
-    if (i >= jobs.length){
-      out.render = res;
-      check('renders', Object.keys(res).every(function(k){ return res[k].ok; }));
-      out.pass = !out.failed.length; QA.done(out); return;
-    }
-    Band.render({ theme: jobs[i][0], bars: 4, at: function(b){ return b === 0 ? { jump: jobs[i][1] } : {}; } }).then(function(buf){
+  /* all at once: each song is set up in turn (so each gets the random numbers it always got) and the browser renders them side by side */
+  Promise.all(jobs.map(function(jb){
+    return Band.render({ theme: jb[0], bars: 4, at: function(b){ return b === 0 ? { jump: jb[1] } : {}; } }).then(function(buf){
       var pk = 0, s = 0, nan = 0, d;
       for (var c = 0; c < 2; c++){ d = buf.getChannelData(c); for (var j = 0; j < d.length; j++){ var a = Math.abs(d[j]); if (a !== a) nan++; else { if (a > pk) pk = a; s += a * a; } } }
       var rms = Math.sqrt(s / (2 * buf.length));
-      res[jobs[i][0]] = { len: +buf.duration.toFixed(1), pk: +pk.toFixed(3), rmsDb: +(20 * Math.log10(rms + 1e-9)).toFixed(1), ok: !nan && pk < 0.98 && rms > 0.001 };
-      next(i + 1);
-    }, function(e){ res[jobs[i][0]] = { err: String(e) }; next(i + 1); });
-  })(0);
+      res[jb[0]] = { len: +buf.duration.toFixed(1), pk: +pk.toFixed(3), rmsDb: +(20 * Math.log10(rms + 1e-9)).toFixed(1), ok: !nan && pk < 0.98 && rms > 0.001 };
+    }, function(e){ res[jb[0]] = { err: String(e) }; });
+  })).then(function(){
+    out.render = {}; jobs.forEach(function(jb){ out.render[jb[0]] = res[jb[0]]; });
+    check('renders', jobs.every(function(jb){ return res[jb[0]] && res[jb[0]].ok; }));
+    out.pass = !out.failed.length; QA.done(out);
+  });
 })();
