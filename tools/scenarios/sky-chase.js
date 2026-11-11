@@ -248,6 +248,15 @@
     ['sk_shield', 'sk_gnat', 'sk_boat', 'sk_missile', 'sk_pod'].forEach(function(k){ [false, true].forEach(function(pt){ try { SKY_DRAW[k](px, { r: 30, anim: 1.3, portrait: pt, up: true }, '#B8C8D0', '#34444C', 0, false, {}); } catch (e) { plusBad += k + ':' + e.message + ' '; } }); });
     [[7, 0], [9, 0], [4, 1], [8, 1], [10, 0]].forEach(function(c){ try { skyStart(c[0]); Sky.inv = 1e9; steps(c[0] === 7 ? 150 : 100); Sky.heat.nose = 0.9; Sky.hull = Sky.max * 0.2; if (c[1]) Sky.wxK = 1; skyGoGun('left'); steps(3); skyRender(px); } catch (e) { plusBad += 'wave' + c[0] + ':' + e.message + ' '; } });
     check('plusDraw', plusBad === ''); out.plusBad = plusBad;
+    /* ---- the low-hull alarm: ten beeps and then quiet (the red edges stay); back above a quarter and down again, it sounds again ---- */
+    var beeps = 0, bt0 = SFX.tone; SFX.tone = function(type, f0){ if (type === 'square' && f0 === 880) beeps++; return bt0.apply(this, arguments); };
+    var low = function(n){ for (var lq = 0; lq < n; lq++){ Sky.hull = Sky.max * 0.2; steps(1); } };
+    try { idle(3); low(420); var b14 = beeps; Sky.hull = Sky.max; steps(3); low(30); check('alarmTen', b14 === 10 && Sky.alarmN === 1 && beeps === 11); out.alarm = b14 + '/' + beeps; } finally { SFX.tone = bt0; }
+    /* ---- "Reduce flashes" softens the squall's lightning to a quarter, like the main game's ---- */
+    var boltA = function(calm){ var was = Settings.calmFlash, a = -1, fr = px.fillRect; Settings.calmFlash = calm;
+      px.fillRect = function(x, y, w, h){ var m = /^rgba\(235, ?240, ?255, ?([\d.]+)\)$/.exec(px.fillStyle); if (m && w >= G.W && h >= G.H) a = +m[1]; return fr.apply(this, arguments); };
+      try { Sky.wxWas = 'rain'; Sky.wxK = 1; Sky.bolt = 0.3; skyDrawOver(px); } finally { px.fillRect = fr; Settings.calmFlash = was; } return a; };
+    idle(4); var bN = boltA(false), bC = boltA(true); check('calmSquall', bN > 0.3 && bC > 0 && Math.abs(bC - bN * 0.25) < 0.01); out.squall = bN + '/' + bC;
     skyQuit();
     }
     if (QA.part(2)){
