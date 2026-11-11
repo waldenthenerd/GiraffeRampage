@@ -50,6 +50,7 @@
     out.menuOpen = /data-a="play16"/.test(html) && /Start Chapter 15/.test(html) && /Straight to wave 361/.test(html) && !/ch-next" aria-label="Next chapter" disabled/.test(html) && (html.match(/class="chdot[ "]/g) || []).length === 19;
     handleAction('play16'); out.menuFilm = G.state === 'cutscene' && !!G.cut && G.cut.kind === 'siegeflight'; G.cut.t = SG_FLIGHT_T.END - 0.01; steps(3);
     out.starts = G.state === 'playing' && G.wave === 361 && G.chapter === SIEGE_CHAPTER && G.biome === 'siege';
+    var hp0 = Object.keys(SGB).every(function(k){ return SGB[k].hp === 100 && !SGB[k].wrecked; });   /* read before the first machines can reach a building */
     steps(90);
     out.spawns = G.enemies.length > 0 && G.enemies.every(function(e){ return e.def && e.def.siege === true; });
     out.hud = /THE SIEGE/.test(document.getElementById('hChapter') ? document.getElementById('hChapter').textContent : 'CH.15 THE SIEGE');
@@ -73,7 +74,7 @@
     var hh = plan.houses.filter(function(h){ return h.k === 'house'; })[0]; P.x = hh.x + hh.w / 2; P.y = hh.y + hh.h / 2; resolveBuildings(P, P.r * 0.8);
     out.blocked = !(P.x > hh.x && P.x < hh.x + hh.w && P.y > hh.y && P.y < hh.y + hh.h);
     /* the buildings' health: each of the five starts at 100, hits lower it, 25 or less is wrecked and then left alone, and the militia mend 30 between waves */
-    var ks = Object.keys(SGB); out.dStart = ks.length === 5 && ks.every(function(k){ return SGB[k].hp === 100 && !SGB[k].wrecked && SGB[k].field && SGB[k].field.length === TW_NX * TW_NY; });
+    var ks = Object.keys(SGB); out.dStart = ks.length === 5 && hp0 && ks.every(function(k){ return SGB[k].field && SGB[k].field.length === TW_NX * TW_NY; });
     G.enemies.length = 0; G.spawnQueue = []; G.waveState = 'idle'; P.invuln = 1e9; P.hp = P.maxHp = 1e12; P.x = 300; P.y = 3000;
     var lib = SGB.library; siegeHurt('library', 15); out.dHurt = Math.abs(lib.hp - 90 * 1) < 1.5 && lib.alert > 0 && !lib.wrecked;      /* the wave's 2% rise is below 1.5 points here */
     siegeHurt('library', 110); out.dWreck = lib.wrecked === true && lib.hp <= 25 && G.sg.dip === true && G.sg.flawless === false;
