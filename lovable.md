@@ -310,7 +310,7 @@ game. This is the complete list for this version (242 scripts; the developer pan
 | 234 | `js/sky/44zzzzl-sky-extras.js` | What the Air Chase adds: menu card, Bestiary, Guide, coat colors, achievements, Films list, the minigame Sky Patrol and the wreck in the Harbor. |
 | 235 | `js/sky/44zzzzm-sky-detail.js` | The Air Chase's detail layer: the sea's small things, boats and animals that steer around rocks, the machines' small parts, her head out of the side door. |
 | 236 | `js/ui/44zzzzn-addons-page.js` | The Add-ons page (from the main menu and the pause menu), the add-ons tag in the HUD and the line in the run report. |
-| 237 | `js/addons/50a-addon-challenge-data.js` | Add-on Challenge Workshop (off until the player switches it on), part 1: registration, recipes, share codes and the draft shelf (its own browser storage, not the save). |
+| 237 | `js/addons/50a-addon-challenge-data.js` | Add-on Challenge Workshop (off until the player switches it on), part 1: registration, recipes, share codes, the draft shelf and the best result on each recipe (its own browser storage, not the save). |
 | 238 | `js/addons/50b-addon-challenge-play.js` | Add-on Challenge Workshop, part 2: the challenge arena and its painter. |
 | 239 | `js/addons/50c-addon-challenge-ui.js` | Add-on Challenge Workshop, part 3: the workshop dialog, its styles, the menu button and the Guide topic. |
 | 240 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |

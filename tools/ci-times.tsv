@@ -1,0 +1,89 @@
+# how long each browser check takes on GitHub, in seconds (label, a tab, seconds); tools/ci-check.sh deals the shares by it. Copy new times from the "qa" job.
+domes on the package (part 2 of 2)	22.6
+siege (part 2 of 2)	20.0
+domes (part 2 of 2)	16.6
+sky-chase (part 2 of 2)	16.4
+enemy-detail	16.3
+tower on the package (part 3 of 3)	16.2
+tower (part 3 of 3)	15.6
+tower on the package (part 2 of 3)	14.9
+siege on the package (part 2 of 2)	13.8
+music	12.9
+domes (part 1 of 2)	12.9
+town-layers	12.5
+sky-chase (part 1 of 2)	12.5
+island on the package (part 2 of 3)	12.1
+siege on the package (part 1 of 2)	11.9
+island (part 2 of 3)	11.5
+together	10.9
+town-layers on the package	10.6
+tower (part 2 of 3)	10.2
+island on the package (part 3 of 3)	9.5
+fort on the package (part 3 of 3)	9.5
+perf-cache	9.4
+films (all 27 films)	9.4
+siege (part 1 of 2)	9.1
+music on the package	8.6
+phone-pass (844x390)	8.5
+island (part 3 of 3)	8.5
+domes on the package (part 1 of 2)	8.4
+challenge-builder (390x844)	8.2
+fort (part 3 of 3)	8.1
+wheels	8.0
+enemy-motion	7.7
+fort (part 2 of 3)	7.3
+fort on the package (part 2 of 3)	7.0
+gadgets	6.8
+challenge-builder	6.8
+tower (part 1 of 3)	6.5
+island on the package (part 1 of 3)	6.2
+scenery-detail	6.0
+challenge-builder (844x390)	5.8
+minimap	5.5
+fort on the package (part 1 of 3)	4.6
+uni-slides	4.5
+tower on the package (part 1 of 3)	4.5
+island (part 1 of 3)	4.5
+phone-pass (390x844)	4.3
+nav-pages	4.2
+fort (part 1 of 3)	4.0
+ship-check on the package	3.9
+fishing-fight	3.7
+camp	3.6
+town-choices	3.5
+review-fixes	3.5
+late-polish	3.5
+oldsave-deep	3.4
+compare-panel-triage	3.4
+fishing	3.3
+addons	3.3
+town-detail	3.2
+late-polish on the package	3.0
+aurora-buff	3.0
+ants-page	2.7
+gags	2.6
+jukebox	2.5
+sea-chart	2.3
+jukebox on the package	2.3
+uni-slides (390x844)	2.2
+upgrades-page	2.1
+preview-trail	2.1
+particles	2.0
+gear-oldsave on the package	2.0
+trinket-ui	1.9
+input-choice	1.9
+gear-oldsave	1.9
+ui-pass	1.8
+npc-voices	1.7
+gold-bank	1.7
+camp on the package	1.7
+achievements	1.7
+intel	1.6
+uni-bank	1.5
+save-gr3	1.5
+runreport-gear	1.2
+ants-engineer	1.2
+wheel-spotted	1.1
+ui-pass (390x844)	1.1
+save-erase	1.1
+gear-spotted	1.0

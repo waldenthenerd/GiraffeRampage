@@ -14,6 +14,20 @@ function buildGradients(){
   lowHpGrad.addColorStop(1, 'rgba(207,68,51,.5)');
 }
 
+/* what a frame decides before it paints: the light setting and where the camera is (the game reads G.camX / G.camY between frames). The QA harness
+   calls it alone for a frame it does not paint (tools/qa.html, draw=sampled). */
+function renderCamera(){
+  if (/^(forage|mini|scout|mscout|cutscene)$/.test(G.state)) return;
+  Light.on = fxLevelNow() > 0;                   /* follows the setting even while paused */
+  const vw = G.W / G.zoom, vh = G.H / G.zoom;
+  let cx = P.x, cy = P.y;
+  const pull = bossIntroPull();                  /* a boss entrance drifts the camera toward the boss */
+  if (pull > 0){ cx += (G.bossIntro.boss.x - cx) * pull; cy += (G.bossIntro.boss.y - cy) * pull; }
+  cx = vw >= ARENA_W ? ARENA_W / 2 : clamp(cx, vw / 2, ARENA_W - vw / 2);
+  cy = vh >= ARENA_H ? ARENA_H / 2 : clamp(cy, vh / 2, ARENA_H - vh / 2);
+  G.camX = cx; G.camY = cy;
+}
+
 function render(){
   const ctx = CTX;
   if (!ctx) return;
@@ -24,15 +38,8 @@ function render(){
   if (G.state === 'scout'){ renderScout(ctx); return; }
   if (G.state === 'mscout'){ renderMScout(ctx); return; }
   if (G.state === 'cutscene'){ if (G.cut) renderCutscene(ctx, G.cut.t, G.W, G.H, G.cut.kind); drawFade(ctx); return; }
-  Light.on = fxLevelNow() > 0;                   /* follows the setting even while paused */
-
-  const vw = G.W / G.zoom, vh = G.H / G.zoom;
-  let cx = P.x, cy = P.y;
-  const pull = bossIntroPull();                  /* a boss entrance drifts the camera toward the boss */
-  if (pull > 0){ cx += (G.bossIntro.boss.x - cx) * pull; cy += (G.bossIntro.boss.y - cy) * pull; }
-  cx = vw >= ARENA_W ? ARENA_W / 2 : clamp(cx, vw / 2, ARENA_W - vw / 2);
-  cy = vh >= ARENA_H ? ARENA_H / 2 : clamp(cy, vh / 2, ARENA_H - vh / 2);
-  G.camX = cx; G.camY = cy;
+  renderCamera();
+  const vw = G.W / G.zoom, vh = G.H / G.zoom, cx = G.camX, cy = G.camY;
 
   /* shake: random, or along the direction of the blow when a hit gave it one */
   const sh = G.shake;
