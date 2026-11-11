@@ -19,6 +19,8 @@ try {
     if (QA.params.ch) setMenuChapter(+QA.params.ch);
     showMenu(); steps(90); showMenu();
     if (QA.params.open) GR.handleAction('mg-' + QA.params.open);
+    if (QA.params.lock){ Save.data['chapter' + (+QA.params.lock - 1) + 'Complete'] = false; setMenuChapter(+QA.params.lock); showMenu(); steps(3); showMenu(); }
+    if (QA.params.slide){ document.head.appendChild(Object.assign(document.createElement('style'), { textContent: '.chghost,.chin,.chtxt{animation-delay:-.1s!important;animation-play-state:paused!important}' })); GR.handleAction('ch-next'); }
     if (QA.params.notes){ Ach.toast('★ First Steps', 'Finish a run  (+5 gems)'); var w = document.getElementById('wardToast') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'wardToast' })); w.textContent = 'New coat color and pattern: Rust and Dune ripples. Find them under Coat colors in the main menu.'; w.className = 'on'; }
     out.off = offScreen(); QA.done(out);
   } else {
@@ -46,7 +48,15 @@ try {
     out.htmlSame = (chapterSelectorHTML().match(/class="chdot[ "]/g) || []).length === TOTAL_CHAPTERS;                /* the page other files build on is as it was */
     if (wide) out.fitsNew = offScreen().length === 0 ? true : offScreen();
     out.worldNew = G.biome === 'savanna';
-    GR.handleAction('ch-go-4'); out.dotGoesLocked = menuChapter() === 4 && G.biome === 'savanna' && !!$('.chstart[disabled]');     /* a locked chapter can be looked at, and is not shown off behind the menu */
+    GR.handleAction('ch-go-4'); out.dotGoesLocked = menuChapter() === 4 && G.biome === 'savanna' && !$('.chstart[disabled]');     /* a locked chapter can be looked at, and is not shown off behind the menu */
+    out.lockedLook = $('.chpic').classList.contains('sil') && $('.chdesc').textContent === MENU_TEASE[3] && $('.chdesc').textContent !== CHAPTER_INFO[3].desc && /Locked/.test($('.chlock').textContent);
+    var nb = $('[data-a="ch-need"]'); out.needButton = !!nb && /Go to Chapter 1/.test(nb.textContent) && /on the way to Chapter 4/.test(nb.textContent);
+    GR.handleAction('ch-go-2'); out.needNext = /Go to Chapter 1/.test($('[data-a="ch-need"]').textContent) && /Clear it to open Chapter 2/.test($('[data-a="ch-need"]').textContent);
+    GR.handleAction('ch-need'); out.needGoes = menuChapter() === 1 && !$('[data-a="ch-need"]') && !!$('[data-a="play"]') && !$('.chpic').classList.contains('sil') && $('.chdesc').textContent === CHAPTER_INFO[0].desc;
+    /* the slide: forward comes in from the right, back from the left, and drawing the same chapter again does not slide */
+    GR.handleAction('ch-go-3'); var w1 = $('.chwrap'); out.slideFwd = w1.style.getPropertyValue('--d') === '1' && $('#chPreview').classList.contains('chin') && !!$('.chpic .chghost') && $('.chname').classList.contains('chtxt');
+    GR.handleAction('ch-prev'); out.slideBack = $('.chwrap').style.getPropertyValue('--d') === '-1' && $('#chPreview').classList.contains('chin') && $$('.chpic .chghost').length === 1;
+    showMenu(); out.noSlide = !$('#chPreview').classList.contains('chin') && !$('.chpic .chghost');
     /* 2. everything open */
     unlock(); setMenuChapter(1); showMenu(); steps(5); showMenu();
     out.wallet = /48\.2k/.test($('.mw.gold b').textContent) && /310/.test($('.mw.gems b').textContent);
@@ -71,7 +81,7 @@ try {
     /* 4. the latest chapter button starts it */
     setMenuChapter(1); showMenu(); GR.handleAction('ch-latest');
     out.latestStarts = menuChapter() === far && G.state !== 'menu';
-    var need = ['kept', 'strip', 'utilNames', 'groups', 'closed', 'opens', 'oneOpen', 'staysOpen', 'shuts', 'icons', 'balancedNew', 'noZeros', 'invite', 'noLatestNew', 'dots', 'keyNew', 'htmlSame', 'worldNew', 'dotGoesLocked', 'wallet', 'goldKept', 'done', 'latest', 'dotGoes', 'latestHidden', 'worldRuns', 'notesClear', 'notesApart', 'latestStarts'].concat(wide ? ['fitsNew', 'fitsOpenNew', 'fitsFull', 'fitsOpenFull', 'fitsLong'] : []);
+    var need = ['kept', 'strip', 'utilNames', 'groups', 'closed', 'opens', 'oneOpen', 'staysOpen', 'shuts', 'icons', 'balancedNew', 'noZeros', 'invite', 'noLatestNew', 'dots', 'keyNew', 'htmlSame', 'worldNew', 'dotGoesLocked', 'lockedLook', 'needButton', 'needNext', 'needGoes', 'slideFwd', 'slideBack', 'noSlide', 'wallet', 'goldKept', 'done', 'latest', 'dotGoes', 'latestHidden', 'worldRuns', 'notesClear', 'notesApart', 'latestStarts'].concat(wide ? ['fitsNew', 'fitsOpenNew', 'fitsFull', 'fitsOpenFull', 'fitsLong'] : []);
     out.pass = out.errs.length === 0 && need.every(function(k){ return out[k] === true; });
     out.failed = need.filter(function(k){ return out[k] !== true; });
     QA.done(out);

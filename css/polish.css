@@ -812,3 +812,19 @@ body:has(#overlay.on .menu2):has(#achToast.on) #wardToast{bottom:112px}
 }
 body:has(#overlay.on .menu2) #songCard{top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));right:14px;transform:translateY(10px)}
 body:has(#overlay.on .menu2) #songCard.on{transform:none}
+/* changing chapter: the old picture slides out and the new one in (--d is 1 going forward, -1 going back) */
+.chpic .chghost{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;animation:chout .28s cubic-bezier(.3,.7,.3,1) forwards}
+.chpic canvas.chin{animation:chin .28s cubic-bezier(.3,.7,.3,1)}
+.menu2 .chtxt{animation:chtxt .28s ease-out}
+@keyframes chin{from{transform:translateX(calc(var(--d,1)*100%))}to{transform:none}}
+@keyframes chout{to{transform:translateX(calc(var(--d,1)*-100%))}}
+@keyframes chtxt{from{transform:translateX(calc(var(--d,1)*26px));opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){ .chpic .chghost{display:none} .chpic canvas.chin,.menu2 .chtxt{animation:none} }
+/* a locked chapter: its picture as a dark shape, a hint, and the way there */
+.chpic.locked.sil canvas,.chpic canvas.chghost.sil{filter:grayscale(1) contrast(2.4) brightness(.2)}
+.chpic.sil{box-shadow:0 0 0 3px rgba(243,234,216,.22),0 10px 30px rgba(0,0,0,.5)}
+.chpic.sil .chlock{font-size:34px;color:rgba(243,234,216,.85)}
+.chpic.sil .chlock small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:0}
+.menu2 .chdesc.chtease{font-style:italic;color:var(--dust)}
+.menu2 .chstart.chneed{background:rgba(20,16,14,.7);color:var(--bone);border:1px solid rgba(242,179,61,.5);box-shadow:none;animation:none}
+.menu2 .chstart.chneed:hover{background:rgba(242,179,61,.18)}

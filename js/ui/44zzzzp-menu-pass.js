@@ -1,6 +1,6 @@
 'use strict';
 /* The main menu, tidied: a top strip (gold and gems on the left; Guide, Add-ons and Settings on the right), the buttons in named groups with a small picture each,
-   chapter dots that say what they are and can be pressed, a "latest chapter" button, friendlier lines on a new save, and the world behind the menu in the chosen
+   chapter dots that say what they are and can be pressed, a slide when the chapter changes, a locked chapter shown as a dark shape with a hint and a button to the chapter that opens it, a "latest chapter" button, friendlier lines on a new save, and the world behind the menu in the chosen
    chapter's ground and weather. Everything here works on the menu the earlier files have already built (showMenu is wrapped last), so a button another file adds
    still turns up: one this file does not know simply stays in the column it was put in. */
 const MENU_ICONS = { shop: '@t-coin', venus: '@t-x-sulfur', mars: '@t-x-rover', lab: '@t-flask-2', 'fusion-menu': '@t-x-fusion', 'town-enter': '@t-x-cottage', 'co-open': '@t-x-herd',
@@ -91,6 +91,39 @@ function menuLatestButton(root){
   const info = CHAPTER_INFO[far - 1];
   go.insertAdjacentHTML('afterend', '<button class="btn ghost mlatest" data-a="ch-latest">' + ico('@t-run') + ' Latest chapter<small>Start Chapter ' + chapterLabel(far) + (info ? ' · ' + info.name : '') + ', the furthest you have reached</small></button>');
 }
+/* ---- a locked chapter: a dark shape of its picture, one line that hints at it, and a button to the chapter that opens the way ---- */
+const MENU_TEASE = [ '',
+  'Something up north has stopped migrating.', 'The water is black, and it hums.', 'The shore ends. The journey does not.', 'Green so thick the sun gives up.',
+  'Streets with nobody in them, and cameras that turn.', 'A launch tower, and guards who were told to expect her.', 'Footprints up here that are not hers.',
+  'Two armies are already fighting over it.', 'The heat is coming from below.', 'Home is glittering, and it should not be.', 'A fence in the desert, with a great deal behind it.',
+  'The trail leaves the Earth again.', 'Mirrors in the heat, and frost on the inside.', 'Someone paid for all of this from a very high floor.', 'They know where she lives.',
+  'This time she goes to them.', 'A circle on a map, far out at sea.', 'Whatever leaves the island leaves by air.' ];
+function menuNeedChapter(ch){ let n = 1; for (let i = 1; i < ch; i++) if (chapterUnlocked(i)) n = i; return n; }       /* the furthest open chapter before this one: clearing it is the next step */
+function menuLocked(root){
+  const ch = menuChapter(); if (chapterUnlocked(ch)) return;
+  const pic = root.querySelector('.menu2 .chpic'), desc = root.querySelector('.menu2 .chdesc'), start = root.querySelector('.menu2 .chstart[disabled]'); if (!pic || !start) return;
+  pic.classList.add('sil');
+  const lk = pic.querySelector('.chlock small'); if (lk) lk.textContent = 'Locked';
+  if (desc && MENU_TEASE[ch - 1]){ desc.textContent = MENU_TEASE[ch - 1]; desc.classList.add('chtease'); }
+  const need = menuNeedChapter(ch), info = CHAPTER_INFO[need - 1], next = need === ch - 1;
+  const why = ch === 11 && need === 10 ? 'Fly home in the spaceplane to open Chapter 11' : next ? 'Clear it to open Chapter ' + chapterLabel(ch) : 'The next one to clear on the way to Chapter ' + chapterLabel(ch);
+  start.outerHTML = '<button class="btn chstart chneed" data-a="ch-need">Go to Chapter ' + chapterLabel(need) + (info ? ' \u00b7 ' + info.name : '') + '<small>' + why + '</small></button>';
+}
+/* ---- changing chapter slides the old picture out and the new one in, the way the arrow points ---- */
+function menuGhost(){                                                              /* a copy of the picture as it is now, taken before the menu is drawn again */
+  if (typeof OV === 'undefined' || G.state !== 'menu') return null;
+  const old = OV.querySelector('.menu2 #chPreview'); if (!old || !old.width) return null;
+  try { const g = document.createElement('canvas'); g.width = old.width; g.height = old.height; g.getContext('2d').drawImage(old, 0, 0); g.className = 'chghost' + (old.closest('.chpic.locked') ? ' sil' : ''); return g; } catch (e) { return null; }
+}
+function menuSlide(root, ghost){
+  const now = menuChapter(), from = MenuUI.ch; MenuUI.ch = now;
+  if (!from || from === now) return;
+  const wrap = root.querySelector('.menu2 .chwrap'), pic = root.querySelector('.menu2 .chpic'), cv = root.querySelector('.menu2 #chPreview'); if (!wrap || !pic || !cv) return;
+  wrap.style.setProperty('--d', now > from ? '1' : '-1');
+  cv.classList.add('chin');
+  if (ghost){ pic.insertBefore(ghost, cv.nextSibling); ghost.addEventListener('animationend', function(){ ghost.remove(); }); }
+  wrap.querySelectorAll('.chname, .chdesc, .chmeta').forEach(function(el){ el.classList.add('chtxt'); });
+}
 /* ---- the world behind the menu: the chosen chapter's ground and weather, with her walking about in it ---- */
 const MENU_WORLD_PLAIN = { savanna: 1, snow: 1, swamp: 1, ocean: 1, jungle: 1, city: 1, space: 1, moon: 1, venus: 1, area51: 1, mars: 1, dome: 1, tower: 1, siege: 1, fort: 1, isle: 1 };
 function menuWorldBiome(){
@@ -108,9 +141,10 @@ function menuWorldSync(){
 (function(){
   const sm = showMenu;
   showMenu = function(){
+    const ghost = menuGhost();
     const r = sm.apply(this, arguments);
     if (G.state === 'menu' && typeof OV !== 'undefined' && OV.querySelector('.menu2')){
-      try { menuTidy(OV); menuDots(OV); menuLatestButton(OV); } catch (e) { if (typeof console !== 'undefined') console.error(e); }
+      try { menuTidy(OV); menuDots(OV); menuLatestButton(OV); menuLocked(OV); menuSlide(OV, ghost); } catch (e) { if (typeof console !== 'undefined') console.error(e); }
       try { menuWorldSync(); } catch (e2) {}
     }
     return r;
@@ -126,6 +160,7 @@ function menuWorldSync(){
       if (typeof OV !== 'undefined') menuGroupSync(OV);
       return;
     }
+    if (a === 'ch-need'){ const n = menuNeedChapter(menuChapter()); if (n !== menuChapter()){ SFX.click(); setMenuChapter(n); showMenu(); } return; }
     if (a === 'ch-latest'){ const far = menuLatestChapter(); setMenuChapter(far); return ha.call(this, far === 1 ? 'play' : 'play' + far); }
     return ha.apply(this, arguments);
   };
