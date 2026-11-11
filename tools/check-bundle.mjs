@@ -44,7 +44,7 @@ async function fingerprint(browser, srv) {
   await page.waitForTimeout(500);
   const fp = await page.evaluate(list => { const o = {};
     for (const k of list) { let v, t; try { v = (0, eval)(k); t = typeof v; } catch (e) { o[k] = 'throws'; continue; }
-      o[k] = t === 'function' ? 'f:' + String(v) : t === 'object' && v ? (/cache|sprites/i.test(k) ? 'o' : 'o:' + Object.keys(v).length) : t; }   // a drawing cache grows with each frame drawn, so its size depends on timing
+      o[k] = t === 'function' ? 'f:' + String(v) : t === 'object' && v ? (/cache|sprites/i.test(k) || k[0] === '_' ? 'o' : 'o:' + Object.keys(v).length) : t; }   // a drawing cache grows with each frame drawn, and a scratch list (_name) is refilled every frame, so their sizes depend on timing
     return o; }, [...names]);
   await page.close(); return { fp, errs };
 }
