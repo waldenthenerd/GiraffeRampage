@@ -47,7 +47,9 @@ jobs:
           if [ "${{ startsWith(matrix.share, 't') }}" != true ]; then
             d="$GITHUB_WORKSPACE/dist"; mkdir -p "$d"; ( bash make-lovable-package.sh "$d/pkg.zip" > "$d/pkg.log" 2>&1; echo $? > "$d/pkg.done" ) &
           fi
-          if [ "${{ steps.pw.outputs.cache-hit }}" = true ]; then npx playwright install-deps chromium; else npx playwright install --with-deps chromium; fi
+          if [ "${{ steps.pw.outputs.cache-hit }}" != true ]; then npx playwright install chromium; fi
+          # the system packages (mostly fonts) come from Ubuntu's package server; when it cannot be reached the checks still run, and fail by themselves if the browser cannot start
+          npx playwright install-deps chromium || echo "::warning::Could not install Chromium's system packages (package server unreachable?); running the checks without them"
       - name: Run this share of the checks
         run: |
           if [ -f dist/pkg.log ] || [ -f dist/pkg.done ]; then
@@ -110,7 +112,9 @@ jobs:
         working-directory: tools
         run: |
           npm ci
-          if [ "${{ steps.pw.outputs.cache-hit }}" = true ]; then npx playwright install-deps chromium; else npx playwright install --with-deps chromium; fi
+          if [ "${{ steps.pw.outputs.cache-hit }}" != true ]; then npx playwright install chromium; fi
+          # the system packages (mostly fonts) come from Ubuntu's package server; when it cannot be reached the checks still run, and fail by themselves if the browser cannot start
+          npx playwright install-deps chromium || echo "::warning::Could not install Chromium's system packages (package server unreachable?); running the checks without them"
       - name: Run this share, drawing every frame and loading the scripts one by one
         run: bash tools/ci-check.sh
         env:
