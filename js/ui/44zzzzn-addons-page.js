@@ -19,6 +19,7 @@ function addonRowHTML(a){
   if (a.dev) notes.push('Developer add-on, hidden from players.');
   return '<div class="kv addonrow' + (un ? '' : ' locked') + '"><div>' + a.name +
       ' <span class="addontag" style="color:' + t.col + ';border-color:' + t.col + '" title="' + t.small + '">' + t.name + '</span>' +
+      (a.local ? ' <span class="addontag local" title="Your own add-on, from addons/' + a.local + '">Local \u00b7 ' + a.local + '</span>' : '') +
       '<small>' + a.desc + (notes.length ? ' <em>' + notes.join(' ') + '</em>' : '') + '</small></div>' +
     '<button class="toggle' + (on ? ' on' : '') + '" data-a="addon-t-' + a.id + '"' + (can ? '' : ' disabled') + '>' + (un ? (on ? 'On' : 'Off') : 'Locked') + '</button></div>';
 }
@@ -34,6 +35,7 @@ function showAddons(){
       '<h2 class="head">Add-ons</h2>' +
       '<p class="sub">Optional features that sit beside the main game: experiments, extras and silly things. Each one is off until you switch it on, and changes save as you make them. While any is on, the HUD and the run report say so.</p>' +
       '<div class="addonlist">' + rows + '</div>' +
+      (typeof localAddonsNoteHTML === 'function' ? localAddonsNoteHTML() : '') +
       '<div class="addonsuggest">Have an idea for an add-on? Suggest it on GitHub: <a href="' + ADDON_SUGGEST_URL + '" target="_blank" rel="noopener">github.com/waldenthenerd/GiraffeRampage</a></div>' +
       '<div class="row" style="margin-top:14px;justify-content:center;gap:10px">' +
         '<button class="btn sm ghost" data-a="addons-alloff"' + (on ? '' : ' disabled') + '>Turn all off</button>' +
