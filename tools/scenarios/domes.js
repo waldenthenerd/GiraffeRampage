@@ -8,6 +8,7 @@
   function steps(n, dt){ for (var i = 0; i < n; i++){ GR.step(dt || 1 / 30); noLevels(); } }
   function killAll(){ G.enemies.slice().forEach(function(e){ if (!e.dead) damageEnemy(e, 1e18, { noCrit: true, quiet: true }); }); noLevels(); }
   try {
+    if (QA.part(1)){
     /* the chapter table: the old chapters are exactly as they were, the Domes are ten waves after Chapter 13 */
     out.table = chapterOf(1) === 1 && chapterOf(25) === 1 && chapterOf(26) === 2 && chapterOf(300) === 12 && chapterOf(301) === 13 && chapterOf(325) === 13 && chapterOf(326) === DOME_CHAPTER && chapterOf(335) === DOME_CHAPTER &&
       chapterWaveOf(325) === 25 && chapterWaveOf(326) === 1 && chapterWaveOf(335) === 10 && isChapterFinaleWave(325) && !isChapterFinaleWave(330) && isChapterFinaleWave(335) && !isChapterFinaleWave(326) &&
@@ -36,6 +37,8 @@
     handleAction('play14'); out.menuFilm = G.state === 'cutscene' && G.cut && G.cut.kind === 'domeflight';
     var cu = G.cut; cu.t = DOME_FLIGHT_T.END - 0.01; steps(3); out.menuStarts = G.state === 'playing' && G.wave === 326 && G.chapter === 14 && G.biome === 'dome';
 
+    }
+    if (QA.part(2)){
     /* a whole run, wave by wave: every wave builds, spawns and can be cleared; waves 330 and 335 have their boss */
     freshSave(); Save.data.chapter13Complete = true;
     startRun(14); steps(10); G.introFX = null; G.banner = null;
@@ -72,6 +75,8 @@
     G.waveState = 'intro'; G.waveTimer = 1e9; var th = spawnEnemy('thawed', P.x + 300, P.y, 330); th.hp = th.maxHp * 0.4; th.state = 'idle'; th.stateT = 0.01; for (var i = 0; i < 40; i++){ GR.step(1 / 30); noLevels(); P.hp = P.maxHp; }
     out.phase2 = th.p2 === true; G.enemies.length = 0;
 
+    }
+    if (QA.part(1)){
     /* the Ice Heart falling ends wave 335 at once, stray monsters and all */
     freshSave(); Save.data.chapter13Complete = true;
     startRun(14, 335); steps(5); G.introFX = null; G.banner = null; P.invuln = 1e9; P.hp = P.maxHp = 1e12;
@@ -119,9 +124,10 @@
 
     out.achieve = ACH.filter(function(a){ return a.id === 'ch135'; }).length === 1 && ACH.filter(function(a){ return a.id === 'ch13'; })[0].goal === 13;
     out.guideChapters = /Chapter 13\.5: The Domes/.test(guideTopicsHTML());
+    }
   } catch (e) { out.errs.push('threw: ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 4).join(' | ')); }
   var need = ['table', 'bossWaves', 'difficulty', 'saveDefault', 'saveSane', 'wardLocked', 'wardOpen', 'wardChoice', 'menuChapter', 'menuLocked', 'menuOpen', 'menuOld', 'arrowEnd', 'dots', 'menuFilm', 'menuStarts', 'runStart', 'bosses', 'noOldBosses', 'cast', 'domeLook', 'bossBehaviour', 'phase2', 'bossEnds', 'lastWave', 'endFilm', 'endVictory', 'victoryText', 'ch13Film1', 'ch13Film2', 'ch13Mini', 'ch13Trans', 'ch13To14', 'bestTotal', 'bestName', 'bestKill', 'bestHtml', 'coLocked', 'coOpen', 'achieve', 'guideChapters'];
-  out.failed = need.filter(function(k){ return out[k] !== true; });
+  out.failed = QA.need(out, need);
   out.pass = out.errs.length === 0 && out.failed.length === 0;
   QA.done(out);
 })();

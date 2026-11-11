@@ -36,6 +36,7 @@
       if (QA.params.hull && Sky.on){ Sky.hull = Sky.max * +QA.params.hull; steps(40); }
       GR.render(); QA.done({ view: V, errs: out.errs, state: G.state, wave: Sky.wave, en: Sky.en.length }); return;
     }
+    if (QA.part(1)){
     /* ---- the chapter in the list ---- */
     check('total', TOTAL_CHAPTERS === 19 && SKY_CHAPTER === 19 && chapterLabel(19) === '17.5' && chapterLen(19) === 10 && chapterFirstWave(19) === 436);
     check('bestiaryTable', bestiaryTable(19) === ETYPES_SKY && BESTIARY_CHAPTERS[18] === 'The Air Chase' && Object.keys(ETYPES_SKY).length === 8);
@@ -59,7 +60,11 @@
     tap('KeyJ'); check('toLeft', Sky.gun === 'left' && Sky.sw > 0); Sky.shots.length = 0; steps(3); check('swapPause', Sky.shots.length === 0);
     steps(14); check('leftFires', Sky.shots.length > 0 && Sky.shots.every(function(b){ return b.vx < 0 && b.vy === 0; }));
     tap('KeyL'); steps(16); Sky.shots.length = 0; steps(8); check('rightFires', Sky.gun === 'right' && Sky.shots.length > 0 && Sky.shots.every(function(b){ return b.vx > 0; }));
-    var d0 = Sky.shots[0] ? Sky.shots[0].dmg : 0; tap('KeyK'); steps(16); Sky.shots.length = 0; steps(8); check('doorHarder', Sky.gun === 'nose' && Sky.shots[0] && d0 > Sky.shots[0].dmg * 1.2);
+    /* each shot as it is fired (a shot that hits a drone at once is gone before it could be looked at), and one that is not a critical hit (one in twenty is, by chance) */
+    var fired = [], baseFire = skyFire; skyFire = function(){ var n = Sky.shots.length; baseFire.apply(this, arguments); fired = fired.concat(Sky.shots.slice(n)); };
+    function plain(){ return fired.filter(function(b){ return !b.crit; })[0]; }
+    fired = []; steps(8); var r0 = plain(), d0 = r0 ? r0.dmg : 0; tap('KeyK'); steps(16); fired = []; steps(8); var n0 = plain(); skyFire = baseFire;
+    check('doorHarder', Sky.gun === 'nose' && !!r0 && !!n0 && d0 > n0.dmg * 1.2);
     var a0 = Save.data.skyAim; tap('KeyI'); check('aimKey', Save.data.skyAim === !a0); tap('KeyI'); check('aimBack', Save.data.skyAim === a0);
     check('keys', DEFAULT_KEYS.skyLeft === 'KeyJ' && DEFAULT_KEYS.skyNose === 'KeyK' && DEFAULT_KEYS.skyRight === 'KeyL' && KEY_ACTIONS.some(function(a){ return a[0] === 'skyAim'; }));
     /* ---- a wave, and the upgrade after wave 2 ---- */
@@ -112,6 +117,8 @@
     check('wreck', TOWN_DIST.harbour.p.some(function(p){ return p.k === 'skywreck'; }));
     /* ---- the phone's run list and startRun go to the chase ---- */
     G.state = 'menu'; startRun(SKY_CHAPTER); check('startRun', G.state === 'cutscene' && G.cut.kind === 'skyin'); endCutscene(); skyQuit();
+    }
+    if (QA.part(2)){
     /* ---- the detail layer (js/sky/44zzzzm-sky-detail.js) ---- */
     skyStart(3); steps(10); Sky.q = []; Sky.en = []; Sky.ws = 'intro'; Sky.wt = 1e9;               /* a wave that never ends, so nothing waits on an upgrade pick */
     var tops = 0, heads = [], tg = drawTopGiraffe, dh = skyDoorHead;                           /* she is never drawn standing on top; only her head, out of the door she shoots from */
@@ -150,6 +157,7 @@
     var old = JSON.parse(JSON.stringify(Save.data)); ['chapter19Complete', 'skyBestWave', 'skyEscorts', 'skyClean', 'skyAim', 'skyRuns'].forEach(function(k){ delete old[k]; });
     localStorage.setItem(SAVE_KEY, JSON.stringify(old)); Save.load();
     check('oldSave', Save.data.chapter19Complete === false && Save.data.skyAim === true && Save.data.skyBestWave === 0 && Save.data.skyRuns === 0);
+    }
   } catch (e) { out.errs.push(String(e && e.stack || e)); }
   out.pass = !out.failed.length && !out.errs.length;
   QA.done(out);

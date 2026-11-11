@@ -3,6 +3,8 @@
    Also here: the "+N ADD-ONS" tag in the HUD while any is on, and the line in the run report that names them, so a screenshot or a bug report
    always shows that a run was not the plain game. Runs with add-ons on count as usual. */
 
+const ADDON_SUGGEST_URL = 'https://github.com/waldenthenerd/GiraffeRampage';           /* the box under the list: ideas for add-ons go to the repository */
+
 function addonsButtonHTML(){
   const all = addonsList(), on = addonsActive().length;
   const small = !all.length ? 'Optional and experimental features' : on ? on + ' of ' + all.length + ' on' : all.length + ' to try, all off';
@@ -34,6 +36,7 @@ function showAddons(){
       '<p class="sub">Optional features that sit beside the main game: experiments, extras and silly things. Each one is off until you switch it on, and changes save as you make them. While any is on, the HUD and the run report say so.</p>' +
       '<div class="addonlist">' + rows + '</div>' +
       (typeof localAddonsNoteHTML === 'function' ? localAddonsNoteHTML() : '') +
+      '<div class="addonsuggest">Have an idea for an add-on? Suggest it on GitHub: <a href="' + ADDON_SUGGEST_URL + '" target="_blank" rel="noopener">github.com/waldenthenerd/GiraffeRampage</a></div>' +
       '<div class="row" style="margin-top:14px;justify-content:center;gap:10px">' +
         '<button class="btn sm ghost" data-a="addons-alloff"' + (on ? '' : ' disabled') + '>Turn all off</button>' +
         '<button class="btn sm" data-a="addons-back">Back</button>' +
