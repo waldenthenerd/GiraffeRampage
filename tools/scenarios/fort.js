@@ -34,6 +34,7 @@
       else if (V === 'film'){ G.state = 'playing'; startCutscene(function(){}, false, QA.params.kind || 'fortflight'); for (var fs = 0; fs < 90; fs++){ G.cut.t = 1; GR.step(1 / 30); } G.cut.t = +QA.params.t || 1; GR.step(1 / 600); }
       out.view = V; QA.done(out); return;
     }
+    if (QA.part(1)){
     /* the chapter table */
     out.table = COUNTER_CHAPTER === 17 && COUNTER_FIRST_WAVE === 386 && COUNTER_WAVES === 25 && COUNTER_LAST_WAVE === 410 && SIEGE_LAST_WAVE === 385 && TOTAL_CHAPTERS === 19 && chapterLabel(17) === '16' &&
       chapterOf(385) === SIEGE_CHAPTER && chapterOf(386) === COUNTER_CHAPTER && chapterOf(410) === COUNTER_CHAPTER && chapterWaveOf(386) === 1 && chapterWaveOf(410) === 25 &&
@@ -110,6 +111,8 @@
     var g1 = 1234, b1 = Save.data.fortBadges; begin(); Save.data.fortBadges = b1; Save.data.gems = g1; fortChaos(160000, P.x, P.y, ''); out.badgeOnce = (Save.data.gems | 0) === g1 && G.ft.tier === 7;
     banner = bn;
 
+    }
+    if (QA.part(2)){
     /* the alarm: a squad at 35, a heavier one at 70, a full alarm at 100 (chaos worth half again); capped; it sinks when she lies low */
     begin(); G.enemies.length = 0; var n0 = G.enemies.length; fortAlarm(36); steps(2); out.squadA = G.enemies.length >= n0 + 3 && G.ft.lvl === 1 && G.ft.squads.a === 1;
     fortAlarm(36); steps(2); out.squadB = G.ft.lvl === 2 && G.ft.squads.b === 1;
@@ -120,7 +123,8 @@
     /* explosions: a fuel tank goes up a moment after it falls, hurts the creatures in the way and the neighbours (a chain), and never hurts her */
     begin(); var t1 = bk('tank', 0), t2 = bk('tank', 1), t3 = bk('tank', 2), tm = mid(t1); put(tm.x - 300, tm.y);
     spawnEnemy('hyena', tm.x + 50, tm.y + 160, G.wave); var ev = G.enemies[0]; ev.hp = ev.maxHp = 100; var hp0 = P.hp; var ch0 = G.ft.chaos;
-    kill(t1); out.fuse = FT.fuse.length === 1 && !t2.collapsed; steps(8); out.boom = !G.enemies.length || ev.dead || ev.hp < 100;
+    kill(t1); out.fuse = FT.fuse.length === 1 && !t2.collapsed; var ex = ev.x, ey = ev.y; for (var hs = 0; hs < 12; hs++){ if (!ev.dead){ ev.x = ex; ev.y = ey; } steps(1); }     /* 0.4 s, past the longest fuse (0.16 to 0.3 s); the hyena held where it stands, in the way */
+    out.boom = !G.enemies.length || ev.dead || ev.hp < 100;
     t2.hp = 50; t3.hp = 50; kill(t1); t1.collapsed = false; t1.hp = t1.maxHp; kill(t1); steps(30);
     out.chain = t2.collapsed === true && t3.collapsed === true && G.ft.chaos > ch0 + t1.chaos + t2.chaos; out.safe = P.hp === hp0;
     out.rubbleFire = t1.fire > 0 || t1.smoke > 0;
@@ -149,6 +153,8 @@
     /* the wave pay: a twelfth of the chaos as gold, the best wave kept */
     begin(); fortChaos(1200, P.x, P.y, ''); var gold0 = G.bonusGold; fortWaveEnd(); out.payout = G.bonusGold === gold0 + 100 && Save.data.fortBestWave >= 1;
 
+    }
+    if (QA.part(3)){
     /* every creature's behavior runs for a while beside her without an error, and does something */
     Settings.fxLevel = 0; var ai = {}, aiBad = '';
     ['hyena', 'grub', 'jackal', 'cheetah', 'warthog', 'vulture', 'rhino', 'baboon', 'honeybadger', 'mamba', 'ember', 'termite'].forEach(function(type){
@@ -206,13 +212,14 @@
     out.detailLooks = FORT_KIT_LOOKS_OK();
     /* an old save, with none of the new fields, still loads */
     freshSave(); delete Save.data.chapter17Complete; delete Save.data.fortBadges; delete Save.data.fortChaosBest; delete Save.data.fortBestWave; Save.write(); Save.load(); out.oldSave = Save.data.chapter17Complete === false && Save.data.fortBadges === 0;
+    }
   } catch (e) { out.err = String(e && e.stack || e); }
   function FORT_KIT_LOOKS_OK(){ var n = 0; for (var k in FORT_DRAW) if (/^ft_/.test(k)) n++; return n >= 17 && (typeof dt_wrap === 'function'); }
   var need = ['table', 'bossWaves', 'harder', 'cast', 'bestiary', 'uniqueLooks', 'flyers', 'saveDefault', 'saveSane', 'ward', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'menuFilm', 'starts', 'spawns', 'hud',
     'bld', 'kinds', 'inside', 'noClash', 'reachAll', 'gatesOpen', 'startOpen', 'turretsOpen', 'fell', 'combo', 'comboEnds', 'score', 'hurt', 'shotDown', 'kickDown', 'tiers', 'tier3', 'tierTop', 'badgeOnce',
     'squadA', 'squadB', 'full', 'fullBonus', 'decay', 'relax', 'caps', 'fuse', 'boom', 'chain', 'safe', 'rubbleFire', 'turretAims', 'turretFires', 'hacking', 'hacked', 'allyShoots', 'burnsOut', 'mended', 'turretShotDown',
     'lightOn', 'spotted', 'dark', 'noSpot', 'backAgain', 'allAgain', 'notTrapped', 'payout', 'aiOk', 'bossOk', 'films', 'noEndCard', 'detail', 'detailLooks', 'finish', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'lastWave', 'endFilm', 'endVictory', 'victoryText2', 'gallery', 'report', 'snapChaos', 'snapRestore', 'oldSave'];
-  out.failed = need.filter(function(k){ return out[k] !== true; });
+  out.failed = QA.need(out, need);
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);
 })();

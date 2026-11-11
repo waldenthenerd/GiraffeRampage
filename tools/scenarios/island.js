@@ -34,6 +34,13 @@
       else if (V === 'film'){ G.state = 'playing'; startCutscene(function(){}, false, QA.params.kind || 'islesail'); for (var fs = 0; fs < 90; fs++){ G.cut.t = 1; GR.step(1 / 30); } G.cut.t = +QA.params.t || 1; GR.step(1 / 600); }
       out.view = V; QA.done(out); return;
     }
+    /* which cells can be walked to from (sx, sy) (here, outside the parts, so every part can use it) */
+    function reach(sx, sy){
+      var N = TW_NX * TW_NY, seen = new Uint8Array(N), st = [twCell(sx, sy)], n = 0; seen[st[0]] = 1;
+      while (st.length){ var c = st.pop(); n++; var ci = c % TW_NX, cj = (c / TW_NX) | 0; [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function(d){ var a = ci + d[0], b = cj + d[1]; if (a < 0 || b < 0 || a >= TW_NX || b >= TW_NY) return; var m = b * TW_NX + a; if (seen[m] || TW.blocked[m]) return; seen[m] = 1; st.push(m); }); }
+      var open = 0; for (var k = 0; k < N; k++) if (!TW.blocked[k]) open++; return { n: n, open: open, seen: seen };
+    }
+    if (QA.part(1)){
     /* the chapter table */
     out.table = ISLE_CHAPTER === 18 && ISLE_FIRST_WAVE === 411 && ISLE_WAVES === 25 && CHAPTER_LAST_WAVE === 435 && COUNTER_LAST_WAVE === 410 && TOTAL_CHAPTERS === 19 && chapterLabel(18) === '17' &&
       chapterOf(410) === COUNTER_CHAPTER && chapterOf(411) === ISLE_CHAPTER && chapterOf(435) === ISLE_CHAPTER && chapterWaveOf(411) === 1 && chapterWaveOf(435) === 25 &&
@@ -85,11 +92,6 @@
     var clash = '', pr = IL.all.filter(function(b){ return b.kind !== 'sea' && b.kind !== 'seawall'; });
     for (var i = 0; i < pr.length; i++) for (var j = i + 1; j < pr.length; j++){ var a1 = pr[i], b1 = pr[j]; if (a1.x < b1.x + b1.w && b1.x < a1.x + a1.w && a1.y < b1.y + b1.h && b1.y < a1.y + a1.h) clash += a1.kind + i + '/' + b1.kind + j + ' '; }
     out.noClash = clash === ''; out.clash = clash;
-    function reach(sx, sy){
-      var N = TW_NX * TW_NY, seen = new Uint8Array(N), st = [twCell(sx, sy)], n = 0; seen[st[0]] = 1;
-      while (st.length){ var c = st.pop(); n++; var ci = c % TW_NX, cj = (c / TW_NX) | 0; [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function(d){ var a = ci + d[0], b = cj + d[1]; if (a < 0 || b < 0 || a >= TW_NX || b >= TW_NY) return; var m = b * TW_NX + a; if (seen[m] || TW.blocked[m]) return; seen[m] = 1; st.push(m); }); }
-      var open = 0; for (var k = 0; k < N; k++) if (!TW.blocked[k]) open++; return { n: n, open: open, seen: seen };
-    }
     var rc = reach(2130, 2760); out.reachAll = rc.n === rc.open; out.reachN = rc.n + '/' + rc.open;
     out.ventsOpen = ISLE_VENTS.every(function(v){ return !inWall(v.x, v.y, 10) && !TW.blocked[twCell(v.x, v.y)] && rc.seen[twCell(v.x, v.y)]; });
     out.startOpen = !inWall(2130, 2760, 20) && !TW.blocked[twCell(2130, 2760)];
@@ -105,6 +107,8 @@
     var ce = spawnEnemy('jackal', 300, 1500, 420), cl = spawnEnemy('jackal', 2130, 2760, 420), cr = spawnEnemy('warthog', 300, 1500, 420);
     out.swimMul = ilWaterMul(ce) > 1 && ilWaterMul(cl) < 1 && ilWaterMul(cr) < 1;
 
+    }
+    if (QA.part(2)){
     /* every creature's behavior runs beside her without an error, and does something; the hiders go under in the water */
     Settings.fxLevel = 0; var ai = {}, aiBad = '';
     ['hyena', 'grub', 'jackal', 'cheetah', 'warthog', 'vulture', 'rhino', 'baboon', 'honeybadger', 'mamba', 'ember', 'termite'].forEach(function(type){
@@ -128,18 +132,23 @@
     bosses.forEach(function(type, bi2){
       begin(415 + bi2 * 5); var bx = type === 'wildfire' ? 2100 : type === 'buffalo' ? 1300 : 1000, by = type === 'wildfire' ? 420 : type === 'buffalo' ? 1760 : 1680;      /* the shark in open water, where it can dive */ put(bx, by); var e = spawnEnemy(type, bx + 420, by, 415 + bi2 * 5); if (!e){ bossBad += type + ':none '; return; }
       e.hp = e.maxHp = 1e12; var seen = {}, mx = 0, mk = 0, bm = 0, dove = false;
-      for (var k = 0; k < (type === 'buffalo' ? 300 : 200); k++){ GR.step(1 / 12); noLevels(); put(bx, by); if (e.state) seen[e.state] = 1; if (e.state === 'dive') dove = true; mx = Math.max(mx, G.eproj.length); mk = Math.max(mk, G.markers.length); bm = Math.max(bm, G.beams.length + G.blasts.length); if (k === 100) e.hp = e.maxHp * 0.3; }
+      for (var k = 0; k < (type === 'buffalo' ? 300 : 200); k++){ GR.step(1 / 12); noLevels(); put(bx, by); if (type === 'buffalo' && e.state === 'idle' && !isleWet(e.x, e.y)){ e.x = bx + 420; e.y = by; }   /* back in open water when a charge ran it ashore */
+        if (e.state) seen[e.state] = 1; if (e.state === 'dive') dove = true; mx = Math.max(mx, G.eproj.length); mk = Math.max(mk, G.markers.length); bm = Math.max(bm, G.beams.length + G.blasts.length); if (k === 100) e.hp = e.maxHp * 0.3; }
       bi[type] = Object.keys(seen).join('/') + (dove ? ' dove' : ''); if (Object.keys(seen).length < 4 || (mx + mk + bm) === 0) bossBad += type + ' ';
       if (type === 'buffalo' && !dove) bossBad += 'buffalo:nodive ';
       if (type === 'crocodile' && !(e.trail && e.trail.length > 10)) bossBad += 'crocodile:notrail ';
       if (type === 'wildfire' && !(G.il.arms && G.il.arms.length >= 0 && seen.armswind)) bossBad += 'wildfire:noarms ';
     });
     out.bossStates = bi; out.bossOk = bossBad === ''; out.bossBad = bossBad;
+    }
+    if (QA.part(3)){
+    if (QA.parted) Settings.fxLevel = 0;                /* what part 2 leaves behind when the whole scenario runs */
     /* the scientist on every boss wave, and a boss beaten without a scratch is remembered */
     begin(414); startWave(415); out.glimpse = !!G.il.glimpse && G.il.glimpse.line === ISLE_GLIMPSE.lion && G.il.bossHit === false; drawFeedbackOverlays(CTX); steps(240); out.glimpseGoes = !G.il.glimpse;
     begin(414); startWave(415); clear(); var kb = spawnEnemy('lion', 1200, 1680, 415); G.bossAlive = true; killEnemy(kb, {}); out.clean = (Save.data.isleClean & 1) === 1;
     begin(419); startWave(420); clear(); var kb2 = spawnEnemy('matriarch', 1200, 1680, 420); G.bossAlive = true; P.invuln = 0; P.hp = P.maxHp = 1e9; hurtPlayer(10, P.x, P.y); killEnemy(kb2, {}); out.notClean = (Save.data.isleClean & 2) === 0;
 
+    if (QA.parted) rc = reach(2130, 2760);             /* the map's reach, worked out in part 1 when the whole scenario runs */
     /* being watched: every spot the scientist stands on, every note, buoy and camera is on open ground (and the notes can be reached) */
     out.spotsOk = ISLE_SIGHT.every(function(s2){ return s2.k !== 'out' || (!isleWet(s2.x, s2.y) && ilClear(s2.x, s2.y, 30) && rc.seen[twCell(s2.x, s2.y)]); }) &&
       ISLE_NOTES.every(function(N){ return !inWall(N.x, N.y, 20) && !isleWet(N.x, N.y) && !TW.blocked[twCell(N.x, N.y)] && rc.seen[twCell(N.x, N.y)]; }) &&
@@ -239,6 +248,7 @@
     /* a run saved part-way comes back on the island */
     begin(420); var snap = runSnapshot(); out.snap = validRunSave(snap); startRun(ISLE_CHAPTER, snap.wave, snap); steps(2); out.snapRestore = G.biome === 'isle' && G.chapter === ISLE_CHAPTER && IL.all.length === ISLE_SEA.length + ISLE_PROPS.length && !!G.il;
     Ach.check = realCheck;
+    }
   } catch (e) { out.err = String(e && e.stack || e); }
   var need = ['table', 'bossWaves', 'harder', 'cast', 'bestiary', 'uniqueLooks', 'traits', 'art', 'saveDefault', 'saveSane', 'ward', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'menuFilm', 'starts', 'spawns', 'hud',
     'props', 'inside', 'noClash', 'reachAll', 'ventsOpen', 'startOpen', 'wetMap', 'wetMatches', 'dryStart', 'wade', 'swimMul', 'aiOk', 'crabPlate', 'jellySplit', 'jellyOnce', 'bossOk', 'glimpse', 'glimpseGoes', 'clean', 'notClean',
@@ -246,7 +256,7 @@
     'enterOk', 'tell', 'coconut', 'palmBump', 'buoy', 'buoyBack', 'boat', 'wakeOn', 'prints', 'music', 'menuDraw', 'chase',
     'films', 'noEndCard', 'mini', 'miniBite', 'miniShell', 'miniWard', 'photo', 'photoOld', 'backdrop', 'finish', 'finishWet', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'minimap',
     'lastWave', 'endFilm', 'endMini', 'endVictory', 'gallery', 'snap', 'snapRestore'];
-  out.failed = need.filter(function(k){ return out[k] !== true; });
+  out.failed = QA.need(out, need);
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);
 })();

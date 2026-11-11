@@ -11,7 +11,7 @@
   var press = function(code){ Input.keys[code] = true; frames(1); Input.keys[code] = false; frames(1); };
   try {
     Save.reset(); var td = townData(); td.tips.controls = 1;
-    G.state = 'menu'; townEnter('in_cafe', 683, 1); Town.fixHour = 12; Town.walkers = []; Town.bannerT = 0; frames(20);
+    G.state = 'menu'; Town.fixHour = 11; townEnter('in_cafe', 683, 1);            /* the hour is set before she goes in: at 12-13.30 the keepers lunch in the café, and the real clock must not decide that */ Town.walkers = []; Town.bannerT = 0; frames(20);
     out.near = Town.near && Town.near.label; out.near2 = Town.near2 && Town.near2.label;
     var ids = [Town.near && Town.near.b && Town.near.b.id, Town.near2 && Town.near2.b && Town.near2.b.id].sort().join();
     check('twoInCafe', ids === 'jukebox,table2' && Town.near2For === Town.near);
