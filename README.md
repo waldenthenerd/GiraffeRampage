@@ -55,16 +55,16 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 241 | 74,641 | 6.23 MiB (6,528,197 bytes) |
+| JavaScript (`js/`) | 242 | 74,725 | 6.23 MiB (6,534,526 bytes) |
 | Styles (`css/`) | 6 | 1,842 | 173 KiB (177,418 bytes) |
-| Page (`index.html`) | 1 | 292 | 15.0 KiB (15,312 bytes) |
-| **Whole game** | **248** | **76,775** | **6.41 MiB (6,720,927 bytes)** |
+| Page (`index.html`) | 1 | 293 | 15.0 KiB (15,366 bytes) |
+| **Whole game** | **249** | **76,860** | **6.42 MiB (6,727,310 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **76,174 lines, 6.36 MiB (6,673,945 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 241 | 74,641 | 6.23 MiB (6,528,197 bytes) |
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **76,259 lines, 6.37 MiB (6,680,328 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+| JavaScript (`js/`) | 242 | 74,725 | 6.23 MiB (6,534,526 bytes) |
 | Styles (`css/`) | 6 | 1,842 | 173 KiB (177,418 bytes) |
-| Page (`index.html`) | 1 | 292 | 15.0 KiB (15,312 bytes) |
-| **Whole game** | **248** | **76,775** | **6.41 MiB (6,720,927 bytes)** |
+| Page (`index.html`) | 1 | 293 | 15.0 KiB (15,366 bytes) |
+| **Whole game** | **249** | **76,860** | **6.42 MiB (6,727,310 bytes)** |
 
 Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
@@ -314,6 +314,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/town/44zzzzf-gadget-gear.js` | 117 | **Gadgets outside the town.** The Photo booth gets three more frames (Gold, Hearts, Circuit) from the Frame Kit and three more filters (Neon, Thermal, Dream) from the Studio Pro Camera (places in the photo code that were free; choosing needs the kit, drawing does not). `GADLIGHT.k` widens her own light in the dark of a run for the torch and the night goggles (`drawNight` is wrapped). |
 | `js/town/44zzzzg-town-post.js` | 234 | **The café menu, the post and the paper.** `GAD_MEALS` (a dish per chapter at Penny's bar: eaten between runs it boosts the next run once, through `applyMutations`), `GAD_MAIL` (a letter per chapter at the Post Office and in the phone, its gift taken once) and the Longneck Gazette (a paper a day: headlines from what she has done, the weather for 12 minutes, columns that open with chapters, and a daily task worth 20 gems). |
 | `js/town/44zzzzh-town-critters.js` | 68 | **A little life about town.** `TOWN_BIRDS` (pigeons on the Square, Market Street and the park path, gulls on the harbor quay: they peck, lift off when she walks up and come back later, and roost after dark) and `TOWN_CATS` (a cat asleep in the bakery, the library, Granny Hoof's, the farmhouse and the seaside cottage), drawn in `townDynamic`. |
+| `js/town/44zzzzi-monkey-hat.js` | 84 | **The Monkey Hat.** A little monkey that rides on her head (side and top-down drawings, her tail swinging, a blink). Found only by a secret: in one run, with no hat on, defeat 20 monkeys (savanna baboons or jungle howler monkeys; `killEnemy` and `startRun` are wrapped to count them). It is the 63rd accessory, the last one photo codes can number. |
 | `js/sky/44zzzzi-sky-art.js` | 138 | **Chapter 17.5, the Air Chase: the machines from above.** `skyHeliTop` (a helicopter seen from above, facing +x: the town helicopter with its cabin open and her inside, LAB-1 the White Bird, the grey escorts), `skyRotor`, the five lab drones (`SKY_DRAW`: Rotor, Net, Mine, Laser and Carrier Drones) and `ETYPES_SKY`, which puts them in the Bestiary's usual slots (the Grey Escort and the White Bird as the bosses). |
 | `js/sky/44zzzzj-sky-chase.js` | 609 | **The Air Chase itself, a sky shooter** (`G.state 'sky'`, its own screen like the sea's): steering, the three guns (nose, left door, right door; J, K and L move her, the gun she is at fires by itself, I turns the dotted aiming line on and off), her gear on the hull and the guns, the ten waves (`SKY_WAVES_DEF`, numbered 436 to 445), each kind's behavior, the escorts that break off, the Grey Escort and the White Bird's three phases, the upgrades after waves 2, 4, 6 and 8 (`SKY_PERKS`), being shot down and trying again from the checkpoint, the end (save, film, minigame, results) and the phone's buttons. `SKY_TUNE` and `SKY_E` hold the numbers to change. |
 | `js/sky/44zzzzk-sky-films.js` | 415 | **The Air Chase films**: `skyin` (the chase from Chapter 17's last shot, the town mechanic flying and her at the open side door; LAB-1's cargo door sliding back on its rail and the drones coming out of it; inside the town helicopter's cabin, her in a harness clipped to the ceiling at the gun bolted to the floor, the brass rolling to rest) and `skyout` (LAB-1 on fire with its tail rotor gone, down in the sea tail up with its blades bent, the two scientists in the water, the coast guard boat sitting in the water with its hook lowered, the two wrapped in blankets on the deck's locker, the boat and the helicopter heading home toward the coast). Shared parts: `skyTownHeli`, `skyLab`, `skyFilmBoat`, `skyFilmFloat`, `skyFilmSitter`, `skyFilmCrew`, `skyCabin`. `domeHeli` (js/films/27a) gained `seat`, `tailGone` and `wreck` for them. |
