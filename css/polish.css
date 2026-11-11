@@ -723,7 +723,14 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 .menu2 .mutils .btn.mutil small{display:none}
 .menu2 .mutils .btn.mutil .mbi{width:auto;height:auto;background:none;font-size:15px}
 .mgroup{display:contents}
-.mghead{display:none}
+.mgbody{display:contents}
+.mgroup:not(.open) .mgbody{display:none}
+.menu2 .btn.mgbtn{position:relative;padding-right:30px;order:1}
+.menu2 .mgbtn small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mgcar{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--dust);transition:transform .15s}
+.mgroup.open .mgcar{transform:translateY(-50%) rotate(90deg)}
+.menu2 .mgroup.open > .mgbtn{border-color:rgba(242,179,61,.6);background:rgba(242,179,61,.12)}
+.menu2 .mgbody .btn{order:2}
 .menu2 .btn.hasic{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;align-items:center;text-align:left}
 .menu2 .btn.hasic small{grid-column:2}
 .mbi{grid-row:1/span 2;display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:rgba(242,179,61,.1);font-size:18px}
@@ -758,7 +765,8 @@ body:has(#overlay.on .menu2):has(#achToast.on) #wardToast{bottom:112px}
   .menu2 .mside{gap:12px;align-self:start}
   .menu2 .mrecord{grid-row:5}
   .mgroup{display:flex;flex-direction:column;gap:6px}
-  .mghead{display:block;text-align:left;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dust);padding-left:2px;text-shadow:0 1px 3px rgba(0,0,0,.85)}
+  .mgroup.open .mgbody{order:2;display:flex;flex-direction:column;gap:6px;padding-left:14px;border-left:2px solid rgba(242,179,61,.3);margin-left:6px}
+  .menu2 .mside .btn.mgbtn{padding:10px 30px 10px 10px}
   .menu2 .mside .btn{padding:7px 10px}
   .menu2 .chsel{margin-top:0}
   .menu2 .chpic{width:min(270px,36vh)}
@@ -797,7 +805,8 @@ body:has(#overlay.on .menu2):has(#achToast.on) #wardToast{bottom:112px}
   .panel.menu2{grid-template-areas:"top sel" "title sel" "tag sel" "row sel" "rec sel"}
   .menu2 .mtop{grid-area:top;margin:0}
   .menu2 .chwrap{align-self:start}
-  body:has(#overlay.on .menu2) #achToast,body:has(#overlay.on .menu2) #wardToast{left:16px;transform:translate(0,-12px);text-align:left;max-width:44vw}
+  body:has(#overlay.on .menu2) #achToast,body:has(#overlay.on .menu2) #wardToast{left:16px;top:auto;bottom:12px;transform:translate(0,12px);text-align:left;max-width:44vw}
+  body:has(#overlay.on .menu2):has(#achToast.on) #wardToast{top:auto;bottom:84px}
   body:has(#overlay.on .menu2) #achToast.on,body:has(#overlay.on .menu2) #wardToast.on{transform:none}
   .menu2 .mlatest,.menu2 .chkey{display:none}
 }

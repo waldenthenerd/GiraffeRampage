@@ -5,13 +5,26 @@
    still turns up: one this file does not know simply stays in the column it was put in. */
 const MENU_ICONS = { shop: '@t-coin', venus: '@t-x-sulfur', mars: '@t-x-rover', lab: '@t-flask-2', 'fusion-menu': '@t-x-fusion', 'town-enter': '@t-x-cottage', 'co-open': '@t-x-herd',
   bestiary: '@t-x-book', forage: '@t-apple', 'mini-menu': '@t-x-crosshair', gallery: '@t-eye', wardrobe: '@t-x-skin', 'ach-open': '@t-x-medal', help: '@t-x-help', addons: '@t-x-box', settings: '@t-x-cog' };
-/* the groups, in order; `side` is the column on a wide screen ('' = whichever column is shorter) */
+/* the groups, in order: the menu shows one button for each, and pressing it opens the group (one open at a time). `side` is the column on a wide screen.
+   A new page goes in the group it belongs to (add its data-a to `has`), so the menu does not grow with every feature. */
 const MENU_GROUPS = [
-  { id: 'shops', name: 'Shops and outposts', side: 'l', has: ['shop', 'venus', 'mars', 'lab', 'fusion-menu'] },
-  { id: 'places', name: 'Places', side: 'l', has: ['town-enter', 'co-open'] },
-  { id: 'play', name: 'Things to do', side: '', has: ['forage', 'mini-menu'] },
-  { id: 'books', name: 'Collections', side: 'r', has: ['bestiary', 'gallery', 'wardrobe', 'ach-open'] }
+  { id: 'shops', name: 'Shops and outposts', icon: '@t-coin', side: 'l', has: ['shop', 'venus', 'mars', 'lab', 'fusion-menu'] },
+  { id: 'places', name: 'Places', icon: '@t-x-cottage', side: 'l', has: ['town-enter', 'co-open'] },
+  { id: 'play', name: 'Things to do', icon: '@t-x-crosshair', side: 'r', has: ['forage', 'mini-menu'] },
+  { id: 'books', name: 'Collections', icon: '@t-x-book', side: 'r', has: ['bestiary', 'gallery', 'wardrobe', 'ach-open'] }
 ];
+const MenuUI = { open: '' };                                  /* the open group's id ('' = all closed); kept for the visit, not in the save */
+function menuGroupHTML(id, name, icon, bs){
+  const names = bs.map(function(b){ const t = b.childNodes; for (let k = 0; k < t.length; k++) if (t[k].nodeType === 3 && t[k].textContent.trim()) return t[k].textContent.trim(); return ''; }).filter(Boolean);
+  return '<button class="btn ghost mgbtn hasic" data-a="mg-' + id + '" aria-expanded="false"><span class="mbi">' + ico(icon) + '</span>' + name +
+    '<small>' + names.join(', ') + '</small><span class="mgcar" aria-hidden="true">\u203A</span></button><div class="mgbody"></div>';
+}
+function menuGroupSync(root){
+  root.querySelectorAll('.menu2 .mgroup').forEach(function(box){
+    const on = box.getAttribute('data-g') === MenuUI.open; box.classList.toggle('open', on);
+    const b = box.querySelector('.mgbtn'); if (b) b.setAttribute('aria-expanded', on ? 'true' : 'false');
+  });
+}
 const MENU_UTILS = ['help', 'addons', 'settings'];
 /* what a button says while its count is still nothing (a new save is not a wall of zeros) */
 const MENU_INVITES = { shop: 'Gold from your runs is spent here', lab: 'Mutations to discover', 'town-enter': 'Take a walk around town', bestiary: 'Fills in as you meet creatures and cards',
@@ -42,20 +55,18 @@ function menuTidy(root){
   /* a saved run to pick up sits above the chapter picture */
   const cont = panel.querySelector(':scope > [data-a="continue"]'); if (cont){ cont.classList.add('mcont'); wrap.insertBefore(cont, wrap.firstChild); }
   /* the groups */
-  const made = [];
   MENU_GROUPS.forEach(function(g){
     const bs = g.has.map(btn).filter(Boolean); if (!bs.length) return;
-    const box = document.createElement('div'); box.className = 'mgroup mg-' + g.id; box.innerHTML = '<div class="mghead">' + g.name + '</div>';
-    bs.forEach(function(b){ box.appendChild(b); }); made.push({ g: g, box: box, n: bs.length });
+    const box = document.createElement('div'); box.className = 'mgroup mg-' + g.id; box.setAttribute('data-g', g.id); box.innerHTML = menuGroupHTML(g.id, g.name, g.icon, bs);
+    bs.forEach(function(b){ box.lastChild.appendChild(b); }); (g.side === 'l' ? L : R).appendChild(box);
   });
-  const count = function(col){ return col.querySelectorAll('.btn').length; };
-  made.forEach(function(m){ if (m.g.side) (m.g.side === 'l' ? L : R).appendChild(m.box); });
-  made.forEach(function(m){ if (!m.g.side) (count(L) <= count(R) ? L : R).appendChild(m.box); });
-  /* anything left over (a button from a file this one does not know) goes under the groups, in a group of its own */
-  [L, R].forEach(function(col){
-    const rest = [].slice.call(col.children).filter(function(c){ return !c.classList.contains('mgroup'); }); if (!rest.length) return;
-    const box = document.createElement('div'); box.className = 'mgroup mg-more'; box.innerHTML = '<div class="mghead">More</div>'; rest.forEach(function(b){ box.appendChild(b); }); col.appendChild(box);
-  });
+  /* anything left over (a button from a file this one does not know) goes in a group of its own, in the shorter column */
+  const rest = [].slice.call(L.children).concat([].slice.call(R.children)).filter(function(c){ return !c.classList.contains('mgroup'); });
+  if (rest.length){
+    const box = document.createElement('div'); box.className = 'mgroup mg-more'; box.setAttribute('data-g', 'more'); box.innerHTML = menuGroupHTML('more', 'More', '@t-x-box', rest);
+    rest.forEach(function(b){ box.lastChild.appendChild(b); }); (L.children.length <= R.children.length ? L : R).appendChild(box);
+  }
+  menuGroupSync(panel);
 }
 /* the dots under the chapter's name: cleared, open or locked, each with its name, and a press goes to that chapter */
 function menuDots(root){
@@ -108,6 +119,11 @@ function menuWorldSync(){
   handleAction = function(a){
     if (typeof a === 'string' && a.indexOf('ch-go-') === 0){
       const n = +a.slice(6); if (n >= 1 && n <= TOTAL_CHAPTERS && n !== menuChapter()){ SFX.click(); setMenuChapter(n); showMenu(); }
+      return;
+    }
+    if (typeof a === 'string' && a.indexOf('mg-') === 0){                           /* open a group, or close the open one */
+      const id = a.slice(3); MenuUI.open = MenuUI.open === id ? '' : id; SFX.click();
+      if (typeof OV !== 'undefined') menuGroupSync(OV);
       return;
     }
     if (a === 'ch-latest'){ const far = menuLatestChapter(); setMenuChapter(far); return ha.call(this, far === 1 ? 'play' : 'play' + far); }
