@@ -712,3 +712,94 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 @keyframes jbSpin{to{transform:rotate(360deg)}}
 .jb-n b{display:block;font-size:14px;color:#FFE9A8}.jb-n small{display:block;font-size:12px;opacity:.75}
 .jb-p{font:700 12px system-ui,sans-serif;padding:6px 8px;border-radius:8px;border:2px solid #FFB84D;background:transparent;color:#FFB84D;cursor:pointer}.jb-p:hover{background:rgba(255,184,77,.18)}.jb-lock{border-color:transparent;color:#8A7A6A;text-align:center;cursor:default}
+
+/* ---------- the main menu, tidied (js/ui/44zzzzp-menu-pass.js): top strip, groups, pictures on the buttons, chapter dots, corner notes ---------- */
+.mtop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 6px;text-align:left}
+.mwallet{display:flex;gap:8px}
+.mw{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(20,15,12,.72);border:1px solid rgba(242,179,61,.28);font-size:14px;color:var(--bone)}
+.mw .mi{font-size:16px}.mw small{color:var(--dust);font-size:11.5px}
+.mutils{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.menu2 .mutils .btn.mutil{display:inline-flex;align-items:center;gap:6px;width:auto;flex:none;max-width:none;padding:6px 12px;font-size:13px;border-radius:999px;background:rgba(20,15,12,.72)}
+.menu2 .mutils .btn.mutil small{display:none}
+.menu2 .mutils .btn.mutil .mbi{width:auto;height:auto;background:none;font-size:15px}
+.mgroup{display:contents}
+.mghead{display:none}
+.menu2 .btn.hasic{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;align-items:center;text-align:left}
+.menu2 .btn.hasic small{grid-column:2}
+.mbi{grid-row:1/span 2;display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:rgba(242,179,61,.1);font-size:18px}
+.menu2 .btn.mutil.hasic{display:inline-flex}
+.menu2 .mcont{margin:0 auto 8px;max-width:420px}
+.menu2 .chdot{cursor:pointer;position:relative;width:11px;height:11px;background:rgba(243,234,216,.4)}
+.menu2 .chdot::after{content:"";position:absolute;inset:-5px}                       /* a bigger place to press */
+.menu2 .chdot.done{background:#8FB85A}
+.menu2 .chdot.on{background:var(--hide);box-shadow:0 0 0 2px rgba(242,179,61,.4),0 0 0 4px rgba(20,15,12,.6)}
+.menu2 .chdot.locked:not(.on){background:transparent;box-shadow:inset 0 0 0 1.5px rgba(243,234,216,.3)}
+.menu2 .chdot:hover{transform:scale(1.35)}
+.menu2 .chdots{flex-wrap:wrap;gap:6px}
+.chkey{margin:5px auto 0;color:var(--dust);font-size:11.5px}
+.menu2 .mlatest{display:block;width:auto;max-width:420px;margin:8px auto 0;padding:7px 14px;font-size:13px;text-align:left}
+.menu2 .tagline,.menu2 .chdesc,.menu2 .chmeta,.menu2 .chkey,.menu2 .mrecord{text-shadow:0 1px 3px rgba(0,0,0,.85)}
+/* more of the world shows behind the menu now that it is the chosen chapter */
+#overlay.on:has(.menu2){background:radial-gradient(ellipse at 50% 42%,rgba(24,17,13,.46),rgba(14,10,8,.66) 100%)}
+/* notes go where they cover nothing: a bottom corner on a computer, the top edge on a phone, one above the other */
+body:has(#overlay.on .menu2) #achToast{left:16px;top:auto;bottom:16px;transform:translate(0,24px);text-align:left;max-width:min(300px,70vw)}
+body:has(#overlay.on .menu2) #achToast.on{transform:none}
+body:has(#overlay.on .menu2) #wardToast{left:16px;bottom:16px;transform:translate(0,12px);text-align:left;max-width:min(300px,70vw)}
+body:has(#overlay.on .menu2) #wardToast.on{transform:none}
+body:has(#overlay.on .menu2):has(#achToast.on) #wardToast{bottom:112px}
+@media (min-width:1000px) and (min-height:521px){
+  .panel.menu2{row-gap:0;align-items:start}
+  .menu2 .mtop{grid-column:1/-1;grid-row:1}
+  .menu2 .marquee{grid-row:2;font-size:clamp(40px,min(5.4vw,8.6vh),76px);line-height:1}
+  .menu2 .marquee br{display:none}
+  .menu2 .marquee span{margin-right:.28em}
+  .menu2 .tagline{grid-row:3;max-width:none;margin:4px auto 10px;font-size:14px}
+  .menu2 .chwrap,.menu2 .mside{grid-row:4}
+  .menu2 .mside{gap:12px;align-self:start}
+  .menu2 .mrecord{grid-row:5}
+  .mgroup{display:flex;flex-direction:column;gap:6px}
+  .mghead{display:block;text-align:left;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dust);padding-left:2px;text-shadow:0 1px 3px rgba(0,0,0,.85)}
+  .menu2 .mside .btn{padding:7px 10px}
+  .menu2 .chsel{margin-top:0}
+  .menu2 .chpic{width:min(270px,36vh)}
+  .menu2 .chname{margin-top:8px;font-size:clamp(20px,3.6vh,30px)}
+  .menu2 .chdesc{margin-top:6px}
+  .menu2 .chmeta{margin-bottom:8px}
+}
+@media (min-width:1000px) and (min-height:521px) and (max-height:800px){
+  .menu2 .mside .btn small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .menu2 .mside .btn{padding:5px 9px;font-size:14px}
+  .mbi{width:28px;height:28px;font-size:16px}
+  .menu2 .mside{gap:9px}.mgroup{gap:5px}
+  .menu2 .chdesc{font-size:13px;line-height:1.35;max-width:none;margin-top:4px}
+  .menu2 .chpic{width:min(270px,33vh)}
+  .menu2 .tagline{margin-bottom:6px}
+  .menu2 .mrecord{margin-top:6px!important}
+  .menu2 .mlatest{margin-top:6px;padding:5px 12px}
+  .menu2 .chmeta{margin-bottom:6px}
+  .chkey{margin-top:3px}
+}
+@media (max-width:999px),(max-height:520px){
+  .mw{padding:4px 10px;font-size:13px}.menu2 .mutils .btn.mutil{padding:5px 10px;font-size:12.5px}
+  .mbi{width:26px;height:26px;font-size:15px;border-radius:7px}
+  .menu2 .btn.hasic{column-gap:8px}
+  /* on a phone the only place that is not a control is the title, so notes sit over it */
+  body:has(#overlay.on .menu2) #achToast,body:has(#overlay.on .menu2) #wardToast{left:50%;right:auto;bottom:auto;top:calc(58px + env(safe-area-inset-top,0px));transform:translate(-50%,-12px);text-align:center;max-width:92vw}
+  body:has(#overlay.on .menu2) #achToast.on,body:has(#overlay.on .menu2) #wardToast.on{transform:translate(-50%,0)}
+  body:has(#overlay.on .menu2):has(#achToast.on) #wardToast{top:calc(146px + env(safe-area-inset-top,0px));bottom:auto}
+  /* Guide, Add-ons and Settings shrink to their pictures, so the strip is one row */
+  .mtop{flex-wrap:nowrap}
+  .menu2 .mutils{flex-wrap:nowrap}
+  .menu2 .mutils .btn.mutil{font-size:0;gap:0;padding:8px;min-width:40px;min-height:40px;justify-content:center}
+  .menu2 .mutils .btn.mutil .mbi{font-size:18px}
+}
+@media (max-height:520px) and (min-width:600px){
+  .panel.menu2{grid-template-areas:"top sel" "title sel" "tag sel" "row sel" "rec sel"}
+  .menu2 .mtop{grid-area:top;margin:0}
+  .menu2 .chwrap{align-self:start}
+  body:has(#overlay.on .menu2) #achToast,body:has(#overlay.on .menu2) #wardToast{left:16px;transform:translate(0,-12px);text-align:left;max-width:44vw}
+  body:has(#overlay.on .menu2) #achToast.on,body:has(#overlay.on .menu2) #wardToast.on{transform:none}
+  .menu2 .mlatest,.menu2 .chkey{display:none}
+}
+body:has(#overlay.on .menu2) #songCard{top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));right:14px;transform:translateY(10px)}
+body:has(#overlay.on .menu2) #songCard.on{transform:none}

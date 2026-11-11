@@ -77,11 +77,14 @@ add "ship-check on the package" "$pkg" ship-check
 add "challenge-builder" "" challenge-builder
 add "challenge-builder (390x844)" "" challenge-builder "--touch --w 390 --h 844"
 add "challenge-builder (844x390)" "" challenge-builder "--touch --w 844 --h 390"
-for s in gear-oldsave trinket-ui wheel-spotted ants-page ants-engineer upgrades-page nav-pages review-fixes oldsave-deep save-gr3 npc-voices gear-spotted perf-cache save-erase gold-bank achievements gags fishing fishing-fight input-choice town-layers wheels intel uni-bank uni-slides ui-pass enemy-detail enemy-motion scenery-detail minimap camp late-polish sea-chart runreport-gear preview-trail aurora-buff compare-panel-triage music jukebox town-choices particles gadgets town-detail addons monkey-hat speedrun local-addons; do add "$s" "" "$s"; done
+for s in gear-oldsave trinket-ui wheel-spotted ants-page ants-engineer upgrades-page nav-pages review-fixes oldsave-deep save-gr3 npc-voices gear-spotted perf-cache save-erase gold-bank achievements gags fishing fishing-fight input-choice town-layers wheels intel uni-bank uni-slides ui-pass enemy-detail enemy-motion scenery-detail minimap camp late-polish sea-chart runreport-gear preview-trail aurora-buff compare-panel-triage music jukebox town-choices particles gadgets town-detail addons monkey-hat speedrun local-addons menu-pass; do add "$s" "" "$s"; done
 add "films (all 27 films)" "" film-sheet '--params kind=all'
 add "phone-pass (390x844)" "" phone-pass "--touch --w 390 --h 844"
 add "uni-slides (390x844)" "" uni-slides "--touch --w 390 --h 844"
 add "ui-pass (390x844)" "" ui-pass "--touch --w 390 --h 844"
+add "menu-pass (1280x720)" "" menu-pass "--w 1280 --h 720 --scale 1"
+add "menu-pass (390x844)" "" menu-pass "--touch --w 390 --h 844"
+add "menu-pass (844x390)" "" menu-pass "--touch --w 844 --h 390"
 add "phone-pass (844x390)" "" phone-pass "--touch --w 844 --h 390"
 for s in $onpkg; do add "$s on the package" "$pkg" "$s"; done
 

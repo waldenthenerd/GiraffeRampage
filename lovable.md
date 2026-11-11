@@ -70,7 +70,7 @@ or "improve" the game's own code**. If something in the game looks odd, leave it
 This list is of the **source** files, which the ZIP no longer contains one by one (the build joins them into a few files in exactly this order and
 minifies them; the folder names are only for finding things). The scripts are loaded in this order. Every file may use things defined by an earlier file at load time, and
 may call anything from any file once the game runs. New files go in the right place **before** `js/core/46-main.js`, which starts the
-game. This is the complete list for this version (245 scripts; the developer panel is the one you must skip).
+game. This is the complete list for this version (246 scripts; the developer panel is the one you must skip).
 
 | # | File | What it does |
 |---|---|---|
@@ -311,14 +311,15 @@ game. This is the complete list for this version (245 scripts; the developer pan
 | 235 | `js/sky/44zzzzm-sky-detail.js` | The Air Chase's detail layer: the sea's small things, boats and animals that steer around rocks, the machines' small parts, her head out of the side door. |
 | 236 | `js/sky/44zzzzo-sky-plus.js` | The Air Chase's look and feel: night, rain, the cloud bank, clouds above and below, the helicopter banking, the guns' recoil and glow, the rotor and alarm sounds. |
 | 237 | `js/ui/44zzzzn-addons-page.js` | The Add-ons page (from the main menu and the pause menu), the add-ons tag in the HUD and the line in the run report. |
-| 238 | `js/addons/50a-addon-challenge-data.js` | Add-on Challenge Workshop (off until the player switches it on), part 1: registration, recipes, share codes, the draft shelf and the best result on each recipe (its own browser storage, not the save). |
-| 239 | `js/addons/50b-addon-challenge-play.js` | Add-on Challenge Workshop, part 2: the challenge arena and its painter. |
-| 240 | `js/addons/50c-addon-challenge-ui.js` | Add-on Challenge Workshop, part 3: the workshop dialog, its styles, the menu button and the Guide topic. |
-| 241 | `js/addons/50d-addon-speedrun.js` | Add-on Speedrun Timer (off until the player switches it on): a split timer in the HUD and best times in the run report, kept in the browser, not the save. |
-| 242 | `js/core/49-local-addons.js` | Loads a player's own add-ons from an `addons/` folder, but only when the game runs on their own computer (localhost); on the website it does nothing. |
-| 243 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
-| 244 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
-| 245 | `js/core/46-main.js` | Starts the game. |
+| 238 | `js/ui/44zzzzp-menu-pass.js` | The tidied main menu: top strip (gold, gems, Guide, Add-ons, Settings), grouped buttons with pictures, chapter dots, the Latest chapter button, the chapter's world behind the menu. |
+| 239 | `js/addons/50a-addon-challenge-data.js` | Add-on Challenge Workshop (off until the player switches it on), part 1: registration, recipes, share codes, the draft shelf and the best result on each recipe (its own browser storage, not the save). |
+| 240 | `js/addons/50b-addon-challenge-play.js` | Add-on Challenge Workshop, part 2: the challenge arena and its painter. |
+| 241 | `js/addons/50c-addon-challenge-ui.js` | Add-on Challenge Workshop, part 3: the workshop dialog, its styles, the menu button and the Guide topic. |
+| 242 | `js/addons/50d-addon-speedrun.js` | Add-on Speedrun Timer (off until the player switches it on): a split timer in the HUD and best times in the run report, kept in the browser, not the save. |
+| 243 | `js/core/49-local-addons.js` | Loads a player's own add-ons from an `addons/` folder, but only when the game runs on their own computer (localhost); on the website it does nothing. |
+| 244 | `js/core/45-test-exports.js` | The window.GR object used by the automated tests. |
+| 245 | `js/dev/45b-dev-panel.js` | **DEVELOPER PANEL. DO NOT INCLUDE IN THE WEBSITE.** Developer panel (testing only, not shipped to the website): the five-click code prompt, the panel, every `debug-*` action, `unlockAllCombos`, and the **Dev Test Run** (a Chapter 1 sandbox with no enemies, XP on/off, invincibility, any card or combo at any level, any enemy in any amount, jump to any wave; opened with the DEV button or the \` key; nothing it does is saved). Optional: delete it and its script tag and the game runs the same. See `LOVABLE-DO-NOT-INCLUDE-DEV-PANEL.md`. |
+| 246 | `js/core/46-main.js` | Starts the game. |
 
 CSS, in the order `index.html` links it: `css/style.css` (all the base styles), `css/polish.css` (layered on top: cards, buttons, HUD, menu, and every screen
 added later: minigames, the album book, the guide, photo studio, collection, wide panels on big screens), `css/campus.css` (the university), `css/townlife.css` (Longneck Town panels),
