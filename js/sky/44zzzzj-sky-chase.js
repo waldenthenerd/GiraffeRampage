@@ -9,13 +9,23 @@
      she is at brightest; the save keeps the choice, Save.data.skyAim).
    HER GEAR COUNTS: the hull is 100 plus her extra health, hits are cut by her damage reduction, her regeneration patches the hull, and her damage, haste
      and crits (P.stats from recalcStats) set the guns.
-   TEN WAVES, numbered 436 to 445: lab drones (Rotor, Net, Mine, Laser and Carrier Drones) and hired Escort Gunships that fly in from the sides and break
+   TEN WAVES, numbered 436 to 445: lab drones (Rotor, Net, Mine, Laser, Carrier, Shield and Swarm Drones) and hired Escort Gunships that fly in from the sides and break
      off after a while if they are not shot down; wave 5 is the Grey Escort (two big gunships flanking her), wave 10 the White Bird itself. After waves
      2, 4, 6 and 8 she picks one of three upgrades for the helicopter. Shot down, she can try again from wave 1, or from wave 6 once the Grey Escort is down.
-   The art is in js/sky/44zzzzi-sky-art.js, the films in js/sky/44zzzzk-sky-films.js, and the menu card, Bestiary, Guide, rewards, achievements and the
+   HEAT AND THE BROADSIDE: the gun she is at heats as it fires and fires slower once it is hot, while the other two cool, so it pays to change guns
+     (U, or the mouse wheel, is "next gun"). The drones she downs fill the broadside: the Kick key (Space; the ALL button on a phone) then fires all
+     three guns at once for a few seconds.
+   MORE MACHINES: Shield Drones (a bubble that stops every shot but a door gun's), swarms of nine small drones in a line, and Missile Boats down on the
+     water. Wave 4 is flown through a rain squall and wave 8 through a cloud bank; wave 7 is flown low through the Needles (rows of sea stacks, then a
+     cargo ship's cranes: steering, not shooting). The White Bird (wave 10) keeps out of range behind two escorts first, then drops cargo pods, then
+     turns side on, then makes ramming runs, with a film moment (skyBeat) at each change. Night falls over waves 6 to 9 (skyNight).
+   The art is in js/sky/44zzzzi-sky-art.js, the weather, night, clouds and the feel of the guns in js/sky/44zzzzo-sky-plus.js, the films in js/sky/44zzzzk-sky-films.js, and the menu card, Bestiary, Guide, rewards, achievements and the
    minigame in js/sky/44zzzzl-sky-extras.js. The numbers in SKY_TUNE are the ones to change if it is too hard or too easy.
    ============================================================================================================================= */
-const SKY_TUNE = { hull: 100, gunDmg: 11, noseCd: 0.15, doorCd: 0.21, doorMul: 1.35, shotSpd: 940, move: 330, swap: 0.3, inv: 0.75, hpStep: 0.15, dmgStep: 0.06, gearDmgK: 0.6, gearDmgCap: 6, scroll: 240 };
+const SKY_TUNE = { hull: 100, gunDmg: 11, noseCd: 0.15, doorCd: 0.21, doorMul: 1.35, shotSpd: 940, move: 330, swap: 0.3, inv: 0.75, hpStep: 0.15, dmgStep: 0.06, gearDmgK: 0.6, gearDmgCap: 6, scroll: 240,
+  heatUp: 0.12, heatCool: 0.4, heatFrom: 0.6, heatSlow: 0.55, charge: 170, allT: 3.2, lowScroll: 1.7, hazDmg: 16, shieldR: 80 };
+/* heatUp, heatCool: how fast the gun she is at heats (a second of firing) and the others cool; from heatFrom up it fires slower, down to heatSlow of its rate when full.
+   charge: the gold's worth of drones that fills the broadside, allT: how long it lasts. lowScroll: how much faster the sea goes by down among the Needles. */
 /* the drones and gunships: hp, radius, speed, what a hit or a ram does, gold for each, and how long a hovering one stays */
 const SKY_E = {
   rotor:   { type: 'hyena',   hp: 18,  r: 22, spd: 125, ram: 13, gold: 10 },
@@ -24,24 +34,31 @@ const SKY_E = {
   laser:   { type: 'cheetah', hp: 40,  r: 26, spd: 140, beam: 24, gold: 18 },
   carrier: { type: 'vulture', hp: 100, r: 40, spd: 48,  ram: 18, gold: 30 },
   gunship: { type: 'rhino',   hp: 150, r: 50, spd: 170, shot: 8,  gold: 45, stay: 15 },
+  shield:  { type: 'warthog', hp: 70,  r: 28, spd: 100, gold: 22, stay: 24 },             /* its bubble stops every shot but the door guns' */
+  gnat:    { type: 'termite', hp: 7,   r: 11, spd: 150, ram: 6,  gold: 2 },                /* one of a swarm of nine */
+  boat:    { type: 'crocodile', hp: 120, r: 40, spd: 0, gold: 34, sea: true },             /* down on the water, launching missiles up at her */
+  missile: { look: 'sk_missile', color: '#D8DCE0', dark: '#5A6268', hp: 10, r: 9, spd: 235, ram: 12, gold: 3 },
+  pod:     { look: 'sk_pod', color: '#E8ECEE', dark: '#AEB8BE', hp: 34, r: 20, spd: 120, gold: 6 },      /* dropped by the White Bird: bursts into drones unless it is shot first */
   grey:    { type: 'lion',    hp: 950, r: 64, spd: 150, shot: 9,  gold: 300, boss: true },
   white:   { type: 'wildfire', hp: 3400, r: 88, spd: 120, shot: 9, gold: 900, boss: true }
 };
-/* what each wave sends: [kind, how many]; the queue mixes them and spaces them out */
+/* what each wave sends: [kind, how many]; the queue mixes them and spaces them out. 'swarm' is nine Swarm Drones in a line. Wave 7 is flown down low
+   through the Needles (skyNeedles: rows of sea stacks, then a cargo ship's cranes), wave 4 through a rain squall and wave 8 through a cloud bank (SKY_WX). */
 const SKY_WAVES_DEF = [
   [['rotor', 10]],
   [['rotor', 12], ['net', 3]],
-  [['rotor', 10], ['mine', 6], ['net', 3]],
+  [['rotor', 10], ['mine', 6], ['net', 3], ['swarm', 1]],
   [['rotor', 10], ['laser', 3], ['net', 3], ['gunship', 1]],
   [['grey', 2], ['rotor', 8]],
-  [['rotor', 14], ['carrier', 2], ['mine', 6]],
-  [['rotor', 12], ['laser', 4], ['gunship', 2], ['net', 4]],
-  [['carrier', 3], ['mine', 8], ['rotor', 12], ['gunship', 2]],
-  [['laser', 5], ['gunship', 3], ['carrier', 2], ['rotor', 14], ['net', 4]],
+  [['rotor', 12], ['carrier', 2], ['mine', 6], ['boat', 2], ['shield', 1]],
+  [['rotor', 6], ['swarm', 1]],
+  [['carrier', 2], ['mine', 6], ['rotor', 10], ['gunship', 2], ['shield', 2], ['laser', 3]],
+  [['laser', 5], ['gunship', 3], ['carrier', 2], ['rotor', 12], ['net', 4], ['boat', 2], ['swarm', 2], ['shield', 1]],
   [['white', 1]]
 ];
-const SKY_FLAVOUR = ['Low over the water', 'The drones come out of its cargo door', 'Mines on the wind', 'Someone hired help', 'The Grey Escort closes in',
-  'Out past the shipping lanes', 'Lasers in the sunset', 'The carriers are full', 'Everything they have left', 'The White Bird turns to fight'];
+const SKY_NEEDLES = 7, SKY_WX = { 4: 'rain', 8: 'cloud' };
+const SKY_FLAVOUR = ['Low over the water', 'The drones come out of its cargo door', 'Mines on the wind', 'Into a squall, and someone hired help', 'The Grey Escort closes in',
+  'Out past the shipping lanes', 'Down low, through the Needles', 'A cloud bank, full of rotors', 'Night, and everything they have left', 'The White Bird turns to fight'];
 /* the helicopter's upgrades, one picked from three after waves 2, 4, 6 and 8 */
 const SKY_PERKS = [
   { id: 'rapid', name: 'Oiled Breeches', desc: 'Every gun fires 20% faster.' },
@@ -49,10 +66,18 @@ const SKY_PERKS = [
   { id: 'plate', name: 'Armor Plate', desc: '25 more hull, and the new plate is put on now.' },
   { id: 'pierce', name: 'Steel Cores', desc: 'Shots go through one more drone.', max: 2 },
   { id: 'swift', name: 'Quick Feet', desc: 'She moves between the guns in half the time, and the helicopter steers 12% faster.', max: 1 },
-  { id: 'patch', name: 'Field Patch', desc: 'Mend half of the hull right now.' }
+  { id: 'patch', name: 'Field Patch', desc: 'Mend half of the hull right now.' },
+  { id: 'seeker', name: 'Seeker Rounds', desc: 'Shots from the door guns bend toward the nearest drone.', max: 1 },
+  { id: 'ward', name: 'Deflector Plate', desc: 'The first hit in every wave bounces off.', max: 1 },
+  { id: 'salvage', name: 'Salvage Hook', desc: 'Everything she shoots down pays half again as much gold.', max: 1 },
+  { id: 'fan', name: 'Fan Muzzle', desc: 'The nose gun fires two more shots, angled out to the sides.', max: 1 },
+  { id: 'tail', name: 'Tail Gunner', desc: 'A second gunner at the tail fires at the nearest drone twice a second.', max: 1 },
+  { id: 'jacket', name: 'Water Jackets', desc: 'The guns heat up half as fast.', max: 1 },
+  { id: 'drum', name: 'Belt Feed', desc: 'The broadside charges half again as fast and lasts a second longer.', max: 1 }
 ];
 const Sky = { on: false, mode: 'chapter', t: 0, wave: 1, ws: 'intro', wt: 0, q: [], en: [], shots: [], eb: [], fx: [], objs: [], x: 0, y: 0, hull: 100, max: 100, inv: 0, gun: 'nose', from: 'nose', sw: 0, fireT: 0,
-  perks: {}, kills: 0, gold: 0, ckpt: 1, hold: '', down: 0, scroll: 0, slowT: 0, keysWas: {}, escSeen: 0, escDown: 0, bossHit: false, btn: null, ptrBtn: false, banner: 0, shake: 0 };
+  perks: {}, kills: 0, gold: 0, ckpt: 1, hold: '', down: 0, scroll: 0, slowT: 0, keysWas: {}, escSeen: 0, escDown: 0, bossHit: false, btn: null, ptrBtn: false, banner: 0, shake: 0,
+  heat: { left: 0, nose: 0, right: 0 }, charge: 0, all: 0, stop: 0, beat: null, haz: [], kick: 0, wardUp: false, tailT: 0, low: false, lowK: 0, wx: '' };
 const SKY_GUNS = ['left', 'nose', 'right'];
 
 function skyS(){ return clamp(Math.min(G.W, G.H) / 720, 0.55, 1.5); }
@@ -63,6 +88,9 @@ function skyGunDmg(){
   return SKY_TUNE.gunDmg * clamp(1 + (m - 1) * SKY_TUNE.gearDmgK, 1, SKY_TUNE.gearDmgCap);
 }
 function skyHasteMul(){ const st = Sky.st || {}; return clamp(st.hasteMul || 1, 1, 3) * Math.pow(1.2, Sky.perks.rapid | 0); }
+function skyHeatMul(g){ const h = Sky.heat[g] || 0, T = SKY_TUNE; return h <= T.heatFrom ? 1 : 1 - (1 - T.heatSlow) * (h - T.heatFrom) / (1 - T.heatFrom); }      /* a hot gun fires slower */
+function skyScroll(){ return SKY_TUNE.scroll * (1 + (SKY_TUNE.lowScroll - 1) * (Sky.lowK || 0)); }                                                    /* how fast the sea goes by: faster down low */
+function skyNight(){ return clamp((Sky.wave - 5) / 4, 0, 1); }                                                                                       /* 0 at sundown (waves 1 to 5), 1 at night (waves 9 and 10) */
 
 /* ---- starting, and the screen's own state ---- */
 function skyStart(fromWave, mode){
@@ -71,6 +99,7 @@ function skyStart(fromWave, mode){
   Sky.kills = 0; Sky.gold = 0; Sky.ckpt = fromWave >= 6 ? 6 : 1; Sky.hold = ''; Sky.down = 0; Sky.slowT = 0; Sky.escSeen = 0; Sky.escDown = 0; Sky.bossHit = false; Sky.shake = 0;
   Sky.en = []; Sky.shots = []; Sky.eb = []; Sky.fx = []; Sky.objs = []; Sky.scroll = 0; Sky.keysWas = {};
   Sky.x = G.W / 2; Sky.y = G.H * 0.76;
+  Sky.heat = { left: 0, nose: 0, right: 0 }; Sky.charge = 0; Sky.all = 0; Sky.stop = 0; Sky.beat = null; Sky.haz = []; Sky.kick = 0; Sky.wardUp = false; Sky.tailT = 0; Sky.low = false; Sky.lowK = 0; Sky.wx = ''; Sky.shotN = 0;
   if (fromWave >= 6){ Sky.perks.rapid = 1; Sky.perks.twin = 1; }                             /* starting again after the Grey Escort: the two upgrades she would have had */
   for (let i = 0; i < 6; i++) skySeaObj(Math.random() * G.H);
   G.state = 'sky'; G.attract = false; G.subScreen = ''; G.chapter = SKY_CHAPTER;
@@ -81,26 +110,53 @@ function skyStart(fromWave, mode){
 }
 function skyWave(cw){
   Sky.wave = cw; Sky.ws = 'intro'; Sky.wt = 1.8; Sky.banner = 0; Sky.q = []; Sky.qt = 0;
-  const def = SKY_WAVES_DEF[cw - 1] || [], list = [];
+  Sky.wx = SKY_WX[cw] || ''; Sky.low = cw === SKY_NEEDLES; Sky.haz = []; Sky.wardUp = !!Sky.perks.ward;
+  const def = SKY_WAVES_DEF[cw - 1] || [], list = [], isBoss = function(k){ return !!(SKY_E[k] && SKY_E[k].boss); };
   def.forEach(function(g){ for (let i = 0; i < g[1]; i++) list.push(g[0]); });
-  const bosses = list.filter(function(k){ return SKY_E[k].boss; }), rest = list.filter(function(k){ return !SKY_E[k].boss; });
+  const bosses = list.filter(isBoss), rest = list.filter(function(k){ return !isBoss(k); });
   for (let i = rest.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)), tmp = rest[i]; rest[i] = rest[j]; rest[j] = tmp; }
   let t = 0.4; const gap = Math.max(0.42, 1.05 - cw * 0.06);
   bosses.forEach(function(k, i){ Sky.q.push({ k: k, t: 0.6 + i * 0.05, side: i ? 1 : -1 }); });
-  rest.forEach(function(k){ Sky.q.push({ k: k, t: bosses.length ? 4 + t * 1.6 : t }); t += gap * (k === 'gunship' || k === 'carrier' ? 2.2 : 1) * (0.6 + Math.random() * 0.8); });
+  rest.forEach(function(k){ Sky.q.push({ k: k, t: bosses.length ? 4 + t * 1.6 : t }); t += gap * (k === 'gunship' || k === 'carrier' || k === 'boat' || k === 'swarm' ? 2.2 : 1) * (0.6 + Math.random() * 0.8); });
+  if (Sky.low) skyNeedles();
   Sky.q.sort(function(a, b){ return a.t - b.t; });
   if (cw === 10) Sky.bossHit = false;
 }
+/* wave 7, down low through the Needles: fourteen rows of sea stacks across five lanes with a way through each (the way moves one lane at a time, so it
+   can always be followed), the last three rows the cranes of a cargo ship. The few drones of the wave are spread along it. */
+function skyNeedles(){
+  Sky.q.forEach(function(it, i){ it.t = 2 + i * 2.5; });
+  let lane = 2, t = 2.2;
+  for (let row = 0; row < 14; row++){
+    if (row && Math.random() < 0.75) lane = clamp(lane + (Math.random() < 0.5 ? -1 : 1), 0, 4);
+    const also = Math.random() < 0.35 ? Math.floor(Math.random() * 5) : -1;
+    for (let l = 0; l < 5; l++) if (l !== lane && l !== also) Sky.q.push({ k: row >= 11 ? 'crane' : 'stack', t: t, lane: l, row: row, open: lane });
+    t += 1.3;
+  }
+}
+function skyHazard(it){
+  const s = skyS(), W = G.W, r = clamp(W * 0.07, 26 * s, 74 * s);
+  Sky.haz.push({ k: it.k, x: W * (0.1 + 0.2 * it.lane) + (it.k === 'crane' ? 0 : (Math.random() - 0.5) * W * 0.03), y: -r * 1.6, r: r, seed: Math.random() * 99, row: it.row, lane: it.lane, open: it.open });
+}
+/* nine Swarm Drones, one behind another, weaving down the screen as a line */
+function skySwarm(){
+  const s = skyS(), x = G.W * (0.2 + Math.random() * 0.6), ph = Math.random() * 6;
+  for (let i = 0; i < 9; i++){ const e = skyEnemy('gnat'); e.hx = x; e.x = x; e.y = (-40 - i * 30) * s; e.ph = ph; e.t = -i * 0.2; }
+}
+/* a moment out of a film: the fight slows right down for a breath, bars close in top and bottom, and a line says what has changed */
+function skyBeat(txt, sub){ Sky.beat = { t: 0, life: 1.7, txt: txt, sub: sub || '' }; Sky.eb.length = 0; try { SFX.boss(); } catch (e) {} }
 function skyEnemy(k, o){
   const D = SKY_E[k], s = skyS(), cw = Sky.wave, hpK = 1 + SKY_TUNE.hpStep * (cw - 1);
-  const e = { k: k, type: D.type, def: ETYPES_SKY[D.type], hp: D.hp * (D.boss ? 1 : hpK), r: D.r * s, x: 0, y: -60 * s, vx: 0, vy: 0, ang: Math.PI / 2, t: 0, anim: Math.random() * 6, flash: 0, ph: Math.random() * 6, cd: 1 + Math.random(), boss: !!D.boss, phase: 1 };
+  const e = { k: k, type: D.type, def: ETYPES_SKY[D.type] || D, hp: D.hp * (D.boss ? 1 : hpK), r: D.r * s, x: 0, y: -60 * s, vx: 0, vy: 0, ang: Math.PI / 2, t: 0, anim: Math.random() * 6, flash: 0, ph: Math.random() * 6, cd: 1 + Math.random(), boss: !!D.boss, phase: 1 };
   e.maxHp = e.hp;
   if (k === 'gunship' || k === 'grey'){
     const side = o && o.side ? o.side : (Math.random() < 0.5 ? -1 : 1);
     e.side = side; e.x = side < 0 ? -90 * s : G.W + 90 * s; e.y = G.H * (k === 'grey' ? 0.45 : 0.3 + Math.random() * 0.4); e.ang = side < 0 ? 0 : Math.PI; e.ty = e.y;
     if (k === 'gunship') Sky.escSeen++;
   } else if (k === 'white'){ e.x = G.W / 2; e.y = -140 * s; e.ty = G.H * 0.18; }
+  else if (k === 'boat'){ e.x = G.W * (0.12 + Math.random() * 0.76); e.y = -70 * s; e.sea = true; e.cd = 1.4; }
   else { e.x = G.W * (0.08 + Math.random() * 0.84); e.y = -50 * s; e.hx = e.x; e.ty = G.H * (0.14 + Math.random() * 0.26); }
+  if (k === 'shield') e.ty = G.H * (0.38 + Math.random() * 0.18);                             /* low enough for a door gun to reach */
   if (k === 'mine') e.vy = D.spd * s;
   Sky.en.push(e); return e;
 }
@@ -114,9 +170,17 @@ function skySeaObj(y){
 function skyKey(a){ const k = Input.keys; return !!k[keyOf(a)]; }
 function skyPressed(a){ const now = skyKey(a), was = !!Sky.keysWas[a]; Sky.keysWas[a] = now; return now && !was; }
 function skyGoGun(g){
-  if (Sky.gun === g && Sky.sw <= 0) return;
+  if (SKY_GUNS.indexOf(g) < 0 || (Sky.gun === g && Sky.sw <= 0)) return;
   Sky.from = Sky.sw > 0 ? Sky.from : Sky.gun; Sky.gun = g; Sky.sw = SKY_TUNE.swap * (Sky.perks.swift ? 0.5 : 1); Sky.swMax = Sky.sw;
   try { SFX.tone('triangle', 520, 700, 0.06, 0.05, 0, 0); } catch (e) {}
+}
+/* the broadside: when the drones she has downed have filled it, all three guns fire at once for a few seconds, and none of them heats */
+function skyBroadside(){
+  if (Sky.charge < 1 || Sky.all > 0 || Sky.down > 0 || Sky.hold) return false;
+  Sky.charge = 0; Sky.all = SKY_TUNE.allT + (Sky.perks.drum ? 1 : 0); Sky.fireT = 0;
+  Sky.fx.push({ txt: 'BROADSIDE!', x: Sky.x, y: Sky.y - 80 * skyS(), t: 0, life: 1.4, big: true });
+  try { SFX.tone('sawtooth', 220, 440, 0.25, 0.12, 0, 0); SFX.tone('square', 440, 880, 0.2, 0.08, 0.08, 0); } catch (e) {}
+  return true;
 }
 function skyToggleAim(){ if (!Save.data) return; Save.data.skyAim = !Save.data.skyAim; Save.write(); try { SFX.click(); } catch (e) {} }
 function skyAimOn(){ return !Save.data || Save.data.skyAim !== false; }
@@ -129,6 +193,10 @@ function skyMuzzle(g){
 }
 function skyHurt(n, x, y){
   if (Sky.inv > 0 || Sky.down > 0 || Sky.hold) return;
+  if (Sky.wardUp){                                                                           /* the Deflector Plate: the first hit of the wave bounces off */
+    Sky.wardUp = false; Sky.inv = SKY_TUNE.inv; Sky.fx.push({ ring: true, x: Sky.x, y: Sky.y, R: 70 * skyS(), t: 0, life: 0.5, col: '158,232,255', thin: true }, { txt: 'Deflected!', x: Sky.x, y: Sky.y - 60 * skyS(), t: 0, life: 1.2 });
+    try { SFX.tone('triangle', 1200, 700, 0.12, 0.08, 0, 0); } catch (e) {} return;
+  }
   const st = Sky.st || {}, cw = Sky.wave, amt = n * (1 + SKY_TUNE.dmgStep * (cw - 1)) * (1 - clamp(st.dr || 0, 0, 0.6));
   Sky.hull = Math.max(0, Sky.hull - amt); Sky.inv = SKY_TUNE.inv * (st.invulnMul || 1); Sky.shake = Math.min(1, Sky.shake + 0.5);
   if (Sky.wave === 10) Sky.bossHit = true;
@@ -144,12 +212,14 @@ function skyBoom(x, y, R, col){ Sky.fx.push({ ring: true, x: x, y: y, R: R, t: 0
 function skySplash(x, y){ Sky.fx.push({ ring: true, x: x, y: y, R: 34 * skyS(), t: 0, life: 0.9, col: '235,250,255', thin: true }); skyBurst(x, y, 10, 'rgba(235,250,255,.9)', 120, { life: 0.6 }); }
 function skyKill(e, by){
   if (e.dead) return; e.dead = true;
-  Sky.kills++; Sky.gold += SKY_E[e.k].gold;
-  if (Sky.mode === 'chapter') skyBestiary(e.type, e);
+  Sky.kills++; Sky.gold += SKY_E[e.k].gold * (Sky.perks.salvage ? 1.5 : 1);
+  if (!(Sky.all > 0)) Sky.charge = Math.min(1, Sky.charge + SKY_E[e.k].gold / SKY_TUNE.charge * (Sky.perks.drum ? 1.5 : 1));
+  if (e.k === 'carrier' || e.k === 'gunship' || e.k === 'grey' || e.k === 'boat'){ Sky.stop = 0.07; Sky.shake = Math.min(1, Sky.shake + 0.35); }      /* a big one: the fight holds its breath for a blink */
+  if (Sky.mode === 'chapter' && e.type) skyBestiary(e.type, e);
   if (e.k === 'gunship') Sky.escDown++;
   if (e.k === 'mine'){ skyMineBlast(e); return; }
   if (e.k === 'carrier') for (let i = 0; i < 3; i++){ const c = skyEnemy('rotor'); c.x = e.x + (i - 1) * 26 * skyS(); c.y = e.y; c.hx = c.x; }
-  if (e.k === 'white'){ e.dead = false; e.ditch = 3.2; e.hp = 0; return; }       /* the White Bird does not blow up: it goes down into the sea */
+  if (e.k === 'white'){ e.dead = false; e.ditch = 3.2; e.hp = 0; e.ram = null; Sky.stop = 0.22; Sky.shake = 1; return; }       /* the White Bird does not blow up: it goes down into the sea */
   skyBoom(e.x, e.y, e.r * 1.6); e.fall = 0.7;
   try { SFX.tone('sawtooth', 240, 60, 0.3, 0.1, 0, 0); } catch (err) {}
 }
@@ -165,14 +235,45 @@ function skyBestiary(type, e){
   b.creatures[key] = (b.creatures[key] | 0) + 1;
   if (first){ Sky.fx.push({ txt: 'New in Bestiary: ' + bestiaryName(SKY_CHAPTER, type).title, x: e.x, y: e.y - 30, t: 0, life: 2.2 }); Save.write(); }
 }
-function skyFire(){
-  const g = Sky.gun, mz = skyMuzzle(g), s = skyS(), n = 1 + Math.min(2, Sky.perks.twin | 0), door = g !== 'nose', st = Sky.st || {};
-  for (let i = 0; i < n; i++){
-    const off = (i - (n - 1) / 2) * 9 * s, crit = Math.random() < (st.crit || 0.05);
-    Sky.shots.push({ x: mz.x + (door ? 0 : off), y: mz.y + (door ? off : 0), vx: mz.dx * SKY_TUNE.shotSpd * s, vy: mz.dy * SKY_TUNE.shotSpd * s, dmg: skyGunDmg() * (door ? SKY_TUNE.doorMul : 1) * (crit ? (st.critMul || 2) : 1), crit: crit, pierce: Sky.perks.pierce | 0, hit: [] });
-  }
-  Sky.fx.push({ flash: true, x: mz.x, y: mz.y, dx: mz.dx, dy: mz.dy, t: 0, life: 0.06 });
-  try { SFX.tone('square', door ? 300 : 380, 200, 0.04, 0.035, 0, 0); } catch (e) {}
+function skyFire(gOpt){
+  const g = gOpt || Sky.gun, mz = skyMuzzle(g), s = skyS(), n = 1 + Math.min(2, Sky.perks.twin | 0), door = g !== 'nose', st = Sky.st || {};
+  const shot = function(x, y, dx, dy, k){
+    const crit = Math.random() < (st.crit || 0.05);
+    Sky.shots.push({ x: x, y: y, vx: dx * SKY_TUNE.shotSpd * s, vy: dy * SKY_TUNE.shotSpd * s, dmg: skyGunDmg() * (door ? SKY_TUNE.doorMul : 1) * (k || 1) * (crit ? (st.critMul || 2) : 1), crit: crit, pierce: Sky.perks.pierce | 0, hit: [], door: door });
+  };
+  for (let i = 0; i < n; i++){ const off = (i - (n - 1) / 2) * 9 * s; shot(mz.x + (door ? 0 : off), mz.y + (door ? off : 0), mz.dx, mz.dy); }
+  if (!door && Sky.perks.fan) for (const a of [-0.22, 0.22]) shot(mz.x, mz.y, Math.sin(a), -Math.cos(a), 0.7);       /* the Fan Muzzle */
+  Sky.fx.push({ flash: true, x: mz.x, y: mz.y, dx: mz.dx, dy: mz.dy, t: 0, life: 0.06, door: door });
+  if (g === Sky.gun) Sky.kick = 1;
+  skyGunSound(g);
+}
+/* each gun has its own voice: the nose gun a sharp crack, the door guns a heavier thump; now and then a spent case rings on the floor */
+function skyGunSound(g){
+  try {
+    if (g === 'nose') SFX.tone('square', 380, 200, 0.04, 0.035, 0, 0);
+    else { SFX.tone('sawtooth', 210, 90, 0.07, 0.045, 0, 0); SFX.burst(0.05, 0.03, 900, 200, 0.7, 0, 'lowpass'); }
+    Sky.shotN = (Sky.shotN | 0) + 1; if (Sky.shotN % 6 === 0) SFX.tone('triangle', 2600, 2100, 0.03, 0.018, 0.2, 0);
+  } catch (e) {}
+}
+function skyNearest(x, y, R){
+  let best = null, bd = R;
+  Sky.en.forEach(function(e){ if (e.dead || e.fall > 0 || e.ditch > 0 || e.far) return; const d = Math.hypot(e.x - x, e.y - y) - e.r; if (d < bd){ bd = d; best = e; } });
+  return best;
+}
+function skyTailShot(){                                                                       /* the Tail Gunner: one shot at the nearest drone */
+  const s = skyS(), x = Sky.x, y = Sky.y + 46 * s, e = skyNearest(x, y, 520 * s); if (!e) return;
+  const a = Math.atan2(e.y - y, e.x - x);
+  Sky.shots.push({ x: x, y: y, vx: Math.cos(a) * SKY_TUNE.shotSpd * s, vy: Math.sin(a) * SKY_TUNE.shotSpd * s, dmg: skyGunDmg() * 0.9, crit: false, pierce: 0, hit: [], tail: true });
+  try { SFX.tone('square', 520, 300, 0.03, 0.02, 0, 0); } catch (err) {}
+}
+/* a shot that meets a sea stack or a crane stops there; so does any shot but a door gun's that meets a Shield Drone's bubble */
+function skyShotBlocked(b){
+  const s = skyS();
+  for (let i = 0; i < Sky.haz.length; i++){ const h = Sky.haz[i]; if (Math.hypot(b.x - h.x, b.y - h.y) < h.r * 0.85){ skyBurst(b.x, b.y, 2, '#D8D0C0', 80, { life: 0.2 }); return true; } }
+  if (b.door) return false;
+  for (let i = 0; i < Sky.en.length; i++){ const e = Sky.en[i];
+    if (e.k === 'shield' && e.up && !e.dead && !(e.fall > 0) && Math.hypot(b.x - e.x, b.y - e.y) < SKY_TUNE.shieldR * s){ e.hitT = 0.18; skyBurst(b.x, b.y, 2, '#9EE8FF', 90, { life: 0.2 }); return true; } }
+  return false;
 }
 function skyEShot(x, y, ang, spd, dmg, o){ const s = skyS(); Sky.eb.push({ x: x, y: y, vx: Math.cos(ang) * spd * s, vy: Math.sin(ang) * spd * s, dmg: dmg, r: ((o && o.r) || 5) * s, net: !!(o && o.net), t: 0 }); }
 function skyAimAt(e){ return Math.atan2(Sky.y - e.y, Sky.x - e.x); }
@@ -180,12 +281,15 @@ function skyAimAt(e){ return Math.atan2(Sky.y - e.y, Sky.x - e.x); }
 function skyStep(dt){
   dt = Math.min(dt, 0.05);                                                                  /* (the loop's own catch-all moves G.time and the timers for this state) */
   if (Sky.hold) return;
+  if (Sky.stop > 0){ Sky.stop -= dt; return; }                                              /* a big machine just went: everything stands still for a blink */
+  if (Sky.beat){ Sky.beat.t += dt; if (Sky.beat.t >= Sky.beat.life) Sky.beat = null; else dt *= 0.3; }
   Sky.t += dt; const s = skyS(), W = G.W, H = G.H;
   if (Sky.shake > 0) Sky.shake = Math.max(0, Sky.shake - dt * 2);
-  Sky.scroll += SKY_TUNE.scroll * s * dt;
+  Sky.lowK = clamp(Sky.lowK + (Sky.low && Sky.ws !== 'clear' ? 1 : -1) * dt * 0.8, 0, 1);
+  Sky.scroll += skyScroll() * s * dt;
   /* the sea below */
-  for (let i = Sky.objs.length - 1; i >= 0; i--){ const o = Sky.objs[i]; o.y += SKY_TUNE.scroll * s * dt * o.v; if (o.y > H + 200) Sky.objs.splice(i, 1); }
-  if (Sky.objs.length < 7 && Math.random() < dt * 0.8) skySeaObj();
+  for (let i = Sky.objs.length - 1; i >= 0; i--){ const o = Sky.objs[i]; o.y += skyScroll() * s * dt * o.v; if (o.y > H + 200) Sky.objs.splice(i, 1); }
+  if (Sky.objs.length < 7 && !Sky.low && Math.random() < dt * 0.8) skySeaObj();
   /* the helicopter going down */
   if (Sky.down > 0){
     Sky.down -= dt; Sky.y += 60 * s * dt; if (Math.random() < 0.6) skyBurst(Sky.x, Sky.y, 1, 'rgba(40,36,34,.7)', 40, { smoke: true, life: 1.2, r: 8 });
@@ -206,16 +310,43 @@ function skyStep(dt){
   const reg = Math.min(2, (Sky.st && Sky.st.regen) || 0); if (reg > 0) Sky.hull = Math.min(Sky.max, Sky.hull + reg * dt);
   /* the guns */
   if (skyPressed('skyLeft')) skyGoGun('left'); if (skyPressed('skyNose')) skyGoGun('nose'); if (skyPressed('skyRight')) skyGoGun('right'); if (skyPressed('skyAim')) skyToggleAim();
+  if (skyPressed('skyNext')) skyGoGun(SKY_GUNS[(SKY_GUNS.indexOf(Sky.gun) + 1) % 3]);
+  if (skyPressed('kick')) skyBroadside();
   if (Sky.sw > 0) Sky.sw -= dt;
-  else { Sky.fireT -= dt; if (Sky.fireT <= 0 && Sky.ws !== 'clear'){ skyFire(); Sky.fireT = (Sky.gun === 'nose' ? SKY_TUNE.noseCd : SKY_TUNE.doorCd) / skyHasteMul(); } }
+  const firing = Sky.sw <= 0 && Sky.ws !== 'clear';
+  SKY_GUNS.forEach(function(g){                                                             /* the gun she is at heats; the other two cool */
+    const was = Sky.heat[g], on = firing && g === Sky.gun && !(Sky.all > 0);
+    Sky.heat[g] = clamp(was + (on ? SKY_TUNE.heatUp * (Sky.perks.jacket ? 0.5 : 1) : -SKY_TUNE.heatCool) * dt, 0, 1);
+    if (was < SKY_TUNE.heatFrom && Sky.heat[g] >= SKY_TUNE.heatFrom){ Sky.fx.push({ txt: 'Running hot: change guns', x: Sky.x, y: Sky.y - 70 * s, t: 0, life: 1.3 }); try { SFX.burst(0.25, 0.06, 5000, 2500, 1.2, 0, 'bandpass'); } catch (e) {} }
+  });
+  if (Sky.kick > 0) Sky.kick = Math.max(0, Sky.kick - dt * 9);
+  if (Sky.all > 0) Sky.all -= dt;
+  if (Sky.all > 0 || Sky.sw <= 0){
+    Sky.fireT -= dt;
+    if (Sky.fireT <= 0 && Sky.ws !== 'clear'){
+      if (Sky.all > 0){ SKY_GUNS.forEach(function(g){ skyFire(g); }); Sky.fireT = SKY_TUNE.noseCd / skyHasteMul(); }
+      else { skyFire(); Sky.fireT = (Sky.gun === 'nose' ? SKY_TUNE.noseCd : SKY_TUNE.doorCd) / skyHasteMul() / skyHeatMul(Sky.gun); }
+    }
+  }
+  if (Sky.perks.tail){ Sky.tailT -= dt; if (Sky.tailT <= 0 && Sky.ws === 'fight'){ Sky.tailT = 0.5; skyTailShot(); } }
   /* the wave */
   if (Sky.ws === 'intro'){ Sky.wt -= dt; Sky.banner += dt; if (Sky.wt <= 0){ Sky.ws = 'fight'; Sky.qt = 0; } }
   else if (Sky.ws === 'fight'){
     Sky.qt += dt; Sky.banner += dt;
-    while (Sky.q.length && Sky.q[0].t <= Sky.qt){ const it = Sky.q.shift(); skyEnemy(it.k, it); }
-    if (!Sky.q.length && !Sky.en.some(function(e){ return !e.dead || e.fall > 0 || e.ditch > 0; })){ Sky.ws = 'clear'; Sky.wt = 1.4; try { SFX.level(); } catch (e) {} }
+    while (Sky.q.length && Sky.q[0].t <= Sky.qt){ const it = Sky.q.shift(); if (it.k === 'stack' || it.k === 'crane') skyHazard(it); else if (it.k === 'swarm') skySwarm(); else skyEnemy(it.k, it); }
+    if (!Sky.q.length && !Sky.haz.length && !Sky.en.some(function(e){ return !e.dead || e.fall > 0 || e.ditch > 0; })){ Sky.ws = 'clear'; Sky.wt = 1.4; try { SFX.level(); } catch (e) {} }
   } else if (Sky.ws === 'clear'){ Sky.wt -= dt; if (Sky.wt <= 0) skyWaveDone(); }
-  skyUpdateEnemies(dt); skyUpdateShots(dt); skyUpdateFx(dt);
+  skyUpdateHaz(dt); skyUpdateEnemies(dt); skyUpdateShots(dt); skyUpdateFx(dt);
+}
+/* the sea stacks and cranes: they come down the screen with the water; flying into one costs hull and shoves her off it */
+function skyUpdateHaz(dt){
+  const s = skyS(), v = skyScroll() * s;
+  for (let i = Sky.haz.length - 1; i >= 0; i--){
+    const h = Sky.haz[i]; h.y += v * dt;
+    if (h.y > G.H + h.r * 2){ Sky.haz.splice(i, 1); continue; }
+    const dx = Sky.x - h.x, dy = Sky.y - h.y, d = Math.hypot(dx, dy) || 1, R = h.r * 0.85 + 22 * s;
+    if (d < R && !(Sky.down > 0)){ skyHurt(SKY_TUNE.hazDmg, Sky.x - dx * 0.5, Sky.y - dy * 0.5); Sky.x += dx / d * (R - d); Sky.y += dy / d * (R - d); }
+  }
 }
 function skyUpdateEnemies(dt){
   const s = skyS(), W = G.W, H = G.H;
@@ -246,6 +377,40 @@ function skyUpdateEnemies(dt){
         break;
       }
       case 'carrier': { e.y += D.spd * s * dt; e.x += Math.sin(e.t * 0.6 + e.ph) * 20 * s * dt; e.ang = Math.PI / 2; break; }
+      case 'gnat': {                                                                         /* one of the swarm: the line snakes down the screen */
+        e.hx += clamp(Sky.x - e.hx, -1, 1) * 30 * s * dt; e.x = e.hx + Math.sin(e.t * 2.2 + e.ph) * 110 * s; e.y += D.spd * s * dt;
+        e.ang = Math.atan2(D.spd, Math.cos(e.t * 2.2 + e.ph) * 240); break;
+      }
+      case 'shield': {                                                                       /* down to its height and hold there, its bubble up; it leaves after a while */
+        if (e.y < e.ty) e.y += D.spd * s * dt; else e.x += Math.sin(e.t * 0.7 + e.ph) * 40 * s * dt;
+        e.x = clamp(e.x, 40 * s, W - 40 * s); e.ang = Math.PI / 2; e.up = e.y >= e.ty && e.ty > 0; if (e.hitT > 0) e.hitT -= dt;
+        if (e.t > D.stay){ e.ty = -200; e.up = false; e.y -= D.spd * 1.6 * s * dt; if (e.y < -80 * s) e.dead = true; }
+        break;
+      }
+      case 'boat': {                                                                         /* on the water, making its own way against the sea going by; a missile every few seconds */
+        e.y += skyScroll() * 0.5 * s * dt; e.ang = -Math.PI / 2; e.cd -= dt;
+        if (e.cd <= 0 && e.y > 20 * s && e.y < H * 0.8){
+          e.cd = 3.6 - Sky.wave * 0.1; const m = skyEnemy('missile'); m.x = e.x; m.y = e.y - e.r * 0.4; m.ang = -Math.PI / 2; m.life = 4.6;
+          skyBurst(m.x, m.y, 6, 'rgba(240,240,236,.8)', 70, { smoke: true, life: 0.7, r: 5 }); try { SFX.whoosh(); } catch (err) {}
+        }
+        break;
+      }
+      case 'missile': {                                                                      /* turns after her, but not sharply; it burns out after a few seconds */
+        let da = skyAimAt(e) - e.ang; while (da > Math.PI) da -= TAU; while (da < -Math.PI) da += TAU;
+        e.ang += clamp(da, -2.4 * dt, 2.4 * dt); e.x += Math.cos(e.ang) * D.spd * s * dt; e.y += Math.sin(e.ang) * D.spd * s * dt; e.life -= dt;
+        if (Math.random() < dt * 30) skyBurst(e.x - Math.cos(e.ang) * e.r, e.y - Math.sin(e.ang) * e.r, 1, 'rgba(236,236,232,.6)', 14, { smoke: true, life: 0.5, r: 3 });
+        if (e.life <= 0){ e.dead = true; skyBurst(e.x, e.y, 5, 'rgba(120,120,124,.7)', 60, { smoke: true, life: 0.6, r: 4 }); }
+        break;
+      }
+      case 'pod': {                                                                          /* a cargo pod falling from the White Bird: at its height it bursts into two drones, or a mine */
+        e.y += D.spd * s * dt; e.ang += dt * 1.5;
+        if (e.y >= e.ty){
+          e.dead = true; skyBurst(e.x, e.y, 10, '#E8ECEE', 150, { life: 0.4 });
+          if (Math.random() < 0.3){ const m = skyEnemy('mine'); m.x = e.x; m.y = e.y; }
+          else for (let i = 0; i < 2; i++){ const c = skyEnemy('rotor'); c.x = e.x + (i ? 22 : -22) * s; c.y = e.y; c.hx = c.x; }
+        }
+        break;
+      }
       case 'gunship': case 'grey': skyGunship(e, dt); break;
       case 'white': skyWhite(e, dt); break;
     }
@@ -276,16 +441,30 @@ function skyGunship(e, dt){                                                     
     for (let i = 0; i < n; i++) setTimeoutish(function(){ if (!e.dead && Sky.on && !Sky.hold) skyEShot(e.x + (e.side < 0 ? e.r : -e.r), e.y, skyAimAt(e) + (Math.random() - 0.5) * 0.12, 330, D.shot); }, i * 0.12);
     if (big && Math.random() < 0.4) for (let q = -2; q <= 2; q++) skyEShot(e.x, e.y, skyAimAt(e) + q * 0.22, 230, D.shot, { r: 7 });
   }
-  if (e.k === 'gunship' && e.t > D.stay){ e.left = true; }
+  if (e.k === 'gunship' && e.t > D.stay && !e.guard){ e.left = true; }      /* (the White Bird's own two stay to the end) */
 }
-function skyWhite(e, dt){                                                                     /* LAB-1: three ways of fighting, worse as it is hurt */
+function skyWhite(e, dt){                                                                     /* LAB-1: first its two escorts, then three ways of fighting, worse as it is hurt */
   const s = skyS(), W = G.W, H = G.H, f = e.hp / e.maxHp;
-  e.phase = f > 0.66 ? 1 : f > 0.33 ? 2 : 3;
-  if (e.phase !== e.wasPhase){ e.wasPhase = e.phase; e.cd = 1.2; e.drop = 1.5; if (e.phase > 1){ Sky.fx.push({ txt: e.phase === 2 ? 'It turns side on' : 'Smoking, and weaving low', x: W / 2, y: H * 0.42, t: 0, life: 2, big: true }); } }
+  if (!e.guards){                                                                            /* it holds off out of range while its last two gunships come back for her */
+    e.ty = H * 0.07; e.guards = [skyEnemy('gunship', { side: -1 }), skyEnemy('gunship', { side: 1 })];
+    e.guards.forEach(function(g){ g.guard = true; g.hp = g.maxHp = g.hp * 1.3; });
+  }
+  const guarded = f >= 1 && e.guards.some(function(g){ return !g.dead; });
+  e.phase = guarded ? 0 : f > 0.66 ? 1 : f > 0.33 ? 2 : 3;
+  if (e.phase !== e.wasPhase){
+    e.wasPhase = e.phase; e.cd = 1.2; e.drop = 1.5; e.far = e.phase === 0; e.ram = null; e.dive = 2.6;
+    if (e.phase === 0) skyBeat('The White Bird', 'Out of range, behind its last two escorts');
+    else if (e.phase === 1){ e.ty = H * 0.18; skyBeat('The cargo door opens', 'Pods of drones: shoot them before they burst'); }
+    else if (e.phase === 2) skyBeat('It turns side on', 'Its door gunner has her in his sights');
+    else skyBeat('Smoking, and out of drones', 'LAB-1 comes straight at her');
+  }
   e.cd -= dt; e.drop -= dt;
+  if (e.phase === 0){
+    e.x = W / 2 + Math.sin(e.t * 0.4) * W * 0.2; e.y += (e.ty - e.y) * Math.min(1, dt * 1.2); e.ang = Math.PI / 2; return;
+  }
   if (e.phase === 1){
     e.x = W / 2 + Math.sin(e.t * 0.55) * W * 0.3; e.y += (e.ty - e.y) * Math.min(1, dt * 1.2); e.ang = Math.PI / 2;
-    if (e.drop <= 0){ e.drop = 2.6; for (let i = 0; i < 2; i++){ const c = skyEnemy('rotor'); c.x = e.x + (i ? 30 : -30) * s; c.y = e.y; c.hx = c.x; } }
+    if (e.drop <= 0){ e.drop = 2.4; const p = skyEnemy('pod'); p.x = clamp(e.x + (Math.random() - 0.5) * 80 * s, 40 * s, W - 40 * s); p.y = e.y + e.r * 0.5; p.ty = H * (0.42 + Math.random() * 0.22); }
     if (e.cd <= 0){ e.cd = 3.2; for (let q = -1; q <= 1; q++) skyEShot(e.x, e.y + e.r * 0.6, Math.PI / 2 + q * 0.3, 240, SKY_E.white.shot); }
   } else if (e.phase === 2){
     const tx = W / 2 + Math.sin(e.t * 0.8) * W * 0.32, ty = H * 0.26 + Math.sin(e.t * 1.1) * H * 0.05;
@@ -293,15 +472,19 @@ function skyWhite(e, dt){                                                       
     if (e.cd <= 0){ e.cd = 1.6; for (let i = 0; i < 5; i++) setTimeoutish(function(){ if (!e.dead && Sky.on && !e.ditch && !Sky.hold) skyEShot(e.x, e.y, skyAimAt(e) + (Math.random() - 0.5) * 0.1, 320, SKY_E.white.shot); }, i * 0.11); }
     if (e.drop <= 0){ e.drop = 4; const m = skyEnemy('mine'); m.x = e.x; m.y = e.y + e.r; }
   } else {
-    e.dive = (e.dive || 0) - dt;
-    const diving = e.dive < 0 && e.dive > -1.6, tx = diving ? Sky.x : W / 2 + Math.sin(e.t * 1.4) * W * 0.36, ty = diving ? Sky.y - 160 * s : H * 0.2 + Math.sin(e.t * 2.2) * H * 0.04;
-    if (e.dive < -1.6) e.dive = 5.5;
-    e.x += (tx - e.x) * Math.min(1, dt * (diving ? 2.2 : 1.8)); e.y += (ty - e.y) * Math.min(1, dt * (diving ? 2.2 : 1.8)); e.ang = Math.PI / 2 + Math.sin(e.t * 1.4) * 0.6;
+    if (e.ram){                                                                              /* the ramming run: a breath to line up on her (a red lane down the screen), then straight down it and round again */
+      const R = e.ram; R.t += dt; e.ang = Math.PI / 2;
+      if (R.t < 0.9){ R.x += clamp(Sky.x - R.x, -1, 1) * 140 * s * dt; e.x += (R.x - e.x) * Math.min(1, dt * 6); e.y += (H * 0.1 - e.y) * Math.min(1, dt * 4); }
+      else { e.y += 1050 * s * dt; if (e.y > H + e.r * 2){ e.y = -e.r * 2; e.ram = null; e.dive = 4.2; } }
+    } else {
+      const tx = W / 2 + Math.sin(e.t * 1.4) * W * 0.36, ty = H * 0.2 + Math.sin(e.t * 2.2) * H * 0.04;
+      e.x += (tx - e.x) * Math.min(1, dt * 1.8); e.y += (ty - e.y) * Math.min(1, dt * 1.8); e.ang = Math.PI / 2 + Math.sin(e.t * 1.4) * 0.6;
+      if (e.cd <= 0){ e.cd = 2; for (let q = -3; q <= 3; q++) skyEShot(e.x, e.y, skyAimAt(e) + q * 0.18, 250, SKY_E.white.shot); }
+      e.dive -= dt; if (e.dive <= 0){ e.ram = { t: 0, x: e.x }; try { SFX.tone('sawtooth', 300, 900, 0.8, 0.09, 0, 0); } catch (err) {} }
+    }
     if (Math.random() < dt * 8) skyBurst(e.x - 10 * s, e.y - 10 * s, 1, 'rgba(36,34,36,.7)', 30, { smoke: true, life: 1.4, r: 9 });
-    if (e.cd <= 0){ e.cd = 2; for (let q = -3; q <= 3; q++) skyEShot(e.x, e.y, skyAimAt(e) + q * 0.18, 250, SKY_E.white.shot); }
-    if (e.drop <= 0){ e.drop = 3.4; const c = skyEnemy('rotor'); c.x = e.x; c.y = e.y; c.hx = c.x; }
   }
-  if (Math.hypot(Sky.x - e.x, Sky.y - e.y) < e.r * 0.8 + 30 * s) skyHurt(16, e.x, e.y);
+  if (Math.hypot(Sky.x - e.x, Sky.y - e.y) < e.r * 0.8 + 30 * s) skyHurt(e.ram && e.ram.t >= 0.9 ? 28 : 16, e.x, e.y);
 }
 function skyWhiteDitch(e, dt){                                                                 /* spinning down, smoking, onto the sea */
   const s = skyS(); e.ditch -= dt; e.t += dt; e.anim += dt * 2; e.ang += dt * (4 - e.ditch); e.y += (G.H * 0.42 - e.y) * Math.min(1, dt); e.x += (G.W / 2 - e.x) * Math.min(1, dt * 0.8);
@@ -313,11 +496,19 @@ function skyUpdateShots(dt){
   for (let i = Sky.shots.length - 1; i >= 0; i--){
     const b = Sky.shots[i]; b.x += b.vx * dt; b.y += b.vy * dt;
     if (b.x < -20 || b.x > W + 20 || b.y < -20 || b.y > H + 20){ Sky.shots.splice(i, 1); continue; }
+    if (b.door && Sky.perks.seeker){                                                         /* Seeker Rounds: a door gun's shot bends toward the nearest drone */
+      const e = skyNearest(b.x, b.y, 240 * s);
+      if (e){ const sp = Math.hypot(b.vx, b.vy), a = Math.atan2(b.vy, b.vx); let da = Math.atan2(e.y - b.y, e.x - b.x) - a; while (da > Math.PI) da -= TAU; while (da < -Math.PI) da += TAU;
+        const na = a + clamp(da, -3.2 * dt, 3.2 * dt); b.vx = Math.cos(na) * sp; b.vy = Math.sin(na) * sp; }
+    }
+    if (skyShotBlocked(b)){ Sky.shots.splice(i, 1); continue; }
     for (let j = 0; j < Sky.en.length; j++){
-      const e = Sky.en[j]; if (e.dead || e.fall > 0 || e.ditch > 0 || b.hit.indexOf(e) >= 0) continue;
+      const e = Sky.en[j]; if (e.dead || e.fall > 0 || e.ditch > 0 || e.far || b.hit.indexOf(e) >= 0) continue;
       if (e.boss && e.y < -20 * s) continue;
       if (Math.hypot(b.x - e.x, b.y - e.y) < e.r + 4 * s){
-        e.hp -= b.dmg; e.flash = 0.08; b.hit.push(e); skyBurst(b.x, b.y, 2, b.crit ? '#FFF0A0' : '#FFD8A0', 90, { life: 0.2 });
+        e.hp -= b.dmg; e.flash = b.crit ? 0.14 : 0.1; b.hit.push(e); skyBurst(b.x, b.y, b.crit ? 6 : 3, b.crit ? '#FFF0A0' : '#FFD8A0', b.crit ? 150 : 100, { life: 0.22 });
+        if (b.crit && Sky.fx.length < 260) Sky.fx.push({ ring: true, x: b.x, y: b.y, R: 16 * s, t: 0, life: 0.2, col: '255,246,176', thin: true });
+        if (Sky.t - (Sky.tickT || 0) > 0.07){ Sky.tickT = Sky.t; try { SFX.tone('square', b.crit ? 1500 : 900, 500, 0.02, 0.018, 0, 0); } catch (err) {} }
         if (e.hp <= 0) skyKill(e, b);
         if (b.pierce-- <= 0){ Sky.shots.splice(i, 1); break; }
       }
@@ -332,7 +523,7 @@ function skyUpdateShots(dt){
 function skyUpdateFx(dt){
   for (let i = Sky.fx.length - 1; i >= 0; i--){
     const f = Sky.fx[i]; f.t += dt; if (f.t > f.life){ Sky.fx.splice(i, 1); continue; }
-    if (f.vx !== undefined){ f.x += f.vx * dt; f.y += f.vy * dt; f.vx *= 1 - dt * 2.2; f.vy *= 1 - dt * 2.2; if (f.smoke){ f.y += SKY_TUNE.scroll * skyS() * dt * 0.5; f.r += dt * 8; } }
+    if (f.vx !== undefined){ f.x += f.vx * dt; f.y += f.vy * dt; f.vx *= 1 - dt * 2.2; f.vy *= 1 - dt * 2.2; if (f.smoke){ f.y += skyScroll() * skyS() * dt * 0.5; f.r += dt * 8; } }
     if (f.txt) f.y -= 24 * dt;
   }
 }
@@ -404,11 +595,14 @@ function skyResults(){
 }
 
 /* ---- drawing ---- */
-function skySeaCol(){ const k = clamp((Sky.wave - 1) / 9, 0, 1); return { top: tw_mix('#2E5A7A', '#2A2A52', k), bot: tw_mix('#1A3A56', '#141A34', k), glint: k < 0.6 ? '255,214,150' : '255,170,150' }; }
+function skySeaCol(){                                                                         /* sundown, then dusk, then night (skyNight) */
+  const k = clamp((Sky.wave - 1) / 9, 0, 1), n = skyNight();
+  return { top: tw_mix(tw_mix('#2E5A7A', '#2A2A52', k), '#0E1630', n * 0.75), bot: tw_mix(tw_mix('#1A3A56', '#141A34', k), '#070B1C', n * 0.75), glint: n > 0.6 ? '190,210,255' : k < 0.6 ? '255,214,150' : '255,170,150' };
+}
 function skyDrawSea(ctx, W, H){
   const c = skySeaCol(), g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, c.top); g.addColorStop(1, c.bot); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   const s = skyS(), sc = Sky.scroll;
-  const sun = ctx.createRadialGradient(W * 0.5, -H * 0.1, 0, W * 0.5, -H * 0.1, H * 0.9); sun.addColorStop(0, 'rgba(255,190,120,.42)'); sun.addColorStop(0.5, 'rgba(255,150,110,.12)'); sun.addColorStop(1, 'rgba(255,150,110,0)'); ctx.fillStyle = sun; ctx.fillRect(0, 0, W, H);      /* the sun going down ahead, in the west */
+  const sun = ctx.createRadialGradient(W * 0.5, -H * 0.1, 0, W * 0.5, -H * 0.1, H * 0.9); const day = 1 - skyNight(); sun.addColorStop(0, 'rgba(255,190,120,' + (0.42 * day).toFixed(3) + ')'); sun.addColorStop(0.5, 'rgba(255,150,110,' + (0.12 * day).toFixed(3) + ')'); sun.addColorStop(1, 'rgba(255,150,110,0)'); ctx.fillStyle = sun; ctx.fillRect(0, 0, W, H);      /* the sun going down ahead, in the west */
   for (let i = 0; i < 70; i++){                                                              /* wave crests streaming down, and the sun on them */
     const fx = (Math.sin(i * 91.7) * 0.5 + 0.5) * W, cy = ((i * 53.3 + sc * (0.8 + (i % 5) * 0.08)) % (H + 40)) - 20, len = (16 + (i % 7) * 6) * s;
     ctx.strokeStyle = i % 4 === 0 ? 'rgba(' + c.glint + ',.35)' : 'rgba(230,246,255,.16)'; ctx.lineWidth = (i % 3 + 1) * s; ctx.beginPath(); ctx.moveTo(fx, cy); ctx.quadraticCurveTo(fx + len / 2, cy - 3 * s, fx + len, cy); ctx.stroke();
@@ -463,19 +657,61 @@ function skyDrawAim(ctx){
 function skyDrawEnemy(ctx, e){
   const d = e.def || ETYPES_SKY[e.type], s = skyS();
   if (!d) return;
-  ctx.fillStyle = 'rgba(8,16,28,.25)'; ctx.beginPath(); ctx.ellipse(e.x + e.r * 0.5, e.y + e.r * 0.8, e.r * 0.9, e.r * 0.5, 0, 0, TAU); ctx.fill();
-  ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.ang); if (e.fall > 0) ctx.globalAlpha = clamp(e.fall / 0.7, 0, 1);
-  const hf = e.flash > 0 ? 0.75 : 0, body = hf ? blendHex(d.color, '#FFFFFF', hf) : d.color, dk = hf ? blendHex(d.dark, '#FFFFFF', hf * 0.6) : d.dark;
-  const look = { r: e.r, anim: e.anim, blink: e.blink, charge: e.charge, phase: e.phase, portrait: false };
+  if (e.k === 'white' && e.ram && e.ram.t < 0.9){                                          /* the lane the White Bird is about to come down */
+    ctx.fillStyle = 'rgba(255,70,50,' + (0.12 + 0.14 * Math.abs(Math.sin(Sky.t * 16))).toFixed(3) + ')'; ctx.fillRect(e.ram.x - e.r * 0.8, 0, e.r * 1.6, G.H);
+  }
+  if (!e.sea){ ctx.fillStyle = 'rgba(8,16,28,.25)'; ctx.beginPath(); ctx.ellipse(e.x + e.r * 0.5, e.y + e.r * 0.8, e.r * 0.9, e.r * 0.5, 0, 0, TAU); ctx.fill(); }
+  ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.ang); if (e.fall > 0) ctx.globalAlpha = clamp(e.fall / 0.7, 0, 1); else if (e.far) ctx.globalAlpha = 0.6;
+  const hf = e.flash > 0 ? 0.85 : 0, body = hf ? blendHex(d.color, '#FFFFFF', hf) : d.color, dk = hf ? blendHex(d.dark, '#FFFFFF', hf * 0.7) : d.dark;
+  const look = { r: e.r, anim: e.anim, blink: e.blink, charge: e.charge, phase: e.phase, portrait: false, up: e.up };
   try { SKY_DRAW[d.look](ctx, look, body, dk, 0, false, d); } catch (err) {}
   ctx.restore();
+  if (e.k === 'shield' && e.up && !(e.fall > 0)){                                          /* the Shield Drone's bubble: brighter where a shot has just met it */
+    const R = SKY_TUNE.shieldR * s, a = 0.1 + (e.hitT > 0 ? 0.25 : 0) + 0.04 * Math.sin(Sky.t * 5 + e.ph);
+    fillCircle(ctx, e.x, e.y, R, 'rgba(120,220,255,' + a.toFixed(3) + ')'); ringPath(ctx, e.x, e.y, R, 2 * s, '#9EE8FF', 0.55 + (e.hitT > 0 ? 0.4 : 0));
+    ctx.strokeStyle = 'rgba(158,232,255,.3)'; ctx.lineWidth = 1.2 * s; ctx.beginPath(); for (let k = 0; k < 6; k++){ const b = k * TAU / 6 + Sky.t * 0.5; ctx.moveTo(e.x + Math.cos(b) * R * 0.5, e.y + Math.sin(b) * R * 0.5); ctx.lineTo(e.x + Math.cos(b) * R, e.y + Math.sin(b) * R); } ctx.stroke();
+  }
   if (e.k === 'laser' && (e.charge > 0 || e.beam > 0)){                                    /* the laser's warning line, then its beam */
     const bx = e.x, by = e.y + e.r * 0.6;
     if (e.beam > 0){ ctx.fillStyle = 'rgba(255,90,70,.35)'; ctx.fillRect(bx - 16 * s, by, 32 * s, G.H); ctx.fillStyle = 'rgba(255,230,220,.9)'; ctx.fillRect(bx - 5 * s, by, 10 * s, G.H); }
     else { ctx.strokeStyle = 'rgba(255,80,60,' + (0.3 + 0.4 * Math.abs(Math.sin(Sky.t * 18))).toFixed(2) + ')'; ctx.lineWidth = 1.5 * s; ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx, G.H); ctx.stroke(); }
   }
-  if (!e.boss && e.hp < e.maxHp && !e.fall){ const w = e.r * 1.6; ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(e.x - w / 2, e.y - e.r - 10 * s, w, 4 * s); ctx.fillStyle = '#9FBF52'; ctx.fillRect(e.x - w / 2, e.y - e.r - 10 * s, w * clamp(e.hp / e.maxHp, 0, 1), 4 * s); }
+  if (!e.boss && e.hp < e.maxHp && !e.fall && e.k !== 'gnat' && e.k !== 'missile'){ const w = e.r * 1.6; ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(e.x - w / 2, e.y - e.r - 10 * s, w, 4 * s); ctx.fillStyle = '#9FBF52'; ctx.fillRect(e.x - w / 2, e.y - e.r - 10 * s, w * clamp(e.hp / e.maxHp, 0, 1), 4 * s); }
 }
+/* the sea stacks of the Needles and the cargo ship's cranes, from above: each throws a long shadow, and stands as high as she flies */
+function skyDrawHaz(ctx){
+  const s = skyS();
+  const ships = {};                                                                           /* the ship under a row of cranes: one hull across the screen, a gap in its deck cargo where the way through is */
+  Sky.haz.forEach(function(h){ if (h.k === 'crane' && !ships[h.row]) ships[h.row] = h; });
+  Object.keys(ships).forEach(function(r){ const h = ships[r], y = h.y, hh = h.r * 1.5;
+    ctx.fillStyle = 'rgba(235,250,255,.22)'; ctx.fillRect(0, y + hh * 0.5, G.W, hh * 0.35);
+    ctx.fillStyle = '#5A2620'; ctx.fillRect(-10, y - hh * 0.5, G.W + 20, hh); ctx.fillStyle = '#7A332A'; ctx.fillRect(-10, y - hh * 0.42, G.W + 20, hh * 0.84);
+    const cols = ['#C84A3A', '#3A7AB8', '#E8B83A', '#4A8A4A', '#8A8F94'], cw = h.r * 0.62;
+    for (let x = cw * 0.3, i = 0; x < G.W; x += cw * 1.08, i++){ const lane = Math.floor((x + cw / 2) / (G.W / 5)); if (lane === h.open) continue; ctx.fillStyle = cols[(i * 7 + (r | 0) * 3) % 5]; ctx.fillRect(x, y - hh * 0.34, cw, hh * 0.68); ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.fillRect(x, y - hh * 0.02, cw, hh * 0.04); }
+  });
+  Sky.haz.forEach(function(h){
+    const x = h.x, y = h.y, r = h.r;
+    ctx.fillStyle = 'rgba(8,16,28,.3)'; ctx.beginPath(); ctx.ellipse(x + r * 0.7, y + r * 0.9, r * 1.2, r * 0.6, 0.5, 0, TAU); ctx.fill();
+    if (h.k === 'crane'){                                                                    /* a crane tower with its jib out over the water, hazard paint, a lamp at the top */
+      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(h.seed) * 0.5);
+      ctx.fillStyle = '#2A2E32'; ctx.fillRect(-r * 1.25, -r * 0.14, r * 2.5, r * 0.28); ctx.fillStyle = '#E8B83A'; for (let k = -4; k <= 4; k++) ctx.fillRect(k * r * 0.27 - r * 0.07, -r * 0.14, r * 0.14, r * 0.28);
+      ctx.fillStyle = '#3A4046'; ctx.fillRect(-r * 0.62, -r * 0.62, r * 1.24, r * 1.24); ctx.fillStyle = '#E8B83A'; ctx.fillRect(-r * 0.5, -r * 0.5, r, r);
+      ctx.strokeStyle = '#2A2E32'; ctx.lineWidth = Math.max(2, r * 0.08); ctx.beginPath(); ctx.moveTo(-r * 0.5, -r * 0.5); ctx.lineTo(r * 0.5, r * 0.5); ctx.moveTo(r * 0.5, -r * 0.5); ctx.lineTo(-r * 0.5, r * 0.5); ctx.stroke();
+      fillCircle(ctx, 0, 0, r * 0.16, Math.sin(Sky.t * 6 + h.seed) > 0 ? '#FF4A3A' : '#5A1A14');
+      ctx.restore();
+    } else {                                                                                 /* a sea stack: surf round its foot, ledges going up to a pale top */
+      ctx.fillStyle = 'rgba(235,250,255,.45)'; ctx.beginPath(); ctx.ellipse(x, y + r * 0.12, r * 1.2, r * 1.05, 0, 0, TAU); ctx.fill();
+      const cols = ['#3E3C40', '#55524F', '#6E6A62', '#8C867A'];
+      for (let k = 0; k < 4; k++){ const rr = r * (1 - k * 0.2); ctx.fillStyle = cols[k]; ctx.beginPath();
+        for (let q = 0; q < 9; q++){ const a = q * TAU / 9 + h.seed, j = rr * (0.86 + 0.14 * Math.sin(h.seed * 7 + q * 2.3 + k)); const px = x - k * r * 0.05 + Math.cos(a) * j, py = y - k * r * 0.07 + Math.sin(a) * j; if (q) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
+        ctx.closePath(); ctx.fill(); }
+      fillCircle(ctx, x - r * 0.2, y - r * 0.28, r * 0.12, 'rgba(240,240,236,.7)');
+    }
+  });
+}
+/* hooks for the look-and-feel layer (js/sky/44zzzzo-sky-plus.js), which draws under the machines and over them; without it they do nothing */
+function skyDrawUnder(ctx){}
+function skyDrawOver(ctx){}
 function skyDrawShots(ctx){
   const s = skyS();
   Sky.shots.forEach(function(b){ const a = Math.atan2(b.vy, b.vx); ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(a); ctx.fillStyle = b.crit ? '#FFF6B0' : '#FFD27A'; ctx.fillRect(-9 * s, -1.6 * s, 14 * s, 3.2 * s); ctx.fillStyle = '#FFFFFF'; ctx.fillRect(1 * s, -1 * s, 4 * s, 2 * s); ctx.restore(); });
@@ -489,15 +725,18 @@ function skyDrawFx(ctx){
   Sky.fx.forEach(function(f){
     const u = f.t / f.life;
     if (f.ring){ ctx.strokeStyle = 'rgba(' + f.col + ',' + (0.8 * (1 - u)).toFixed(3) + ')'; ctx.lineWidth = (f.thin ? 2 : 4) * s * (1 - u) + 1; ctx.beginPath(); ctx.arc(f.x, f.y, f.R * (0.3 + u), 0, TAU); ctx.stroke(); if (!f.thin) fillCircle(ctx, f.x, f.y, f.R * 0.5 * (1 - u), 'rgba(255,220,150,' + (0.6 * (1 - u)).toFixed(3) + ')'); }
-    else if (f.flash){ fillCircle(ctx, f.x + f.dx * 8 * s, f.y + f.dy * 8 * s, 7 * s, 'rgba(255,240,180,.85)'); }
+    else if (f.flash){ const z = f.door ? 1.35 : 1, fx = f.x + f.dx * 10 * s * z, fy = f.y + f.dy * 10 * s * z, px = -f.dy, py = f.dx;                    /* the muzzle flash: a tongue of flame out of the barrel and a bright core */
+      ctx.fillStyle = 'rgba(255,190,90,.75)'; ctx.beginPath(); ctx.moveTo(f.x + px * 6 * s * z, f.y + py * 6 * s * z); ctx.lineTo(f.x + f.dx * 34 * s * z, f.y + f.dy * 34 * s * z); ctx.lineTo(f.x - px * 6 * s * z, f.y - py * 6 * s * z); ctx.closePath(); ctx.fill();
+      fillCircle(ctx, fx, fy, 9 * s * z, 'rgba(255,240,180,.9)'); fillCircle(ctx, fx, fy, 4.5 * s * z, '#FFFFFF'); }
     else if (f.txt){ ctx.globalAlpha = clamp(2 * (1 - u), 0, 1); miniText(ctx, f.txt, f.x, f.y, (f.big ? 26 : 15) * s, f.big ? '#FFE6A0' : '#E8C24A'); ctx.globalAlpha = 1; }
     else { ctx.globalAlpha = (1 - u) * (f.smoke ? 0.7 : 1); fillCircle(ctx, f.x, f.y, f.r, f.col); ctx.globalAlpha = 1; }
   });
 }
 function skyBossOf(){ return Sky.en.filter(function(e){ return e.boss && !e.dead && !(e.ditch > 0); }); }
-function skyButtons(){                                                                       /* the phone's buttons: the three guns, the aiming line and pause */
-  const s = skyS(), W = G.W, H = G.H, R = 34 * s, y = H - 58 * s, x0 = W - 58 * s - R * 4.4;
-  return [{ id: 'left', x: x0, y: y, r: R }, { id: 'nose', x: x0 + R * 2.2, y: y - R * 0.9, r: R }, { id: 'right', x: x0 + R * 4.4, y: y, r: R }, { id: 'aim', x: 44 * s, y: H - 50 * s, r: 24 * s }, { id: 'pause', x: W - 34 * s, y: 34 * s, r: 22 * s }];
+function skyButtons(){                                                                       /* the phone's buttons, in an arc under the right thumb: the three guns, the broadside over them, the aiming line and pause */
+  const s = skyS(), W = G.W, H = G.H, R = Math.max(40 * s, 30), y = H - R * 1.5 - 8, xr = W - R * 1.3;
+  return [{ id: 'left', x: xr - R * 4.4, y: y, r: R }, { id: 'nose', x: xr - R * 2.2, y: y - R * 0.9, r: R }, { id: 'right', x: xr, y: y, r: R }, { id: 'all', x: xr - R * 0.3, y: y - R * 2.5, r: R * 0.8 },
+    { id: 'aim', x: Math.max(34, 44 * s), y: H - Math.max(40, 50 * s), r: Math.max(22, 24 * s) }, { id: 'pause', x: W - Math.max(28, 34 * s), y: Math.max(28, 34 * s), r: Math.max(20, 22 * s) }];
 }
 function skyDrawHud(ctx){
   const s = skyS(), W = G.W, H = G.H;
@@ -506,15 +745,19 @@ function skyDrawHud(ctx){
   miniText(ctx, 'HULL', x0, 20, 13, '#FFF6E0', 'left');
   ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(x0, 27, bw, bh); ctx.fillStyle = f > 0.5 ? '#9FBF52' : f > 0.25 ? '#F2B33D' : '#CF4433'; ctx.fillRect(x0, 27, bw * f, bh);
   miniText(ctx, Math.ceil(Sky.hull) + ' / ' + Sky.max, x0 + bw / 2, 27 + bh * 0.82, 12.5, '#FFFFFF');
-  if (Sky.slowT > 0) miniText(ctx, 'Tangled in a net!', x0, 27 + bh + 20, 14, '#E8D8A0', 'left');
+  const ready = Sky.charge >= 1 && !(Sky.all > 0), pulse = 0.6 + 0.4 * Math.abs(Math.sin(Sky.t * 6)), cy = 27 + bh + 5, cw = bw * 0.55;      /* the broadside, a thin bar under the hull */
+  ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(x0, cy, cw, 7); ctx.fillStyle = Sky.all > 0 ? '#FFFFFF' : ready ? 'rgba(255,226,122,' + pulse.toFixed(2) + ')' : '#C89A3A'; ctx.fillRect(x0, cy, cw * (Sky.all > 0 ? clamp(Sky.all / SKY_TUNE.allT, 0, 1) : Sky.charge), 7);
+  miniText(ctx, Sky.all > 0 ? 'ALL GUNS' : ready ? (Input.hasTouch ? 'BROADSIDE: tap ALL' : keyName(keyOf('kick')) + ': BROADSIDE') : 'Broadside', x0 + cw + 8, cy + 8, 12, ready || Sky.all > 0 ? '#FFE27A' : 'rgba(255,246,224,.7)', 'left');
+  const notes = []; if (Sky.slowT > 0) notes.push(['Tangled in a net!', '#E8D8A0']); if (Sky.wardUp) notes.push(['Deflector up', '#9EE8FF']);
+  notes.forEach(function(nt, i){ miniText(ctx, nt[0], x0, cy + 28 + i * 18, 14, nt[1], 'left'); });
   /* the chapter and the wave: beside the hull on a wide screen, under it on a narrow one */
-  const ty = narrow ? 27 + bh + (Sky.slowT > 0 ? 40 : 20) : 24;
+  const ty = narrow ? cy + 28 + notes.length * 18 : 24;
   miniText(ctx, (narrow ? 'CH.17.5 · WAVE ' : 'CH.17.5 THE AIR CHASE · WAVE ') + skyWaveNo(Sky.wave), narrow ? x0 : W / 2, ty, 14, '#FFE6A0', narrow ? 'left' : 'center');
   const bosses = skyBossOf();
   if (bosses.length){
     let hp = 0, mx = 0; bosses.forEach(function(b){ hp += Math.max(0, b.hp); mx += b.maxHp; });
     const w = Math.min(460 * s, W * (narrow ? 0.8 : 0.6)), by = ty + 10; ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(W / 2 - w / 2, by, w, 12); ctx.fillStyle = '#E86A4A'; ctx.fillRect(W / 2 - w / 2, by, w * clamp(hp / mx, 0, 1), 12);
-    miniText(ctx, bosses[0].k === 'white' ? 'THE WHITE BIRD' : 'GREY ESCORT', W / 2, by + 30, 14, '#FFFFFF');
+    miniText(ctx, bosses[0].k === 'white' ? (bosses[0].far ? 'THE WHITE BIRD · out of range: its escorts first' : 'THE WHITE BIRD') : 'GREY ESCORT', W / 2, by + 30, 14, '#FFFFFF');
   }
   if (Sky.ws === 'intro' || (Sky.banner < 3 && Sky.ws === 'fight')){
     const a = clamp(Math.min(Sky.banner * 3, (3 - Sky.banner) * 1.5), 0, 1); ctx.globalAlpha = a;
@@ -522,43 +765,56 @@ function skyDrawHud(ctx){
   }
   if (Sky.ws === 'clear') miniText(ctx, 'Wave cleared', W / 2, H * 0.4, 30 * s, '#BFF0A0');
   /* the guns: where she is, and the key for each */
+  const hotCol = function(h){ return h >= SKY_TUNE.heatFrom ? '#FF6A3A' : '#E8C24A'; };
   if (Input.hasTouch){
-    const lab = { left: '◀', nose: '▲', right: '▶', aim: 'AIM', pause: 'II' };
+    const lab = { left: '◀', nose: '▲', right: '▶', aim: 'AIM', pause: 'II', all: 'ALL' };
     skyButtons().forEach(function(b){
-      const on = b.id === Sky.gun || (b.id === 'aim' && skyAimOn());
-      fillCircle(ctx, b.x, b.y, b.r, on ? 'rgba(232,194,74,.55)' : 'rgba(20,24,32,.45)'); ringPath(ctx, b.x, b.y, b.r, 2 * s, '#FFF6E0', 0.7);
-      miniText(ctx, lab[b.id], b.x, b.y + b.r * 0.3, b.id === 'aim' ? b.r * 0.55 : b.r * 0.8, '#FFF6E0');
+      const on = b.id === Sky.gun || (b.id === 'aim' && skyAimOn()) || (b.id === 'all' && (ready || Sky.all > 0));
+      fillCircle(ctx, b.x, b.y, b.r, on ? 'rgba(232,194,74,' + (b.id === 'all' ? 0.35 + 0.3 * pulse : 0.55).toFixed(2) + ')' : 'rgba(20,24,32,.45)'); ringPath(ctx, b.x, b.y, b.r, 2 * s, '#FFF6E0', 0.7);
+      const arc = b.id === 'all' ? (Sky.all > 0 ? 1 : Sky.charge) : Sky.heat[b.id];             /* a ring round the button: the gun's heat, or how full the broadside is */
+      if (arc > 0.02){ ctx.strokeStyle = b.id === 'all' ? '#FFE27A' : hotCol(arc); ctx.lineWidth = Math.max(3, 4 * s); ctx.beginPath(); ctx.arc(b.x, b.y, b.r + 4, -Math.PI / 2, -Math.PI / 2 + TAU * clamp(arc, 0, 1)); ctx.stroke(); }
+      miniText(ctx, lab[b.id], b.x, b.y + b.r * 0.3, b.id === 'aim' || b.id === 'all' ? b.r * 0.55 : b.r * 0.8, '#FFF6E0');
     });
   } else {
     const names = { left: 'Left door', nose: 'Nose', right: 'Right door' }, keys = { left: 'skyLeft', nose: 'skyNose', right: 'skyRight' };
     SKY_GUNS.forEach(function(g, i){
-      const x = W / 2 + (i - 1) * 150 * s, y = H - 26 * s, on = g === Sky.gun;
+      const x = W / 2 + (i - 1) * 150 * s, y = H - 30 * s, on = g === Sky.gun, h = Sky.heat[g];
       ctx.fillStyle = on ? 'rgba(232,194,74,.5)' : 'rgba(10,14,20,.45)'; ctx.fillRect(x - 66 * s, y - 20 * s, 132 * s, 30 * s);
       miniText(ctx, keyName(keyOf(keys[g])) + '  ' + names[g], x, y, 14 * s, on ? '#FFFFFF' : '#D8D0C0');
+      ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(x - 66 * s, y + 12 * s, 132 * s, 5 * s); ctx.fillStyle = hotCol(h); ctx.fillRect(x - 66 * s, y + 12 * s, 132 * s * h, 5 * s);      /* its heat */
     });
-    miniText(ctx, keyName(keyOf('skyAim')) + ': aiming line ' + (skyAimOn() ? 'on' : 'off') + '   Esc: pause', W / 2, H - 56 * s, 12 * s, 'rgba(255,246,224,.75)');
+    miniText(ctx, keyName(keyOf('skyNext')) + ' or the wheel: next gun   ' + keyName(keyOf('skyAim')) + ': aiming line ' + (skyAimOn() ? 'on' : 'off') + '   Esc: pause', W / 2, H - 58 * s, 12 * s, 'rgba(255,246,224,.75)');
   }
+  if (Sky.low && Sky.ws === 'fight' && Sky.banner < 6) miniText(ctx, 'Steer through the gaps. The rocks stop shots, hers too.', W / 2, H * 0.36 + 62 * s, 15 * s, '#FFE6A0');
 }
 function skyRender(ctx){
   const W = G.W, H = G.H, s = skyS();
   ctx.save();
   if (Sky.shake > 0){ ctx.translate((Math.random() - 0.5) * 10 * Sky.shake * s, (Math.random() - 0.5) * 10 * Sky.shake * s); }
   skyDrawSea(ctx, W, H);                                                                    /* the sea, and the ships and rocks on it */
+  Sky.en.forEach(function(e){ if (e.sea) skyDrawEnemy(ctx, e); });                          /* the missile boats, down on the water */
+  skyDrawUnder(ctx);                                                                        /* night on the water, her searchlight, the cloud below her */
+  skyDrawHaz(ctx);                                                                          /* the sea stacks and the cranes */
   skyDrawAim(ctx);
   skyDrawHeli(ctx);                                                                         /* the helicopter and her */
   skyDrawShots(ctx);                                                                        /* the shots */
-  Sky.en.forEach(function(e){ skyDrawEnemy(ctx, e); });                                     /* the drones and gunships */
+  Sky.en.forEach(function(e){ if (!e.sea) skyDrawEnemy(ctx, e); });                         /* the drones and gunships */
   skyDrawFx(ctx);                                                                           /* explosions, smoke, splashes */
   Sky.objs.forEach(function(o){ if (o.k === 'fog'){ for (let k = 0; k < 4; k++){ const fx = o.x + Math.cos(o.seed + k * 1.7) * o.r * 1.4 * s, fy = o.y + Math.sin(o.seed + k) * o.r * 0.6 * s, R = o.r * 1.8 * s, gr = ctx.createRadialGradient(fx, fy, 0, fx, fy, R); gr.addColorStop(0, 'rgba(240,236,232,.2)'); gr.addColorStop(1, 'rgba(240,236,232,0)'); ctx.fillStyle = gr; ctx.fillRect(fx - R, fy - R, R * 2, R * 2); } } });      /* low fog, over everything */
+  skyDrawOver(ctx);                                                                         /* the weather, the cloud above her, LAB-1's searchlight */
   const v = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.max(W, H) * 0.75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(40,10,20,.35)'); ctx.fillStyle = v; ctx.fillRect(-20, -20, W + 40, H + 40);
   ctx.restore();
+  if (Sky.beat){                                                                            /* a film moment: bars top and bottom, and a line */
+    const u = Sky.beat.t / Sky.beat.life, a = clamp(Math.min(u * 6, (1 - u) * 5), 0, 1), bar = H * 0.11 * a;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, bar); ctx.fillRect(0, H - bar, W, bar);
+    ctx.globalAlpha = a; miniText(ctx, Sky.beat.txt, W / 2, H * 0.44, 34 * s, '#FFF6E0'); if (Sky.beat.sub) miniText(ctx, Sky.beat.sub, W / 2, H * 0.44 + 30 * s, 17 * s, '#FFE6A0'); ctx.globalAlpha = 1;
+  }
   skyDrawHud(ctx);                                                                          /* the interface */
 }
-
 /* ---- wiring: the loop, the keys, the phone's buttons, the menu actions ---- */
 (function(){
-  KEY_ACTIONS.push(['skyLeft', 'Air Chase: left door gun'], ['skyNose', 'Air Chase: nose gun'], ['skyRight', 'Air Chase: right door gun'], ['skyAim', 'Air Chase: aiming line on/off']);
-  DEFAULT_KEYS.skyLeft = 'KeyJ'; DEFAULT_KEYS.skyNose = 'KeyK'; DEFAULT_KEYS.skyRight = 'KeyL'; DEFAULT_KEYS.skyAim = 'KeyI';
+  KEY_ACTIONS.push(['skyLeft', 'Air Chase: left door gun'], ['skyNose', 'Air Chase: nose gun'], ['skyRight', 'Air Chase: right door gun'], ['skyNext', 'Air Chase: next gun'], ['skyAim', 'Air Chase: aiming line on/off']);
+  DEFAULT_KEYS.skyLeft = 'KeyJ'; DEFAULT_KEYS.skyNose = 'KeyK'; DEFAULT_KEYS.skyRight = 'KeyL'; DEFAULT_KEYS.skyAim = 'KeyI'; DEFAULT_KEYS.skyNext = 'KeyU';      /* (the broadside is on the Kick key) */
   const st = step, rn = render;
   step = function(dt){ if (Sky.on && G.state === 'sky') skyStep(dt); return st(dt); };
   render = function(){
@@ -576,8 +832,12 @@ function skyRender(ctx){
     Sky.ptrBtn = !!id;
     if (!id) return;
     e.preventDefault(); e.stopPropagation();
-    if (id === 'aim') skyToggleAim(); else if (id === 'pause') skyPause(); else skyGoGun(id);
+    if (id === 'aim') skyToggleAim(); else if (id === 'pause') skyPause(); else if (id === 'all') skyBroadside(); else skyGoGun(id);
   }, true);
+  window.addEventListener('wheel', function(e){                                                /* the mouse wheel: one gun along, left door / nose / right door */
+    if (!(Sky.on && G.state === 'sky') || Sky.hold || !e.deltaY) return;
+    skyGoGun(SKY_GUNS[clamp(SKY_GUNS.indexOf(Sky.gun) + (e.deltaY > 0 ? 1 : -1), 0, 2)]);
+  }, { passive: true });
   window.addEventListener('pointerup', function(){ Sky.ptrBtn = false; }, true);
   const ha = handleAction;
   handleAction = function(a){
@@ -594,14 +854,14 @@ function skyRender(ctx){
   /* anything else that starts a run in this chapter (the phone, a saved run) starts the chase instead */
   const sr = startRun;
   startRun = function(ch, wave){ if ((ch === SKY_CHAPTER && !wave) || (wave && wave >= SKY_FIRST_WAVE)){ startCutscene(function(){ skyStart(1); }, false, 'skyin'); return; } return sr.apply(this, arguments); };
-  /* the music: the war films' tune, the whole band in for the two bosses */
+  /* the music: the war films' tune, building as the chase goes on: quiet for the first two waves, fuller from the third and the sixth, the whole band in for the two bosses */
   if (typeof Music !== 'undefined' && Music.refresh){
     const mr = Music.refresh;
     Music.refresh = function(){
       const r = mr.apply(this, arguments);
       if (G.state === 'sky' && Sky.on && this.want){
         const boss = skyBossOf().length > 0;
-        this.want.theme = 'filmwar'; this.want.lvl = Sky.hold ? 0 : boss ? 3 : Sky.wave >= 6 ? 2 : 1; this.want.shift = boss ? 0 : [0, 2, 3, 5, 7][Math.floor((Sky.wave - 1) / 2)] || 0;
+        this.want.theme = 'filmwar'; this.want.lvl = Sky.hold ? 0 : boss ? 3 : Sky.wave >= 6 ? 2 : Sky.wave >= 3 ? 1 : 0; this.want.dense = boss || Sky.wave >= 8; this.want.shift = boss ? 0 : [0, 2, 3, 5, 7][Math.floor((Sky.wave - 1) / 2)] || 0;
       }
       return r;
     };
