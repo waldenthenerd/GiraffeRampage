@@ -75,6 +75,7 @@
     act('town-ph-run'); check('runApp', document.querySelectorAll('.ph-song').length >= 1);
     closeAll(); check('gameStopped', PH.game === null || !document.getElementById('phCv'));
     /* ---- the earbuds ---- */
+    SFX.init();                                                  /* Music.refresh does nothing until the audio exists; without this the menu check depended on timing */
     var heard = jbHeard(); heard.town = 1; heard.menu = 1; heard.savanna = 1; Save.data.gad.song = ''; Save.data.gad.own.buds = 1; Save.data.gad.on.buds = 1; G.state = 'town';
     act('town-ph-song-savanna'); check('songChosen', gadData().song === 'savanna');
     Music.refresh(); check('budsPlayTown', Music.want.theme === 'savanna' && phBudsPlay());
