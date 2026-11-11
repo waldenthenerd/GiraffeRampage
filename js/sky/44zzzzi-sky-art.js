@@ -1,7 +1,7 @@
 'use strict';
 /* =============================================================================================================================
    44zzzzi-sky-art.js  --  CHAPTER 17.5, THE AIR CHASE: WHAT IT LOOKS LIKE FROM ABOVE. The town helicopter (green, with her in the cabin at the nose
-   gun or in either side door), the scientists' white helicopter LAB-1 (the White Bird), the grey escort gunships and the five kinds of lab drone.
+   gun or in either side door), the scientists' white helicopter LAB-1 (the White Bird), the grey escort gunships, the seven kinds of lab drone, the Missile Boat with its missiles, and LAB-1's cargo pods.
    Every machine is drawn in its own space facing +x, like every creature, so the same drawing serves the sky shooter (js/sky/44zzzzj-sky-chase.js,
    which turns them to face where they fly), the Bestiary and the menu's round window. ETYPES_SKY puts them in the Bestiary's usual slots.
    ============================================================================================================================= */
@@ -113,11 +113,48 @@ const SKY_DRAW = {
   sk_whitebird(ctx, e, b, dk, bob, wind, d){                                    /* The White Bird: LAB-1, the scientists' white helicopter */
     skyHeliTop(ctx, e.r * 0.62, SKY_PAL.white, { spin: (e.anim || 0) * 5, gun: (e.phase | 0) >= 2, smoke: (e.phase | 0) >= 3 });
     ctx.save(); ctx.rotate(Math.PI / 2); ctx.fillStyle = '#2A8A7A'; ctx.font = 'bold ' + Math.round(e.r * 0.2) + 'px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('LAB-1', 0, e.r * 0.08); ctx.restore();
+  },
+  sk_shield(ctx, e, b, dk, bob, wind, d){                                       /* Shield Drone: a six-sided body on three rotors, an emitter in the middle that lights when its bubble is up */
+    const r = e.r, sp = (e.anim || 0) * 8, hex = function(q){ const p = []; for (let i = 0; i < 6; i++){ p.push(Math.cos(i * TAU / 6) * r * q, Math.sin(i * TAU / 6) * r * q); } return p; };
+    for (let i = 0; i < 3; i++) skyArm(ctx, i * TAU / 3 + Math.PI / 3, r * 0.88, r * 0.42, sp + i, dk);
+    tw_poly(ctx, hex(0.62), dk); tw_poly(ctx, hex(0.52), b);
+    for (let i = 0; i < 3; i++){ const a = i * TAU / 3; tw_ln(ctx, [Math.cos(a) * r * 0.2, Math.sin(a) * r * 0.2, Math.cos(a) * r * 0.56, Math.sin(a) * r * 0.56], Math.max(1.4, r * 0.07), SKY_LAB); }
+    fillCircle(ctx, 0, 0, r * 0.3, '#1E3A44'); fillCircle(ctx, 0, 0, r * 0.22, e.up || e.portrait ? '#9EE8FF' : SKY_LAB); fillCircle(ctx, -r * 0.07, -r * 0.07, r * 0.07, '#FFFFFF');
+    if (e.portrait) ringPath(ctx, 0, 0, r * 0.98, Math.max(1, r * 0.04), '#9EE8FF', 0.6);
+  },
+  sk_gnat(ctx, e, b, dk, bob, wind, d){                                         /* Swarm Drone: the smallest the lab makes, three rotors and a red eye; they fly nine in a line */
+    const r = e.r, sp = (e.anim || 0) * 12;
+    for (let i = 0; i < 3; i++) skyArm(ctx, i * TAU / 3 + Math.PI, r * 0.8, r * 0.5, sp + i, dk);
+    fillCircle(ctx, 0, 0, r * 0.44, dk); fillCircle(ctx, 0, 0, r * 0.34, b); fillCircle(ctx, r * 0.2, 0, r * 0.15, SKY_RED);
+    if (e.portrait) for (const o of [[-1.25, -0.95, 0.5], [-1.25, 0.95, 0.5]]){                                    /* in the Bestiary: two more of the line behind it */ ctx.save(); ctx.translate(o[0] * r, o[1] * r); ctx.scale(o[2] * 1.6, o[2] * 1.6); for (let i = 0; i < 3; i++) skyArm(ctx, i * TAU / 3 + Math.PI, r * 0.8, r * 0.5, sp + i + o[0], dk); fillCircle(ctx, 0, 0, r * 0.4, b); fillCircle(ctx, r * 0.2, 0, r * 0.15, SKY_RED); ctx.restore(); }
+  },
+  sk_boat(ctx, e, b, dk, bob, wind, d){                                         /* Missile Boat: a grey patrol boat down on the water, a rack of four missiles at the stern, its wake behind it */
+    const r = e.r, an = e.anim || 0;
+    tw_poly(ctx, [-r * 0.8, -r * 0.36, -r * 2.3, -r * 0.95, -r * 2.0, 0, -r * 2.3, r * 0.95, -r * 0.8, r * 0.36], 'rgba(235,250,255,.16)');          /* its wake: a fan of churned water, whiter down the middle */
+    tw_poly(ctx, [-r * 0.9, -r * 0.2, -r * 2.0, -r * 0.34, -r * 2.0, r * 0.34, -r * 0.9, r * 0.2], 'rgba(240,250,255,.3)');
+    const hull = function(q, col){ ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(-r * 0.95 * q, -r * 0.46 * q); ctx.lineTo(r * 0.35, -r * 0.46 * q); ctx.quadraticCurveTo(r * (0.75 + 0.4 * q), 0, r * 0.35, r * 0.46 * q); ctx.lineTo(-r * 0.95 * q, r * 0.46 * q); ctx.closePath(); ctx.fill(); };
+    hull(1, dk); hull(0.86, b);
+    tw_rect(ctx, r * 0.24, -r * 0.3, r * 0.08, r * 0.6, SKY_LAB);
+    tw_rect(ctx, -r * 0.42, -r * 0.24, r * 0.5, r * 0.48, '#3A4248'); tw_rect(ctx, -r * 0.02, -r * 0.2, r * 0.07, r * 0.4, SKY_GLASS);
+    tw_rect(ctx, -r * 0.8, -r * 0.27, r * 0.3, r * 0.54, '#2A3034'); for (let k = 0; k < 4; k++) fillCircle(ctx, -r * 0.65, -r * 0.195 + k * r * 0.13, r * 0.05, SKY_RED);
+    fillCircle(ctx, -r * 0.2, 0, r * 0.07, '#E8ECEE'); tw_ln(ctx, [-r * 0.2 - Math.cos(an * 2) * r * 0.16, -Math.sin(an * 2) * r * 0.16, -r * 0.2 + Math.cos(an * 2) * r * 0.16, Math.sin(an * 2) * r * 0.16], Math.max(1.2, r * 0.05), '#E8ECEE');
+  },
+  sk_missile(ctx, e, b, dk, bob, wind, d){                                      /* a boat's missile: white, a red nose, four fins and its flame */
+    const r = e.r;
+    tw_poly(ctx, [-r * 1.0, 0, -r * 1.9, -r * 0.3, -r * 2.4 - Math.sin((e.anim || 0) * 9) * r * 0.3, 0, -r * 1.9, r * 0.3], '#FFB04A'); tw_poly(ctx, [-r * 1.0, 0, -r * 1.5, -r * 0.16, -r * 1.8, 0, -r * 1.5, r * 0.16], '#FFF0B0');
+    tw_poly(ctx, [-r * 1.0, -r * 0.62, -r * 0.5, -r * 0.3, -r * 0.5, r * 0.3, -r * 1.0, r * 0.62], dk);
+    tw_rect(ctx, -r * 1.0, -r * 0.3, r * 1.6, r * 0.6, b); tw_poly(ctx, [r * 0.6, -r * 0.3, r * 1.3, 0, r * 0.6, r * 0.3], SKY_RED); tw_rect(ctx, -r * 0.2, -r * 0.3, r * 0.14, r * 0.6, SKY_LAB);
+  },
+  sk_pod(ctx, e, b, dk, bob, wind, d){                                          /* a cargo pod from LAB-1: a white drum with the lab's band and a hatch, drones folded inside */
+    const r = e.r;
+    fillCircle(ctx, 0, 0, r, dk); fillCircle(ctx, 0, 0, r * 0.88, b); tw_rect(ctx, -r * 0.88, -r * 0.14, r * 1.76, r * 0.28, '#2A8A7A');
+    fillCircle(ctx, 0, 0, r * 0.4, '#2A3034'); fillCircle(ctx, 0, 0, r * 0.3, '#8A9298'); fillCircle(ctx, r * 0.08, 0, r * 0.09, SKY_RED);
+    for (let i = 0; i < 4; i++){ const a = i * TAU / 4 + Math.PI / 4; fillCircle(ctx, Math.cos(a) * r * 0.68, Math.sin(a) * r * 0.68, r * 0.07, '#5A6268'); }
   }
 };
 /* in the Bestiary's boxes (e.portrait) a machine is drawn half again as big: its rotors stay inside its radius, where a creature's legs and tail reach out past it */
 Object.keys(SKY_DRAW).forEach(function(k){
-  ENEMY_LOOK_DRAW[k] = function(ctx, e){ if (!e.portrait) return SKY_DRAW[k].apply(this, arguments); const z = k === 'sk_greyescort' ? 1.15 : 1.5; ctx.save(); ctx.scale(z, z); SKY_DRAW[k].apply(this, arguments); ctx.restore(); };
+  ENEMY_LOOK_DRAW[k] = function(ctx, e){ if (!e.portrait) return SKY_DRAW[k].apply(this, arguments); const z = k === 'sk_greyescort' ? 1.15 : k === 'sk_boat' ? 0.95 : k === 'sk_gnat' ? 1.5 : 1.5; ctx.save(); ctx.scale(z, z); SKY_DRAW[k].apply(this, arguments); ctx.restore(); };
 });
 /* the Bestiary's table: the drones and the escorts in the usual slots (BESTIARY_ORDER), the two bosses where the fifth and tenth waves' bosses sit */
 const SKY_KIT = {
@@ -127,6 +164,9 @@ const SKY_KIT = {
   cheetah:  { look: 'sk_laser',      color: '#C8CED4', dark: '#4A5258', r: 26, name: 'Laser Drone' },
   vulture:  { look: 'sk_carrier',    color: '#8A949C', dark: '#2E363C', r: 40, name: 'Carrier Drone' },
   rhino:    { look: 'sk_gunship',    color: '#6A727A', dark: '#3E464C', r: 50, name: 'Escort Gunship' },
+  warthog:  { look: 'sk_shield',     color: '#B8C8D0', dark: '#34444C', r: 28, name: 'Shield Drone' },
+  termite:  { look: 'sk_gnat',       color: '#A8A0B0', dark: '#2E2A36', r: 11, name: 'Swarm Drone' },
+  crocodile: { look: 'sk_boat',      color: '#8A949C', dark: '#3A444C', r: 40, name: 'Missile Boat' },
   lion:     { look: 'sk_greyescort', color: '#5A6268', dark: '#30383E', r: 64, name: 'Grey Escort', title: 'Grey Escort', big: true },
   wildfire: { look: 'sk_whitebird',  color: '#E8ECEE', dark: '#AEB8BE', r: 88, name: 'The White Bird', title: 'The White Bird', big: true }
 };

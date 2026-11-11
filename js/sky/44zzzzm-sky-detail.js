@@ -276,8 +276,8 @@ skyDrawShots = function(ctx){
 };
 function skyBit(o){ if (!Sky.dbits) Sky.dbits = []; if (Sky.dbits.length < 140) Sky.dbits.push(Object.assign({ t: 0, a: Math.random() * TAU, va: (Math.random() - 0.5) * 18 }, o)); }
 const skyFireBase = skyFire;
-skyFire = function(){
-  const g = Sky.gun, s = skyS(), mz = skyMuzzle(g);
+skyFire = function(gOpt){
+  const g = gOpt || Sky.gun, s = skyS(), mz = skyMuzzle(g);
   skyFireBase.apply(this, arguments);
   const ex = g === 'nose' ? Sky.x + 8 * s : Sky.x + (g === 'left' ? -20 : 20) * s, ey = g === 'nose' ? Sky.y - 24 * s : Sky.y + 10 * s;              /* the brass, thrown out of the gun and falling away to the sea */
   skyBit({ k: 'brass', x: ex, y: ey, vx: (g === 'nose' ? 90 : -mz.dx * 40) * s * (0.6 + Math.random() * 0.8), vy: (40 + Math.random() * 60) * s, life: 0.7, sz: 1 });
@@ -303,7 +303,7 @@ skyStep = function(dt){
     if (!e.boss && e.hp < e.maxHp * 0.5 && e.r > 20 * s && Math.random() < dt * 5) skyBurst(e.x, e.y, 1, 'rgba(50,46,44,.6)', 20, { smoke: true, life: 0.9, r: 4 });   /* a hurt machine trails smoke */
     if (e.k === 'white' && (e.phase | 0) >= 2 && Math.random() < dt * (e.ditch > 0 ? 14 : 4)) skyBit({ k: 'paper', x: e.x + (Math.random() - 0.5) * e.r * 0.6, y: e.y, vx: (Math.random() - 0.5) * 80 * s, vy: (20 + Math.random() * 60) * s, va: (Math.random() - 0.5) * 6, life: 1.6 + Math.random(), sz: 1 });   /* pages from LAB-1's notes, blowing out */
   });
-  for (let i = Sky.dbits.length - 1; i >= 0; i--){ const b = Sky.dbits[i]; b.t += dt; b.x += b.vx * dt; b.y += b.vy * dt + SKY_TUNE.scroll * s * dt * 0.5; b.vx *= 1 - dt * 1.6; b.vy *= 1 - dt * 1.6; b.a += b.va * dt;
+  for (let i = Sky.dbits.length - 1; i >= 0; i--){ const b = Sky.dbits[i]; b.t += dt; b.x += b.vx * dt; b.y += b.vy * dt + skyScroll() * s * dt * 0.5; b.vx *= 1 - dt * 1.6; b.vy *= 1 - dt * 1.6; b.a += b.va * dt;
     if (b.t >= b.life){ if (b.k !== 'brass' && Sky.fx.length < 260) Sky.fx.push({ ring: true, x: b.x, y: b.y, R: 8 * s * b.sz, t: 0, life: 0.6, col: '235,250,255', thin: true }); Sky.dbits.splice(i, 1); } }
   if (Sky.on && !Sky.down && Sky.hull < Sky.max * 0.35 && Math.random() < dt * (Sky.hull < Sky.max * 0.15 ? 14 : 6)){                              /* a hurt helicopter: smoke from the engine, now and then a spark */
     skyBurst(Sky.x - 12 * s, Sky.y + 30 * s, 1, 'rgba(40,36,34,.85)', 40, { smoke: true, life: 1.3, r: 10 });

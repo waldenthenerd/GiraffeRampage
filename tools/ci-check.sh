@@ -68,7 +68,7 @@ timed=" ants-engineer enemy-detail enemy-motion particles perf-cache scenery-det
 add1(){ case "$timed" in *" $3 "*) [ -z "$2" ] && { printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$alone"; return; };; esac; printf '%s|%s|%s|%s\n' "$1" "$2" "$3" "${4:-}" >> "$list"; }
 # the long scenarios are split into parts (QA.part in the scenario, part=i/n), each its own check, so no one check holds up a share; the coverage
 # record joins a scenario's parts back together (tools/coverage.mjs)
-parts=" domes:2 island:3 tower:3 siege:2 fort:3 sky-chase:2 "
+parts=" domes:2 island:3 tower:3 siege:2 fort:3 sky-chase:3 "
 add(){ local n="${parts#* $3:}"; [ "$n" = "$parts" ] && { add1 "$@"; return; }; n="${n%% *}"
   for i in $(seq 1 "$n"); do add1 "$1 (part $i of $n)" "$2" "$3" "${4:+$4 }--params part=$i/$n"; done; }
 onpkg="gear-oldsave town-layers domes tower siege fort island camp late-polish music jukebox"   # also run on the joined and minified copy
