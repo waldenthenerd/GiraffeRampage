@@ -11,16 +11,19 @@ function addonsButtonHTML(){
   return '<button class="btn ghost" data-a="addons">Add-ons<small>' + small + '</small></button>';
 }
 
+/* an add-on's name, description and lock are plain text: a player's own add-on may put a < or & in them, so they are escaped before they go in the page */
+function addonEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
 function addonRowHTML(a){
   const t = ADDON_TAGS[a.tag], on = addonOn(a.id), un = addonUnlocked(a), can = addonCanSwitch(a);
   const notes = [];
-  if (!un) notes.push('Locked' + (a.lock ? ': ' + a.lock : '.'));
+  if (!un) notes.push('Locked' + (a.lock ? ': ' + addonEsc(a.lock) : '.'));
   else if (a.when === 'between-runs') notes.push(addonsInRun() ? 'Can be switched after this run.' : 'Takes effect from the next run.');
   if (a.dev) notes.push('Developer add-on, hidden from players.');
-  return '<div class="kv addonrow' + (un ? '' : ' locked') + '"><div>' + a.name +
+  return '<div class="kv addonrow' + (un ? '' : ' locked') + '"><div>' + addonEsc(a.name) +
       ' <span class="addontag" style="color:' + t.col + ';border-color:' + t.col + '" title="' + t.small + '">' + t.name + '</span>' +
-      (a.local ? ' <span class="addontag local" title="Your own add-on, from addons/' + a.local + '">Local \u00b7 ' + a.local + '</span>' : '') +
-      '<small>' + a.desc + (notes.length ? ' <em>' + notes.join(' ') + '</em>' : '') + '</small></div>' +
+      (a.local ? ' <span class="addontag local" title="Your own add-on, from addons/' + addonEsc(a.local) + '">Local \u00b7 ' + addonEsc(a.local) + '</span>' : '') +
+      '<small>' + addonEsc(a.desc) + (notes.length ? ' <em>' + notes.join(' ') + '</em>' : '') + '</small></div>' +
     '<button class="toggle' + (on ? ' on' : '') + '" data-a="addon-t-' + a.id + '"' + (can ? '' : ' disabled') + '>' + (un ? (on ? 'On' : 'Off') : 'Locked') + '</button></div>';
 }
 
@@ -78,6 +81,6 @@ function showAddons(){
     const names = r && r.report && r.report.addons;
     if (!out || !names || !names.length) return out;
     const at = out.lastIndexOf('</div>');
-    return out.slice(0, at) + '<div class="rr-line">Add-ons on: <b>' + names.join(', ') + '</b>.</div>' + out.slice(at);
+    return out.slice(0, at) + '<div class="rr-line">Add-ons on: <b>' + names.map(addonEsc).join(', ') + '</b>.</div>' + out.slice(at);
   };
 }
