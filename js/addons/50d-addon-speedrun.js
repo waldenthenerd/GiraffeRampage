@@ -9,13 +9,15 @@
    resumed from the menu sets no bests at all, since its clock started part way.
    Bests are kept for each run speed (normal, fast, hyperspeed, ultrafast: G.runSpeedLevel 0 to 3), since they are not the same race. They live
    in their own localStorage key, never in the campaign save, so switching the add-on off or deleting it leaves the save as it was.
-   The run report gets a "Speedrun" section: the total, the chapter, the wave splits with the difference to her best, and any new bests. */
+   The run report gets a "Speedrun" section: the total, the chapter, the wave splits with the difference to her best, and any new bests.
+   When a wave or chapter beats an earlier best, the clock flashes that split in green for a moment, with a short chime (a first time sets a
+   best quietly, so a first run does not chime on every wave). */
 addonRegister({ id: 'speedrun', name: 'Speedrun Timer', tag: 'extra',
   desc: 'A split timer in the HUD: the run, the wave and the chapter, against your best times. The run report lists every wave’s split and any new bests. Bests are kept for each run speed.',
   off: function(){ speedrunHide(); } });
 
 const SR_KEY = 'giraffe_rampage_speedrun_v1';
-const SR = { on: false, resumed: false, waveN: 0, waveT: 0, chap: 0, chapT: 0, chapClean: false, splits: [], chapters: [], newBests: [] };
+const SR = { on: false, resumed: false, waveN: 0, waveT: 0, chap: 0, chapT: 0, chapClean: false, splits: [], chapters: [], newBests: [], pb: null };
 
 /* ---- the bests: { s0: { w: { wave: seconds }, c: { chapter: seconds } }, s1: ..., s2: ..., s3: ... } ---- */
 function speedrunLoad(){
@@ -34,8 +36,17 @@ function speedrunBest(kind, n){ const v = speedrunTable(speedrunLoad(), kind)[n]
 function speedrunOffer(kind, n, sec){
   if (SR.resumed || !(sec > 0)) return 0;
   const d = speedrunLoad(), tb = speedrunTable(d, kind), old = typeof tb[n] === 'number' && tb[n] > 0 ? tb[n] : 0;
-  if (!old || sec < old){ tb[n] = Math.round(sec * 1000) / 1000; speedrunSave(d); SR.newBests.push({ kind: kind, n: n, sec: sec, old: old }); }
+  if (!old || sec < old){ tb[n] = Math.round(sec * 1000) / 1000; speedrunSave(d); SR.newBests.push({ kind: kind, n: n, sec: sec, old: old }); if (old) speedrunCheer(kind, n, sec, old); }
   return old;
+}
+/* a best beaten: the clock shows that split in green for SR_PB_SHOW ms, and a rising chime plays (once, if a wave and its chapter go together) */
+const SR_PB_SHOW = 2600;
+function speedrunNow(){ return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now(); }     /* real time: the run's clock stops at a chapter's end */
+function speedrunCheer(kind, n, sec, old){
+  const now = speedrunNow(), again = SR.pb && now - SR.pb.at < 200;
+  SR.pb = { kind: kind, n: n, sec: sec, d: sec - old, at: now };
+  if (again) return;
+  try { [784, 988, 1319].forEach(function(f, i){ SFX.tone('triangle', f, f, 0.16, 0.07, i * 0.07); }); } catch (e) {}
 }
 
 /* ---- the clock as text: 1:23.4, or 1:02:03.4 past an hour ---- */
@@ -71,7 +82,7 @@ function speedrunActive(){ return addonOn('speedrun') && SR.on && !G.attract; }
 {
   const baseStart = startRun;
   startRun = function(startChapter, waveOverride, snap){
-    SR.on = true; SR.resumed = !!snap; SR.waveN = 0; SR.chap = 0; SR.splits = []; SR.chapters = []; SR.newBests = [];     /* before: startRun starts the first wave itself */
+    SR.on = true; SR.resumed = !!snap; SR.waveN = 0; SR.chap = 0; SR.splits = []; SR.chapters = []; SR.newBests = []; SR.pb = null;     /* before: startRun starts the first wave itself */
     const r = baseStart.apply(this, arguments);
     if (G.attract) SR.on = false;
     return r;
@@ -153,6 +164,8 @@ function speedrunEl(){
       '#srTimer em,.sr-split em{font-style:normal;margin-left:6px}.ahead{color:#9BE04A}.behind{color:#FF8A6A}' +
       '.sr-splits{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 2px}.sr-split{font:600 11.5px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:2px 6px;border:1px solid rgba(255,255,255,.12);border-radius:4px;color:#E8DCC8}' +
       '.sr-split i{font-style:normal;color:#B8A890;margin-right:5px}.sr-split.pb{border-color:rgba(155,224,74,.6)}' +
+      '#srTimer.pb{border-color:rgba(155,224,74,.85);animation:srPb .65s ease-out 2}#srTimer .r.pb{color:#9BE04A}#srTimer .r.pb span:first-child{color:#9BE04A}' +
+      '@keyframes srPb{0%{box-shadow:0 0 0 0 rgba(155,224,74,.75),0 2px 10px rgba(0,0,0,.3)}100%{box-shadow:0 0 0 10px rgba(155,224,74,0),0 2px 10px rgba(0,0,0,.3)}}' +
       '@media (max-width:700px),(max-height:500px){#srTimer{left:8px;top:72px;min-width:0;padding:3px 7px;font-size:10.5px}#srTimer b{font-size:15px}}' +
       '@media (max-width:500px){#srTimer{top:90px}}';                              /* a phone held upright: the health bars wrap under the top row */
     document.head.appendChild(st);
@@ -172,8 +185,11 @@ function speedrunHUD(){
   else if (SR.splits.length){ const w = SR.splits[SR.splits.length - 1]; wTxt = '<div class="r"><span>Wave ' + w.wave + '</span><span>' + speedrunFmt(w.sec) + '</span></div>'; }
   if (live && SR.chap){ const sec = G.runTime - SR.chapT, d = SR.chapClean ? speedrunDelta(sec, speedrunBestCached('c', SR.chap)) : { txt: '' }; cTxt = '<div class="r"><span>Chapter ' + chapterLabel(SR.chap) + '</span><span>' + speedrunFmt(sec) + (d.txt ? '<em class="' + d.cls + '">' + d.txt + '</em>' : '') + '</span></div>'; }
   else if (SR.chapters.length){ const c = SR.chapters[SR.chapters.length - 1]; cTxt = '<div class="r"><span>Chapter ' + chapterLabel(c.ch) + '</span><span>' + speedrunFmt(c.sec) + '</span></div>'; }
-  const html = '<b>' + speedrunFmt(G.runTime) + '</b>' + wTxt + cTxt;
+  const pb = SR.pb && speedrunNow() - SR.pb.at < SR_PB_SHOW ? SR.pb : null;
+  const pbTxt = pb ? '<div class="r pb"><span>' + (pb.kind === 'c' ? 'Chapter ' + chapterLabel(pb.n) : 'Wave ' + pb.n) + ' best!</span><span>' + speedrunFmt(pb.sec) + '<em class="ahead">' + speedrunDelta(pb.sec, pb.sec - pb.d).txt + '</em></span></div>' : '';
+  const html = '<b>' + speedrunFmt(G.runTime) + '</b>' + pbTxt + wTxt + cTxt;
   if (html !== _srLast){ _srLast = html; e.innerHTML = html; }
+  if (e.classList.contains('pb') !== !!pb) e.classList.toggle('pb', !!pb);
   if (e.style.display !== 'block') e.style.display = 'block';
 }
 /* the HUD asks every frame, so the bests are read from storage once per wave or chapter, not per frame */

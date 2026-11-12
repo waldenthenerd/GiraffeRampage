@@ -11,12 +11,12 @@
      the flying:  the helicopter leans into a turn (Sky.bank) and pitches as she climbs and drops (Sky.pitch), with streaks in the air when she moves
                   fast; a hot gun's barrel glows, the gun she is moving to gets a ring closing on its muzzle, and the gun she is at kicks as it fires
                   (Sky.kick), her head at the door with it;
-     the sound:   the rotor's thud, louder as the hull goes; an alarm under a quarter of the hull, with the edges of the screen pulsing red; thunder.
+     the sound:   the rotor's thud, louder as the hull goes; ten beeps of alarm when the hull drops under a quarter, with the edges of the screen pulsing red; thunder.
    ============================================================================================================================= */
 const skyStartPlus = skyStart;
 skyStart = function(){
   const r = skyStartPlus.apply(this, arguments);
-  Sky.bank = 0; Sky.pitch = 0; Sky.px = Sky.x; Sky.py = Sky.y; Sky.wxK = 0; Sky.wxWas = ''; Sky.bolt = 0; Sky.boltT = 2.5; Sky.thudT = 0; Sky.alarmT = 0;
+  Sky.bank = 0; Sky.pitch = 0; Sky.px = Sky.x; Sky.py = Sky.y; Sky.wxK = 0; Sky.wxWas = ''; Sky.bolt = 0; Sky.boltT = 2.5; Sky.thudT = 0; Sky.alarmT = 0; Sky.alarmN = 0;
   return r;
 };
 const skyStepPlus = skyStep;
@@ -36,7 +36,8 @@ skyStep = function(dt){
   const f = clamp(Sky.hull / Sky.max, 0, 1);
   if (!(Sky.down > 0)){
     Sky.thudT -= dt; if (Sky.thudT <= 0){ Sky.thudT = 0.42 + f * 0.2; try { SFX.tone('sine', 78, 46, 0.11, 0.02 + 0.09 * (1 - f), 0, 0); } catch (e) {} }
-    if (f < 0.25){ Sky.alarmT -= dt; if (Sky.alarmT <= 0){ Sky.alarmT = 0.8; try { SFX.tone('square', 880, 880, 0.09, 0.06, 0, 0); SFX.tone('square', 660, 660, 0.09, 0.06, 0.12, 0); } catch (e) {} } }
+    if (f < 0.25){ Sky.alarmT -= dt; if (Sky.alarmT <= 0 && (Sky.alarmN | 0) < 10){ Sky.alarmT = 0.8; Sky.alarmN = (Sky.alarmN | 0) + 1; try { SFX.tone('square', 880, 880, 0.09, 0.06, 0, 0); SFX.tone('square', 660, 660, 0.09, 0.06, 0.12, 0); } catch (e) {} } }
+    else { Sky.alarmN = 0; Sky.alarmT = 0; }                                                     /* ten beeps, then quiet (the red edges stay); back above a quarter and it may sound again */
   }
   return r;
 };
@@ -122,7 +123,7 @@ skyDrawOver = function(ctx){
     ctx.strokeStyle = 'rgba(200,220,255,' + (0.4 * wk).toFixed(3) + ')'; ctx.lineWidth = 1.2 * s; ctx.beginPath();
     for (let i = 0; i < 110; i++){ const x = skyDHash(i + 300) * (W + 80) - 20, y = ((i * 61.7 + t * 1500 * s * (0.8 + skyDHash(i + 400) * 0.4)) % (H + 80)) - 40; ctx.moveTo(x, y); ctx.lineTo(x - 9 * s, y + 34 * s); }
     ctx.stroke();
-    if (Sky.bolt > 0){ ctx.fillStyle = 'rgba(235,240,255,' + (Math.min(0.5, Sky.bolt * 1.6) * wk).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H); }
+    if (Sky.bolt > 0){ const calm = Settings.calmFlash ? 0.25 : 1; ctx.fillStyle = 'rgba(235,240,255,' + (Math.min(0.5, Sky.bolt * 1.6) * wk * calm).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H); }   /* "Reduce flashes": the same gentle sky as the main game's lightning */
   }
   if (wk > 0.01 && wx === 'cloud'){                                                            /* the cloud bank: thick across the top of the screen, thinning down to where she flies; the drones come out of it */
     for (let row = 0; row < 4; row++){

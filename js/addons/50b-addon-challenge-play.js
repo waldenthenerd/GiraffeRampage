@@ -535,7 +535,7 @@ var GRChallengePlay = (function(){
       ctx.strokeStyle=appearance.time==='night'?'#d8d8e855':'#e8eef866';ctx.lineWidth=1.3;
       for(let n=0;n<70+detail*35;n++){const x=(random()*1100+time*120)%1100-70,y=(random()*720+time*420)%720-40;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-10,y+20);ctx.stroke();}
       ctx.fillStyle='#10142a22';ctx.fillRect(0,0,960,640);
-      const beat=Math.floor(time/5.3),ph=time-beat*5.3;if(time&&hsh(beat+.5)>.45&&ph<.35){ctx.fillStyle='rgba(240,245,255,'+((ph<.08||ph>.16&&ph<.24)?.35:.08).toFixed(3)+')';ctx.fillRect(0,0,960,640);}
+      const beat=Math.floor(time/5.3),ph=time-beat*5.3;if(time&&hsh(beat+.5)>.45&&ph<.35){const calm=typeof Settings!=='undefined'&&Settings.calmFlash?.25:1;ctx.fillStyle='rgba(240,245,255,'+(((ph<.08||ph>.16&&ph<.24)?.35:.08)*calm).toFixed(3)+')';ctx.fillRect(0,0,960,640);}   /* "Reduce flashes" softens it, as in the main game */
     }else if(appearance.weather==='fog'){                                     /* soft banks of mist drifting across */
       for(let n=0;n<10+detail*4;n++){const x=(random()*1300+time*(8+n%3*4))%1300-170,y=random()*640,rx=120+random()*90;ellipse(x,y,rx,rx*.35,appearance.time==='night'?'#8a90a01c':'#f4f2ea26');}
       ctx.fillStyle=appearance.time==='night'?'#7a80901a':'#e8e6de22';ctx.fillRect(0,0,960,640);

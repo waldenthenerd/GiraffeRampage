@@ -166,6 +166,13 @@ check('Visual detail, weather and time settings never change gameplay',()=>{
   const l=level('survive',100);l.appearance={time:'day',weather:'clear',detail:0};R.start(l);key('d');const one=JSON.stringify(R.advance(1));R.stop();
   l.appearance={time:'night',weather:'snow',detail:2};R.start(l);key('d');assert.equal(JSON.stringify(R.advance(1)),one);
 });
+check('Storm lightning is softened by the game\'s Reduce flashes setting',()=>{
+  const hsh=n=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s);};let beat=1;while(hsh(beat+.5)<=.45)beat++;
+  const l=level('survive',100);l.appearance={time:'day',weather:'storm',detail:1};
+  const flash=()=>{let a=-1;const ctx=new Proxy({}, {get:(o,k)=>k==='createRadialGradient'||k==='createLinearGradient'?()=>({addColorStop(){}}):()=>{},set:(o,k,v)=>{const m=k==='fillStyle'&&/^rgba\(240,245,255,([\d.]+)\)$/.exec(v);if(m)a=+m[1];return true;}});R.paintArena(ctx,l,{time:beat*5.3+.04});return a;};
+  const plain=flash();sandbox.Settings={calmFlash:false};const off=flash();sandbox.Settings={calmFlash:true};const calm=flash();delete sandbox.Settings;
+  assert.equal(plain,.35);assert.equal(off,.35);assert.ok(Math.abs(calm-.35*.25)<.002,String(calm));
+});
 check('Retry resets timer and reuses exact level; quit cleans up',()=>{
   let quits=0;R.start(level(),{onQuit(){quits++;}});R.advance(2);
   let dialog=nodes.filter(n=>n.id==='challengePlay'&&n.isConnected).at(-1);
