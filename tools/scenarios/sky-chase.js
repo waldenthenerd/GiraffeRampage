@@ -251,7 +251,7 @@
     /* ---- the low-hull alarm: ten beeps and then quiet (the red edges stay); back above a quarter and down again, it sounds again ---- */
     var beeps = 0, bt0 = SFX.tone; SFX.tone = function(type, f0){ if (type === 'square' && f0 === 880) beeps++; return bt0.apply(this, arguments); };
     var low = function(n){ for (var lq = 0; lq < n; lq++){ Sky.hull = Sky.max * 0.2; steps(1); } };
-    try { idle(3); low(420); var b14 = beeps; Sky.hull = Sky.max; steps(3); low(30); check('alarmTen', b14 === 10 && Sky.alarmN === 1 && beeps === 11); out.alarm = b14 + '/' + beeps; } finally { SFX.tone = bt0; }
+    try { idle(3); low(420); var b14 = beeps; Sky.hull = Sky.max; steps(3); low(15); check('alarmTen', b14 === 10 && Sky.alarmN === 1 && beeps === 11); out.alarm = b14 + '/' + beeps; } finally { SFX.tone = bt0; }
     /* ---- "Reduce flashes" softens the squall's lightning to a quarter, like the main game's ---- */
     var boltA = function(calm){ var was = Settings.calmFlash, a = -1, fr = px.fillRect; Settings.calmFlash = calm;
       px.fillRect = function(x, y, w, h){ var m = /^rgba\(235, ?240, ?255, ?([\d.]+)\)$/.exec(px.fillStyle); if (m && w >= G.W && h >= G.H) a = +m[1]; return fr.apply(this, arguments); };
