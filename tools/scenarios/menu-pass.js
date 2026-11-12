@@ -9,6 +9,7 @@ function rect(el){ return el.getBoundingClientRect(); }
 function hit(a, b){ return a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1; }
 function unlock(){ try { GR.handleAction('debug-unlockall'); } catch (e) {} Save.data.gold = 48200; Save.data.gems = 310; }
 function shown(){ return $$('#overlay [data-a]').filter(function(b){ return b.offsetParent && !/^ch-go|^speed|^debug/.test(b.getAttribute('data-a')); }); }
+function inner(){ return $$('.menu2 .mgbody .btn').filter(function(b){ return b.offsetParent; }).map(function(b){ return b.getAttribute('data-a'); }); }
 function offScreen(){ return shown().concat($$('.menu2 .mrecord')).filter(function(b){ var r = rect(b); return r.bottom > innerHeight + 1 || r.top < 0 || r.right > innerWidth + 1 || r.left < 0; }).map(function(b){ return b.getAttribute('data-a') || 'record'; }); }
 var wide = innerWidth >= 1000 && innerHeight >= 521;
 try {
@@ -17,6 +18,9 @@ try {
     if (view === 'full') unlock();
     if (QA.params.ch) setMenuChapter(+QA.params.ch);
     showMenu(); steps(90); showMenu();
+    if (QA.params.open) GR.handleAction('mg-' + QA.params.open);
+    if (QA.params.lock){ Save.data['chapter' + (+QA.params.lock - 1) + 'Complete'] = false; setMenuChapter(+QA.params.lock); showMenu(); steps(3); showMenu(); }
+    if (QA.params.slide){ document.head.appendChild(Object.assign(document.createElement('style'), { textContent: '.chghost,.chin,.chtxt{animation-delay:-.1s!important;animation-play-state:paused!important}' })); GR.handleAction('ch-next'); }
     if (QA.params.notes){ Ach.toast('★ First Steps', 'Finish a run  (+5 gems)'); var w = document.getElementById('wardToast') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'wardToast' })); w.textContent = 'New coat color and pattern: Rust and Dune ripples. Find them under Coat colors in the main menu.'; w.className = 'on'; }
     out.off = offScreen(); QA.done(out);
   } else {
@@ -26,9 +30,15 @@ try {
     out.kept = before.every(function(a){ return $$('#overlay [data-a="' + a + '"]').length === 1; });
     out.strip = !!$('.menu2 .mtop') && $$('.mtop .mw').length === 2 && /0/.test($('.mw.gold b').textContent) && ['help', 'addons', 'settings'].every(function(a){ return !!$('.mtop .mutils [data-a="' + a + '"]'); });
     out.utilNames = $$('.mtop .mutil').every(function(b){ return (b.getAttribute('aria-label') || '').length > 3; });
-    out.groups = $$('.menu2 .mgroup').length >= 3 && $$('.menu2 .mside .btn').every(function(b){ return !!b.closest('.mgroup'); });
+    out.groups = $$('.menu2 .mgroup').length === 4 && $$('.menu2 .mside .btn').every(function(b){ return !!b.closest('.mgroup'); }) && $$('.menu2 .mgbtn').every(function(b){ return b.offsetParent && b.querySelector('small').textContent.length > 3; });
+    out.closed = inner().length === 0 && $$('.mgbtn[aria-expanded="true"]').length === 0;                      /* the menu opens with every group shut */
+    GR.handleAction('mg-places'); out.opens = inner().join() === 'town-enter,co-open' && $('[data-a="mg-places"]').getAttribute('aria-expanded') === 'true';
+    GR.handleAction('mg-books'); out.oneOpen = inner().join() === 'bestiary,wardrobe,ach-open' && $$('.mgroup.open').length === 1;
+    showMenu(); out.staysOpen = inner().length === 3;                                                            /* the menu is drawn again often (a chapter arrow, a page closed) */
+    if (wide) out.fitsOpenNew = offScreen().length === 0 ? true : offScreen();
+    GR.handleAction('mg-books'); out.shuts = inner().length === 0;
     out.icons = $$('.menu2 .mside .btn[data-a], .mtop .mutil').every(function(b){ return !MENU_ICONS[b.getAttribute('data-a')] || !!b.querySelector('.mbi svg'); });
-    var nl = $$('.mside.l .btn').length, nr = $$('.mside.r .btn').length; out.balancedNew = Math.abs(nl - nr) <= 2; out.cols = [nl, nr];
+    var nl = $$('.mside.l .mgbtn').length, nr = $$('.mside.r .mgbtn').length; out.balancedNew = nl === 2 && nr === 2; out.cols = [nl, nr];
     out.noZeros = $$('.menu2 .mside .btn small').every(function(s){ return !/^0 (of|gold)\b/.test(s.textContent.trim()); });
     out.invite = /Gold from your runs/.test($('[data-a="shop"]').textContent) && /Trophies pay/.test($('[data-a="ach-open"]').textContent);
     out.noLatestNew = !$('[data-a="ch-latest"]');
@@ -38,7 +48,15 @@ try {
     out.htmlSame = (chapterSelectorHTML().match(/class="chdot[ "]/g) || []).length === TOTAL_CHAPTERS;                /* the page other files build on is as it was */
     if (wide) out.fitsNew = offScreen().length === 0 ? true : offScreen();
     out.worldNew = G.biome === 'savanna';
-    GR.handleAction('ch-go-4'); out.dotGoesLocked = menuChapter() === 4 && G.biome === 'savanna' && !!$('.chstart[disabled]');     /* a locked chapter can be looked at, and is not shown off behind the menu */
+    GR.handleAction('ch-go-4'); out.dotGoesLocked = menuChapter() === 4 && G.biome === 'savanna' && !$('.chstart[disabled]');     /* a locked chapter can be looked at, and is not shown off behind the menu */
+    out.lockedLook = $('.chpic').classList.contains('sil') && $('.chdesc').textContent === MENU_TEASE[3] && $('.chdesc').textContent !== CHAPTER_INFO[3].desc && /Locked/.test($('.chlock').textContent);
+    var nb = $('[data-a="ch-need"]'); out.needButton = !!nb && /Go to Chapter 1/.test(nb.textContent) && /on the way to Chapter 4/.test(nb.textContent);
+    GR.handleAction('ch-go-2'); out.needNext = /Go to Chapter 1/.test($('[data-a="ch-need"]').textContent) && /Clear it to open Chapter 2/.test($('[data-a="ch-need"]').textContent);
+    GR.handleAction('ch-need'); out.needGoes = menuChapter() === 1 && !$('[data-a="ch-need"]') && !!$('[data-a="play"]') && !$('.chpic').classList.contains('sil') && $('.chdesc').textContent === CHAPTER_INFO[0].desc;
+    /* the slide: forward comes in from the right, back from the left, and drawing the same chapter again does not slide */
+    GR.handleAction('ch-go-3'); var w1 = $('.chwrap'); out.slideFwd = w1.style.getPropertyValue('--d') === '1' && $('#chPreview').classList.contains('chin') && !!$('.chpic .chghost') && $('.chname').classList.contains('chtxt');
+    GR.handleAction('ch-prev'); out.slideBack = $('.chwrap').style.getPropertyValue('--d') === '-1' && $('#chPreview').classList.contains('chin') && $$('.chpic .chghost').length === 1;
+    showMenu(); out.noSlide = !$('#chPreview').classList.contains('chin') && !$('.chpic .chghost');
     /* 2. everything open */
     unlock(); setMenuChapter(1); showMenu(); steps(5); showMenu();
     out.wallet = /48\.2k/.test($('.mw.gold b').textContent) && /310/.test($('.mw.gems b').textContent);
@@ -47,9 +65,9 @@ try {
     out.done = nDone === flags && nDone > 10 && /\(cleared\)/.test(d2[0].title) && new RegExp(nDone + ' of ' + TOTAL_CHAPTERS + ' chapters cleared').test($('.chkey').textContent);
     var far = menuLatestChapter(), lb = $('[data-a="ch-latest"]');
     out.latest = far === TOTAL_CHAPTERS && !!lb && lb.textContent.indexOf('Chapter ' + chapterLabel(far)) > 0;
-    if (wide) out.fitsFull = offScreen().length === 0 ? true : offScreen();
+    if (wide){ out.fitsFull = offScreen().length === 0 ? true : offScreen(); var wo = []; ['shops', 'places', 'play', 'books'].forEach(function(g){ MenuUI.open = ''; GR.handleAction('mg-' + g); var o = offScreen(); if (o.length || !inner().length) wo.push(g + ':' + o.join()); }); out.fitsOpenFull = wo.length ? wo : true; MenuUI.open = ''; showMenu(); }
     GR.handleAction('ch-go-9'); out.dotGoes = menuChapter() === 9 && $('.chdot.on').getAttribute('data-a') === 'ch-go-9' && G.biome === 'venus';
-    if (wide){ var worst = []; [14, 16, 17, 18].forEach(function(n){ GR.handleAction('ch-go-' + n); var o = offScreen(); if (o.length) worst.push(n + ':' + o.join()); }); out.fitsLong = worst.length ? worst : true; }
+    if (wide){ MenuUI.open = 'shops'; var worst = []; [14, 16, 17, 18].forEach(function(n){ GR.handleAction('ch-go-' + n); var o = offScreen(); if (o.length) worst.push(n + ':' + o.join()); }); out.fitsLong = worst.length ? worst : true; MenuUI.open = ''; }
     GR.handleAction('ch-go-' + TOTAL_CHAPTERS); out.latestHidden = !$('[data-a="ch-latest"]') && G.biome === 'ocean';                 /* on the latest chapter the Start button is it; the air chase is over the sea */
     GR.handleAction('ch-go-2'); steps(40); out.worldRuns = G.biome === 'snow' && G.attract === true && !P.dead && G.state === 'menu';
     /* 3. notes cover no control (and, on a computer, not the title) */
@@ -63,7 +81,7 @@ try {
     /* 4. the latest chapter button starts it */
     setMenuChapter(1); showMenu(); GR.handleAction('ch-latest');
     out.latestStarts = menuChapter() === far && G.state !== 'menu';
-    var need = ['kept', 'strip', 'utilNames', 'groups', 'icons', 'balancedNew', 'noZeros', 'invite', 'noLatestNew', 'dots', 'keyNew', 'htmlSame', 'worldNew', 'dotGoesLocked', 'wallet', 'goldKept', 'done', 'latest', 'dotGoes', 'latestHidden', 'worldRuns', 'notesClear', 'notesApart', 'latestStarts'].concat(wide ? ['fitsNew', 'fitsFull', 'fitsLong'] : []);
+    var need = ['kept', 'strip', 'utilNames', 'groups', 'closed', 'opens', 'oneOpen', 'staysOpen', 'shuts', 'icons', 'balancedNew', 'noZeros', 'invite', 'noLatestNew', 'dots', 'keyNew', 'htmlSame', 'worldNew', 'dotGoesLocked', 'lockedLook', 'needButton', 'needNext', 'needGoes', 'slideFwd', 'slideBack', 'noSlide', 'wallet', 'goldKept', 'done', 'latest', 'dotGoes', 'latestHidden', 'worldRuns', 'notesClear', 'notesApart', 'latestStarts'].concat(wide ? ['fitsNew', 'fitsOpenNew', 'fitsFull', 'fitsOpenFull', 'fitsLong'] : []);
     out.pass = out.errs.length === 0 && need.every(function(k){ return out[k] === true; });
     out.failed = need.filter(function(k){ return out[k] !== true; });
     QA.done(out);

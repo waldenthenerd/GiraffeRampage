@@ -311,7 +311,7 @@ game. This is the complete list for this version (246 scripts; the developer pan
 | 235 | `js/sky/44zzzzm-sky-detail.js` | The Air Chase's detail layer: the sea's small things, boats and animals that steer around rocks, the machines' small parts, her head out of the side door. |
 | 236 | `js/sky/44zzzzo-sky-plus.js` | The Air Chase's look and feel: night, rain, the cloud bank, clouds above and below, the helicopter banking, the guns' recoil and glow, the rotor and alarm sounds. |
 | 237 | `js/ui/44zzzzn-addons-page.js` | The Add-ons page (from the main menu and the pause menu), the add-ons tag in the HUD and the line in the run report. |
-| 238 | `js/ui/44zzzzp-menu-pass.js` | The tidied main menu: top strip (gold, gems, Guide, Add-ons, Settings), grouped buttons with pictures, chapter dots, the Latest chapter button, the chapter's world behind the menu. |
+| 238 | `js/ui/44zzzzp-menu-pass.js` | The tidied main menu: top strip (gold, gems, Guide, Add-ons, Settings), four group buttons that open their pages, chapter dots, the Latest chapter button, the chapter's world behind the menu. |
 | 239 | `js/addons/50a-addon-challenge-data.js` | Add-on Challenge Workshop (off until the player switches it on), part 1: registration, recipes, share codes, the draft shelf and the best result on each recipe (its own browser storage, not the save). |
 | 240 | `js/addons/50b-addon-challenge-play.js` | Add-on Challenge Workshop, part 2: the challenge arena and its painter. |
 | 241 | `js/addons/50c-addon-challenge-ui.js` | Add-on Challenge Workshop, part 3: the workshop dialog, its styles, the menu button and the Guide topic. |
