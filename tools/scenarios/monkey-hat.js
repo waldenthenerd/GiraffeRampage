@@ -13,6 +13,14 @@ try {
   out.notOnWheel = ACC_SLICES.every(function(s){ return !s.item || s.item.id !== 'monkey'; }) && !(miniSlicesFor ? miniSlicesFor(1) : []).some(function(s){ return s.item && s.item.id === 'monkey'; });
   out.hint = /secret/i.test(TOWN_SPECIAL_SRC.monkey || '');
 
+  /* the monkeys chatter at the 10th and the 15th, and not before or between */
+  function said(re){ return (G.texts || []).some(function(t){ return re.test(t.txt || t.text || ''); }); }
+  clean(); GR.startRun(1); G.enemies.length = 0; P.invuln = 99; G.texts.length = 0;
+  kill(9, 1); out.chatterNot9 = !said(/ooh/i);
+  kill(1, 1); out.chatter10 = said(/ooh\?/i) && !said(/eyeing/i);
+  G.texts.length = 0; kill(4, 1); out.chatterNot14 = !said(/ooh/i);
+  kill(1, 1); out.chatter15 = said(/ooh ooh\?/i) && said(/eyeing her bare head/i);
+  G.texts.length = 0; kill(4, 1); out.chatterNot19 = !said(/ooh|eyeing/i);
   /* 19 bare-headed savanna monkeys: not yet; the 20th: it moves in and is worn */
   clean(); GR.startRun(1); G.enemies.length = 0; P.invuln = 99;
   kill(19, 1); out.notYet = !accOwned('monkey') && MONKEY.n === 19;
@@ -22,7 +30,9 @@ try {
   clean(); kill(12, 1); GR.startRun(1); G.enemies.length = 0; out.resets = MONKEY.n === 0;
   /* with a hat on, monkeys do not count */
   clean(); miniData().own.beanie = 1; miniData().hat = 'beanie'; GR.startRun(1); G.enemies.length = 0;
-  kill(30, 1); out.hatBlocks = !accOwned('monkey') && MONKEY.n === 0; miniData().hat = '';
+  G.texts.length = 0; kill(30, 1); out.hatBlocks = !accOwned('monkey') && MONKEY.n === 0 && !said(/ooh|eyeing/i); miniData().hat = '';
+  /* once she owns it, the monkeys say nothing more */
+  miniData().own.monkey = 1; GR.startRun(1); G.enemies.length = 0; G.texts.length = 0; kill(20, 1); out.ownedQuiet = !said(/ooh|eyeing/i) && MONKEY.n === 0;
   /* jungle howler monkeys count; the arctic's ermine (the same creature in a coat) does not */
   clean(); GR.startRun(5); G.enemies.length = 0; var e5 = spawnEnemy('baboon', P.x + 200, P.y, W(5)); out.howlerLook = !!e5 && e5.def.look === 'howler'; if (e5) GR_kill(e5);
   kill(19, 5); out.jungle = accOwned('monkey');
@@ -39,7 +49,7 @@ try {
   drawAccIcon(q, it, 60, 60, 2, 1.3); q.save(); q.translate(60, 60); drawHatOnHeadTop(q, 'monkey', 0.5); q.restore(); drawHatOnHeadSide(q, 'monkey', 2, 60, 80);
   var px = q.getImageData(0, 0, 120, 120).data, n = 0; for (var k = 3; k < px.length; k += 4) if (px[k] > 0) n++; out.drawn = n > 400;
   hideOverlay(); G.state = 'menu';
-  out.pass = out.errs.length === 0 && ['item', 'lastSlot', 'notOnWheel', 'hint', 'notYet', 'given', 'resets', 'hatBlocks', 'howlerLook', 'jungle', 'ermineNo', 'othersNo', 'photo', 'outfitLocked', 'outfitOwned', 'drawn'].every(function(k){ return out[k] === true; });
+  out.pass = out.errs.length === 0 && ['item', 'lastSlot', 'notOnWheel', 'hint', 'chatterNot9', 'chatter10', 'chatterNot14', 'chatter15', 'chatterNot19', 'ownedQuiet', 'notYet', 'given', 'resets', 'hatBlocks', 'howlerLook', 'jungle', 'ermineNo', 'othersNo', 'photo', 'outfitLocked', 'outfitOwned', 'drawn'].every(function(k){ return out[k] === true; });
 
   /* screenshots */
   var v = QA.params.view;

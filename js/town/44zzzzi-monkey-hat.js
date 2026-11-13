@@ -3,12 +3,15 @@
 /* ========================= 44zzzzi. THE MONKEY HAT ========================= */
 /* THE SECRET: in one run, with no hat on, defeat 20 monkeys (the savanna's baboons, or the jungle's howler monkeys; the other chapters dress
    the same creature as something else, an ermine or a drone, and those do not count). When the twentieth falls, a monkey climbs onto her
-   bare head and stays: "Ooh ooh!". Nothing in the game says how; the Gear page of the town journal only hints at it.
+   bare head and stays: "Ooh ooh!". Nothing in the game says how; the Gear page of the town journal only hints at it. On the way the monkeys chatter
+   (at the 10th, a small "ooh?"; at the 15th, a louder one and a line that they are eyeing her bare head), so a player who stumbles on it can tell
+   something is building; once she owns the hat, or with a hat on, they say nothing.
    It is a town-style hat (town: true keeps it off the minigame wheel) so it shows in the wardrobe, the collection's "Only in Longneck Town"
    section and the journal like the others. It takes the LAST place photo codes can number (6 bits, ACC_ITEMS index 63): nothing may be
    added to ACC_ITEMS after it without a new photo code version. Owning it is miniData().own.monkey, like every other hat, so no new save field. */
 const MONKEY_HAT_GOAL = 20;
 const MONKEY = { n: 0 };                                            /* monkeys defeated bare-headed this run */
+const MONKEY_CHATTER = [10, 15];                                    /* the counts at which the monkeys chatter, a hint that something is building */
 (function(){
   const h = { id: 'monkey', name: 'Monkey Hat', c: '#7A4A26', kind: 'hat', rare: false, p: 0, town: true, secret: true };
   if (ACC_ITEMS.length >= 63) return;                               /* the photo codes cannot number any more */
@@ -69,10 +72,26 @@ const MONKEY = { n: 0 };                                            /* monkeys d
     if (counts && !G.attract && !accOwned('monkey') && !accEquipped('hat')){
       MONKEY.n++;
       if (MONKEY.n >= MONKEY_HAT_GOAL) monkeyHatGive();
+      else if (MONKEY_CHATTER.indexOf(MONKEY.n) >= 0) monkeyChatter(MONKEY.n);
     }
     return r;
   };
 })();
+/* the monkeys notice her bare head: a small "ooh?" over her at the 10th, a louder chatter and a hint at the 15th, with a short monkey sound.
+   Text and sound only, no flash; the sound goes through SFX.tone, so mute and the effects volume apply. */
+function monkeyChatter(n){
+  const big = n >= MONKEY_CHATTER[MONKEY_CHATTER.length - 1];
+  try { if (typeof gagSay === 'function'){
+    gagSay(P.x + 16, P.y - 72, big ? 'Ooh ooh? Ah?' : 'ooh?', '#FFD98A', big ? 2.2 : 1.8);
+    if (big) gagSay(P.x, P.y - 52, 'The monkeys are eyeing her bare head.', '#FFF6D8', 2.6);
+  } } catch (err) {}
+  try { if (SFX.ctx){
+    const b = SFX.abilityGain;
+    SFX.tone('triangle', 480, 760, 0.09, 0.13, 0, 0, b);           /* "ooh" */
+    SFX.tone('triangle', 620, 940, 0.08, 0.11, 0.12, 0, b);
+    if (big) SFX.tone('triangle', 980, 640, 0.11, 0.12, 0.25, 0, b);  /* "ah" */
+  } } catch (err) {}
+}
 /* the monkey moves in: she owns it and wears it at once (her head is bare, so miniAward puts it on) */
 function monkeyHatGive(){
   if (accOwned('monkey') || !ACC_BY_ID.monkey) return;
