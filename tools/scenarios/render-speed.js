@@ -12,7 +12,7 @@ try {
   var proto = CanvasRenderingContext2D.prototype, blurred = 0, counting = false, saved = {};
   ['fill', 'stroke'].forEach(function(k){ saved[k] = proto[k]; proto[k] = function(){ if (counting && this.shadowBlur > 0) blurred++; return saved[k].apply(this, arguments); }; });
   var most = 0, dp = drawPlayer; drawPlayer = function(){ counting = true; blurred = 0; try { return dp.apply(this, arguments); } finally { counting = false; most = Math.max(most, blurred); } };
-  GR.step(1 / 60); render();
+  GR.step(1 / 60); GR.render();                 /* GR.render always draws, even when CI draws only some frames */
   out.rimBlurred = most;                                       /* per drawing of her */
   out.rimKept = most >= 4;                                     /* her outline still gets it */
   out.rimFew = most <= 12;                                     /* was 30 or so: hooves, tail ball, armor, cape, mane, ears and every spot each blurred their own */
@@ -21,7 +21,7 @@ try {
   /* 2. the grade: no soft-light is laid over the frame, hard-light is */
   var ops = {}, ds = Object.getOwnPropertyDescriptor(proto, 'globalCompositeOperation');
   Object.defineProperty(proto, 'globalCompositeOperation', { configurable: true, get: function(){ return ds.get.call(this); }, set: function(v){ ops[v] = (ops[v] || 0) + 1; ds.set.call(this, v); } });
-  GR.step(1 / 60); render();
+  GR.step(1 / 60); GR.render();                 /* GR.render always draws, even when CI draws only some frames */
   Object.defineProperty(proto, 'globalCompositeOperation', ds);
   out.gradeOps = ops;
   out.noSoftLight = !ops['soft-light'];
@@ -38,7 +38,7 @@ try {
   out.tilesCpu = !!(att && att.willReadFrequently === true);
   var smooth = [], di = proto.drawImage;
   proto.drawImage = function(src){ if (src && src.width >= 300 && src.width === src.height && this.canvas && this.canvas.id === 'stage') smooth.push(this.imageSmoothingEnabled); return di.apply(this, arguments); };
-  steps(6); proto.drawImage = di;
+  steps(6); GR.render(); proto.drawImage = di;
   out.tileBlits = smooth.length;
   out.tilesUnsmoothed = smooth.length > 0 && smooth.every(function(v){ return v === false; });
   out.smoothingRestored = CTX.imageSmoothingEnabled === true;
