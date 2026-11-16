@@ -85,8 +85,25 @@ function render(){
   drawScreenFX(ctx);
 }
 
+/* The dark edge is a screen-sized gradient, evaluated pixel by pixel every frame (a tenth of a menu frame where the CPU draws the canvas). It never changes
+   between resizes, so it is painted once into a bitmap the size of the canvas and copied 1:1. */
+let vigCv = null, vigKey = '';
+function vignetteBitmap(ctx){
+  if (!vignette || ctx.canvas !== stage || !ctx.getTransform) return null;
+  const key = stage.width + 'x' + stage.height + '|' + G.W + 'x' + G.H;
+  if (key !== vigKey || !vigCv){
+    vigCv = vigCv || document.createElement('canvas');
+    vigCv.width = stage.width; vigCv.height = stage.height;
+    const x = vigCv.getContext('2d', { willReadFrequently: true });
+    x.setTransform(stage.width / G.W, 0, 0, stage.height / G.H, 0, 0); x.fillStyle = vignette; x.fillRect(0, 0, G.W, G.H);
+    vigKey = key;
+  }
+  return vigCv;
+}
 function drawScreenFX(ctx){
-  if (vignette){ ctx.fillStyle = vignette; ctx.fillRect(0, 0, G.W, G.H); }
+  const vb = vignetteBitmap(ctx);
+  if (vb){ ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(vb, 0, 0); ctx.restore(); }
+  else if (vignette){ ctx.fillStyle = vignette; ctx.fillRect(0, 0, G.W, G.H); }
   if (lowHpGrad && G.state === 'playing' && P.hp / P.maxHp < 0.3){
     ctx.globalAlpha = 0.4 + 0.3 * Math.sin(G.time * 5);
     ctx.fillStyle = lowHpGrad; ctx.fillRect(0, 0, G.W, G.H);
