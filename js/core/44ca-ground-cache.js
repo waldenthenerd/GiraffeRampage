@@ -36,17 +36,19 @@ function tilesDraw(L, sig, ctx, cx, cy, vw, vh, paint){
     if (L.map.has(key)) continue;
     if (built >= L.perFrame){ missing++; continue; }
     const cv = document.createElement('canvas'); cv.width = cv.height = px;
-    const c = cv.getContext('2d'); if (!c){ missing++; continue; }
+    const c = cv.getContext('2d', { willReadFrequently: true }); if (!c){ missing++; continue; }      /* kept in memory the CPU can read: a tile this big would otherwise be put on the graphics card by Firefox, and copying it onto the screen canvas then waits for the card every frame (a sixth of a frame in a Firefox profile) */
     c.setTransform(s, 0, 0, s, -i * CH * s, -j * CH * s);
     try { paint(c, i * CH + CH / 2, j * CH + CH / 2, CH + L.pad * 2, CH + L.pad * 2); } catch (e) { missing++; continue; }
     cv._b = px * px * 4; L.map.set(key, cv); L.bytes += cv._b; L.builds++; built++;
   }
   if (missing){ L.live++; return false; }                                                  /* some tiles are still being made */
+  const smooth = ctx.imageSmoothingEnabled; ctx.imageSmoothingEnabled = false;             /* a tile is copied at almost exactly its own size: smoothing it costs several times more on a canvas the CPU draws (Firefox on Linux) and changes nothing you can see */
   for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++){
     const key = sig + '#' + i + ',' + j, cv = L.map.get(key);
     L.map.delete(key); L.map.set(key, cv);                                                  /* most recently used goes last */
     ctx.drawImage(cv, i * CH - 0.5, j * CH - 0.5, CH + 1, CH + 1);                          /* a half unit over each edge, so no hairline shows between tiles */
   }
+  ctx.imageSmoothingEnabled = smooth;
   L.hits++;
   while (L.map.size > L.max || L.bytes > L.maxBytes){ const old = L.map.keys().next().value; L.bytes -= L.map.get(old)._b; L.map.delete(old); }
   return true;

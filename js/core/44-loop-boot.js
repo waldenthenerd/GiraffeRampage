@@ -72,7 +72,7 @@ function step(dt){
 /* ========================= 39. RESIZE & BOOT ========================= */
 function resize(){
   const w = Math.max(280, window.innerWidth), h = Math.max(320, window.innerHeight);
-  G.dpr = Math.min(window.devicePixelRatio || 1, 2) * (typeof Perf !== 'undefined' ? Perf.scale : 1);      /* the slow-device governor can lower the sharpness (js/core/44c-perf.js) */
+  G.dpr = Math.min(window.devicePixelRatio || 1, 2) * (typeof Perf !== 'undefined' ? Perf.scale : 1) * ([1, 0.75, 0.5][Settings.sharp | 0] || 1);      /* the slow-device governor can lower the sharpness (js/core/44c-perf.js), and so can the player (Settings, Sharpness) */
   G.W = w; G.H = h;
   if (stage){
     stage.width = Math.round(w * G.dpr);
