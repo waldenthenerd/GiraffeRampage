@@ -5,7 +5,7 @@
      1  Music, Mail, News, Blocks (falling blocks)      2  + Run (start a run from anywhere in town) and Photo      3  + Neck Snake and Scores
    Earbuds (Pods) play the chosen song in town; Pods Plus also in the menus and in runs, over the chapter's music (the song's loudness follows the run as it
    does for the chapter's own music); Pods Max can shuffle through every record she has heard. They are off in films and minigames, where the music is the
-   picture's, and the café jukebox wins while it plays. The games run on their own timer while their canvas is on screen and stop when it is not. */
+   picture's, and the jukebox's record wins while it plays (it follows her round the town). The games run on their own timer while their canvas is on screen and stop when it is not. */
 const PH = { game: null, raf: 0, shuf: { id: '', at: 0 }, overAt: 0 };
 
 /* ---- what plays ---- */

@@ -2,8 +2,10 @@
 /* ========================= 44zzzz. THE JUKEBOX AND THE SONG CARD ========================= */
 /* Every song of the band (js/audio/02f-band-songs.js) is remembered the first time it plays (Save.data.songsHeard), and the jukebox in
    Penny's Café (Market Street) plays any song heard so far: the chapters, the bosses, the town, the screens and the films, each with
-   where it is heard, and the ones not heard yet as a blank record with a clue. It plays while she is in the café and stops when she
-   leaves. The giraffe's tune is a part of the songs, not a record of its own, so 'longneck' is not on it.
+   where it is heard, and the ones not heard yet as a blank record with a clue. The record follows her round the town, the streets, the rooms
+   and the Burrows, wherever the town's own music would play (a shop or a room with a tune of its own keeps it, and the record comes back after),
+   and stops when she leaves the town. Next goes on to the next record heard; Shuffle picks one at random, and moves on by itself when a song
+   has played through once. The giraffe's tune is a part of the songs, not a record of its own, so 'longneck' is not on it.
    The song card: when the music changes outside a fight (the menus, the town, the shops, the end of a run), the song's name and where it
    belongs show for a few seconds in a corner (Settings.songNames turns it off). */
 
@@ -50,7 +52,13 @@ bandBar = function(R, S, cur){
   const was = S.theme;
   bandBarBeforeJukebox.apply(this, arguments);
   if (!R.offline && S.theme !== was) jbOnSong(S.theme);
+  if (!R.offline && Jukebox.on && Jukebox.shuffle && S.theme === Jukebox.on){       /* on shuffle, a record that has played through once gives way to another */
+    if (S.theme !== was) Jukebox.bars = 0;
+    if (++Jukebox.bars >= jbSongBars(S.song)) jukeboxNext(true);
+  }
 };
+/* one play through a song: the bars of every section of its form */
+function jbSongBars(song){ if (!song || !song.form) return 64; return Math.max(16, song.form.reduce(function(n, k){ return n + ((song.sections[k] && song.sections[k].bars) || 0); }, 0)); }
 
 /* ---- the song card ---- */
 function songCard(theme){
@@ -74,22 +82,34 @@ function songCard(theme){
 }
 
 /* ---- the jukebox: what it is playing, and the music while she is in the café ---- */
-const Jukebox = { on: null, fresh: false };
+const Jukebox = { on: null, fresh: false, shuffle: false, bars: 0 };
 const musicBeforeJukebox = Music.refresh;
 Music.refresh = function(){
   musicBeforeJukebox.apply(this, arguments);
   if (!Jukebox.on) return;
-  const inCafe = typeof Town !== 'undefined' && Town.on && Town.d === 'in_cafe' && /^(town|townnight|burrow)$/.test(this.want.theme);
-  if (!inCafe){ if (!(Town.on && Town.d === 'in_cafe')) Jukebox.on = null; return; }      /* she left: the record stops */
+  if (!(typeof Town !== 'undefined' && Town.on)){ Jukebox.on = null; return; }       /* she left the town: the record stops */
+  if (!/^(town|townnight|burrow)$/.test(this.want.theme)) return;                     /* a screen with its own tune keeps it; the record comes back after */
   const w = this.want; w.theme = Jukebox.on; w.lvl = 1; w.shift = 0; w.run = false; w.rest = false;
 };
 function jukeboxPlay(id){
   if (!id){ Jukebox.on = null; SFX.click(); townShowJukebox(); return; }
   if (!jbHeard()[id]){ SFX.deny(); return; }
-  Jukebox.on = id; SFX.pick();
+  Jukebox.on = id; Jukebox.bars = 0; SFX.pick();
   try { Music.refresh(); } catch (e) {}
   townShowJukebox();
 }
+/* the next record heard: the one after this in the list, or on shuffle any other at random. auto: shuffle moving on by itself (no click, and the list
+   is only redrawn if it is open) */
+function jukeboxNext(auto){
+  const h = jbHeard(), got = jbCatalog().filter(function(r){ return h[r.id]; }).map(function(r){ return r.id; });
+  if (!got.length) return;
+  let id;
+  if (Jukebox.shuffle){ const rest = got.filter(function(k){ return k !== Jukebox.on; }); id = rest.length ? rest[Math.floor(Math.random() * rest.length)] : got[0]; }
+  else { const i = got.indexOf(Jukebox.on); id = got[(i + 1) % got.length]; }
+  if (auto){ Jukebox.on = id; Jukebox.bars = 0; try { Music.refresh(); } catch (e) {} if (Town.panel && document.querySelector('.tp-juke')) townShowJukebox(); return; }
+  jukeboxPlay(id);
+}
+function jukeboxShuffle(){ Jukebox.shuffle = !Jukebox.shuffle; SFX.click(); if (Jukebox.shuffle) jukeboxNext(); else townShowJukebox(); }
 function townShowJukebox(){
   const h = jbHeard(), L = jbCatalog(), n = jbHeardCount();
   let html = '<div class="tp-title">JUKEBOX</div><div class="jb-count">' + n + ' of ' + L.length + ' records' + (n >= L.length ? ' — every one!' : '') + '</div>' +
@@ -101,8 +121,9 @@ function townShowJukebox(){
     html += '<div class="jb-r' + (got ? '' : ' off') + (playing ? ' on' : '') + '"><span class="jb-disc"></span><span class="jb-n"><b>' + (got ? BAND_SONGS[r.id].name : '? ? ?') + '</b><small>' + (got ? r.where : 'Not heard yet — ' + r.where.charAt(0).toLowerCase() + r.where.slice(1)) + '</small></span>' +
       (got ? '<button class="jb-p" data-a="town-juke-' + i + '">' + (playing ? '♪ On' : 'Play') + '</button>' : '<span class="jb-p jb-lock">—</span>') + '</div>';
   });
-  html += '<div class="tnote">A song joins the jukebox the first time she hears it. It plays while she is in the café.</div>';
-  html += Jukebox.on ? '<div class="tp-foot" style="margin-top:8px"><button class="tbtn" data-a="town-juke-stop">Stop the record</button></div>' : '';
+  html += '<div class="tnote">A song joins the jukebox the first time she hears it. The record follows her round the town until she leaves it.</div>';
+  html += '<div class="tp-foot jb-ctl" style="margin-top:8px"><button class="tbtn" data-a="town-juke-next">Next</button><button class="tbtn' + (Jukebox.shuffle ? ' on' : '') + '" data-a="town-juke-shuffle" aria-pressed="' + Jukebox.shuffle + '">Shuffle: ' + (Jukebox.shuffle ? 'on' : 'off') + '</button>' +
+    (Jukebox.on ? '<button class="tbtn" data-a="town-juke-stop">Stop the record</button>' : '') + '</div>';
   townPanelT('juke', html, { w: 600 });
   Jukebox.fresh = false;
 }
@@ -110,6 +131,8 @@ function townShowJukebox(){
   const h = handleTownAction;
   handleTownAction = function(a){
     if (a === 'town-juke-stop'){ jukeboxPlay(null); return true; }
+    if (a === 'town-juke-next'){ jukeboxNext(); return true; }
+    if (a === 'town-juke-shuffle'){ jukeboxShuffle(); return true; }
     const m = /^town-juke-(\d+)$/.exec(a);
     if (m){ const r = jbCatalog()[+m[1]]; if (r) jukeboxPlay(r.id); return true; }
     return h(a);

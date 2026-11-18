@@ -708,6 +708,7 @@ input[type=range]:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 .jb-g{margin:12px 0 4px;text-align:left;color:#7AE0FF;font:700 12px system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase}
 .jb-r{display:grid;grid-template-columns:26px 1fr 64px;gap:8px;align-items:center;padding:5px 4px;border-bottom:1px solid rgba(201,162,74,.22);text-align:left}
 .jb-r.off{opacity:.45}.jb-r.on{background:rgba(255,184,77,.14);border-radius:6px}
+.jb-ctl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}.jb-ctl .tbtn.on{border-color:#FFB84D;color:#FFE9A8}
 .jb-disc{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#C9A24A 0 18%,#111 20% 46%,#2A2A2A 48% 52%,#111 54%)}.jb-r.on .jb-disc{animation:jbSpin 1.6s linear infinite}
 @keyframes jbSpin{to{transform:rotate(360deg)}}
 .jb-n b{display:block;font-size:14px;color:#FFE9A8}.jb-n small{display:block;font-size:12px;opacity:.75}

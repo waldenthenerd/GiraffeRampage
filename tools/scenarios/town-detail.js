@@ -46,7 +46,10 @@
     G.state = 'menu'; Town.fixHour = 12; Town.fixWeather = 'clear'; townEnter('square', 200, 1); for (var i = 0; i < 10; i++) GR.step(1 / 30);
     Town._birds = {}; var drawn = 0, tb = townBird; townBird = function(){ drawn++; return tb.apply(this, arguments); };
     Town.x = 300; Town.camX = 400; townDynamic(hold, TOWN_DIST.square, 50, 0); out.birdsDrawn = drawn; check('birdsPeck', drawn >= 3 && Town._birds.square0 && Town._birds.square0.up < 0);
+    var snd = { w: 0, g: 0, p: 0 }, sw = SFX.wingsUp, sg = SFX.gullCall, sp = SFX.purr; SFX.wingsUp = function(){ snd.w++; }; SFX.gullCall = function(){ snd.g++; }; SFX.purr = function(){ snd.p++; };
     Town.x = 880; townDynamic(hold, TOWN_DIST.square, 60, 0); check('birdsLift', Town._birds.square0.up === 60);
+    townDynamic(hold, TOWN_DIST.square, 60.5, 0); check('birdsFlap', snd.w === 1 && snd.g === 0);
+    Town.x = 620; townDynamic(hold, TOWN_DIST.harbour, 61, 0); check('gullsCry', snd.w === 2 && snd.g === 1);
     drawn = 0; Town.x = 300; townDynamic(hold, TOWN_DIST.square, 66, 0); var away = drawn;
     townDynamic(hold, TOWN_DIST.square, 74, 0); townDynamic(hold, TOWN_DIST.square, 80, 0); check('birdsBack', Town._birds.square0.up < 0 && away < 8);
     drawn = 0; townDynamic(hold, TOWN_DIST.square, 90, 0.9); check('birdsRoost', drawn === 0);
@@ -55,6 +58,11 @@
     var cats = 0, tc = townCat; townCat = function(){ cats++; return tc.apply(this, arguments); };
     townDynamic(hold, TOWN_DIST.in_bakery, 5, 0); townDynamic(hold, TOWN_DIST.square, 5, 0); townCat = tc;
     check('cat', cats === 1);
+    /* ---- petting it: in reach when she stands by it, and it purrs; out of reach a step away ---- */
+    townEnter('in_bakery', TOWN_CATS.in_bakery[0] + 20, 1); var po = townNearest(TOWN_DIST.in_bakery, townInput()); check('catInReach', !!po && po.k === 'cat' && po.label === 'Pet the cat');
+    var pops0 = Town.pops.length; townUse(po); check('catPurr', snd.p === 1 && Town.pops.length === pops0 + 1);
+    Town.x = TOWN_CATS.in_bakery[0] + 200; var po2 = townNearest(TOWN_DIST.in_bakery, townInput()); check('catFar', !po2 || po2.k !== 'cat');
+    SFX.wingsUp = sw; SFX.gullCall = sg; SFX.purr = sp;
     if (view === 'birds'){ Town._birds = {}; townEnter('square', 640, 1); Town.walkers = []; for (var j = 0; j < 20; j++) GR.step(1 / 30); Town.x = 640; Town.camX = 420; GR.render(); }
     if (view === 'cat'){ townEnter('in_bakery', 900, 1); Town.walkers = []; for (var q = 0; q < 20; q++) GR.step(1 / 30); GR.render(); }
   } catch (e) { out.errs.push(String(e && e.stack || e)); }

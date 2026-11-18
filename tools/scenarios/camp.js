@@ -47,6 +47,16 @@
     var spent0 = Save.data.gems; while (campBuy('rate')); while (campBuy('cap'));
     out.upMax = Save.data.campRate === 5 && Save.data.campCap === 5 && campCapHours() === 12 && campUpNext('rate').maxed && spent0 - Save.data.gems === 2 * (120 + 240 + 360 + 600 + 900) - 120 * 1;
     out.upTriple = CAMP_UP.rate.gems.join() === '120,240,360,600,900' && CAMP_UP.cap.ch.join() === '4,6,8,10,12' && CAMP_UP.rate.ch.join() === '3,5,7,9,11';
+    /* a faster hand counts from the purchase on: the hours stored before it are banked at the old rate, still fill the larder, and Collect empties the bank */
+    fresh(); campStart(); Save.data.gems = 5000; Save.data.chapter3Complete = true; Save.data.campProg = 0; Save.data.campLast = Date.now() - 2 * H;
+    var pre = campPending().gold; campBuy('rate'); var t1 = Date.now(), post = campPending(t1);
+    out.bankKeeps = pre === 500 && Math.abs(post.gold - 500) <= 1 && Math.abs(post.hours - 2) < 0.01 && Math.abs(Save.data.campBankH - 2) < 0.01;
+    Save.data.campLast = t1 - 1 * H; var later = campPending(t1);
+    out.bankNewRate = Math.abs(later.gold - 825) <= 1 && Math.abs(later.prog - (0.5 + 1.3 / 4)) < 0.01;
+    Save.data.campLast = t1 - 10 * H; out.bankCap = campHours(t1) === 3;
+    Save.data.campLast = t1 - 1 * H; var gb0 = Save.data.gold, rb = campCollect(t1);
+    out.bankCollect = Math.abs(rb.gold - 825) <= 1 && Save.data.gold === gb0 + rb.gold && Save.data.campBankH === 0 && Save.data.campBankGold === 0 && Save.data.campBankProg === 0 && campHours(t1) === 0;
+    Save.data.chapter4Complete = true; Save.data.chapter5Complete = true; Save.data.campLast = t1 - 1 * H; out.bankLarder = campBuy('rate') && campBuy('cap') && Save.data.campBankH > 0.99 && Math.abs(campHours() - 1) < 0.01 && Math.abs(campPending().gold - 325) <= 1;
 
     /* Camp Crates: opened from the store, a Prime Crate's odds and pity, the Camp Hearth by chance */
     fresh(); campStart(); Save.data.campCrates = 3; var gems0 = Save.data.gems, opened0 = Save.data.cratesOpened | 0;
@@ -67,8 +77,8 @@
     out.hearthOff = campCapHours() === 3 && campRateMul() === 1;
 
     /* saves: the new fields default, junk is mended, an old save loads */
-    fresh(); Save.data.campLast = 'x'; Save.data.campRate = 99; Save.data.campCap = -4; Save.data.campProg = 7; Save.data.campCrates = -2; Save.write(); Save.load();
-    out.sane = Save.data.campLast === 0 && Save.data.campRate === 5 && Save.data.campCap === 0 && Save.data.campProg < 1 && Save.data.campCrates === 0;
+    fresh(); Save.data.campLast = 'x'; Save.data.campRate = 99; Save.data.campCap = -4; Save.data.campProg = 7; Save.data.campCrates = -2; Save.data.campBankH = 'y'; Save.data.campBankGold = -5; Save.write(); Save.load();
+    out.sane = Save.data.campBankH === 0 && Save.data.campBankGold === 0 && Save.data.campLast === 0 && Save.data.campRate === 5 && Save.data.campCap === 0 && Save.data.campProg < 1 && Save.data.campCrates === 0;
     out.defaults = DEFAULT_SAVE.campLast === 0 && DEFAULT_SAVE.campRate === 0 && DEFAULT_SAVE.campCrates === 0;
     fresh(); ['campLast', 'campRate', 'campCap', 'campProg', 'campCrates', 'campOpened'].forEach(function(k){ delete Save.data[k]; }); Save.write(); Save.load();
     out.oldSave = Save.data.campLast === 0 && Save.data.campRate === 0 && Save.data.campCrates === 0 && campHours() < 0.01;
@@ -113,7 +123,7 @@
       out.view = V;
     }
   } catch (e) { out.err = String(e && e.stack || e); }
-  var need = ['locked', 'noTab', 'open', 'tab', 'starts', 'rate', 'minRate', 'rateLv', 'oneHour', 'cap3', 'cap6', 'back', 'collect', 'again', 'counters', 'ach', 'reactions', 'crateMade', 'fastCrates', 'upLocked', 'upBuy', 'upNext', 'upPoor', 'upMax', 'upTriple',
+  var need = ['locked', 'noTab', 'open', 'tab', 'starts', 'rate', 'minRate', 'rateLv', 'oneHour', 'cap3', 'cap6', 'back', 'collect', 'again', 'counters', 'ach', 'reactions', 'crateMade', 'fastCrates', 'upLocked', 'upBuy', 'upNext', 'upPoor', 'upMax', 'upTriple', 'bankKeeps', 'bankNewRate', 'bankCap', 'bankCollect', 'bankLarder',
     'openOne', 'odds', 'openAll', 'pity', 'hearthDrop', 'hearthOnce', 'hearthRare', 'hearthStats', 'hearthCamp', 'hearthOff', 'sane', 'defaults', 'oldSave', 'shop', 'collectBtn', 'tick', 'pageCollect', 'pageOpen', 'revealClosed', 'pageMany',
     'pageBuy', 'lockedRow', 'timerStops', 'menuNote', 'menuQuiet', 'scene', 'sceneLoop', 'sceneDrawn', 'sceneColours'];
   out.failed = need.filter(function(k){ return out[k] !== true; });

@@ -2,7 +2,8 @@
 /* =============================================================================================================================
    44zzzzh-town-critters.js  --  A LITTLE LIFE ON THE STREETS AND IN THE ROOMS. Pigeons peck along the pavement of the Town Square,
    Market Street and the park path, and gulls stand on the harbor quay; when she walks up they lift off, and a while later they come
-   back down. After dark the birds have gone to roost. In a few of the cosier rooms a cat sleeps on the floor, breathing slowly.
+   back down, with a clatter of wings (and a gull's cry on the quay). After dark the birds have gone to roost. In a few of the cosier rooms a cat sleeps
+   on the floor, breathing slowly; walk up to it and it can be petted (E, or tap the prompt), and it purrs.
    All of it is drawn in townDynamic (the tier for things that move: under the herd, over the street's pictures).
    ============================================================================================================================= */
 const TOWN_BIRDS = {                                                     /* street: [x, how many, kind] */
@@ -12,6 +13,11 @@ const TOWN_BIRDS = {                                                     /* stre
   harbour: [[620, 2, 'gull'], [1420, 2, 'gull']]
 };
 const TOWN_CATS = { in_bakery: [1010, 1, '#E8A050'], in_library: [1310, -1, '#3A3A40'], in_house1: [640, 1, '#C9C4B8'], in_fhouse: [930, -1, '#E8A050'], in_icottage: [760, 1, '#F4F1E8'] };
+
+/* the sounds: a clatter of wings as a flock lifts off, a gull's two-note cry, and a cat's purr (a soft low rumble that swells and fades) */
+SFX.wingsUp = function(n){ for (let i = 0; i < 4 + (n | 0); i++) this.burst(0.05, 0.05, 1500 + Math.random() * 500, 600, 0.7, i * 0.06 + Math.random() * 0.03, 'bandpass'); };
+SFX.gullCall = function(){ for (let k = 0; k < 2; k++){ const d = 0.1 + k * 0.42; this.tone('triangle', 1250, 1750, 0.11, 0.045, d); this.tone('triangle', 1700, 980, 0.3, 0.045, d + 0.11); } };
+SFX.purr = function(){ for (let i = 0; i < 28; i++){ const k = Math.sin(Math.PI * i / 28); this.burst(0.05, 0.02 + 0.06 * k, 240, 110, 0.8, i * 0.045, 'lowpass'); } this.tone('sine', 54, 50, 1.3, 0.05, 0); };
 
 /* one bird, standing (flap undefined) or flying (flap -1..1); k is how far its head is down, pecking */
 function townBird(ctx, x, y, face, k, gull, flap){
@@ -28,7 +34,7 @@ function townBird(ctx, x, y, face, k, gull, flap){
 }
 /* a cat asleep, curled up, its back rising and falling */
 function townCat(ctx, x, y, face, col, t){
-  const s = 1 + 0.035 * Math.sin(t * 1.6), dk = col === '#3A3A40' ? '#2A2A30' : 'rgba(0,0,0,.18)';
+  const pet = Town.catPetT !== undefined && Town.t - Town.catPetT < 2.5, s = 1 + (pet ? 0.05 : 0.035) * Math.sin(t * (pet ? 5 : 1.6)), dk = col === '#3A3A40' ? '#2A2A30' : 'rgba(0,0,0,.18)';
   ctx.save(); ctx.translate(x, y); ctx.scale(face, 1);
   tEll(ctx, 'rgba(0,0,0,.18)', 0, 1, 20, 4);
   ctx.strokeStyle = col; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(-4, -3, 14, 0.2, 1.9); ctx.stroke(); ctx.lineCap = 'butt';   /* the tail round the front */
@@ -51,7 +57,7 @@ function townCat(ctx, x, y, face, col, t){
     flocks.forEach(function(f, j){
       const fx = f[0], n = f[1], gull = f[2] === 'gull', key = D.id + j, s = st[key] || (st[key] = { up: -1 });
       const near = Math.abs(Town.x - fx) < 110;
-      if (s.up < 0 && near) s.up = t;                                                              /* she came close: off they go */
+      if (s.up < 0 && near){ s.up = t; SFX.wingsUp(n); if (gull) SFX.gullCall(); }                 /* she came close: off they go */
       let p = 0;                                                                                  /* 0 on the ground, 1 out of sight */
       if (s.up >= 0){
         const e = t - s.up;
@@ -64,5 +70,23 @@ function townCat(ctx, x, y, face, col, t){
         else { const dir = i % 2 ? 1 : -1; townBird(ctx, bx + dir * p * 180, by - p * p * 260 - p * 20, dir, 0, gull, Math.sin(t * 28 + i)); }
       }
     });
+  };
+})();
+/* petting a cat: it is in reach when she stands by it (the nearest gets the gold prompt, the other the blue one); a purr, a heart, and its back rises a little faster for a moment */
+(function(){
+  const tu = townUse, nr = townNearest;
+  const far = function(o){ if (!o) return 1e9; if (o.k === 'npc'){ const n = Town.npcs.find(function(q){ return q.id === o.id; }); return n ? Math.abs(Town.x - n.x) : 1e9; } return Math.abs(Town.x - (o.b ? o.b.x : o.x)); };
+  townNearest = function(D, inp){
+    const o = nr.apply(this, arguments), cat = TOWN_CATS[D.id];
+    if (!cat) return o;
+    const d = Math.abs(Town.x - cat[0]); if (d >= 60) return o;
+    const pet = { k: 'cat', x: cat[0], label: 'Pet the cat' };                         /* the two-things-in-reach prompts (js/town/44zzzzb-town-choices.js) know the cat too */
+    if (d < far(o)){ Town.near2 = o || null; Town.near2For = pet; return pet; }
+    if (Town.near2For === o && !Town.near2) Town.near2 = pet;
+    return o;
+  };
+  townUse = function(o){
+    if (o && o.k === 'cat'){ Town.catPetT = Town.t; townPop(o.x + 10, TG - 40, '\u2665 purr', '#FF9ECB'); townBurst(o.x + 8, TG - 14, '#FF9ECB', 8); SFX.purr(); return; }
+    return tu.apply(this, arguments);
   };
 })();
