@@ -6,7 +6,7 @@
    Earbuds (Pods) play the chosen song in town; Pods Plus also in the menus and in runs, over the chapter's music (the song's loudness follows the run as it
    does for the chapter's own music); Pods Max can shuffle through every record she has heard. They are off in films and minigames, where the music is the
    picture's, and the café jukebox wins while it plays. The games run on their own timer while their canvas is on screen and stop when it is not. */
-const PH = { game: null, raf: 0, shuf: { id: '', at: 0 } };
+const PH = { game: null, raf: 0, shuf: { id: '', at: 0 }, overAt: 0 };
 
 /* ---- what plays ---- */
 function phHeardList(){ const h = jbHeard(); return jbCatalog().filter(function(r){ return h[r.id] && BAND_SONGS[r.id]; }); }
@@ -109,10 +109,12 @@ function phGameStart(g, title, w, h, keysHtml){
   phFrame(title, '<div class="ph-gscore"><span id="phSc">0</span><small>Best <b id="phHi">' + hi[g.id] + '</b></small></div><canvas id="phCv" width="' + w + '" height="' + h + '"></canvas><div class="ph-keys">' + keysHtml + '</div>', 'Home');
   PH.game = g; g.init(); cancelAnimationFrame(PH.raf); PH.raf = requestAnimationFrame(phGameLoop);
 }
+function phOverSound(){ PH.overAt = performance.now(); try { [494, 392, 294].forEach(function(f, i){ SFX.tone('square', f, f * 0.97, 0.11, 0.07, i * 0.1, 0, SFX.eventGain); }); SFX.tone('square', 196, 147, 0.26, 0.06, 0.3, 0, SFX.eventGain); } catch (e) {} }
 function phGameScore(g){ const el = document.getElementById('phSc'); if (el) el.textContent = g.score; }
 function phGameEnd(g){                                 /* a best score pays 5 gems for each thousand points it climbs */
   const hi = gadData().hi, was = hi[g.id];
   if (g.score > was){ hi[g.id] = g.score; const gems = (Math.floor(g.score / 1000) - Math.floor(was / 1000)) * 5; if (gems > 0){ Save.data.gems = (Save.data.gems | 0) + gems; townToast('A new best: ' + g.score + '. +' + gems + ' gems.', '#BFFF9A'); } else townToast('A new best: ' + g.score + '.', '#BFFF9A'); Save.write(); SFX.level(); }
+  else phOverSound();                                  /* no best: a short handheld "game over", three notes falling */
   const el = document.getElementById('phHi'); if (el) el.textContent = hi[g.id];
 }
 const PH_KEYS = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd', Space: 'x', Enter: 'x' };
@@ -155,6 +157,16 @@ function phBlocks(){
       for (let j = 0; j < R; j++) for (let i = 0; i < C; i++) if (G2.grid[j][i] >= 0) cell(i, j, G2.grid[j][i]);
       if (G2.p && !G2.over){ let gy = G2.p.y; while (G2.ok(G2.p.m, G2.p.x, gy + 1)) gy++; G2.p.m.forEach(function(row, j){ row.forEach(function(v, i){ if (v){ c.fillStyle = 'rgba(255,255,255,.12)'; c.fillRect((G2.p.x + i) * S + 1, (gy + j) * S + 1, S - 2, S - 2); } }); });
         G2.p.m.forEach(function(row, j){ row.forEach(function(v, i){ if (v) cell(G2.p.x + i, G2.p.y + j, G2.p.t); }); }); }
+      if (!G2.over){                                   /* the next piece, small, in the top right corner (the new piece drops in the middle, clear of it) */
+        const nm = BLOCKS_SH[G2.next], q = 8, bw = 4 * q + 8, bx = C * S - bw - 3, by = 3;
+        let under = false; for (let j = 0; j < 2; j++) for (let i = 8; i < C; i++) if (G2.grid[j][i] >= 0) under = true;   /* it fades while anything is under it */
+        if (G2.p) G2.p.m.forEach(function(row, j){ row.forEach(function(v, i){ if (v && G2.p.y + j < 2 && G2.p.x + i >= 8) under = true; }); });
+        c.globalAlpha = under ? 0.3 : 1;
+        c.fillStyle = 'rgba(0,0,0,.55)'; c.fillRect(bx, by, bw, 2 * q + 22); c.fillStyle = 'rgba(255,255,255,.55)'; c.font = 'bold 8px system-ui'; c.textAlign = 'center'; c.fillText('NEXT', bx + bw / 2, by + 10);
+        const ox = bx + (bw - nm[0].length * q) / 2, oy = by + 14 + (2 - nm.length) * q / 2;
+        nm.forEach(function(row, j){ row.forEach(function(v, i){ if (v){ c.fillStyle = BLOCKS_COL[G2.next]; c.fillRect(ox + i * q, oy + j * q, q - 1, q - 1); } }); });
+        c.globalAlpha = 1;
+      }
       if (G2.over){ c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 150, C * S, 120); c.fillStyle = '#FFE9A0'; c.font = 'bold 24px system-ui'; c.textAlign = 'center'; c.fillText('GAME OVER', C * S / 2, 200); c.font = '14px system-ui'; c.fillText('Score ' + G2.score + ' · press Space or Again', C * S / 2, 230); }
     } };
   return G2;

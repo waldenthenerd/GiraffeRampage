@@ -36,18 +36,18 @@ function mealOpen(m){ return m.need === 0 || townDoneCh(m.need); }
 function mealPrice(m){ return m.cost.coin ? { gold: m.cost.coin * townCoin(), gems: 0 } : { gold: 0, gems: m.cost.gems }; }
 const GADRUN = { meal: '' };
 function mealBuy(id){
-  const m = GAD_MEAL_BY_ID[id]; if (!m || !mealOpen(m)) return false;
+  const m = GAD_MEAL_BY_ID[id]; if (!m || !mealOpen(m) || gadData().meal === m.id) return false;   /* the dish already waiting is not paid for twice */
   const p = mealPrice(m), d = Save.data; if (goldInt(d.gold) < p.gold || (d.gems | 0) < p.gems) return false;
   d.gold = goldInt(d.gold) - p.gold; d.gems = (d.gems | 0) - p.gems; gadData().meal = m.id; Save.write(); return true;
 }
 function townShowMenu2(){
   const g = gadData(), gold = goldInt(Save.data.gold), gems = Save.data.gems | 0, cur = GAD_MEAL_BY_ID[g.meal];
   let h = '<div class="tp-title">PENNY’S MENU</div><div class="gd-purse">' + fmt(gold) + ' gold  ·  ' + fmt(gems) + ' gems</div>' +
-    '<div class="mn-now">' + (cur ? 'Waiting for the next run: <b>' + cur.name + '</b> (' + cur.fx + ')' : 'Eat a dish now and she runs well fed: it lasts one run.') + '</div>';
+    '<div class="mn-now">' + (cur ? 'Waiting for the next run: <b>' + cur.name + '</b> (' + cur.fx + '). Another dish swaps it out, and what it cost is not given back.' : 'Eat a dish now and she runs well fed: it lasts one run.') + '</div>';
   GAD_MEALS.forEach(function(m){
     const open = mealOpen(m), p = mealPrice(m), can = open && gold >= p.gold && gems >= p.gems, ate = g.ate[m.id] | 0;
     h += '<div class="mn-row' + (open ? '' : ' off') + (g.meal === m.id ? ' on' : '') + '"><span class="mn-n"><b>' + (open ? m.name : '? ? ?') + '</b><small>' + (open ? m.fx + (ate ? '  ·  eaten ' + ate + '×' : '') : 'Finish ' + gadChapterName(m.need) + ' to put it on the menu') + '</small></span>' +
-      (open ? '<button class="chalk" data-a="town-meal-' + m.id + '"' + (can ? '' : ' disabled') + '>' + (g.meal === m.id ? 'Waiting' : 'Eat') + '<small>' + (p.gold ? fmt(p.gold) + ' gold' : p.gems + ' gems') + '</small></button>' : '<span class="mn-lock">—</span>') + '</div>';
+      (open ? '<button class="chalk" data-a="town-meal-' + m.id + '"' + (can && g.meal !== m.id ? '' : ' disabled') + (cur && g.meal !== m.id ? ' title="Swaps out the ' + cur.name + ' that is waiting"' : '') + '>' + (g.meal === m.id ? 'Waiting' : cur ? 'Swap' : 'Eat') + '<small>' + (p.gold ? fmt(p.gold) + ' gold' : p.gems + ' gems') + '</small></button>' : '<span class="mn-lock">—</span>') + '</div>';
   });
   h += '<div class="tnote">A new dish joins the menu for every chapter she finishes.</div>';
   townPanelT('menu2', h, { w: 600 });
@@ -68,7 +68,8 @@ GAD_LABEL.order = 'Read the menu';
   const h = handleTownAction;
   handleTownAction = function(a){
     const m = /^town-meal-(\w+)$/.exec(a);
-    if (m){ if (mealBuy(m[1])){ SFX.level(); townToast('Well fed for the next run: ' + GAD_MEAL_BY_ID[m[1]].name + '.', '#BFFF9A'); } else SFX.deny(); townShowMenu2(); return true; }
+    if (m){ const was = GAD_MEAL_BY_ID[gadData().meal];   /* a dish already waiting is swapped out, and the toast says which */
+      if (mealBuy(m[1])){ SFX.level(); townToast((was && was.id !== m[1] ? 'Swapped the ' + was.name + ' for the ' + GAD_MEAL_BY_ID[m[1]].name : 'Well fed for the next run: ' + GAD_MEAL_BY_ID[m[1]].name) + '.', '#BFFF9A'); } else SFX.deny(); townShowMenu2(); return true; }
     return h(a);
   };
 })();
@@ -152,11 +153,15 @@ function gadHeadlines(){
   const d = Save.data, key = townDayKey(), done = townChaptersDone(), pick = function(a, s){ return a[townHash(key + s) % a.length]; }, L = [];
   let last = 0; for (let c = 1; c <= 18; c++) if (townDoneCh(c)) last = c;
   if (last) L.push([pick(['LOCAL GIRAFFE CONQUERS ' + String(BESTIARY_CHAPTERS[last - 1] || '').toUpperCase(), 'TOWN TOASTS A CHAPTER WON: ' + String(BESTIARY_CHAPTERS[last - 1] || '').toUpperCase()], 'a'), 'Chapter ' + chapterLabel(last) + ' is done and the whole street heard about it by lunch.']);
-  if ((d.runs | 0) > 0) L.push(['' + (d.runs | 0) + ' EXPEDITIONS, AND COUNTING', 'Experts disagree on whether she has a day off. She has been seen napping on a bench.']);
-  if (scoreInt(d.totalKills) > 0) L.push([fmt(scoreInt(d.totalKills)) + ' CREATURES KICKED', 'Authorities call the number “a lot”. The creatures decline to comment.']);
-  L.push([jbHeardCount() + ' RECORDS IN THE JUKEBOX', 'Penny says the café has never been so musical. Nobody has complained. Yet.']);
-  L.push([townFoundTotal() + ' TOWN TREASURES FOUND', 'Hunters are still missing a few. “They are hiding,” says the Mayor.']);
+  const many = function(n, one, more){ return n + ' ' + (n === 1 ? one : more); };   /* "1 EXPEDITION", never "1 EXPEDITIONS"; a count of nothing makes no headline */
+  if ((d.runs | 0) > 0) L.push([many(d.runs | 0, 'EXPEDITION', 'EXPEDITIONS') + ', AND COUNTING', 'Experts disagree on whether she has a day off. She has been seen napping on a bench.']);
+  if (scoreInt(d.totalKills) > 0) L.push([fmt(scoreInt(d.totalKills)) + (scoreInt(d.totalKills) === 1 ? ' CREATURE KICKED' : ' CREATURES KICKED'), 'Authorities call the number “a lot”. The creatures decline to comment.']);
+  if (jbHeardCount() > 0) L.push([many(jbHeardCount(), 'RECORD', 'RECORDS') + ' IN THE JUKEBOX', 'Penny says the café has never been so musical. Nobody has complained. Yet.']);
+  if (townFoundTotal() > 0) L.push([many(townFoundTotal(), 'TOWN TREASURE', 'TOWN TREASURES') + ' FOUND', 'Hunters are still missing a few. “They are hiding,” says the Mayor.']);
   L.push([pick(['QUIET DAY IN LONGNECK', 'GIRAFFE SEEN LOOKING UP', 'MAYOR LOSES HAT, FINDS HAT'], 'q'), 'Nothing much happened, and the town is grateful for it.']);
+  /* a new save has few counts to report, so a little town gossip keeps the paper at three stories */
+  [['BAKERY RUNS OUT OF BUNS BY NOON', 'Crumb blames the giraffe. The giraffe blames the pigeons. The pigeons have left town.'],
+    ['PIGEONS ELECT A NEW LEADER', 'Nobody knows which one it is. They all look very pleased.']].forEach(function(f){ if (L.length < 3) L.push(f); });
   const r = []; const used = {};
   for (let i = 0; i < 3 && L.length; i++){ let k = townHash(key + 'h' + i) % L.length, n = 0; while (used[k] && n++ < L.length) k = (k + 1) % L.length; used[k] = 1; r.push(L[k]); }
   return r;

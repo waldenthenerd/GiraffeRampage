@@ -60,6 +60,9 @@
     for (var k = 0; k < 40; k++) B.key('x'); check('blocksOver', B.over && B.score > 0); check('blocksPaid', gadData().hi.blocks === B.score);
     var gems0 = Save.data.gems; B.over = false; B.score = 2500; phGameEnd(B); check('bestGems', Save.data.gems - gems0 === 10 && gadData().hi.blocks === 2500);
     var gems1 = Save.data.gems; B.score = 1200; phGameEnd(B); check('noGemsBelowBest', Save.data.gems === gems1);
+    check('overSound', (function(){ PH.overAt = 0; var T = phBlocks(); T.init(); T.score = 0; phGameEnd(T); return PH.overAt > 0; })());
+    check('blocksNext', (function(){ var T = phBlocks(); T.init(); T.next = 1; var cv2 = document.createElement('canvas'); cv2.width = 220; cv2.height = 440; T.draw(cv2.getContext('2d'));
+      var d = cv2.getContext('2d').getImageData(170, 3, 47, 38).data, hit = 0; for (var q = 0; q < d.length; q += 4) if (d[q] === 0xFF && d[q + 1] === 0xD8 && d[q + 2] === 0x4D) hit++; out.nextPx = hit; return hit >= 16; })());
     var lines = (function(){ var T = phBlocks(); T.init(); T.grid[19] = new Array(10).fill(0); T.grid[19][4] = -1; T.p = { t: 0, m: [[1]], x: 4, y: 18 }; var s0 = T.score; T.key('d'); T.key('d'); return T.score - s0; })(); check('lineClears', lines >= 100);
     press('ArrowLeft'); check('keysCaught', true);
     /* Snake */
@@ -93,6 +96,11 @@
     check('dishFewerEarly', (function(){ var n = 0; for (var c = 1; c <= 18; c++) delete Save.data['chapter' + c + 'Complete']; n = GAD_MEALS.filter(mealOpen).length; for (c = 1; c <= 13; c++) Save.data['chapter' + c + 'Complete'] = true; return n === 1 && GAD_MEALS.filter(mealOpen).length > n; })());
     if (view === 'menu'){ QA.done(out); return; }
     Save.data.gold = 1e9; var gm = Save.data.gold; check('eat', mealBuy('bun') && gadData().meal === 'bun' && Save.data.gold < gm); check('eatReplaces', mealBuy('tea') && gadData().meal === 'tea');
+    var gw = Save.data.gold; check('mealNotTwice', !mealBuy('tea') && Save.data.gold === gw);
+    GAD_ACT.order(); out.swapBtns = document.querySelectorAll('.mn-row:not(.off) .chalk:not(:disabled)').length; out.swapLabel = (document.querySelector('[data-a="town-meal-bun"]') || {}).textContent;
+    check('swapLabel', /^Swap/.test(out.swapLabel || '') && /Acacia tea/.test(document.querySelector('[data-a="town-meal-bun"]').title) && /swaps it out/.test(document.querySelector('.mn-now').textContent));
+    check('waitingNoPay', (document.querySelector('[data-a="town-meal-tea"]') || {}).disabled === true && /^Waiting/.test(document.querySelector('[data-a="town-meal-tea"]').textContent));
+    act('town-meal-bun'); out.swapToast = (Town.toasts[Town.toasts.length - 1] || {}).txt; check('swapped', gadData().meal === 'bun' && /^Swapped the Acacia tea for the Honey bun/.test(out.swapToast || '')); act('town-meal-tea');
     check('locked', !mealBuy('coconut')); closeAll();
     G.state = 'menu'; startRun(1); frames(2); var base = P.stats.speedMul; check('mealUsed', GADRUN.meal === 'tea' && gadData().meal === '' && gadData().ate.tea === 1);
     G.state = 'menu'; startRun(1); frames(2); check('mealOnce', GADRUN.meal === '' && Math.abs(P.stats.speedMul - (base - 0.05)) < 1e-9);
@@ -110,6 +118,12 @@
     townDaily().got = [0, 1]; newsShow('town'); check('paperShows', !!document.querySelector('.np-mast') && document.querySelectorAll('.np-col').length >= 2 && !!document.querySelector('.np-wx')); check('paperSeen', !newsFresh());
     check('taskReady', !!document.querySelector('[data-a="town-news-claim"]')); act('town-news-claim'); check('taskPays', Save.data.gems === 20 && gadData().news.done === 1); act('town-news-claim'); check('taskOnce', Save.data.gems === 20);
     check('taskNotDone', (function(){ var n2 = newsEnsure(); n2.q = 4; n2.done = 0; return !GAD_TASKS[4].ok(gadData()); })());
+    check('headlineCounts', (function(){ var s0 = Save.data, bad = [];
+      var look = function(){ gadHeadlines().forEach(function(h){ if (/^0 /.test(h[0]) || /^1 [A-Z ]*S\b/.test(h[0])) bad.push(h[0]); }); };
+      var keep = { runs: s0.runs, totalKills: s0.totalKills }; s0.runs = 0; s0.totalKills = 0; look(); var n0 = gadHeadlines().length;
+      s0.runs = 1; s0.totalKills = 1; var all = []; for (var dd = 0; dd < 40; dd++){ var k0 = townDayKey; townDayKey = function(){ return 'd' + dd; }; look(); gadHeadlines().forEach(function(h){ all.push(h[0]); }); townDayKey = k0; }
+      s0.runs = keep.runs; s0.totalKills = keep.totalKills; out.badHeadlines = bad;
+      return bad.length === 0 && n0 === 3 && all.indexOf('1 EXPEDITION, AND COUNTING') >= 0 && all.indexOf('1 CREATURE KICKED') >= 0; })());
     check('headlines', gadHeadlines().length === 3 && gadHeadlines().every(function(h){ return h[0].length > 3 && h[1].length > 3; })); check('weather', gadWeather().length === 3);
     check('newDay', (function(){ var d = townDayKey(); gadData().news.d = 'yesterday'; var n3 = newsEnsure(); return n3.d === d && n3.done === 0; })());
     check('morningColumns', (function(){ var a = GAD_COLS.filter(function(c){ return c.need === 0 || townDoneCh(c.need); }).length; for (var c = 1; c <= 18; c++) Save.data['chapter' + c + 'Complete'] = true; return GAD_COLS.filter(function(c2){ return c2.need === 0 || townDoneCh(c2.need); }).length > a; })());
