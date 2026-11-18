@@ -103,7 +103,12 @@
 
     /* wading: slower in the shallows, and the run remembers that she got wet */
     begin(); put(2130, 2760); steps(3); out.dryStart = !G.il.wet && !(G.terrain && G.terrain.kind === 'wade');
+    updateHUD(); out.dryTick = el('hDry').textContent === '\u2713 DRY HOOVES'; G.texts.length = 0;
     put(1000, 1680); steps(3); out.wade = !!G.terrain && Math.abs(G.terrain.spd - ISLE_WADE) < 1e-6 && G.il.wet === true;
+    /* Dry Hooves: the first step into the water says it is lost, once, and the tick goes; nothing is said when she already has it */
+    var lostN = function(){ return G.texts.filter(function(t){ return t.txt === 'Dry Hooves lost'; }).length; };
+    updateHUD(); out.dryLost = lostN() === 1 && el('hDry').textContent === ''; put(1450, 2120); steps(3); out.dryLostOnce = lostN() <= 1;
+    begin(); Save.data.isleDry = true; G.texts.length = 0; put(1000, 1680); steps(3); updateHUD(); out.dryHad = G.il.wet && lostN() === 0 && el('hDry').textContent === '';
     var ce = spawnEnemy('jackal', 300, 1500, 420), cl = spawnEnemy('jackal', 2130, 2760, 420), cr = spawnEnemy('warthog', 300, 1500, 420);
     out.swimMul = ilWaterMul(ce) > 1 && ilWaterMul(cl) < 1 && ilWaterMul(cr) < 1;
 
@@ -214,6 +219,9 @@
     steps(2); var lane = DASH_LANES[0], eel = mg.eels.filter(function(e2){ return e2.lane === 0; })[0], gH = mg.p.y / 0.9;
     mg.p.y = gH * lane; mg.p.x = eel.x + eel.d * 10; mg.inv = 0; var lv = mg.lives; steps(1); out.miniBite = mg.lives < lv;
     mg.inv = 0; mg.p.x = mg.shell.x; mg.p.y = mg.shell.y; var sc0 = mg.score; steps(1); out.miniShell = mg.score === sc0 + 1;
+    /* wading throws the island's splashes, and the eels speed up with the shells only so far */
+    mg.p.y = gH * 0.9; steps(1); mg.fx = []; mg.inv = 9; mg.p.y = gH * DASH_LANES[1]; steps(1); out.miniSplash = mg.fx.some(function(f){ return f.ring; }) && mg.fx.some(function(f){ return f.col === '#E8FAFA'; });
+    out.miniEelCap = dashEelSpeed(0) === 120 && dashEelSpeed(DASH_EEL_MAX) === dashEelSpeed(DASH_EEL_MAX + 40) && dashEelSpeed(DASH_EEL_MAX) > dashEelSpeed(DASH_EEL_MAX - 1);
     Save.data.mini.stars[ISLE_CHAPTER] = 3; out.miniWard = wardUnlocked(57) === true; G.mini = null; G.state = 'menu';
 
     /* photo codes: an island creature and the Reef scales pattern survive the round trip, and an older photo keeps its old format */
@@ -251,10 +259,10 @@
     }
   } catch (e) { out.err = String(e && e.stack || e); }
   var need = ['table', 'bossWaves', 'harder', 'cast', 'bestiary', 'uniqueLooks', 'traits', 'art', 'saveDefault', 'saveSane', 'ward', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'menuFilm', 'starts', 'spawns', 'hud',
-    'props', 'inside', 'noClash', 'reachAll', 'ventsOpen', 'startOpen', 'wetMap', 'wetMatches', 'dryStart', 'wade', 'swimMul', 'aiOk', 'crabPlate', 'jellySplit', 'jellyOnce', 'bossOk', 'glimpse', 'glimpseGoes', 'clean', 'notClean',
+    'props', 'inside', 'noClash', 'reachAll', 'ventsOpen', 'startOpen', 'wetMap', 'wetMatches', 'dryStart', 'dryTick', 'wade', 'dryLost', 'dryLostOnce', 'dryHad', 'swimMul', 'aiOk', 'crabPlate', 'jellySplit', 'jellyOnce', 'bossOk', 'glimpse', 'glimpseGoes', 'clean', 'notClean',
     'tune', 'spotsOk', 'sight', 'sightDuck', 'sightGone', 'noSightBoss', 'doorShut', 'doorOpen', 'camTrack', 'brief', 'briefOn', 'briefGone', 'noteTake', 'noteBest', 'noteAch',
     'enterOk', 'tell', 'coconut', 'palmBump', 'buoy', 'buoyBack', 'boat', 'wakeOn', 'prints', 'music', 'menuDraw', 'chase',
-    'films', 'noEndCard', 'mini', 'miniBite', 'miniShell', 'miniWard', 'photo', 'photoOld', 'backdrop', 'finish', 'finishWet', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'minimap',
+    'films', 'noEndCard', 'mini', 'miniBite', 'miniShell', 'miniSplash', 'miniEelCap', 'miniWard', 'photo', 'photoOld', 'backdrop', 'finish', 'finishWet', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'minimap',
     'lastWave', 'endFilm', 'endMini', 'endVictory', 'gallery', 'snap', 'snapRestore'];
   out.failed = QA.need(out, need);
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;

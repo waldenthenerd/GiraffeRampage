@@ -1,7 +1,7 @@
 /* jukebox: the jukebox in Penny's Café and the song card (js/town/44zzzz-jukebox.js). A song is remembered the first time it plays for real (not
    when it is drawn offline), an older save is given the songs its progress must have played, the save keeps only clean names, every band song
-   but the giraffe's own is a record, the jukebox stands in the café and opens its panel, a heard record plays while she is in the café and
-   stops when she leaves, a record not heard cannot play, and the song card shows a song's name (once, and not when Song names is off).
+   but the giraffe's own is a record, the jukebox stands in the café and opens its panel, a heard record plays and follows her round the town
+   (Next and Shuffle choose the next one) and stops when she leaves it, a record not heard cannot play, and the song card shows a song's name (once, and not when Song names is off).
    Pictures: --params "view=room" (the café with the jukebox playing) or "view=panel" (the jukebox's list). */
 (function(){
   var out = { failed: [], errs: [] }, check = function(k, v){ if (!v) out.failed.push(k); };
@@ -40,7 +40,19 @@
     if (view === 'room'){ townClosePanel(); Town.x = 600; Town.walkers = []; Town.bannerT = 0; for (var j = 0; j < 90; j++) GR.step(1 / 30); songCard.seen = {}; songCard('swamp'); GR.render(); QA.done(out); return; }
     if (view === 'panel'){ QA.done(out); return; }
     townClosePanel();
-    townGo('market', 1200, 1); Music.refresh(); check('stopsOutside', Jukebox.on === null && Music.want.theme !== 'swamp');
+    /* the record follows her round the town, and keeps going in a screen with its own tune; it stops when she leaves the town */
+    townGo('market', 1200, 1); Music.refresh(); check('followsTown', Jukebox.on === 'swamp' && Music.want.theme === 'swamp');
+    townGo('burrows', 260, 1); Music.refresh(); check('followsBurrows', Jukebox.on === 'swamp' && Music.want.theme === 'swamp');
+    townGo('market', 1200, 1);
+    /* Next goes down the list of records heard; Shuffle picks another heard one, and moves on by itself once a song has played through */
+    var heardIds = ids.filter(function(k){ return jbHeard()[k]; }), iS = heardIds.indexOf('swamp');
+    handleTownAction('town-juke-next'); check('next', Jukebox.on === heardIds[(iS + 1) % heardIds.length] && !!jbHeard()[Jukebox.on]);
+    handleTownAction('town-juke-shuffle'); var sh1 = Jukebox.on; check('shuffle', Jukebox.shuffle === true && !!jbHeard()[sh1] && !!document.querySelector('.tp-juke [data-a="town-juke-shuffle"][aria-pressed="true"]'));
+    var bs = bandState(), bcur = { theme: sh1, lvl: 1, tempo: 1, shift: 0 }; townClosePanel();
+    bandBar(Music.R, bs, bcur, { run: false }, SFX.ctx.currentTime + 1); var oneBar = Jukebox.on === sh1 && Jukebox.bars === 1; Jukebox.bars = jbSongBars(bs.song) - 1;
+    bandBar(Music.R, bs, bcur, { run: false }, SFX.ctx.currentTime + 2); check('shuffleMovesOn', oneBar && Jukebox.on !== sh1 && Jukebox.bars === 0 && !!jbHeard()[Jukebox.on]);
+    handleTownAction('town-juke-shuffle'); check('shuffleOff', Jukebox.shuffle === false); townClosePanel();
+    townExit(); Music.refresh(); check('stopsOutside', Jukebox.on === null && Music.want.theme !== 'swamp');
     /* the song card: a name, once; not when it is turned off */
     G.state = 'menu'; Settings.songNames = true; songCard.seen = {}; songCard('town');
     var el = document.getElementById('songCard'); out.card = el && el.textContent;

@@ -14,6 +14,14 @@ miniEndsRun = function(ch){ return ch === ISLE_CHAPTER || isleBaseEndsRun.apply(
 
 /* ---------- Tide Pool Dash: three channels of the tide run across the beach with eels in them. Fetch the shells from the far sand and from the bars between. ---------- */
 const DASH_LANES = [0.34, 0.52, 0.7];
+const DASH_EEL_MAX = 15;                                                              /* the eels speed up with each shell up to this many, then hold */
+function dashEelSpeed(score){ return 120 + Math.min(score, DASH_EEL_MAX) * 12; }
+/* the island's splash (ilSplash, js/island/44zzzt-island-map.js) in the minigame's own particles: droplets and a ring on the water */
+function dashSplash(m, x, y, s, k){
+  miniBurst(m, x, y, 3, '#E8FAFA', { speed: 70 * s * k, up: 50 * s * k, r: 2.4 * s * k, life: 0.45, glow: false });
+  miniBurst(m, x, y, 1, '#9AE0E0', { speed: 60 * s * k, up: 40 * s * k, r: 2.8 * s * k, life: 0.45, glow: false });
+  miniRing(m, x, y, 'rgba(232,250,250,.8)', 26 * s * k, 0.6, 0.4);
+}
 registerMini({
   ch: ISLE_CHAPTER, id: 'tidepool', name: 'Tide Pool Dash', unit: 'shells', dur: 45, goal: 10,
   blurb: 'The tide is going out, and the shells it leaves behind are on the far side of three channels.\nThe eels in the channels do not like being stepped on.',
@@ -33,7 +41,10 @@ registerMini({
     const inLane = DASH_LANES.findIndex(function(ly){ return Math.abs(p.y - g.H * ly) < g.H * 0.045; }), spd = (inLane >= 0 ? 150 : 240) * s;
     p.x = clamp(p.x + st.x * spd * dt, 22 * s, g.W - 22 * s); p.y = clamp(p.y + st.y * spd * dt, g.H * 0.16, g.H * 0.96);
     p.moving = !!(st.x || st.y); if (p.moving) p.ph += dt * (inLane >= 0 ? 8 : 13);
-    const es = (120 + m.score * 12) * s;
+    if (inLane >= 0 && m.lane !== inLane){ dashSplash(m, p.x, p.y + 6 * s, s, 1.4); SFX.splash && SFX.splash(); }          /* in she goes */
+    else if (inLane >= 0 && p.moving && Math.random() < dt * 9) dashSplash(m, p.x + (Math.random() - 0.5) * 20 * s, p.y + 4 * s + Math.random() * 10 * s, s, 0.7);
+    m.lane = inLane;
+    const es = dashEelSpeed(m.score) * s;
     m.eels.forEach(function(e){ e.x += e.d * es * dt * (1 + 0.25 * e.lane); e.ph += dt * 8; if (e.x > g.W + 60 * s) e.x = -60 * s; if (e.x < -60 * s) e.x = g.W + 60 * s;
       if (m.inv <= 0 && e.lane === inLane && (e.d > 0 ? p.x - e.x < 30 * s && e.x - p.x < 120 * s : e.x - p.x < 30 * s && p.x - e.x < 120 * s)) miniHurt(m, p.x, p.y - 30 * s, 'Bitten!'); });
     const sh = m.shell;

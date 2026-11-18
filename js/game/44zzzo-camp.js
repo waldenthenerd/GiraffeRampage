@@ -6,6 +6,8 @@
    THE CLOCK  The device clock, with Save.data.campLast as the moment it was last emptied. A clock set backwards earns nothing (campLast is pulled
      back to now); a clock set far ahead is still held by the cap, so cheating gains at most one cap's worth per Collect. Nothing runs in the background:
      the amount is worked out from the clock whenever a page asks.
+   THE BANK  A Busier Hands level counts only from the moment it is bought: the hours already stored are paid at the old rate there and then, into
+     Save.data.campBankGold and campBankProg, and campBankH remembers how many hours that was, so they still fill the larder until the next Collect.
    THE RATE  Gold an hour is 0.025% of her best score (at least 40), which is about a sixteenth of what a half-hour run at that score pays; each Busier Hands
      level adds 30% of that. A crate is worked toward at one every 4 hours of storage (at the same rate bonus).
    THE UPGRADES  Two tracks of five levels, bought with gems and opened by chapters: Busier Hands (rate) with Chapters 3, 5, 7, 9 and 11, Bigger Larder
@@ -50,13 +52,14 @@ function campHours(now){
   if (!campStart(now)) return 0;
   now = now || Date.now();
   if (Save.data.campLast > now) Save.data.campLast = now;
-  return Math.min(campCapHours(), Math.max(0, (now - Save.data.campLast) / 3600000));
+  return Math.min(campCapHours(), (+Save.data.campBankH || 0) + Math.max(0, (now - Save.data.campLast) / 3600000));
 }
 function campFull(now){ return campHours(now) >= campCapHours() - 1e-9; }
 /* what a Collect would hand over: gold, and the crates the work comes to together with what was already worked toward */
 function campPending(now){
-  const h = campHours(now), mul = campRateMul(), prog = (+Save.data.campProg || 0) + h * mul / CAMP_CRATE_HOURS;
-  return { hours: h, gold: Math.floor(h * campBaseGold() * mul), crates: Math.floor(prog), prog: prog - Math.floor(prog) };
+  const h = campHours(now), fresh = Math.max(0, h - (+Save.data.campBankH || 0)), mul = campRateMul();   /* banked hours were paid at the rate of their day */
+  const prog = (+Save.data.campProg || 0) + (+Save.data.campBankProg || 0) + fresh * mul / CAMP_CRATE_HOURS;
+  return { hours: h, gold: Math.floor((+Save.data.campBankGold || 0) + fresh * campBaseGold() * mul), crates: Math.floor(prog), prog: prog - Math.floor(prog) };
 }
 /* hand it over and start the clock again; the time past the cap is lost, as the cap says */
 function campCollect(now){
@@ -66,7 +69,7 @@ function campCollect(now){
   if (p.hours < 1 / 120){ return null; }                                            /* under half a minute: nothing to take */
   Save.data.gold = goldInt(Save.data.gold + p.gold);
   Save.data.campCrates = Math.min(9999, (Save.data.campCrates | 0) + p.crates); Save.data.campProg = Math.min(0.999, p.prog);
-  Save.data.campLast = now;
+  Save.data.campLast = now; Save.data.campBankH = 0; Save.data.campBankGold = 0; Save.data.campBankProg = 0;
   Save.data.campCollects = scoreInt((Save.data.campCollects | 0) + 1); Save.data.campGoldTotal = scoreInt(scoreInt(Save.data.campGoldTotal) + p.gold);
   if (p.hours >= campCapHours() - 1e-9) Save.data.campFullOnce = true;
   Save.write();
@@ -83,9 +86,14 @@ function campBuy(id){
   if (!CAMP_UP[id] || !campStart()) return false;
   const nx = campUpNext(id);
   if (nx.maxed || !nx.can){ return false; }
-  const stored = campHours();                                                         /* what is stored stays stored: a bigger larder or a faster hand must not change it */
+  const now = Date.now(), stored = campHours(now), bankH = +Save.data.campBankH || 0;   /* what is stored stays stored: a bigger larder or a faster hand must not change it */
+  if (id === 'rate' && stored > bankH){                                              /* the faster hand starts now: bank the hours so far at the old rate */
+    const fresh = stored - bankH, mul = campRateMul();
+    Save.data.campBankGold = (+Save.data.campBankGold || 0) + fresh * campBaseGold() * mul; Save.data.campBankProg = (+Save.data.campBankProg || 0) + fresh * mul / CAMP_CRATE_HOURS;
+    Save.data.campBankH = stored; Save.data.campLast = now;
+  }
   Save.data.gems -= nx.cost; Save.data[id === 'rate' ? 'campRate' : 'campCap'] = nx.lv + 1;
-  if (stored > 0){ Save.data.campLast = Date.now() - stored * 3600000; }
+  if (id === 'cap' && stored > bankH){ Save.data.campLast = now - (stored - bankH) * 3600000; }
   Save.write(); return true;
 }
 /* open n crates from the store (all of it or as many as there are): [{piece, rarity, ..., trinket}] like the gear page's, or null */

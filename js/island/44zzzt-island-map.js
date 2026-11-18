@@ -91,9 +91,18 @@ sceneryUpdate = function(dt){
   if (G.biome !== 'isle' || G.state !== 'playing' || P.dead) return;
   if (isleWet(P.x, P.y)){
     G.terrain = G.terrain ? Object.assign({}, G.terrain, { spd: G.terrain.spd * ISLE_WADE }) : { kind: 'wade', spd: ISLE_WADE, accel: 1 };
-    if (G.il && G.chapter === ISLE_CHAPTER) G.il.wet = true;
+    if (G.il && G.chapter === ISLE_CHAPTER && !G.il.wet){
+      G.il.wet = true;
+      if (Save.data && !Save.data.isleDry){ addText(P.x, P.y - 46, 'Dry Hooves lost', '#9AE0E0', 15, true); if (SFX.deny) SFX.deny(); }     /* the achievement goes with the first step, so say so */
+    }
     if (Math.hypot(P.vx, P.vy) > 60 && Math.random() < dt * 9) ilSplash(P.x + rand(-10, 10), P.y + rand(-6, 10), 0.7);
   }
+};
+/* the HUD keeps a small tick under the chapter while Dry Hooves can still be had this run (not once she has it) */
+const isleBaseUpdateHUD = updateHUD;
+updateHUD = function(){
+  isleBaseUpdateHUD.apply(this, arguments);
+  if (el('hDry')) hudTxt('hDry', G.il && G.chapter === ISLE_CHAPTER && G.biome === 'isle' && !G.il.wet && Save.data && !Save.data.isleDry ? '\u2713 DRY HOOVES' : '');
 };
 function ilSplash(x, y, s){
   for (let i = 0; i < 3; i++) addParticle(x, y, rand(-60, 60) * s, rand(-70, -20) * s, rand(1.6, 3) * s, 0.4, i ? '#E8FAFA' : '#9AE0E0', { drag: 3 });
