@@ -319,6 +319,7 @@ function drawPlayer(ctx){
       ctx.globalAlpha = 1;
     } else {
       ctx.beginPath(); ctx.ellipse(0, 0, 6.2, 4.6, 0, 0, TAU); ctx.fill();
+      if (rim) ctx.shadowBlur = 0;                        /* the rim is blurred once per fill, which is slow where the canvas is drawn by the CPU: only her outline gets it */
       ctx.fillStyle = '#5C3A16';
       ctx.beginPath(); ctx.ellipse(2, 0, 2.6, 2.6, 0, 0, TAU); ctx.fill();
       ctx.fillStyle = dark;
@@ -330,10 +331,12 @@ function drawPlayer(ctx){
   ctx.beginPath(); ctx.moveTo(-22, 0);
   ctx.quadraticCurveTo(-32, Math.sin(P.walk * 3) * 8, -37, Math.sin(P.walk * 3) * 13);
   ctx.stroke();
+  if (rim) ctx.shadowBlur = 0;
   fillCircle(ctx, -37, Math.sin(P.walk * 3) * 13, 3.2, '#4A2E12');
   ctx.lineCap = 'butt';
 
   /* body */
+  if (rim) ctx.shadowBlur = rim[1];
   ctx.fillStyle = coat;
   ctx.beginPath(); ctx.ellipse(0, 0, 24, 16, 0, 0, TAU); ctx.fill();
   ctx.save();
@@ -348,6 +351,7 @@ function drawPlayer(ctx){
     else { ctx.beginPath(); ctx.ellipse(s.x, s.y, s.r, s.r * 0.82, i * 0.7, 0, TAU); ctx.fill(); }
   }
   ctx.restore();
+  if (rim) ctx.shadowBlur = 0;                            /* boots, armor and weapons sit on the body and need no rim of their own */
 
   if (bootAcc){                                           /* boots, on the feet that show along her flanks */
     for (let i = 0; i < 4; i++){
@@ -371,7 +375,9 @@ function drawPlayer(ctx){
   const px = -Math.sin(a), py = Math.cos(a);
   let hx = cv ? cv.hx : shx + Math.cos(a) * nlen, hy = cv ? cv.hy : shy + Math.sin(a) * nlen;
   hx += px * GF.sway; hy += py * GF.sway;                  /* the head sways when idle and nods when running */
+  if (rim) ctx.shadowBlur = 0;
   if (typeof neckGhostsDraw === 'function') neckGhostsDraw(ctx, coat);           /* motion-blur frames of the lunge */
+  if (rim) ctx.shadowBlur = rim[1];
   ctx.fillStyle = coat;
   if (cv){ neckPath(ctx, cv.pts); ctx.fill(); }
   else {
@@ -393,7 +399,6 @@ function drawPlayer(ctx){
     if (spPat) wardSpot(ctx, spPat, nx + px * off, ny + py * off, 3.4 - t * 1.1, 2.8 - t * 0.9, a);
     else { ctx.beginPath(); ctx.ellipse(nx + px * off, ny + py * off, 3.4 - t * 1.1, 2.8 - t * 0.9, a, 0, TAU); ctx.fill(); }
   }
-  if (rim) ctx.shadowBlur = rim[1];
   /* mane */
   ctx.strokeStyle = '#7A4A21'; ctx.lineWidth = 2;
   ctx.beginPath();
@@ -451,7 +456,9 @@ function drawPlayer(ctx){
   /* head */
   ctx.save(); ctx.translate(hx, hy); ctx.rotate(a + (cv ? cv.turn * 0.6 : 0));
   ctx.fillStyle = coat;
+  if (rim) ctx.shadowBlur = rim[1];
   ctx.beginPath(); ctx.ellipse(2, 0, 11, 7.6, 0, 0, TAU); ctx.fill();
+  if (rim) ctx.shadowBlur = 0;
   ctx.fillStyle = dark;
   ctx.beginPath(); ctx.ellipse(10, 0, 5.4, 4.4, 0, 0, TAU); ctx.fill();
   fillCircle(ctx, 13, -1.8, 1.1, '#2B1D12');

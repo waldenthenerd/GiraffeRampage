@@ -4,7 +4,9 @@
 /* ========================= 44c. PERFORMANCE GOVERNOR ========================= */
 /* How it decides: it times how long each frame's update and draw take on this machine (not how long the screen waits between
    frames, so a 30 or 144 Hz screen does not confuse it). Over about a second and a half, an average above 20 ms means it
-   cannot hold 50 frames a second, so it steps down one notch. An average under 9 ms for about ten seconds steps back up one.
+   cannot hold 50 frames a second, so it steps down one notch (two when the average is over 40 ms). When frames are that slow it
+   decides after about a second and a half of work instead of waiting for 90 frames. An average under 9 ms for about ten seconds steps back up one.
+   It counts a run, a minigame being played and the main menu (the menu draws the same big picture, and it is the first thing seen).
    After going back up, if it has to come down again within half a minute it stays down for the rest of the visit. */
 const PERF_STEPS = [
   { s: 1,    fx: 2 },      /* what the player chose */
@@ -34,14 +36,15 @@ const Perf = {
     this.sinceChange += dt;
     if (!(Settings.autoPerf !== false)){ if (this.idx !== 0) this.reset(); return; }
     const inMini = G.state === 'mini' && G.mini && G.mini.phase === 'play';          /* a minigame being played counts too */
-    if ((G.state !== 'playing' && !inMini) || G.attract) return;                     /* only real play counts: menus and films are cheap or different */
+    const inMenu = G.state === 'menu';                                               /* the menu's moving backdrop draws the whole screen too */
+    if (!(inMenu || inMini || (G.state === 'playing' && !G.attract))) return;       /* the other pages and films are cheap or different */
     if (this.sinceChange < 1.5) return;                                              /* let a change settle (a resize can hitch one frame) */
     this.sum += ms; this.n++;
-    if (this.n < 90) return;
+    if (this.n < 90 && !(this.n >= 20 && this.sum >= 1500)) return;                  /* 90 frames, or 20 slow ones that already add up to a second and a half */
     const avg = this.sum / this.n; this.sum = 0; this.n = 0;
     if (avg > 20 && this.idx < PERF_STEPS.length - 1){
       if (this.clock - this.lastUpAt < 30) this.ceil = this.idx;                  /* it came back and fell again: this level is as good as it gets here */
-      this.idx++;
+      this.idx = Math.min(PERF_STEPS.length - 1, this.idx + (avg > 40 ? 2 : 1));
       this.apply();
       this.told = true;
       try { perfNotice(); } catch (e) {}

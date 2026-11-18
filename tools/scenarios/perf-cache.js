@@ -3,6 +3,7 @@
 (function(){
   var res = {}, errs = [];
   GR.handleAction('splash-go');
+  Settings.autoPerf = false; Perf.reset();                      /* the governor also watches the menu now, and on a slow headless browser it would step down under this test (as in perf-ground and preview-trail) */
   GR.startRun(1); G.introFX = null;
   for (var i = 0; i < 60; i++){ P.invuln = 99; GR.step(1/60); }
   res.cacheThere = typeof ShadowCache === 'object' && softShadow === ShadowCache.draw;

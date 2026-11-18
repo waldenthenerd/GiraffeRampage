@@ -134,7 +134,7 @@ function fogSprite(rgb){
   const k = rgb.join(',');
   if (fogSprites[k]) return fogSprites[k];
   const c = document.createElement('canvas'); c.width = c.height = 128;
-  const x = c.getContext('2d'), g = x.createRadialGradient(64, 64, 4, 64, 64, 64);
+  const x = c.getContext('2d', { willReadFrequently: true }), g = x.createRadialGradient(64, 64, 4, 64, 64, 64);      /* CPU memory, as the cloud sprites (36o) */
   g.addColorStop(0, 'rgba(' + k + ',1)'); g.addColorStop(1, 'rgba(' + k + ',0)');
   x.fillStyle = g; x.fillRect(0, 0, 128, 128);
   return (fogSprites[k] = c);

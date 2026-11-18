@@ -36,17 +36,24 @@ function tilesDraw(L, sig, ctx, cx, cy, vw, vh, paint){
     if (L.map.has(key)) continue;
     if (built >= L.perFrame){ missing++; continue; }
     const cv = document.createElement('canvas'); cv.width = cv.height = px;
-    const c = cv.getContext('2d'); if (!c){ missing++; continue; }
+    const c = cv.getContext('2d', { willReadFrequently: true }); if (!c){ missing++; continue; }      /* kept in memory the CPU can read: a tile this big would otherwise be put on the graphics card by Firefox, and copying it onto the screen canvas then waits for the card every frame (a sixth of a frame in a Firefox profile) */
     c.setTransform(s, 0, 0, s, -i * CH * s, -j * CH * s);
     try { paint(c, i * CH + CH / 2, j * CH + CH / 2, CH + L.pad * 2, CH + L.pad * 2); } catch (e) { missing++; continue; }
     cv._b = px * px * 4; L.map.set(key, cv); L.bytes += cv._b; L.builds++; built++;
   }
   if (missing){ L.live++; return false; }                                                  /* some tiles are still being made */
+  /* A tile is copied at its own size onto whole pixels of the screen: no scaling, so nothing is smoothed (Firefox kept smoothing the scaled copy even with smoothing off,
+     and that was a tenth of a menu frame). A tile is a pixel or less wider than the CH units it shows, so neighbours overlap a little and no hairline can open between them. */
+  const m = ctx.getTransform ? ctx.getTransform() : null;
+  const flat = m && Math.abs(m.b) < 1e-6 && Math.abs(m.c) < 1e-6 && m.a > 0 && Math.abs(m.a - m.d) < 1e-6;
+  if (flat){ ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); }
   for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++){
     const key = sig + '#' + i + ',' + j, cv = L.map.get(key);
     L.map.delete(key); L.map.set(key, cv);                                                  /* most recently used goes last */
-    ctx.drawImage(cv, i * CH - 0.5, j * CH - 0.5, CH + 1, CH + 1);                          /* a half unit over each edge, so no hairline shows between tiles */
+    if (flat) ctx.drawImage(cv, Math.round(m.a * i * CH + m.e), Math.round(m.d * j * CH + m.f));
+    else ctx.drawImage(cv, i * CH - 0.5, j * CH - 0.5, CH + 1, CH + 1);                     /* tilted: a half unit over each edge, so no hairline shows between tiles */
   }
+  if (flat) ctx.restore();
   L.hits++;
   while (L.map.size > L.max || L.bytes > L.maxBytes){ const old = L.map.keys().next().value; L.bytes -= L.map.get(old)._b; L.map.delete(old); }
   return true;

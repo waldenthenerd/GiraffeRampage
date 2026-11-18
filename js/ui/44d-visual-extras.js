@@ -185,8 +185,8 @@ function drawHaze(ctx){
     const f = this.todFrac(G.chapter | 0 || 1);
     if (f === null) return;
     const c = todTint(f); if (c[3] < 0.01) return;
-    ctx.save(); ctx.globalCompositeOperation = 'soft-light';
-    ctx.fillStyle = 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + c[3].toFixed(3) + ')';
+    ctx.save(); ctx.globalCompositeOperation = GRADE_OP;
+    ctx.fillStyle = 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + (c[3] * GRADE_K).toFixed(3) + ')';
     ctx.fillRect(0, 0, G.W, G.H);
     ctx.restore();
   };

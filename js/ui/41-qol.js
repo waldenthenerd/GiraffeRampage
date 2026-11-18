@@ -181,6 +181,7 @@ function showSettings(){
         '<div class="sub" style="margin:14px 0 2px;font-weight:700;color:var(--sun)">Screen</div>' +
         toggleRowHTML('s-fx', 'Visual effects', 'Lighting, weather and depth effects. Turn them down on a slow device.', fxLevelSetting() > 0, ['Low', 'Medium', 'High'][fxLevelSetting()], ['Low', 'Medium', 'High'][fxLevelSetting()]) +
         toggleRowHTML('s-perf', 'Adapt to slow devices', 'If the game cannot keep up, it lowers sharpness and effects by itself, and brings them back when it can.', s.autoPerf !== false) +
+        toggleRowHTML('s-sharp', 'Sharpness', 'How finely the picture is drawn. Lower it on a big screen or a slow device to get a smoother game; menus and text stay sharp. Auto draws it fully, unless the game is slow.', (s.sharp | 0) > 0, ['Auto', '75%', '50%'][s.sharp | 0], 'Auto') +
         sliderRowHTML('setFlash', 'Hit flash', 'How white enemies flash when struck.', pct(s.hitFlash)) +
         toggleRowHTML('s-calm', 'Reduce flashes', 'Softens full-screen flashes, lightning and bright bursts.', !!s.calmFlash) +
         toggleRowHTML('s-text', 'Text size', 'Makes menus and the HUD larger.', (s.textScale | 0) > 0, ['Normal', 'Large', 'Larger'][s.textScale | 0], 'Normal') +

@@ -12,7 +12,7 @@
   const AMBIENT = { 1: 1, 2: 1, 3: 1, 5: 1, 6: 1, 11: 1, 12: 1 };        /* the chapters with an open sky, for the thin calm-weather clouds */
   const CL = { list: [], sprites: [], t: 0, ch: 0, wind: 1, rgb: [70, 80, 100], want: 0, amb: 0 };
   function sprite(seed){
-    const W = 260, H = 160, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'), r = miniRng(seed * 977 + 5);
+    const W = 260, H = 160, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d', { willReadFrequently: true }), r = miniRng(seed * 977 + 5);       /* CPU memory: a sprite drawn onto the screen canvas every frame must not live on the graphics card (Firefox), or each copy waits for it */
     for (let i = 0; i < 11; i++){
       const rad = 24 + r() * 26, x = rad + 2 + r() * (W - 2 * rad - 4), y = rad * 0.8 + 2 + r() * (H - rad * 1.6 - 4), gr = g.createRadialGradient(x, y, 2, x, y, rad);
       gr.addColorStop(0, 'rgba(255,255,255,.55)'); gr.addColorStop(0.55, 'rgba(255,255,255,.22)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
@@ -22,7 +22,7 @@
   }
   function tinted(sp, rgb, key){                                          /* the sprite in the front's color, kept for reuse */
     sp._t = sp._t || {}; if (sp._t[key]) return sp._t[key];
-    const c = document.createElement('canvas'); c.width = sp.width; c.height = sp.height; const g = c.getContext('2d');
+    const c = document.createElement('canvas'); c.width = sp.width; c.height = sp.height; const g = c.getContext('2d', { willReadFrequently: true });
     g.drawImage(sp, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; g.fillRect(0, 0, c.width, c.height);
     sp._t[key] = c; return c;
   }
