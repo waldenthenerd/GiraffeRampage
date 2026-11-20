@@ -85,10 +85,11 @@ try {
   GR.handleAction('s-sharp'); GR.handleAction('s-sharp'); GR.handleAction('s-sharp');
   out.cycles = Settings.sharp === 0 && stage.width === w0;
   showSettings(); out.settingsRow = !!document.querySelector('[data-a="s-sharp"]');
+  out.versionShown = /Version: \S/.test(document.getElementById('overlay') ? document.getElementById('overlay').textContent : document.body.textContent) && buildLabel() === 'development copy';
   Settings.sharp = 0; Settings.autoPerf = true; Settings.save(); resize();
 
   var need = ['rimKept', 'rimFew', 'noSoftLight', 'hardLight', 'gradeConst', 'tilesMade', 'tilesCpu', 'tilesUnscaled', 'vignetteCopied', 'vignetteShape', 'spritesCpu', 'noEarlyStep', 'menuTwoSteps', 'menuScaled', 'cheapStays', 'shopNotCounted', 'slowOneStep',
-              'sharp1', 'sharp2', 'saved', 'loaded', 'oldSave', 'junkSaved', 'cycles', 'settingsRow'];
+              'sharp1', 'sharp2', 'saved', 'loaded', 'oldSave', 'junkSaved', 'cycles', 'settingsRow', 'versionShown'];
   out.pass = out.errs.length === 0 && need.every(function(k){ return out[k] === true; });
   out.failed = need.filter(function(k){ return out[k] !== true; });
   QA.done(out);

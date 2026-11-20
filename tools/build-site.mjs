@@ -76,6 +76,9 @@ html = html.replace(tagRe, (m, src) => /js\/dev\//.test(src) ? '' : first ? (fir
 let firstCss = true;
 html = html.replace(/<link rel="stylesheet" href="css\/[^"]+">\s*\r?\n/g, () => firstCss ? (firstCss = false, '<link rel="stylesheet" href="' + cssName + '">\n') : '');
 if (/45b-dev-panel/.test(html)) throw new Error('the developer panel line is still in index.html');
+// the build stamp shown at the bottom of Settings: the date and the commit this package was made from
+let sha = ''; try { sha = (await import('node:child_process')).execSync('git rev-parse --short HEAD', { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch (e) {}
+html = html.replace('<meta name="game-build" content="development copy">', '<meta name="game-build" content="' + new Date().toISOString().slice(0, 10) + (sha ? ' \u00b7 ' + sha : '') + '">');
 fs.writeFileSync(path.join(outDir, 'index.html'), html);
 
 const src = pieces.reduce((n, p) => n + p.srcBytes, 0);
