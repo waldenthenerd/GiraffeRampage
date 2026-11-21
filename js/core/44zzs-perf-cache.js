@@ -17,7 +17,7 @@ const ShadowCache = (function(){
     const by0 = Math.min(oy - ry * 1.3, oy * 0.4 - ry) - 2, by1 = Math.max(oy + ry * 1.3, oy * 0.4 + ry) + 2;
     const cv = document.createElement('canvas');
     cv.width = Math.max(2, Math.ceil((bx1 - bx0) * sc)); cv.height = Math.max(2, Math.ceil((by1 - by0) * sc));
-    const c = cv.getContext('2d');
+    const c = cv.getContext('2d', { willReadFrequently: true });
     c.setTransform(sc, 0, 0, sc, -bx0 * sc, -by0 * sc);
     c.fillStyle = 'rgba(' + Light.shRGB + ',' + (sa * 0.4).toFixed(3) + ')';
     c.beginPath(); c.ellipse(ox, oy, rx * 1.3, ry * 1.3, 0, 0, TAU); c.fill();

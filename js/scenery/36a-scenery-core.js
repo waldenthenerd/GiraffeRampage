@@ -58,7 +58,7 @@ function scenFade(c){
 function scenPatchSprite(fill, r, squash){
   const w = Math.max(32, Math.round(r)), h = Math.max(24, Math.round(r * squash)), c = document.createElement('canvas');
   c.width = w * 2; c.height = h * 2;
-  const g = c.getContext('2d'); if (!g) return null;
+  const g = c.getContext('2d', { willReadFrequently: true }); if (!g) return null;
   for (let i = 0; i < 5; i++){                                                                    /* a few overlapping soft lobes make an irregular patch */
     const px = w + (i ? Math.cos(i * 1.9) * w * 0.35 : 0), py = h + (i ? Math.sin(i * 2.7) * h * 0.35 : 0), pr = w * (i ? 0.55 : 0.8);
     const gr = g.createRadialGradient(px, py, 0, px, py, pr);

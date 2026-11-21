@@ -242,7 +242,7 @@ function sdDrawFast(ctx, p, ops, t){
         const t0 = performance.now();
         if (SDC.px + W * H > SDC.budget){ for (let i = 0; i < SDC.held.length; i++) SDC.held[i]._sdSpr = null; SDC.held.length = 0; SDC.px = 0; SDC.gen++; }
         const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
-        const c = cv.getContext('2d'); c.setTransform(s, 0, 0, s, -B[0] * s, -B[1] * s); sdDraw(c, p._sdSt, t);
+        const c = cv.getContext('2d', { willReadFrequently: true }); c.setTransform(s, 0, 0, s, -B[0] * s, -B[1] * s); sdDraw(c, p._sdSt, t);
         sp = p._sdSpr = { cv: cv, s: s, gen: SDC.gen, w: W / s, h: H / s }; SDC.held.push(p); SDC.px += W * H; SDC.built++;
         SDC.ms += performance.now() - t0;
       }

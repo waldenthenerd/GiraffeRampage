@@ -1,5 +1,5 @@
 /* render-speed: the changes that make the game cheaper to draw where the canvas is drawn by the CPU (Firefox on Linux, found with a Firefox profile): the giraffe's rim blur is kept to her
-   outline, the colour grade uses hard-light at 0.37 strength instead of soft-light, the ground tiles are copied unscaled onto whole pixels and live in CPU memory, the dark screen edge is a cached bitmap, the cloud and fog sprites live in CPU memory, the slow-device governor also
+   outline, the colour grade uses hard-light at 0.37 strength instead of soft-light, the ground tiles are copied unscaled onto whole pixels and live in CPU memory, the dark screen edge is a cached bitmap, the cloud and fog sprites, the light sprites and the ground patches live in CPU memory, the slow-device governor also
    watches the menu and moves two steps when frames are very slow, and Settings has a Sharpness choice (Auto, 75%, 50%) that is saved and loaded like the other settings.
    Run: node tools/qa-cloud.mjs tools/scenarios/render-speed.js --wait 90000 [--w 1280 --h 720 --scale 1] [--touch --w 390 --h 844] */
 GR.handleAction('splash-go'); Ach.check = function(){ return []; };
@@ -45,13 +45,16 @@ try {
   out.tileBlits = blits.length;
   out.tilesUnscaled = blits.length > 0 && blits.every(function(b){ return b.n === 3 && b.id && b.x === Math.round(b.x) && b.y === Math.round(b.y); });   /* whole pixels, no scaling: nothing for the browser to smooth */
 
-  /* 3b. the dark screen edge is a bitmap the size of the canvas, copied 1:1, and looks like the gradient it came from; the cloud and fog sprites live in CPU memory */
+  /* 3b. the dark screen edge is a bitmap the size of the canvas, copied 1:1, and looks like the gradient it came from; the cloud and fog sprites, the light sprites and the ground patches live in CPU memory */
   var vcopies = 0; proto.drawImage = function(src){ if (src === vigCv && this.canvas && this.canvas.id === 'stage') vcopies++; return di.apply(this, arguments); };
   GR.render(); proto.drawImage = di;
   out.vignetteCopied = vcopies === 1 && !!vigCv && vigCv.width === stage.width && vigCv.height === stage.height;
   var vd = vigCv.getContext('2d').getImageData(0, 0, vigCv.width, vigCv.height).data, cx = (vigCv.width >> 1), cy = (vigCv.height >> 1);
   out.vignetteShape = vd[(cy * vigCv.width + cx) * 4 + 3] < 4 && vd[3] > 90 && vd[3] < 125;           /* clear in the middle, about .42 of 255 at the corner */
-  out.spritesCpu = fogSprite([10, 20, 30]).getContext('2d').getContextAttributes().willReadFrequently === true;
+  var cpu = function(cv){ return !!cv && cv.getContext('2d').getContextAttributes().willReadFrequently === true; };
+  out.spritesCpu = cpu(fogSprite([10, 20, 30])) && cpu(lightSprite([200, 150, 90]));
+  var pat = SCEN.patches.length ? SCEN.patches[0].spr : null;
+  out.cachesCpu = !pat || cpu(pat);                                   /* the ground patches too: drawn onto the screen again and again and never changed, so kept where the CPU can read them */
 
   /* 4. the governor: it counts the menu, decides sooner when frames are slow, and steps two at a time when they are very slow */
   var saveState = G.state, saveAtt = G.attract; Settings.autoPerf = true;
@@ -88,7 +91,7 @@ try {
   out.versionShown = /Version: \S/.test(document.getElementById('overlay') ? document.getElementById('overlay').textContent : document.body.textContent) && buildLabel() === 'development copy';
   Settings.sharp = 0; Settings.autoPerf = true; Settings.save(); resize();
 
-  var need = ['rimKept', 'rimFew', 'noSoftLight', 'hardLight', 'gradeConst', 'tilesMade', 'tilesCpu', 'tilesUnscaled', 'vignetteCopied', 'vignetteShape', 'spritesCpu', 'noEarlyStep', 'menuTwoSteps', 'menuScaled', 'cheapStays', 'shopNotCounted', 'slowOneStep',
+  var need = ['rimKept', 'rimFew', 'noSoftLight', 'hardLight', 'gradeConst', 'tilesMade', 'tilesCpu', 'tilesUnscaled', 'vignetteCopied', 'vignetteShape', 'spritesCpu', 'cachesCpu', 'noEarlyStep', 'menuTwoSteps', 'menuScaled', 'cheapStays', 'shopNotCounted', 'slowOneStep',
               'sharp1', 'sharp2', 'saved', 'loaded', 'oldSave', 'junkSaved', 'cycles', 'settingsRow', 'versionShown'];
   out.pass = out.errs.length === 0 && need.every(function(k){ return out[k] === true; });
   out.failed = need.filter(function(k){ return out[k] !== true; });
