@@ -201,6 +201,7 @@ function showSettings(){
         '<div class="sub" style="margin:22px 0 2px;font-weight:700;color:#FF8A6A">Danger zone</div>' +
         '<div class="kv" style="width:100%"><div>Erase all progress<small>Clears the save on this device: gold, upgrades, gear, ants, the bestiary, photos and Longneck Town. You are asked twice.</small></div>' +
           '<button class="btn sm ghost" data-a="wipe">Erase&hellip;</button></div>') +
+      '<div class="sub" style="margin-top:18px;opacity:.6;font-size:12px">Version: ' + buildLabel() + '</div>' +
       '<div class="row stickyback" style="margin-top:18px"><button class="btn sm" data-a="settings-back">Back</button></div>' +
     '</div>');
   wireSlider('setMusic', function(v){ s.musicVol = v; try { Music.refresh(); } catch (e) {} });
@@ -218,6 +219,11 @@ function showSettings(){
   wireSlider('setFlash', function(v){ s.hitFlash = v; });
   wireSlider('setTouch', function(v){ s.touchScale = v; applyTouchLayout(); }, 0.5);
   if (typeof mmWireSettings === 'function') mmWireSettings();
+}
+/* what the page says it was built from (index.html's game-build tag; the website build fills in the date and commit), for bug reports */
+function buildLabel(){
+  const m = document.querySelector('meta[name="game-build"]'), t = m && m.content ? String(m.content).replace(/[<>&"]/g, '') : '';
+  return t || 'unknown';
 }
 function applyTouchLayout(){
   const sc = clamp(Settings.touchScale, 0.5, 1) * 1.0;
