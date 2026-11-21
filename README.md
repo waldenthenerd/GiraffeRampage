@@ -82,18 +82,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 246 | 75,832 | 6.33 MiB (6,635,002 bytes) |
+| JavaScript (`js/`) | 246 | 75,838 | 6.33 MiB (6,635,434 bytes) |
 | Styles (`css/`) | 6 | 1,964 | 182 KiB (186,693 bytes) |
-| Page (`index.html`) | 1 | 298 | 15.4 KiB (15,754 bytes) |
-| **Whole game** | **253** | **78,094** | **6.52 MiB (6,837,449 bytes)** |
+| Page (`index.html`) | 1 | 299 | 15.4 KiB (15,806 bytes) |
+| **Whole game** | **253** | **78,101** | **6.52 MiB (6,837,933 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **77,493 lines, 6.48 MiB (6,790,467 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
-| JavaScript (`js/`) | 246 | 75,832 | 6.33 MiB (6,635,002 bytes) |
-| Styles (`css/`) | 6 | 1,964 | 182 KiB (186,693 bytes) |
-| Page (`index.html`) | 1 | 298 | 15.4 KiB (15,754 bytes) |
-| **Whole game** | **253** | **78,094** | **6.52 MiB (6,837,449 bytes)** |
-
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **55,543 lines, 4.19 MiB (4,388,892 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **77,500 lines, 6.48 MiB (6,790,951 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
 ## How the files fit together
 
@@ -207,7 +201,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/ui/38-overlays-cards.js` | 130 | DOM handles, card presentation, offer generation, overlay helper. |
 | `js/ui/39-run-report.js` | 188 | Run report, tooltips, key bindings, kick trails. |
 | `js/game/40-fusion.js` | 890 | Card fusion: combos, the machine screen, the film. |
-| `js/ui/41-qol.js` | 777 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
+| `js/ui/41-qol.js` | 783 | Quality of life: navigation, settings screens, gallery, save/continue, touch layout, developer panel, actions. |
 | `js/ui/42-run-hud.js` | 242 | Run lifecycle and the HUD. `startRun` builds the Tower's world (`buildTowerWorld`) for the `tower` biome and the town (`buildSiegeWorld`) for the `siege` biome, and clears `G.tower` for every other; `chapterComplete` also sets `chapter14Complete`, `chapter15Complete` and `chapter16Complete`. |
 | `js/core/43-input.js` | 379 | Input: keyboard, mouse, touch, gamepad. |
 | `js/ui/41a-gear-page.js` | 355 | **The Gear page, redone.** Overrides `gearTabHTML`: a paper doll with a live picture of her wearing the gear (drawn by `drawPlayer`), slot buttons, a picker of drawn icons, a compare panel with stat changes and a try-on, a Sets view, the crate reveal (`gearReveal`) and Buy 5 / Buy 10 on every crate (`gearBuyMany`: all the openings play at once, five to a row). Loads after `43-input.js` because it wraps `handleAction`. Hats and boots stay on the Coat colors screen. |

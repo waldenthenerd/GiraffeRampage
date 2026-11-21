@@ -75,7 +75,7 @@ Keep a scenario under about 700 `GR.step` calls. The final state is what the scr
 - **Films**: `startCutscene(null, false, kind)` with kind one of `moon`, `venus`, `home`, `a51`, `mars`, `mships`, `marshome`, `fusion`, `sh1`..`sh9`. Step with `GR.step(1/60)` until `G.state !== 'cutscene'`.
 - **Mini-modes**: `startForage()`, `startScout()` (Venus), `startMScout()` (Mars); they run inside `GR.step`. The chapter minigames: `GR.startMini(ch, null, 'menu')` (clear the cooldown first with `GR.miniData().last = 0`), then press Space (or call `GR.step` with `GR.Input.keys.Space = true` for a frame) to begin; `GR.G.mini` holds `score`, `goal`, `phase` (`intro`, `play`, `done`) and `prize`. Chapter ch's completion flag (`chapter<ch>Complete`) unlocks the one in the minigames list.
 - **Weather events**: `WxE.cur = WX_EVENTS[G.chapter][0]; WxE.age = 0; WxE.dur = 60; WxE.k = 1;` then step. Lightning: `WxE.flash = 1`.
-- **Settings**: `Settings.fxLevel` (0 low, 1 medium, 2 high), `Settings.calmFlash`, `Settings.textScale` (0, 1, 2), `Settings.autoKick`.
+- **Settings**: `buildLabel()` (the build stamp shown at the bottom of Settings), `Settings.fxLevel` (0 low, 1 medium, 2 high), `Settings.calmFlash`, `Settings.textScale` (0, 1, 2), `Settings.autoKick`.
 - **Timing**: `performance.now()` around a loop gives milliseconds per frame (it is software-rendered, so treat only big numbers as meaningful).
 - Boss wave: `GR.startRun(ch, (ch - 1) * 25 + 5)` and step until `G.bossAlive`.
 
