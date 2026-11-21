@@ -148,7 +148,7 @@ const EnemySprite = (function(){
     if (x0 <= 0 || y0 <= 0 || x1 >= size - 1 || y1 >= size - 1) return null;         /* touches the edge of the box: it may be cut */
     const w = x1 - x0 + 1, h = y1 - y0 + 1, out = document.createElement('canvas');
     out.width = w; out.height = h;
-    out.getContext('2d').drawImage(c.canvas, x0, y0, w, h, 0, 0, w, h);
+    out.getContext('2d', { willReadFrequently: true }).drawImage(c.canvas, x0, y0, w, h, 0, 0, w, h);
     px += w * h; stats.built++;
     return { cv: out, x: (x0 - size / 2) / sc, y: (y0 - size / 2) / sc, w: w / sc, h: h / sc };
   }

@@ -70,7 +70,7 @@ function lightSprite(rgb){
   const r = rgb[0] >> 4 << 4, g = rgb[1] >> 4 << 4, b = rgb[2] >> 4 << 4, k = (r >> 4 & 15) << 8 | (g >> 4 & 15) << 4 | (b >> 4 & 15);      /* a number, not text: this runs for every light on every frame */
   let c = _lightSprites[k]; if (c) return c;
   c = document.createElement('canvas'); c.width = c.height = 64;
-  const x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  const x = c.getContext('2d', { willReadFrequently: true }), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
   gr.addColorStop(0, 'rgba(255,255,255,0.95)');
   gr.addColorStop(0.18, 'rgba(' + Math.min(255, r + 70) + ',' + Math.min(255, g + 70) + ',' + Math.min(255, b + 70) + ',0.7)');
   gr.addColorStop(0.5, 'rgba(' + r + ',' + g + ',' + b + ',0.28)');
