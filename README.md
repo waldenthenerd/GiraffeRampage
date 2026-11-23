@@ -82,12 +82,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 246 | 75,838 | 6.33 MiB (6,635,584 bytes) |
+| JavaScript (`js/`) | 246 | 75,882 | 6.33 MiB (6,638,417 bytes) |
 | Styles (`css/`) | 6 | 1,964 | 182 KiB (186,693 bytes) |
 | Page (`index.html`) | 1 | 299 | 15.4 KiB (15,806 bytes) |
-| **Whole game** | **253** | **78,101** | **6.52 MiB (6,838,083 bytes)** |
+| **Whole game** | **253** | **78,145** | **6.52 MiB (6,840,916 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **77,500 lines, 6.48 MiB (6,791,101 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **77,544 lines, 6.48 MiB (6,793,934 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
 ## How the files fit together
 
@@ -184,7 +184,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/art/35o-art-detail-fort.js` | 261 | **Enemy art, detail layer for Chapter 16** (`dt_wrap` on every `ft_` look): MOLLE webbing, magazines, rivets, weld seams, hubs, lamps, rotor tip stripes, shark teeth, cables and gears, all still kept by the sprite cache. |
 | `js/scenery/36a-scenery-core.js` | 186 | Scenery system: large ground patches, themed props and landmarks, ground decals, ambient life and light gameplay terrain, per chapter. |
 | `js/render/36-atmosphere.js` | 299 | Light, weather and depth: per-chapter base weather, time of day, night, fog, the intro card. |
-| `js/render/36i-lighting.js` | 259 | Lighting: per-chapter color grade (GRADE), the sun and soft shadows (`softShadow`), light pools around bright things (PROP_LIGHT, PICKUP_LIGHT), sun shafts, ocean caustics. |
+| `js/render/36i-lighting.js` | 303 | Lighting: per-chapter color grade (GRADE), the sun and soft shadows (`softShadow`), light pools around bright things (PROP_LIGHT, PICKUP_LIGHT), sun shafts, ocean caustics. |
 | `js/render/36j-weather-events.js` | 160 | Weather events (storms, blizzards, meteor showers...), lightning with thunder, rain ripples, fireflies and stars at dusk (WX_EVENTS, WX_TOD). |
 | `js/render/36k-water-depth.js` | 192 | Moving water and wet or icy ground, wakes, and depth sorting so tall scenery overlaps creatures (SCEN_TALL). |
 | `js/render/36l-combat-fx.js` | 214 | Combat feedback: hit sparks and flashes, a death effect per kind of creature (`deathStyle`), stains and debris on the ground, damage-number sizing. |
