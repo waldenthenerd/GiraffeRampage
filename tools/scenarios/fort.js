@@ -149,9 +149,10 @@
     for (var s3 = 0; s3 < 90; s3++){ var an = fortLightAng(li, G.time + 0.0); P.x = lm.x + Math.cos(an) * 280; P.y = lm.y + Math.sin(an) * 280; GR.step(1 / 30); noLevels(); if (G.ft.alarm > alarm0 + 10){ spotted = true; break; } }
     out.spotted = spotted;
     /* the siren sounds every time a light catches her, even when every squad has already come */
-    var sirens = 0, sr = SFX.fortSiren; SFX.fortSiren = function(){ sirens++; }; G.ft.squads = { a: 2, b: 2, c: 3 }; var ne = G.enemies.length; li.cool = 0; li.spotT = 0;
-    for (var s4 = 0; s4 < 90 && !sirens; s4++){ var an2 = fortLightAng(li, G.time); P.x = lm.x + Math.cos(an2) * 280; P.y = lm.y + Math.sin(an2) * 280; GR.step(1 / 30); noLevels(); }
+    var sirens = 0, sr = SFX.fortSiren, sq0 = G.ft.squads; SFX.fortSiren = function(){ sirens++; }; G.ft.squads = { a: 2, b: 2, c: 3 }; var ne = G.enemies.length, px0 = P.x, py0 = P.y, sv = { alarm: G.ft.alarm, quiet: G.ft.quiet, lvl: G.ft.lvl, cool: li.cool };
+    var an2 = fortLightAng(li, G.time); P.x = lm.x + Math.cos(an2) * 280; P.y = lm.y + Math.sin(an2) * 280; li.cool = 0; li.spotT = FT_LIGHT.spot; delete sfxGate.fortSiren; fortLightTick(li, 1 / 30);
     SFX.fortSiren = sr; out.siren = sirens === 1 && G.enemies.length === ne;
+    P.x = px0; P.y = py0; G.ft.alarm = sv.alarm; G.ft.quiet = sv.quiet; G.ft.lvl = sv.lvl; li.cool = sv.cool; li.spotT = 0; G.ft.squads = sq0;
     kill(gen); out.dark = !fortLightOn(li); steps(2); out.lightsOut = true;
     put(lm.x + Math.cos(fortLightAng(li, G.time)) * 300, lm.y + Math.sin(fortLightAng(li, G.time)) * 300); var al1 = G.ft.alarm; li.cool = 0; steps(40); out.noSpot = G.ft.alarm <= al1;
 
