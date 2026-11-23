@@ -138,7 +138,7 @@
     tu.allyT = 0.05; steps(5); out.burnsOut = tu.tState === 'dead'; SFX.fortFizzle = fz; out.fizzle = fizz === 1;
     /* a burned-out gun: a grey lamp (not the red of a gun that shoots at her) and smoke until it is mended */
     out.deadLamp = ftTurretLamp('dead') === '#6A6A62' && ftTurretLamp('hostile') === '#FF5A4A' && ftTurretLamp('ally') === '#6AE08A' && ftMmColor(tu) === '#7A7A70';
-    var fx0 = Settings.fxLevel, pf0 = typeof Perf !== 'undefined' ? Perf.fx : 0; Settings.fxLevel = 2; if (typeof Perf !== 'undefined') Perf.fx = 2; G.particles.length = 0; steps(12);
+    var fx0 = Settings.fxLevel, pf0 = typeof Perf !== 'undefined' ? Perf.fx : 0; Settings.fxLevel = 2; if (typeof Perf !== 'undefined') Perf.fx = 2; G.particles.length = 0; steps(30);     /* about four smoke ticks: the gun smokes on every other one, so a short run could miss */
     out.deadSmoke = G.particles.some(function(p){ return p.color === 'rgba(70,66,62,.45)' && Math.abs(p.x - um.x) < 40; }); Settings.fxLevel = fx0; if (typeof Perf !== 'undefined') Perf.fx = pf0;
     var sp = tu.tState; clear(); fortWaveStart(G.wave + 1); out.mended = tu.tState === 'hostile' && !tu.collapsed;
     kill(tu); out.turretShotDown = tu.collapsed === true;
