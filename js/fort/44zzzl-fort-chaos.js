@@ -26,11 +26,14 @@ const FT_LIGHT = { range: 540, half: 0.19, spot: 0.6, cool: 9, speed: 0.55 };
 const FT_HACK = { reach: 95, time: 1.6, ally: 30, fire: 0.22, range: 700 };
 WARD.push({ name: 'Fort Camo', c: '#6A7048' }); WARD.push({ name: 'Calamity Gold', c: '#E8B83A' });          /* 51 and 52: Chapter 16's colors (wardUnlocked in js/ui/44e-wardrobe.js) */
 BUILDING_DMG_TAKEN.blast = 1;                       /* an explosion's damage to a neighbouring building is not trimmed the way a blast from a card is */
+/* the fort's own sounds: the siren when a searchlight catches her (two rising and falling whoops) and the fizzle of a hacked gun burning out (a hiss, a dying buzz, a few crackles) */
+SFX.fortSiren = function(){ for (let k = 0; k < 2; k++){ const d = k * 0.62; this.tone('sawtooth', 560, 940, 0.31, 0.03, d); this.tone('sawtooth', 940, 560, 0.31, 0.03, d + 0.31); this.tone('sine', 560, 940, 0.31, 0.04, d); this.tone('sine', 940, 560, 0.31, 0.04, d + 0.31); } };
+SFX.fortFizzle = function(){ this.burst(0.5, 0.07, 6000, 900, 0.7, 0, 'highpass'); this.tone('square', 360, 55, 0.4, 0.03, 0.02); for (let i = 0; i < 4; i++) this.burst(0.03, 0.05, 2600, 1800, 1, 0.1 + i * 0.08 + Math.random() * 0.03, 'bandpass'); };
 function ftTierOf(c){ let t = -1; for (let i = 0; i < FT_TIERS.length; i++) if (c >= FT_TIERS[i].at) t = i; return t; }
 function ftTierColor(){ const ft = G.ft; return ft && ft.tier >= 0 ? FT_TIERS[ft.tier].c : '#FFE49A'; }
 function fortChaosInit(){
   G.ft = { chaos: G.ftChaosRestore | 0, waveChaos: 0, combo: 0, comboT: 0, alarm: 0, lvl: 0, quiet: 0, fullT: 0, squads: { a: 0, b: 0, c: 0 }, tracers: [], wrecked: 0, tip: false, smokeT: 0, arrowT: 0 };
-  G.ftChaosRestore = 0; G.ft.tier = ftTierOf(G.ft.chaos);
+  G.ftChaosRestore = 0; G.ft.tier = ftTierOf(G.ft.chaos); G.ft.best0 = (Save.data && Save.data.fortChaosBest) | 0;      /* the best before this run, so the report can say when it was beaten */
   FT.fuse.length = 0; FT.all.forEach(function(b){ b.tState = 'hostile'; b.allyT = 0; b.hack = 0; b.cd = 1 + Math.random() * 2; b.cd2 = 0; b.burst = 0; b.bt = 0; b.muzzle = 0; b.ang = b.ang || 0; if (b.kind === 'light'){ b.ph = b.idx * 1.7; b.spotT = 0; b.cool = 0; } });
 }
 
@@ -164,7 +167,7 @@ function fortTurretTick(b, dt){
         if (tgt.dead) fortChaos(15, tgt.x, tgt.y - 10, '');
       }
     }
-    if (b.allyT <= 0){ b.tState = 'dead'; addText(cx, cy - 50, 'Burned out', '#BBBBBB', 14, false); burstParticles(cx, cy, 10, '#6A6A6A', 120, 4); }
+    if (b.allyT <= 0){ b.tState = 'dead'; addText(cx, cy - 50, 'Burned out', '#BBBBBB', 14, false); burstParticles(cx, cy, 10, '#6A6A6A', 120, 4); sfx('fortFizzle', 0.2, cx, cy); }
   }
 }
 function fortLightOn(l){ return !l.collapsed && !(l.gen && l.gen.collapsed); }
@@ -175,7 +178,7 @@ function fortLightTick(l, dt){
   const cx = l.x + l.w / 2, cy = l.y + l.h / 2, dx = P.x - cx, dy = P.y - cy, d = Math.sqrt(dx * dx + dy * dy);
   if (d < FT_LIGHT.range && Math.abs(angDiff(Math.atan2(dy, dx), fortLightAng(l, G.time))) < FT_LIGHT.half && ftSight(cx, cy, P.x, P.y, 46)){
     l.spotT += dt;
-    if (l.spotT >= FT_LIGHT.spot && l.cool <= 0 && !G.attract){ l.cool = FT_LIGHT.cool; l.spotT = 0; fortAlarm(14); fortSquad(G.ft.lvl >= 1 ? 'b' : 'a'); addText(P.x, P.y - 70, 'SPOTTED!', '#FF8A6A', 18, true); }
+    if (l.spotT >= FT_LIGHT.spot && l.cool <= 0 && !G.attract){ l.cool = FT_LIGHT.cool; l.spotT = 0; fortAlarm(14); fortSquad(G.ft.lvl >= 1 ? 'b' : 'a'); addText(P.x, P.y - 70, 'SPOTTED!', '#FF8A6A', 18, true); sfx('fortSiren', 1.2, cx, cy); }     /* the siren sounds every time, even when no more squads can come */
   } else l.spotT = Math.max(0, l.spotT - dt * 2);
 }
 
@@ -194,6 +197,7 @@ function fortTick(dt){
     ft.smokeT = 0.2;
     for (let i = 0; i < FT.all.length; i++){
       const b = FT.all[i]; if (b.collapsed){ if (b.smoke <= 0) continue; b.smoke -= 0.2; addParticle(b.x + Math.random() * b.w, b.y + Math.random() * b.h * 0.8, rand(-10, 10), -rand(30, 60), rand(10, 18), rand(1.2, 2), 'rgba(50,44,40,.5)', { drag: 0.6 }); if (Math.random() < 0.5) addParticle(b.x + Math.random() * b.w, b.y + Math.random() * b.h * 0.8, rand(-8, 8), -rand(20, 50), rand(4, 8), 0.6, '#FF8A3A', { glow: true, drag: 1 }); }
+      else if (b.kind === 'turret' && b.tState === 'dead'){ if ((b.idx + Math.floor(G.time * 5)) % 2 === 0) addParticle(b.x + b.w / 2 + rand(-10, 10), b.y + b.h / 2 + rand(-10, 10), rand(-6, 6), -rand(26, 46), rand(6, 11), rand(1, 1.6), 'rgba(70,66,62,.45)', { drag: 0.6 }); }     /* a burned-out gun smokes until the next wave mends it */
       else if (b.hp < b.maxHp * 0.5 && (b.idx + Math.floor(G.time * 5)) % 3 === 0) addParticle(b.x + Math.random() * b.w, b.y + Math.random() * b.h * 0.7, rand(-8, 8), -rand(24, 44), rand(7, 12), rand(0.9, 1.5), 'rgba(80,76,72,.4)', { drag: 0.6 });
     }
   }
@@ -248,6 +252,8 @@ function ftDrawMech(ctx, x0, y0, x1, y1, t){
   }
   for (let i = 0; i < ft.tracers.length; i++){ const tr = ft.tracers[i]; ctx.strokeStyle = tr.c; ctx.globalAlpha = Math.min(1, tr.t * 8); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(tr.x1, tr.y1); ctx.lineTo(tr.x2, tr.y2); ctx.stroke(); ctx.globalAlpha = 1; }
 }
+/* the alarm bar's colour: green, amber, orange, and at full alarm red flashing white (steady red with "Reduce flashes" on) */
+function ftAlarmColor(lvl, t){ return lvl >= 3 ? (!Settings.calmFlash && Math.sin(t * 14) > 0 ? '#FFFFFF' : '#FF3A2A') : lvl >= 2 ? '#FF6A3A' : lvl >= 1 ? '#F2B83A' : '#6AC85A'; }
 const fortBaseOverlays = drawFeedbackOverlays;
 drawFeedbackOverlays = function(ctx){
   fortBaseOverlays.apply(this, arguments);
@@ -262,7 +268,7 @@ drawFeedbackOverlays = function(ctx){
   for (let i = 0; i < FT_TIERS.length; i++){ const px = x0 + 12 + i * 15, on = i <= ft.tier, got = Save.data && ((Save.data.fortBadges | 0) & (1 << i)); ctx.fillStyle = on ? FT_TIERS[i].c : 'rgba(255,255,255,.14)'; ctx.fillRect(px, y0 + 36, 12, 5); if (got){ ctx.fillStyle = '#FFE49A'; ctx.fillRect(px + 4, y0 + 42, 4, 3); } }
   ctx.font = '800 12px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; ctx.textAlign = 'right';
   if (ft.combo > 1){ const m = 1 + Math.min(ft.combo, FT_COMBO.cap) * FT_COMBO.step; ctx.fillStyle = col; ctx.fillText('COMBO ×' + m.toFixed(1), x0 + pw - 10, y0 + 43); ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.fillRect(x0 + pw - 10 - 70 * clamp(ft.comboT / FT_COMBO.window, 0, 1), y0 + 46, 70 * clamp(ft.comboT / FT_COMBO.window, 0, 1), 2); }
-  const al = ft.alarm / FT_ALARM.full, hot = ft.lvl >= 3 && Math.sin(G.time * 14) > 0, ac = ft.lvl >= 3 ? (hot ? '#FFFFFF' : '#FF3A2A') : ft.lvl >= 2 ? '#FF6A3A' : ft.lvl >= 1 ? '#F2B83A' : '#6AC85A';
+  const al = ft.alarm / FT_ALARM.full, ac = ftAlarmColor(ft.lvl, G.time);
   ctx.fillStyle = 'rgba(255,255,255,.14)'; ctx.fillRect(x0 + 12, y0 + 54, pw - 22, 14); ctx.fillStyle = ac; ctx.fillRect(x0 + 12, y0 + 54, (pw - 22) * al, 14);
   ctx.textAlign = 'left'; ctx.font = '800 10px ui-sans-serif, "Segoe UI", Roboto, sans-serif'; ctx.fillStyle = al > 0.2 ? '#14120E' : '#FFF6D8'; ctx.fillText(ft.lvl >= 3 ? 'FULL ALARM' : ft.lvl >= 2 ? 'LOCKDOWN' : ft.lvl >= 1 ? 'ALERT' : 'ALARM', x0 + 18, y0 + 65);
   /* an arrow at the edge for the nearest big thing still standing, when none is on the screen */
@@ -285,7 +291,7 @@ drawFeedbackOverlays = function(ctx){
 const fortBaseRunReport = runReport;
 runReport = function(){
   const r = fortBaseRunReport.apply(this, arguments);
-  if (G.ft && G.chapter === COUNTER_CHAPTER){ r.ftChaos = G.ft.chaos | 0; r.ftTier = G.ft.tier; r.ftWrecked = G.ft.wrecked | 0; }
+  if (G.ft && G.chapter === COUNTER_CHAPTER){ r.ftChaos = G.ft.chaos | 0; r.ftTier = G.ft.tier; r.ftWrecked = G.ft.wrecked | 0; r.ftBest0 = G.ft.best0 | 0; r.ftBest = Math.max(r.ftChaos, (Save.data && Save.data.fortChaosBest) | 0); }
   return r;
 };
 const fortBaseReportHTML = runReportHTML;
@@ -293,6 +299,16 @@ runReportHTML = function(r, died){
   const h = fortBaseReportHTML.apply(this, arguments), R = r && r.report;
   if (!R || R.ftChaos === undefined) return h;
   const T = R.ftTier >= 0 && FT_TIERS[R.ftTier] ? FT_TIERS[R.ftTier] : null;
-  const line = '<div class="rr-line">Chaos <b style="color:' + (T ? T.c : '#FFE49A') + '">' + fmt(R.ftChaos) + '</b>' + (T ? ' \u00b7 level <b style="color:' + T.c + '">' + T.n + '</b>' : '') + ' \u00b7 ' + R.ftWrecked + ' things wrecked.</div>';
+  const b0 = R.ftBest0 | 0, best = R.ftBest === undefined ? 0 : R.ftBest | 0,
+    bestTxt = b0 > 0 && R.ftChaos > b0 ? ' A new best: the old one was ' + fmt(b0) + '.' : best > R.ftChaos ? ' Your best is ' + fmt(best) + '.' : '';     /* the best chaos ever (Save.data.fortChaosBest) */
+  const line = '<div class="rr-line' + (b0 > 0 && R.ftChaos > b0 ? ' good' : '') + '">Chaos <b style="color:' + (T ? T.c : '#FFE49A') + '">' + fmt(R.ftChaos) + '</b>' + (T ? ' \u00b7 level <b style="color:' + T.c + '">' + T.n + '</b>' : '') + ' \u00b7 ' + R.ftWrecked + ' things wrecked.' + bestTxt + '</div>';
   return h.replace('<div class="rr-sub">', line + '<div class="rr-sub">').replace(/<\/div>$/, function(m){ return h.indexOf('<div class="rr-sub">') >= 0 ? m : line + m; });
+};
+/* ---- the chapter card on the menu shows the best chaos so far, and its level ---- */
+const fortBaseChapterCard = chapterSelectorHTML;
+chapterSelectorHTML = function(){
+  const h = fortBaseChapterCard.apply(this, arguments), best = (Save.data && Save.data.fortChaosBest) | 0;
+  if (menuChapter() !== COUNTER_CHAPTER || best <= 0 || !chapterUnlocked(COUNTER_CHAPTER)) return h;
+  const t = ftTierOf(best), T = t >= 0 ? FT_TIERS[t] : null;
+  return h.replace(' bosses</p>', ' bosses \u00b7 Best chaos <b style="color:' + (T ? T.c : '#FFE49A') + '">' + fmt(best) + '</b>' + (T ? ' (' + T.n + ')' : '') + '</p>');
 };

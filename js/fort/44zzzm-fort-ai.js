@@ -252,3 +252,20 @@ const FORT_BOSS_AI = {
   }
 };
 Object.assign(FORT_AI, FORT_AI_COMMON, FORT_BOSS_AI);
+
+/* the Sniper's aim: a thin red line from the rifle all the way out to her, along the line the shot will take, brighter as the shot comes. It is drawn here in the
+   world over the Sniper's picture, never in the picture itself, so a cached picture of the Sniper (js/game/44t-enemy-sprites.js) never holds a line of the wrong length. */
+function ftSniperLaser(ctx, e){
+  const a = e.ang, s = e.r / 13, x0 = e.x + Math.cos(a) * 20 * s, y0 = e.y + Math.sin(a) * 20 * s, len = hyp(P.x - x0, P.y - y0), k = clamp(1 - e.stateT / 0.95, 0, 1);
+  const x1 = x0 + Math.cos(a) * len, y1 = y0 + Math.sin(a) * len;
+  ctx.save(); ctx.lineCap = 'round';
+  ctx.strokeStyle = FT_RED; ctx.globalAlpha = 0.18 + 0.22 * k; ctx.lineWidth = 3 + 2 * k; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  ctx.globalAlpha = 0.55 + 0.4 * k; ctx.lineWidth = 1 + 0.6 * k; ctx.stroke();
+  ctx.globalAlpha = 0.6 + 0.4 * k; fillCircle(ctx, x1, y1, 2.5 + 2 * k, FT_RED);
+  ctx.restore();
+}
+const ftBaseDrawEnemy = drawEnemy;
+drawEnemy = function(ctx, e){
+  ftBaseDrawEnemy.apply(this, arguments);
+  if (e.state === 'aim' && !e.portrait && !e.dead && e.def && e.def.look === 'ft_sniper') ftSniperLaser(ctx, e);
+};

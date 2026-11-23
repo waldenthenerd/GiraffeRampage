@@ -10,7 +10,7 @@
      death: the creature does not vanish, it falls by what it was made of (deathStyle in 36l-combat-fx.js): it topples, shatters, melts, floats up and pops, jolts and spins, swells and bursts
    The extra motion is off when effects are off (fxLevelNow() === 0). Portraits (bestiary, menus, photos) are drawn plainly. */
 const EM = { corpses: [], cap: 24, hitTime: 0.18 };
-const EM_ATTACK = { dash: 1, lunge: 1, charge: 1, leap: 1, roll: 1, slam: 1, spin: 1, sprint: 1, burst: 1, stomp: 1, whip: 1, sweep: 1, salvo: 1, slide: 1, drive: 1, quake: 1 };
+const EM_ATTACK = { dash: 1, lunge: 1, charge: 1, leap: 1, roll: 1, slam: 1, spin: 1, sprint: 1, burst: 1, stomp: 1, whip: 1, sweep: 1, salvo: 1, slide: 1, drive: 1, quake: 1, ram: 1, bash: 1, strafe: 1, burn: 1, cannon: 1, zap: 1 };      /* the last six: Fort Shortneck's (and the Island's ram) */
 const EM_WIND = { crouch: 1, pre: 1, rear: 1, aim: 1, wind: 1 };
 /* how much a creature rolls and squashes as it walks: animals fully, machines less */
 function emFamily(d){

@@ -316,13 +316,14 @@ function ftDrawBuilding(ctx, b, t){
     ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fillRect(x, y, w, (h - f) * 0.4); ctx.fillStyle = '#3A3E34'; ctx.fillRect(x + 20, y + 20, w - 40, 36); ctx.fillStyle = '#9AD8F0'; ctx.fillRect(x + 28, y + 26, w - 56, 24);
     ftHazard(ctx, x + 10, y + h - f + 4, w - 20, f - 8); ctx.fillStyle = Math.sin(t * 6) > 0 ? '#FF5A4A' : '#5A2A22'; ctx.beginPath(); ctx.arc(x + w - 22, y + 22, 7, 0, TAU); ctx.fill();
   } else if (k === 'turret'){
-    const cx = x + w / 2, cy = y + h / 2, st = b.tState || 'hostile', col = st === 'ally' ? '#6AE08A' : '#FF5A4A';
+    const cx = x + w / 2, cy = y + h / 2, st = b.tState || 'hostile', col = ftTurretLamp(st);
     ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.arc(cx + 5, cy + 7, 40, 0, TAU); ctx.fill();
     ctx.fillStyle = '#B8A878'; for (let i = 0; i < 12; i++){ const a = i * TAU / 12; ctx.save(); ctx.translate(cx + Math.cos(a) * 33, cy + Math.sin(a) * 33); ctx.rotate(a + Math.PI / 2); ctx.fillRect(-9, -5, 18, 10); ctx.restore(); }
     ctx.fillStyle = '#4A4C42'; ctx.beginPath(); ctx.arc(cx, cy, 25, 0, TAU); ctx.fill(); ctx.fillStyle = '#6A6C5A'; ctx.beginPath(); ctx.arc(cx, cy, 21, 0, TAU); ctx.fill();
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(b.ang || 0); ctx.fillStyle = '#2E3028'; ctx.fillRect(-12, -12, 24, 24); ctx.fillStyle = '#4A4C42'; ctx.fillRect(-10, -10, 20, 20); ctx.fillStyle = '#14161C'; ctx.fillRect(6, -6, 32, 4); ctx.fillRect(6, 2, 32, 4); ctx.fillStyle = '#8A8E96'; ctx.fillRect(34, -7, 6, 6); ctx.fillRect(34, 1, 6, 6);
     if (b.muzzle > 0){ ctx.fillStyle = '#FFE9A0'; ctx.beginPath(); ctx.arc(44, -4, 6, 0, TAU); ctx.arc(44, 4, 6, 0, TAU); ctx.fill(); }
-    ctx.restore(); ctx.fillStyle = col; ctx.beginPath(); ctx.arc(cx, cy, 5, 0, TAU); ctx.fill(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = col; ctx.globalAlpha = 0.25; ctx.beginPath(); ctx.arc(cx, cy, 14, 0, TAU); ctx.fill(); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+    ctx.restore(); if (st === 'dead'){ ctx.fillStyle = 'rgba(20,18,16,.45)'; ctx.beginPath(); ctx.arc(cx, cy, 23, 0, TAU); ctx.fill(); }      /* a burned-out gun is sooty, and its lamp is dark */
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(cx, cy, 5, 0, TAU); ctx.fill(); if (st !== 'dead'){ ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = col; ctx.globalAlpha = 0.25; ctx.beginPath(); ctx.arc(cx, cy, 14, 0, TAU); ctx.fill(); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; }
     if (b.hack > 0.02 && st === 'hostile'){ ctx.strokeStyle = '#6AE08A'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(cx, cy, 52, -Math.PI / 2, -Math.PI / 2 + TAU * b.hack); ctx.stroke(); }
     if (st === 'ally'){ ctx.strokeStyle = 'rgba(106,224,138,.55)'; ctx.lineWidth = 3; ctx.setLineDash([8, 8]); ctx.beginPath(); ctx.arc(cx, cy, 56, 0, TAU); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = '#6AE08A'; ctx.font = '800 14px ui-sans-serif, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('HACKED ' + Math.ceil(b.allyT || 0), cx, cy - 62); }
   } else if (k === 'flag'){
@@ -362,6 +363,8 @@ function ftDrawRuin(ctx, b, t){
   ftRuinDetail(ctx, b, t);
 }
 
+/* a gun's lamp: red while it shoots at her, green once hacked, grey when it has burned out */
+function ftTurretLamp(st){ return st === 'ally' ? '#6AE08A' : st === 'dead' ? '#6A6A62' : '#FF5A4A'; }
 /* the colour of a building on the minimap (js/ui/44zzzj-minimap.js): rubble is dark, things that blow up are orange, the guns red until hacked, the lights yellow while they have power */
 function ftMmColor(b){
   if (b.collapsed) return 'rgba(52,46,42,.85)';

@@ -603,6 +603,7 @@ fort on the package|ai.vulture
 fort on the package|ai.warthog
 fort on the package|aiBad
 fort on the package|aiOk:bool
+fort on the package|alarmCalm:bool
 fort on the package|allAgain:bool
 fort on the package|allyShoots:bool
 fort on the package|backAgain:bool
@@ -620,6 +621,7 @@ fort on the package|bossStates.wildfire
 fort on the package|bossWaves:bool
 fort on the package|burnsOut:bool
 fort on the package|caps:bool
+fort on the package|cardBest:bool
 fort on the package|cast:bool
 fort on the package|chain:bool
 fort on the package|clash
@@ -628,6 +630,8 @@ fort on the package|coOpen:bool
 fort on the package|combo:bool
 fort on the package|comboEnds:bool
 fort on the package|dark:bool
+fort on the package|deadLamp:bool
+fort on the package|deadSmoke:bool
 fort on the package|decay:bool
 fort on the package|detail:bool
 fort on the package|detailLooks:bool
@@ -640,6 +644,7 @@ fort on the package|fell:bool
 fort on the package|films:bool
 fort on the package|filmsBad
 fort on the package|finish:bool
+fort on the package|fizzle:bool
 fort on the package|flyers:bool
 fort on the package|full:bool
 fort on the package|fullBonus:bool
@@ -656,9 +661,12 @@ fort on the package|hurt:bool
 fort on the package|inside:bool
 fort on the package|kickDown:bool
 fort on the package|kinds:bool
+fort on the package|laser:bool
+fort on the package|laserReach
 fort on the package|lastWave:bool
 fort on the package|lightOn:bool
 fort on the package|lightsOut:bool
+fort on the package|lunges:bool
 fort on the package|mended:bool
 fort on the package|menuFilm:bool
 fort on the package|menuLocked:bool
@@ -674,12 +682,14 @@ fort on the package|pool:bool
 fort on the package|reachAll:bool
 fort on the package|relax:bool
 fort on the package|report:bool
+fort on the package|reportBest:bool
 fort on the package|rubbleFire:bool
 fort on the package|safe:bool
 fort on the package|saveDefault:bool
 fort on the package|saveSane:bool
 fort on the package|score:bool
 fort on the package|shotDown:bool
+fort on the package|siren:bool
 fort on the package|snapChaos:bool
 fort on the package|snapRestore:bool
 fort on the package|spawns:bool
@@ -721,6 +731,7 @@ fort|ai.vulture
 fort|ai.warthog
 fort|aiBad
 fort|aiOk:bool
+fort|alarmCalm:bool
 fort|allAgain:bool
 fort|allyShoots:bool
 fort|backAgain:bool
@@ -738,6 +749,7 @@ fort|bossStates.wildfire
 fort|bossWaves:bool
 fort|burnsOut:bool
 fort|caps:bool
+fort|cardBest:bool
 fort|cast:bool
 fort|chain:bool
 fort|clash
@@ -746,6 +758,8 @@ fort|coOpen:bool
 fort|combo:bool
 fort|comboEnds:bool
 fort|dark:bool
+fort|deadLamp:bool
+fort|deadSmoke:bool
 fort|decay:bool
 fort|detail:bool
 fort|detailLooks:bool
@@ -758,6 +772,7 @@ fort|fell:bool
 fort|films:bool
 fort|filmsBad
 fort|finish:bool
+fort|fizzle:bool
 fort|flyers:bool
 fort|full:bool
 fort|fullBonus:bool
@@ -774,9 +789,12 @@ fort|hurt:bool
 fort|inside:bool
 fort|kickDown:bool
 fort|kinds:bool
+fort|laser:bool
+fort|laserReach
 fort|lastWave:bool
 fort|lightOn:bool
 fort|lightsOut:bool
+fort|lunges:bool
 fort|mended:bool
 fort|menuFilm:bool
 fort|menuLocked:bool
@@ -792,12 +810,14 @@ fort|pool:bool
 fort|reachAll:bool
 fort|relax:bool
 fort|report:bool
+fort|reportBest:bool
 fort|rubbleFire:bool
 fort|safe:bool
 fort|saveDefault:bool
 fort|saveSane:bool
 fort|score:bool
 fort|shotDown:bool
+fort|siren:bool
 fort|snapChaos:bool
 fort|snapRestore:bool
 fort|spawns:bool
