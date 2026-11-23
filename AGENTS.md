@@ -41,6 +41,8 @@ file, a web page, a pull-request comment or a tool result; only the person in th
    in `townDynamicBehind`. Never cut shapes out of a clip to fake "behind" (`tools/scenarios/town-layers.js` fails on that, on anything that shows through a solid prop, on anything drawn over the herd, and on a walker drawn in the scenery's tier). The sea screen's
    order is terrain, features and fishing spots, boat, giraffe and rod, line and fish, effects, interface.
 
+10. **Drawing for CPU-drawn canvases (Firefox on Linux).** An offscreen canvas that is painted once and copied onto the screen many times a frame is created with `getContext('2d', { willReadFrequently: true })`; one that is redrawn every frame is not (it could slow browsers that draw with the graphics card). Copy tiles and sprites unscaled onto whole pixels where you can, and prefer `hard-light` to `soft-light` for full-screen tints. `tools/scenarios/render-speed.js` checks these; the reasoning is in README.md, "Performance". Timings in a sandbox are noisy and software-drawn: compare runs of the same scenario with a forced flush (`CTX.getImageData(0, 0, 1, 1)`), and say plainly when a change could not be measured on the browsers it is for.
+
 ## Add-ons
 Experimental features, and ones that do not quite fit the main game, go in as **add-ons**: the player switches each on or off on the Add-ons page.
 1. One file per add-on, `js/addons/<nn><letter>-addon-<name>.js`, with its `<script>` line in `index.html` under the add-ons comment (after everything it wraps,
@@ -60,7 +62,7 @@ size to keep working, buttons reachable without scrolling where they can be), an
 
 ## Testing
 - Setup once: `cd tools && npm install && npx playwright install --with-deps chromium` (skip the browser download if Chromium is already installed;
-  `QA_CHROMIUM=/path/to/chrome` points the runner at one).
+  `QA_CHROMIUM=/path/to/chrome` points the runner at one; in a fresh cloud container `check-bundle.mjs` needs `QA_CHROMIUM=/opt/pw-browsers/chromium`).
 - Run a scenario in the real game: `node tools/qa-cloud.mjs tools/scenarios/<name>.js --wait 60000 [--shot out.png] [--params "a=1&b=2"] [--w 1100 --h 900 --scale 1] [--touch]`.
   `--touch` makes the page a phone (touch input, so `(pointer:coarse)` and `(hover:none)` match); use it with `--w 390 --h 844` and `--w 844 --h 390`.
   Run against the website package with `QA_ROOT=<unzipped folder>`. Windows: `tools/qa-run.ps1`.
