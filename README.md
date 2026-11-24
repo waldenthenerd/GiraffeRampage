@@ -82,12 +82,12 @@ Counted from the files in this folder, with the developer panel included:
 
 | | Files | Lines | Size |
 |---|---|---|---|
-| JavaScript (`js/`) | 246 | 75,874 | 6.33 MiB (6,639,873 bytes) |
+| JavaScript (`js/`) | 246 | 75,918 | 6.33 MiB (6,642,706 bytes) |
 | Styles (`css/`) | 6 | 1,964 | 182 KiB (186,693 bytes) |
 | Page (`index.html`) | 1 | 299 | 15.4 KiB (15,806 bytes) |
-| **Whole game** | **253** | **78,137** | **6.53 MiB (6,842,372 bytes)** |
+| **Whole game** | **253** | **78,181** | **6.53 MiB (6,845,205 bytes)** |
 
-Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **77,536 lines, 6.48 MiB (6,795,390 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
+Without the developer panel (`js/dev/45b-dev-panel.js`, which is not shipped to the website): **77,580 lines, 6.48 MiB (6,798,223 bytes)**. Sizes are on disk, unminified and ungzipped. Re-count after big changes; the per-file line counts below are kept in step with this.
 
 ## How the files fit together
 
@@ -184,7 +184,7 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 | `js/art/35o-art-detail-fort.js` | 261 | **Enemy art, detail layer for Chapter 16** (`dt_wrap` on every `ft_` look): MOLLE webbing, magazines, rivets, weld seams, hubs, lamps, rotor tip stripes, shark teeth, cables and gears, all still kept by the sprite cache. |
 | `js/scenery/36a-scenery-core.js` | 186 | Scenery system: large ground patches, themed props and landmarks, ground decals, ambient life and light gameplay terrain, per chapter. |
 | `js/render/36-atmosphere.js` | 299 | Light, weather and depth: per-chapter base weather, time of day, night, fog, the intro card. |
-| `js/render/36i-lighting.js` | 259 | Lighting: per-chapter color grade (GRADE), the sun and soft shadows (`softShadow`), light pools around bright things (PROP_LIGHT, PICKUP_LIGHT), sun shafts, ocean caustics. |
+| `js/render/36i-lighting.js` | 303 | Lighting: per-chapter color grade (GRADE), the sun and soft shadows (`softShadow`), light pools around bright things (PROP_LIGHT, PICKUP_LIGHT), sun shafts, ocean caustics. |
 | `js/render/36j-weather-events.js` | 160 | Weather events (storms, blizzards, meteor showers...), lightning with thunder, rain ripples, fireflies and stars at dusk (WX_EVENTS, WX_TOD). |
 | `js/render/36k-water-depth.js` | 192 | Moving water and wet or icy ground, wakes, and depth sorting so tall scenery overlaps creatures (SCEN_TALL). |
 | `js/render/36l-combat-fx.js` | 214 | Combat feedback: hit sparks and flashes, a death effect per kind of creature (`deathStyle`), stains and debris on the ground, damage-number sizing. |
@@ -394,6 +394,9 @@ Every file starts with `'use strict';` except `00-icons.js`, which was outside s
 xLevelSetting()) and shows a one-time note when it first acts. 
 xLevelNow() is the level actually running.
 - **Performance pass 3** (`js/core/44zzs-perf-cache.js` and small edits): the particle, number, pickup, projectile, ant, ally, turret and hostile-zone draw loops skip what is off the screen (`viewBounds()` in js/render/32-render.js, set from the camera `render()` sets); shadows are cached pictures (`ShadowCache`); creature pictures are made on a 3 ms budget and each creature remembers its picture set; the spatial grid (`Grid`, js/core/01-core.js) uses number keys and reuses its lists instead of building text keys and new arrays every frame; `hyp(x, y)` (js/core/01-core.js) replaces `Math.hypot(x, y)` in the per-frame code (about ten times faster); `resolveBuildings` rejects far buildings before any arithmetic; the knockback fade is worked out once per frame; the light sprites are looked up by number; and the backdrop behind the menu, the shop and Guide pages and the pause screen runs at 30 frames a second. `tools/scenarios/perf-bench.js` times a heavy late-game scene stage by stage (and `--heap` on the runner lists what allocates the most).
+- **Where the canvas is drawn by the CPU (Firefox on Linux, found with Firefox Profiler recordings):** a big offscreen canvas, or one copied from onto the screen many times a frame, can end up on the graphics card there, and every copy then makes the CPU wait. So the pictures that are painted once and copied again and again (ground and scenery tiles, fog and cloud sprites, light sprites, shadow pictures, enemy pictures, ground patches, prop pictures, the dark screen edge) are made with `getContext('2d', { willReadFrequently: true })`. The ground tiles are copied unscaled onto whole pixels (`tilesDraw`, `js/core/44ca-ground-cache.js`; Firefox smooths a scaled copy even with smoothing off), the dark screen edge is one cached bitmap (`vignetteBitmap`, `js/core/37-frame-transitions.js`), the colour grade uses `hard-light` at strength 0.37 (`GRADE_OP`, `GRADE_K` in `js/render/36i-lighting.js`; `soft-light` costs about three times as much in software and the two look the same to within about 1.5 of 255), and the giraffe's rim blur is kept to her outline fills. A canvas that is redrawn every frame (the night layer) is left alone, since keeping it in CPU memory could slow browsers that draw with the graphics card. `tools/scenarios/render-speed.js` checks all of this.
+- **Sharpness (Settings):** Auto, 75% or 50% of the screen's pixels, saved as `Save.data.sharp` (0, 1, 2; `js/core/10-settings.js`, applied in `resize()` in `js/core/44-loop-boot.js`). Menus and text stay sharp. The governor still works on top of it.
+- **Version line:** Settings ends with "Version: ...", read from the `game-build` tag in `index.html` (`buildLabel()` in `js/ui/41-qol.js`). The source copy says "development copy"; `tools/build-site.mjs` stamps the website package with the date and commit.
 - **High-refresh screens:** `frame()` carries time over so a 120 or 144 Hz display does not run the whole game twice as often (about 60-72 updates a second).
 - **Audio:** a voice cap and a limiter in js/core/01-core.js; the convolver reverb is disconnected at effects Low.
 - **Statistics panel:** press `\` in the game to show or hide frame rate, frame time, update and draw cost, the share of a 60 fps budget used, long frames, what is on the field (enemies, shots, particles, texts), canvas size and sharpness, effects chosen and running, the governor's step, audio state and voices, and memory (Chrome only). Implemented in `js/core/44c-perf.js` (`Stats`).

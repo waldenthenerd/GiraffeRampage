@@ -31,6 +31,29 @@ const GRADE = {
 /* The grade is laid on with hard-light at 0.37 of the tint's strength. Soft-light looks the same to within about 1.6 of 255 levels, with almost no tilt toward lighter or darker (measured over ten chapters) but costs
    about three times as much on a canvas drawn by the CPU (Firefox on Linux, where the whole-screen passes were a sixth of every frame). */
 const GRADE_OP = 'hard-light', GRADE_K = 0.37;
+/* The two full-screen gradients of the light pass (the sun's side and the tinted vignette) cost the CPU as much as a whole screen of pixels every frame
+   when painted live, and they only change with the chapter, the sun's direction or the window. Each is painted once into a bitmap the size of the
+   canvas and copied 1:1 (as the dark screen edge is, `vignetteBitmap` in 37-frame-transitions.js). Anything but the game's own canvas paints live. */
+function sunGradientLive(ctx, W, H, sq){
+  const dx = Math.cos(sq) * Math.max(W, H) * 0.6, dy = Math.sin(sq) * Math.max(W, H) * 0.6;
+  const lg = ctx.createLinearGradient(W / 2 + dx, H / 2 + dy, W / 2 - dx, H / 2 - dy);
+  lg.addColorStop(0, 'rgba(255,255,255,0.20)'); lg.addColorStop(0.5, 'rgba(128,128,128,0)'); lg.addColorStop(1, 'rgba(0,0,0,0.20)');
+  return lg;
+}
+const LIGHT_BM = [{ cv: null, key: '' }, { cv: null, key: '' }];
+function lightBitmap(ctx, slot, key, paint){
+  if (ctx.canvas !== stage || !ctx.getTransform) return null;
+  const L = LIGHT_BM[slot], full = key + '|' + stage.width + 'x' + stage.height + '|' + G.W + 'x' + G.H;
+  if (L.key !== full || !L.cv){
+    L.cv = L.cv || document.createElement('canvas');
+    L.cv.width = stage.width; L.cv.height = stage.height;
+    const x = L.cv.getContext('2d', { willReadFrequently: true });
+    x.setTransform(stage.width / G.W, 0, 0, stage.height / G.H, 0, 0); paint(x);
+    L.key = full;
+  }
+  return L.cv;
+}
+
 
 /* things that give off light: color, radius and where on the prop the light sits */
 const PROP_LIGHT = {
@@ -138,17 +161,38 @@ const Light = {
     ctx.fillStyle = 'rgba(' + g.tint[0] + ',' + g.tint[1] + ',' + g.tint[2] + ',' + (g.tint[3] * (g.k === undefined ? 0.82 : g.k) * GRADE_K).toFixed(3) + ')';
     ctx.fillRect(0, 0, W, H);
     /* the sun side is a touch brighter, the far side a touch darker */
-    const dx = Math.cos(this.sun) * Math.max(W, H) * 0.6, dy = Math.sin(this.sun) * Math.max(W, H) * 0.6;
-    const lg = ctx.createLinearGradient(W / 2 + dx, H / 2 + dy, W / 2 - dx, H / 2 - dy);
-    lg.addColorStop(0, 'rgba(255,255,255,0.20)'); lg.addColorStop(0.5, 'rgba(128,128,128,0)'); lg.addColorStop(1, 'rgba(0,0,0,0.20)');
-    ctx.fillStyle = lg; ctx.fillRect(0, 0, W, H);
+    /* The sun's side is a hard-light gradient from white through no change (grey, no opacity) to black. Hard-light lets a colour act only as strongly as it is
+       far from grey, so a white that fades is the same as plain white at an opacity that falls with the square of the fade, and the black likewise: the
+       gradient is painted that way (many stops stand in for the curve) into a bitmap kept while the sun holds still, and copied over with source-over,
+       which is cheaper than blending a gradient (or a picture) with hard-light every frame. */
+    const sq = Math.round(this.sun * 100) / 100;                    /* the sun's direction in steps of 0.01 radian */
+    const paintSun = function(x){
+      const dx = Math.cos(sq) * Math.max(W, H) * 0.6, dy = Math.sin(sq) * Math.max(W, H) * 0.6;
+      const lg = x.createLinearGradient(W / 2 + dx, H / 2 + dy, W / 2 - dx, H / 2 - dy);
+      for (let k = 0; k <= 10; k++){
+        const u = k / 10, f = 1 - u * 0.99608;
+        lg.addColorStop(u * 0.5, 'rgba(255,255,255,' + (0.20 * (1 - u) * f).toFixed(4) + ')');
+        lg.addColorStop(1 - u * 0.5, 'rgba(0,0,0,' + (0.20 * (1 - u) * f).toFixed(4) + ')');
+      }
+      x.fillStyle = lg; x.fillRect(0, 0, W, H);
+    };
+    const sb = lightBitmap(ctx, 0, '' + sq, paintSun);
+    ctx.globalCompositeOperation = 'source-over';
+    if (sb){ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(sb, 0, 0); }
+    else { ctx.globalCompositeOperation = GRADE_OP; ctx.fillStyle = sunGradientLive(ctx, W, H, sq); ctx.fillRect(0, 0, W, H); }
     ctx.restore();
     if (G.state === 'menu') return;                      /* the menu keeps just its own light edge */
     /* a tinted vignette on top of the neutral one */
-    const r =hyp(W, H) * 0.5, vg = ctx.createRadialGradient(W / 2, H / 2, r * 0.45, W / 2, H / 2, r);
-    vg.addColorStop(0, 'rgba(' + g.vig[0] + ',' + g.vig[1] + ',' + g.vig[2] + ',0)');
-    vg.addColorStop(1, 'rgba(' + g.vig[0] + ',' + g.vig[1] + ',' + g.vig[2] + ',' + g.vig[3] + ')');
-    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+    const r = hyp(W, H) * 0.5;
+    const paintVig = function(x){
+      const vg = x.createRadialGradient(W / 2, H / 2, r * 0.45, W / 2, H / 2, r);
+      vg.addColorStop(0, 'rgba(' + g.vig[0] + ',' + g.vig[1] + ',' + g.vig[2] + ',0)');
+      vg.addColorStop(1, 'rgba(' + g.vig[0] + ',' + g.vig[1] + ',' + g.vig[2] + ',' + g.vig[3] + ')');
+      x.fillStyle = vg; x.fillRect(0, 0, W, H);
+    };
+    const vb = lightBitmap(ctx, 1, g.vig.join(','), paintVig);
+    if (vb){ ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(vb, 0, 0); ctx.restore(); }
+    else paintVig(ctx);
     if (fx < 2) return;
     /* sun shafts: broad soft bands drifting slowly, fainter as the day goes dark */
     const day = clamp(1 - this.dark * 2.4, 0, 1);
