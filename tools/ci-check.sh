@@ -32,9 +32,18 @@ case "$si$sn" in *[!0-9]*|'') echo "CI_SHARD must look like 2/3"; exit 2;; esac
 [ "$si" -ge 1 ] && [ "$si" -le "$sn" ] || { echo "CI_SHARD must look like 2/3"; exit 2; }
 case "$part" in all|shared|timed) ;; *) echo "CI_PART must be all, shared or timed"; exit 2;; esac
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
-fails=(); pass=0; t0=$SECONDS
+fails=(); pass=0; warned=(); t0=$SECONDS
 ok(){ echo "  ok   $1"; pass=$((pass + 1)); }
-bad(){ echo "  FAIL $1"; fails+=("$1"); [ -n "${2:-}" ] && echo "$2" | tail -n 12 | cut -c1-600 | sed 's/^/       /'; }
+# on GitHub a failure (and a warning) is also an annotation, so the check and why it failed show on the run's page and the pull request, not only
+# deep in one share's log:  annotate error|warning <title> <text> (its first four lines)
+annotate(){ [ -n "${GITHUB_ACTIONS:-}" ] || return 0
+  local m t; m="$(printf '%s\n' "$3" | head -n 4 | cut -c1-300 | sed 's/%/%25/g' | awk 'NR > 1 { printf "%%0A" } { printf "%s", $0 }')"
+  t="$(printf '%s' "$2" | sed 's/%/%25/g; s/:/%3A/g; s/,/%2C/g')"; echo "::$1 title=$t::$m"; }
+# bad <label> [output] [why]: why is a browser check's explanation (tools/ci-explain.mjs: the failed keys, page errors, last logs), printed whole
+# before the output, which is cut short (a browser check's output is one long JSON line)
+bad(){ echo "  FAIL $1"; fails+=("$1"); local w=600; [ -n "${3:-}" ] && { w=300; echo "$3" | cut -c1-600 | sed 's/^/       /'; }
+  [ -n "${2:-}" ] && echo "$2" | tail -n 12 | cut -c1-$w | sed 's/^/       /'
+  annotate error "FAIL $1" "${3:-$(echo "${2:-}" | tail -n 4)}"; }
 quick(){                                                   # quick <label> <command...>: a fast check that needs no browser, run here and now
   local label="$1"; shift; local s=$SECONDS out
   if out="$("$@" 2>&1)"; then ok "$label ($((SECONDS - s))s)"; else bad "$label" "$out"; fi
@@ -127,7 +136,13 @@ while IFS= read -r line; do
   n=$((n + 1)); label="${line%%|*}"
   if [ ! -f "$tmp/$n.res" ]; then [ -n "$failfast" ] && continue; bad "$label" "did not run"; continue; fi
   read -r res secs < "$tmp/$n.res"
-  if [ "$res" = pass ]; then ok "$label (${secs}s)"; else bad "$label (${secs}s)" "$(cat "$tmp/$n.out")"; fi
+  if [ "$res" = pass ]; then ok "$label (${secs}s)"
+    # a check can pass while the game throws (a scenario that does not look at the page errors): say so, since it is often a real bug
+    if ! grep -q '"errors":\[\]' "$tmp/$n.out" || grep -q '"errs":\["' "$tmp/$n.out"; then
+      e="$(node tools/ci-explain.mjs "$tmp/$n.out" --errors)"
+      if [ -n "$e" ]; then warned+=("$label"); echo "$e" | sed 's/^/       page error (the check passed): /'; annotate warning "Page errors in $label (it passed)" "$e"; fi
+    fi
+  else bad "$label (${secs}s)" "$(cat "$tmp/$n.out")" "$(node tools/ci-explain.mjs "$tmp/$n.out")"; fi
   printf '%s\t%s\n' "$label" "$tmp/$n.out" >> "$tmp/manifest"
 done < "$list"
 
@@ -138,6 +153,9 @@ node tools/coverage.mjs record "$tmp/manifest" > "$rec"
 if [ -n "${CI_RESULTS:-}" ]; then mkdir -p "$CI_RESULTS"; while IFS=$'\t' read -r l f; do printf '%s\t%s\n' "$l" "$(head -n 1 "$f")"; done < "$tmp/manifest" > "$CI_RESULTS/results.tsv"; cp "$tmp/times.tsv" "$CI_RESULTS/times.tsv" 2>/dev/null; fi
 [ -n "$whole" ] && quick "coverage record matches the baseline" node tools/coverage.mjs check tools/coverage-baseline.txt "$rec"
 
+if [ -n "${CI_RESULTS:-}" ]; then mkdir -p "$CI_RESULTS"; : > "$CI_RESULTS/failed.txt"; [ ${#fails[@]} -gt 0 ] && printf '%s\n' "${fails[@]}" > "$CI_RESULTS/failed.txt"; fi   # the qa job lists them
+
 echo
+[ ${#warned[@]} -gt 0 ] && echo "${#warned[@]} passed with page errors (see above): ${warned[*]}"
 echo "Took $((SECONDS - t0))s."
 if [ ${#fails[@]} -eq 0 ]; then echo "All $pass checks passed."; else echo "${#fails[@]} failed, $pass passed: ${fails[*]}"; exit 1; fi

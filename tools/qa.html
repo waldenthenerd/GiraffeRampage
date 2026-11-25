@@ -341,13 +341,25 @@
       QA.draw.drawn++; return drawn.apply(this, arguments);
     };
     stepRender.__qa = true; window.render = stepRender;
-    /* the slow-device governor (js/core/44c-perf.js) times each frame; a frame not drawn is told it cost what the last drawn one did, so the
-       governor lowers and raises the detail just as it does when every frame is drawn */
+    /* the slow-device governor (js/core/44c-perf.js) times each frame. A test machine is slow in its own way (drawn by the CPU, other checks side
+       by side), so by default each frame that GR.step makes is told it cost a steady 12 ms, which keeps the governor where it is (it steps down over
+       20 ms and up under 9): no check depends on how fast the machine was. On a slow GitHub machine it used to lower the effects in the middle of a
+       check and take the smoke being counted with them. governor=real gives it the measured times; then a frame not drawn is told it cost what the
+       last drawn one did, so it lowers and raises the detail just as it does when every frame is drawn. A scenario that calls Perf.cost itself
+       (render-speed) still decides what the governor hears. */
+    var inStep = 0, realGov = q.get('governor') === 'real';
     if (typeof Perf !== 'undefined' && Perf.cost && !Perf.cost.__qa){
       var baseCost = Perf.cost, lastDraw = 0;
-      Perf.cost = function(ms, dt){ if (skippedNow) ms += lastDraw; else lastDraw = drawMsNow; skippedNow = false; drawMsNow = 0; return baseCost.call(this, ms, dt); };
+      Perf.cost = function(ms, dt){
+        if (inStep && !realGov) ms = 12;
+        else if (skippedNow) ms += lastDraw; else lastDraw = drawMsNow;
+        skippedNow = false; drawMsNow = 0; return baseCost.call(this, ms, dt);
+      };
       Perf.cost.__qa = true;
     }
+    var counted = function(f){ if (typeof f !== 'function' || f.__qa) return f; var w = function(){ inStep++; try { return f.apply(this, arguments); } finally { inStep--; } }; w.__qa = true; return w; };
+    if (window.GR) GR.step = counted(GR.step);
+    if (typeof step === 'function') window.step = counted(step);
     if (window.GR) GR.render = drawn;
   }
   window.addEventListener('load', function(){

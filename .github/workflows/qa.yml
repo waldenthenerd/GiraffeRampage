@@ -6,7 +6,8 @@
 # main, job "every-frame" runs the whole suite again drawing every frame and loading the game's scripts one by one (the shares inline them into the
 # page), so a drawing error the sampled run could miss is still caught.
 # The job named "qa" passes only when every share passes and their joined coverage record still has every check in tools/coverage-baseline.txt;
-# it also prints how long each check took (lines starting "time", to copy into tools/ci-times.tsv when the shares drift apart).
+# when a share failed it lists the checks that failed, and it prints how long each check took (lines starting "time", to copy into tools/ci-times.tsv
+# when the shares drift apart). A failed check, and a check that passed while the page threw an error, is also an annotation on the run's page.
 # To make it block merges: Settings > Rules > the main ruleset > "Require status checks to pass" > add "QA / qa".
 name: QA
 on:
@@ -16,7 +17,7 @@ permissions:
   contents: read
 concurrency:
   group: qa-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}   # a newer push to a branch replaces its run; on main every merge is checked to the end
 env:
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.pw-browsers
 jobs:
@@ -69,20 +70,25 @@ jobs:
           path: |
             coverage-${{ matrix.share }}.txt
             results-${{ matrix.share }}/times.tsv
+            results-${{ matrix.share }}/failed.txt
           retention-days: 7
   qa:
     needs: share
-    if: always()
+    if: ${{ !cancelled() }}                     # a run that was cancelled (a newer run took its place) leaves no red qa check
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Every share passed
-        run: '[ "${{ needs.share.result }}" = success ] || { echo "a share failed or was cancelled: ${{ needs.share.result }}"; exit 1; }'
       - uses: actions/download-artifact@v4
         with:
           pattern: coverage-*
           path: cov
           merge-multiple: true
+      - name: Every share passed
+        run: |
+          [ "${{ needs.share.result }}" = success ] && exit 0
+          echo "a share failed or was cancelled: ${{ needs.share.result }}. The checks that failed (each share's log says why, and so do the annotations on the run's page):"
+          cat cov/results-*/failed.txt 2>/dev/null | sed 's/^/  FAIL /'
+          exit 1
       - name: The coverage record still has every check
         run: node tools/coverage.mjs check tools/coverage-baseline.txt cov/coverage-*.txt
       - name: How long each check took (copy into tools/ci-times.tsv to rebalance the shares)
