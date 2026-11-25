@@ -119,7 +119,7 @@ const FORT_DRAW = {
     tw_rect(ctx, -2 * s, bob - 0.8 * s, 20 * s, 1.6 * s, '#10121A'); tw_rect(ctx, -2 * s, bob - 0.6 * s, 20 * s, 0.5 * s, '#3A3E4A'); tw_rect(ctx, 5 * s, bob - 2.4 * s, 5 * s, 1.5 * s, '#10121A'); fillCircle(ctx, 5.4 * s, bob - 1.6 * s, 1 * s, aim ? '#FFFFFF' : '#9AD8F0');
     tw_rect(ctx, 16 * s, bob - 1.4 * s, 4 * s, 2.8 * s, '#0A0C10'); for (const sd of [-1, 1]) tw_ln(ctx, [11 * s, bob + sd * 0.8 * s, 14 * s, bob + sd * 4 * s], 0.9 * s, '#2A2E38');
     fillCircle(ctx, 2.4 * s, bob, 3.6 * s, '#14160E'); fillCircle(ctx, 2.2 * s, bob, 3.1 * s, tw_li(b, 0.14)); tw_rect(ctx, 4 * s, bob - 1.8 * s, 1 * s, 3.6 * s, '#9AD8F0');
-    if (aim){ ctx.globalAlpha = 0.3; tw_rect(ctx, 20 * s, bob - 0.4 * s, 90 * s, 0.8 * s, FT_RED); ctx.globalAlpha = 1; csGlow(ctx, 20 * s, bob, 6 * s, FT_RED, 0.5); }
+    if (aim) csGlow(ctx, 20 * s, bob, 6 * s, FT_RED, 0.5);                           /* the laser itself reaches all the way to her: ftSniperLaser in js/fort/44zzzm-fort-ai.js */
   },
   ft_pyro(ctx, e, b, dk, bob, wind, d){                                                /* Pyro Trooper: a soldier in an orange suit with a fuel tank on the back and a nozzle that spits fire */
     const s = e.r / 13, fire = e.state === 'burn', wnd = e.state === 'burnwind';

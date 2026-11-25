@@ -134,14 +134,26 @@
     out.turretAims = Math.abs(angDiff(tu.ang, Math.atan2(P.y - um.y, P.x - um.x))) < 0.6; var shots = 0; for (var s2 = 0; s2 < 120; s2++){ GR.step(1 / 30); noLevels(); shots = Math.max(shots, G.eproj.length); } out.turretFires = shots > 0;
     put(um.x + 60, um.y); var ch1 = G.ft.chaos; steps(10); out.hacking = tu.hack > 0 && tu.tState === 'hostile'; steps(60); out.hacked = tu.tState === 'ally' && tu.allyT > 28 && G.ft.chaos === ch1 + 150 + 0 || (tu.tState === 'ally' && G.ft.chaos >= ch1 + 150);
     spawnEnemy('hyena', um.x + 250, um.y, G.wave); var ee = G.enemies[G.enemies.length - 1]; ee.hp = ee.maxHp = 5000; ee.spd = 0; var h5 = ee.hp; G.eproj.length = 0; put(um.x - 400, um.y + 60); steps(30); out.allyShoots = ee.hp < h5 || ee.dead;
-    tu.allyT = 0.05; steps(5); out.burnsOut = tu.tState === 'dead'; var sp = tu.tState; clear(); fortWaveStart(G.wave + 1); out.mended = tu.tState === 'hostile' && !tu.collapsed;
+    var fizz = 0, fz = SFX.fortFizzle; SFX.fortFizzle = function(){ fizz++; };
+    tu.allyT = 0.05; steps(5); out.burnsOut = tu.tState === 'dead'; SFX.fortFizzle = fz; out.fizzle = fizz === 1;
+    /* a burned-out gun: a grey lamp (not the red of a gun that shoots at her) and smoke until it is mended */
+    out.deadLamp = ftTurretLamp('dead') === '#6A6A62' && ftTurretLamp('hostile') === '#FF5A4A' && ftTurretLamp('ally') === '#6AE08A' && ftMmColor(tu) === '#7A7A70';
+    var fx0 = Settings.fxLevel, pf0 = typeof Perf !== 'undefined' ? Perf.fx : 0; Settings.fxLevel = 2; if (typeof Perf !== 'undefined') Perf.fx = 2; G.particles.length = 0; steps(30);     /* about four smoke ticks: the gun smokes on every other one, so a short run could miss */
+    out.deadSmoke = G.particles.some(function(p){ return p.color === 'rgba(70,66,62,.45)' && Math.abs(p.x - um.x) < 40; }); Settings.fxLevel = fx0; if (typeof Perf !== 'undefined') Perf.fx = pf0;
+    var sp = tu.tState; clear(); fortWaveStart(G.wave + 1); out.mended = tu.tState === 'hostile' && !tu.collapsed;
     kill(tu); out.turretShotDown = tu.collapsed === true;
 
     /* searchlights: a beam on her sets off the alarm and a squad; without its generator the light is dark */
     begin(); var li = FT.lights[2], lm = mid(li), gen = li.gen; var a0 = fortLightAng(li, G.time); put(lm.x + Math.cos(a0) * 300, lm.y + Math.sin(a0) * 300);
     out.lightOn = fortLightOn(li); li.cool = 0; li.ph += 0; var alarm0 = G.ft.alarm, spotted = false;
     for (var s3 = 0; s3 < 90; s3++){ var an = fortLightAng(li, G.time + 0.0); P.x = lm.x + Math.cos(an) * 280; P.y = lm.y + Math.sin(an) * 280; GR.step(1 / 30); noLevels(); if (G.ft.alarm > alarm0 + 10){ spotted = true; break; } }
-    out.spotted = spotted; kill(gen); out.dark = !fortLightOn(li); steps(2); out.lightsOut = true;
+    out.spotted = spotted;
+    /* the siren sounds every time a light catches her, even when every squad has already come */
+    var sirens = 0, sr = SFX.fortSiren, sq0 = G.ft.squads; SFX.fortSiren = function(){ sirens++; }; G.ft.squads = { a: 2, b: 2, c: 3 }; var ne = G.enemies.length, px0 = P.x, py0 = P.y, sv = { alarm: G.ft.alarm, quiet: G.ft.quiet, lvl: G.ft.lvl, cool: li.cool };
+    var an2 = fortLightAng(li, G.time); P.x = lm.x + Math.cos(an2) * 280; P.y = lm.y + Math.sin(an2) * 280; li.cool = 0; li.spotT = FT_LIGHT.spot; delete sfxGate.fortSiren; fortLightTick(li, 1 / 30);
+    SFX.fortSiren = sr; out.siren = sirens === 1 && G.enemies.length === ne;
+    P.x = px0; P.y = py0; G.ft.alarm = sv.alarm; G.ft.quiet = sv.quiet; G.ft.lvl = sv.lvl; li.cool = sv.cool; li.spotT = 0; G.ft.squads = sq0;
+    kill(gen); out.dark = !fortLightOn(li); steps(2); out.lightsOut = true;
     put(lm.x + Math.cos(fortLightAng(li, G.time)) * 300, lm.y + Math.sin(fortLightAng(li, G.time)) * 300); var al1 = G.ft.alarm; li.cool = 0; steps(40); out.noSpot = G.ft.alarm <= al1;
 
     /* the rebuild: vehicles, tanks and guns come back each wave, everything after a boss; the nav is made again and she is never inside a wall */
@@ -149,6 +161,11 @@
     fortWaveStart(387); out.backAgain = !jp.collapsed && !tk.collapsed && ha.collapsed && bu.collapsed && jp.hp === jp.maxHp && TW.solid[twCell(mid(jp).x, mid(jp).y)] === 1;
     fortWaveStart(391); out.allAgain = !ha.collapsed && !bu.collapsed && ha.hp === ha.maxHp && TW.solid[twCell(mid(ha).x, mid(ha).y)] === 1;
     put(mid(ha).x, mid(ha).y); kill(ha); put(mid(ha).x, mid(ha).y); fortWaveStart(396); out.notTrapped = !buildingAt(P.x, P.y);
+
+    /* the full-alarm bar flashes white, but with "Reduce flashes" on it is a steady red */
+    var calm0 = Settings.calmFlash, cols = function(){ var o = {}; for (var t = 0; t < 2; t += 0.01) o[ftAlarmColor(3, t)] = 1; return Object.keys(o).sort().join(); };
+    Settings.calmFlash = false; var flashy = cols(); Settings.calmFlash = true; var calm = cols(); Settings.calmFlash = calm0;
+    out.alarmCalm = flashy === '#FF3A2A,#FFFFFF' && calm === '#FF3A2A' && ftAlarmColor(2, 0) === '#FF6A3A';
 
     /* the wave pay: a twelfth of the chaos as gold, the best wave kept */
     begin(); fortChaos(1200, P.x, P.y, ''); var gold0 = G.bonusGold; fortWaveEnd(); out.payout = G.bonusGold === gold0 + 100 && Save.data.fortBestWave >= 1;
@@ -166,6 +183,18 @@
       if (!(moved > 20 || maxShots > 0 || maxMk > 0)) aiBad += type + ' ';
     });
     out.ai = ai; out.aiOk = aiBad === ''; out.aiBad = aiBad;
+    /* the fort's attacks lunge forward like every other attack (their wind-ups, ending in "wind", already crouch) */
+    out.lunges = ['ram', 'bash', 'strafe', 'burn', 'cannon', 'zap'].every(function(st){ return EM_ATTACK[st] === 1 && !emWinding(st); }) && ['ramwind', 'bashwind', 'strafewind', 'burnwind', 'cannonwind', 'zapwind'].every(emWinding);
+    /* the Sniper's aim: the red line reaches all the way to her, not a short stub; a portrait draws none */
+    Settings.fxLevel = 1; begin(); put(2100, 1300); spawnEnemy('mamba', 2100 + 620, 1300, G.wave); var sn = G.enemies[0];
+    if (sn){
+      sn.state = 'aim'; sn.stateT = 0.4; sn.ang = Math.atan2(P.y - sn.y, P.x - sn.x);
+      var lcv = document.createElement('canvas'); lcv.width = lcv.height = 64; var lc = lcv.getContext('2d'), far = 0, lt = lc.lineTo;
+      lc.lineTo = function(x, y){ var m = this.getTransform(); if (m.a === 1 && m.b === 0 && m.e === 0 && m.f === 0) far = Math.max(far, hyp(x - sn.x, y - sn.y)); return lt.apply(this, arguments); };     /* lines drawn in the world, not in the creature's own space */
+      drawEnemy(lc, sn); var reachTo = far; far = 0; drawEnemy(lc, Object.assign({}, sn, { portrait: true })); var portraitFar = far; sn.state = 'idle'; far = 0; drawEnemy(lc, sn); var idleFar = far;
+      out.laserReach = Math.round(reachTo); out.laser = reachTo > 560 && portraitFar < 100 && idleFar < 100;
+    } else out.laser = false;
+    Settings.fxLevel = 0;
     var bosses = ['lion', 'matriarch', 'buffalo', 'crocodile', 'wildfire'], bossBad = '', bi = {};
     bosses.forEach(function(type, bi2){
       begin(390 + bi2 * 5); put(2100, 1300); spawnEnemy(type, 2100 + 420, 1300, 390 + bi2 * 5); var e = G.enemies[0]; if (!e){ bossBad += type + ':none '; return; }
@@ -202,6 +231,13 @@
     G.chapter = COUNTER_CHAPTER; out.victoryText2 = /maker of the Warden/.test(victoryText(3, 4)) && !/the end|thanks for playing/i.test(victoryText(3, 4));
     out.gallery = filmList().filter(function(x){ return x.kind === 'fortflight' || x.kind === 'fortout'; }).length === 2;
     begin(); fortChaos(12500, P.x, P.y, ''); G.ft.wrecked = 3; var rep = runReport(0, 0); var rh = runReportHTML({ report: rep }, false); out.report = rep.ftChaos === 12500 && rep.ftTier === 2 && /Chaos <b[^>]*>(12,?500|12\.5k)<\/b>/.test(rh) && /Mayhem/.test(rh) && /3 things wrecked/.test(rh);
+    /* the best chaos: the report says when it is beaten and what it is otherwise, and the chapter card on the menu shows it with its level */
+    begin(); G.ft.best0 = Save.data.fortChaosBest = 20000; fortChaos(12500, P.x, P.y, ''); var rh2 = runReportHTML({ report: runReport(0, 0) }, false);
+    begin(); G.ft.best0 = Save.data.fortChaosBest = 5000; fortChaos(12500, P.x, P.y, ''); var rh3 = runReportHTML({ report: runReport(0, 0) }, false);
+    begin(); fortChaos(12500, P.x, P.y, ''); var rh4 = runReportHTML({ report: runReport(0, 0) }, false);
+    out.reportBest = rh2.indexOf('Your best is ' + fmt(20000) + '.') >= 0 && rh3.indexOf('A new best: the old one was ' + fmt(5000) + '.') >= 0 && /rr-line good">Chaos/.test(rh3) && !/A new best|Your best is/.test(rh4) && Save.data.fortChaosBest === 12500;
+    var mc = menuChapter(); freshSave(); setMenuChapter(17); var card0 = chapterSelectorHTML(); Save.data.fortChaosBest = 26000; var card1 = chapterSelectorHTML(); setMenuChapter(16); var card2 = chapterSelectorHTML(); setMenuChapter(mc);
+    out.cardBest = !/Best chaos/.test(card0) && /5 bosses · Best chaos <b[^>]*>26k<\/b> \(Uproar\)<\/p>/.test(card1) && !/Best chaos/.test(card2);
     /* a run saved part-way keeps the chaos */
     begin(); fortChaos(777, P.x, P.y, ''); var snap = runSnapshot(); out.snapChaos = snap.ftChaos === 777 && validRunSave(snap); startRun(COUNTER_CHAPTER, snap.wave, snap); steps(2); out.snapRestore = !!G.ft && G.ft.chaos === 777 && G.ft.tier === ftTierOf(777) && FT.all.length === FT_PLAN.length;
     /* the detail layer: every kind draws its small parts, a ruin and the ground draw theirs, and none of it throws */
@@ -217,8 +253,8 @@
   function FORT_KIT_LOOKS_OK(){ var n = 0; for (var k in FORT_DRAW) if (/^ft_/.test(k)) n++; return n >= 17 && (typeof dt_wrap === 'function'); }
   var need = ['table', 'bossWaves', 'harder', 'cast', 'bestiary', 'uniqueLooks', 'flyers', 'saveDefault', 'saveSane', 'ward', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'menuFilm', 'starts', 'spawns', 'hud',
     'bld', 'kinds', 'inside', 'noClash', 'reachAll', 'gatesOpen', 'startOpen', 'turretsOpen', 'fell', 'combo', 'comboEnds', 'score', 'hurt', 'shotDown', 'kickDown', 'tiers', 'tier3', 'tierTop', 'badgeOnce',
-    'squadA', 'squadB', 'full', 'fullBonus', 'decay', 'relax', 'caps', 'fuse', 'boom', 'chain', 'safe', 'rubbleFire', 'turretAims', 'turretFires', 'hacking', 'hacked', 'allyShoots', 'burnsOut', 'mended', 'turretShotDown',
-    'lightOn', 'spotted', 'dark', 'noSpot', 'backAgain', 'allAgain', 'notTrapped', 'payout', 'aiOk', 'bossOk', 'films', 'noEndCard', 'detail', 'detailLooks', 'finish', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'lastWave', 'endFilm', 'endVictory', 'victoryText2', 'gallery', 'report', 'snapChaos', 'snapRestore', 'oldSave'];
+    'squadA', 'squadB', 'full', 'fullBonus', 'decay', 'relax', 'caps', 'fuse', 'boom', 'chain', 'safe', 'rubbleFire', 'turretAims', 'turretFires', 'hacking', 'hacked', 'allyShoots', 'burnsOut', 'fizzle', 'deadLamp', 'deadSmoke', 'mended', 'turretShotDown',
+    'lightOn', 'spotted', 'siren', 'alarmCalm', 'lunges', 'laser', 'reportBest', 'cardBest', 'dark', 'noSpot', 'backAgain', 'allAgain', 'notTrapped', 'payout', 'aiOk', 'bossOk', 'films', 'noEndCard', 'detail', 'detailLooks', 'finish', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'lastWave', 'endFilm', 'endVictory', 'victoryText2', 'gallery', 'report', 'snapChaos', 'snapRestore', 'oldSave'];
   out.failed = QA.need(out, need);
   out.pass = out.errs.length === 0 && !out.err && out.failed.length === 0;
   QA.done(out);
