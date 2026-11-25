@@ -2,6 +2,7 @@
 // raw result. The raw JSON line is cut short in the log, and the failed keys often came after the cut (a long value in front of them), so a failure
 // could not be read without running the check again.   usage: node tools/ci-explain.mjs <check's .out file> [--errors]
 //   --errors: only the page errors of a check that passed (ci-check.sh warns about those: a check can pass while the game throws).
+//   A check that makes page errors on purpose names them in its result as expectedErrors (a pattern); --errors leaves those out.
 import fs from 'node:fs';
 
 const [file, mode] = process.argv.slice(2);
@@ -11,7 +12,11 @@ if (!o) { console.log('no result'); process.exit(0); }
 const cut = (v, n) => { const s = typeof v === 'string' ? v : JSON.stringify(v); return s.length > n ? s.slice(0, n) + '...' : s; };
 const r = o.result && typeof o.result === 'object' ? o.result : {};
 const errors = [].concat(o.errors || [], Array.isArray(r.errs) ? r.errs : [], Array.isArray(r.errors) ? r.errors : []).map(String);
-if (mode === '--errors') { for (const e of [...new Set(errors)].slice(0, 3)) console.log(cut(e, 240)); process.exit(0); }
+if (mode === '--errors') {
+  let onPurpose = null; try { if (typeof r.expectedErrors === 'string' && r.expectedErrors) onPurpose = new RegExp(r.expectedErrors); } catch (e) { onPurpose = null; }
+  for (const e of [...new Set(errors)].filter(e => !onPurpose || !onPurpose.test(e)).slice(0, 3)) console.log(cut(e, 240));
+  process.exit(0);
+}
 
 if (!o.done) console.log('it did not finish: the scenario never called QA.done within the wait (a stall, a script error before the end, or a page that did not load)');
 const failed = Array.isArray(r.failed) ? r.failed.map(String) : [];

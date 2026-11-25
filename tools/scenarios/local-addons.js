@@ -3,7 +3,8 @@
    a missing one, a repeated id, the "Local" tag and the note on the Add-ons page, markup in an add-on's name, description, lock or file name shown as text, and that nothing is looked for away from this computer.
    Run: node tools/qa-cloud.mjs tools/scenarios/local-addons.js --wait 60000 [--shot x.png --params "view=page|file"] */
 GR.handleAction('splash-go'); Ach.check = function(){ return []; };
-var out = { errs: [] }; window.addEventListener('error', function(e){ if (!/oops|fixtures|registered twice/.test(e.message + e.filename)) out.errs.push(e.message); });
+var ON_PURPOSE = /oops|fixtures|registered twice/;                    /* the errors this check makes on purpose (a file that throws, a repeated id) */
+var out = { errs: [], expectedErrors: ON_PURPOSE.source }; window.addEventListener('error', function(e){ if (!ON_PURPOSE.test(e.message + e.filename)) out.errs.push(e.message); });
 function finish(){
   out.pass = out.errs.length === 0 && ['here', 'listing', 'listTxt', 'loaded', 'tagged', 'offIsOriginal', 'onCheers', 'thrown', 'noReg', 'missing', 'dupe', 'gameGoesOn', 'row', 'note', 'fileNote', 'offNote', 'wrapBad', 'escaped'].every(function(k){ return out[k] === true; });
   var v = QA.params.view;
