@@ -40,11 +40,15 @@ function serve(dir, indexText) {
 async function fingerprint(browser, srv) {
   const page = await browser.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message.slice(0, 200)));
+  /* the game's frame loop is stopped (as in the QA harness): what is compared is what the scripts leave behind when they load. With frames running,
+     the tables the drawing fills as it goes (CH1_MEMO, TW_MIXC, DT_MASKS, PART_POOL, drawing caches) held as many entries as frames happened to be
+     drawn in the half second, which differed between the two pages and failed about one run in ten on GitHub */
+  await page.addInitScript(() => { window.requestAnimationFrame = function(){ return 0; }; });
   await page.goto('http://127.0.0.1:' + srv.address().port + '/'); try { await page.waitForFunction(() => typeof window.GR === 'object', null, { timeout: 20000 }); } catch (e) { errs.push('the game did not start (window.GR is missing)'); await page.close(); return { fp: {}, errs }; }
   await page.waitForTimeout(500);
   const fp = await page.evaluate(list => { const o = {};
     for (const k of list) { let v, t; try { v = (0, eval)(k); t = typeof v; } catch (e) { o[k] = 'throws'; continue; }
-      o[k] = t === 'function' ? 'f:' + String(v) : t === 'object' && v ? (/cache|sprites/i.test(k) || k[0] === '_' ? 'o' : 'o:' + Object.keys(v).length) : t; }   // a drawing cache grows with each frame drawn, and a scratch list (_name) is refilled every frame, so their sizes depend on timing
+      o[k] = t === 'function' ? 'f:' + String(v) : t === 'object' && v ? (/cache|sprites/i.test(k) || k[0] === '_' ? 'o' : 'o:' + Object.keys(v).length) : t; }   // a drawing cache or a scratch list (_name) may still change size in the wait (timers run), so only its kind is compared
     return o; }, [...names]);
   await page.close(); return { fp, errs };
 }
