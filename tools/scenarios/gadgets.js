@@ -78,7 +78,8 @@
     pad(2, true); pad(2, false); check('padXTurns', turns === 2);
     var ps = PB.score; pad(0, true); pad(0, false); check('padDrops', PB.score > ps && PH.game === PB);
     for (k = 0; k < 40 && !PB.over; k++) PB.key('x'); pad(0, true); pad(0, false); check('padAgain', PB.over && !!PH.game && PH.game !== PB && !PH.game.over);
-    pad(1, true); pad(1, false); check('padBackCloses', !Town.panel && !document.getElementById('phCv'));
+    var PC = PH.game; pad(1, true); pad(1, false); out.padBackPanel = Town.panel; check('padBackCloses', !Town.panel);      /* the phone fades out, so its canvas is still there for a moment */
+    var pcx = PC.p.x; pad(15, true); pad(15, false); check('padNotAfterClose', PC.p.x === pcx);
     navigator.getGamepads = realPads; Input.padUsed = false; Input.padOn = false; Pad.prev = [];
     /* Snake */
     act('town-ph-snake'); frames(2); var S = PH.game; check('snake', !!S && S.id === 'snake' && S.body.length === 3);
