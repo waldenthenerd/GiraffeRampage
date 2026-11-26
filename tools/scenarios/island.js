@@ -109,6 +109,15 @@
     var lostN = function(){ return G.texts.filter(function(t){ return t.txt === 'Dry Hooves lost'; }).length; };
     updateHUD(); out.dryLost = lostN() === 1 && el('hDry').textContent === ''; put(1450, 2120); steps(3); out.dryLostOnce = lostN() <= 1;
     begin(); Save.data.isleDry = true; G.texts.length = 0; put(1000, 1680); steps(3); updateHUD(); out.dryHad = G.il.wet && lostN() === 0 && el('hDry').textContent === '';
+    /* Dry Hooves and Continue: the saved run hears of the first step in at once (the run is saved at the start of a wave), so leaving for the menu and carrying on
+       keeps her wet, through the next wave's save too, and the chapter's end does not award it; a new run starts dry again */
+    begin(); put(2130, 2760); steps(3); var rsv = Save.data.runSave, dryThen = !!rsv && rsv.chapter === ISLE_CHAPTER && rsv.isleWet === false;
+    put(1000, 1680); steps(3); var wetNow = !!Save.data.runSave && Save.data.runSave.isleWet === true;
+    Save.load(); var kept = !!Save.data.runSave && Save.data.runSave.isleWet === true && validRunSave(Save.data.runSave);
+    GR.handleAction('menu'); GR.handleAction('continue'); steps(2); put(2130, 2760); steps(2); updateHUD();
+    var back = G.chapter === ISLE_CHAPTER && G.biome === 'isle' && G.state === 'playing' && G.il.wet === true && el('hDry').textContent === '' && runSnapshot().isleWet === true;
+    isleFinishSave(); out.dryContinue = dryThen && wetNow && kept && back && Save.data.isleDry === false;
+    begin(); out.dryFresh = G.il.wet === false && G.isleWetRestore === false && Save.data.runSave && Save.data.runSave.isleWet === false;
     var ce = spawnEnemy('jackal', 300, 1500, 420), cl = spawnEnemy('jackal', 2130, 2760, 420), cr = spawnEnemy('warthog', 300, 1500, 420);
     out.swimMul = ilWaterMul(ce) > 1 && ilWaterMul(cl) < 1 && ilWaterMul(cr) < 1;
 
@@ -179,12 +188,18 @@
       begin(c[1]); put(c[2], c[3]); var e = spawnEnemy(c[0], 300, 420, c[1]); if (!e){ entBad += c[0] + ':none '; return; } e.hp = e.maxHp = 1e9;
       var ok = !!e.enter && e.untarg === true && damageEnemy(e, 100, {}) === 0, where = Math.round(e.x) + ',' + Math.round(e.y);
       if (c[4] !== null) ok = ok && isleWet(e.x, e.y) === c[4] && hyp(e.x - P.x, e.y - P.y) < 700;
-      if (c[0] === 'wildfire') ok = ok && e.x === ISLE_FTANK.x && e.y === ISLE_FTANK.y && !!G.il.feed && !G.il.tankBroke;
-      for (var k = 0; k < 150 && e.enter; k++){ GR.step(1 / 30); noLevels(); put(c[2], c[3]); }
-      ok = ok && !e.enter && !e.untarg && e.state === 'roar'; if (c[0] === 'wildfire') ok = ok && G.il.tankBroke === true;
+      /* Zero, seen from far off: the scientist's farewell is not cut short; Zero waits under the glass (no attack) until the line is done, then the camera beeps on */
+      var zb = 0, zHeld = true, zf = SFX.feedBeep; if (c[0] === 'wildfire'){ ok = ok && e.x === ISLE_FTANK.x && e.y === ISLE_FTANK.y && !!G.il.feed && !G.il.tankBroke && e.enter.hold === true && !!G.il.glimpse && G.il.glimpse.t > 5 && G.il.glimpse.line === ISLE_GLIMPSE.wildfire; SFX.feedBeep = function(){ zb++; }; }
+      for (var k = 0; k < 330 && e.enter; k++){ GR.step(1 / 30); noLevels(); put(c[2], c[3]); if (c[0] === 'wildfire' && G.il.glimpse && (e.enter.t > 0 || zb > 0 || !(e.atkCd > 0))) zHeld = false; }
+      SFX.feedBeep = zf;
+      ok = ok && !e.enter && !e.untarg && e.state === 'roar'; if (c[0] === 'wildfire') ok = ok && G.il.tankBroke === true && zHeld && zb === 1 && !G.il.glimpse && !!G.il.feed && G.il.feed.on === true;
       ent[c[0]] = where + (ok ? '' : ' BAD'); if (!ok) entBad += c[0] + ' ';
     });
     out.enter = ent; out.enterOk = entBad === ''; out.enterBad = entBad;
+    /* she comes into the tank room while Zero waits for the line to end: no camera feed then, she sees it break out for herself */
+    begin(435); put(2130, 2600); var z2 = spawnEnemy('wildfire', 300, 420, 435); z2.hp = z2.maxHp = 1e9; var zHad = !!G.il.feed && !!(z2.enter && z2.enter.hold);
+    put(2100, 560); for (var k4 = 0; k4 < 330 && z2.enter; k4++){ GR.step(1 / 30); noLevels(); put(2100, 560); }
+    out.zeroInRoom = zHad && !z2.enter && !G.il.feed && G.il.tankBroke === true;
     /* a hidden swimmer warns before it comes up, and waits a moment once it is up */
     begin(420); put(700, 1750); var hd = spawnEnemy('jackal', 1080, 1640, 420); hd.hp = hd.maxHp = 1e9; var told = false, surf = false;
     for (var k2 = 0; k2 < 150; k2++){ GR.step(1 / 30); noLevels(); put(700, 1750); if (hd.tell) told = true; if (hd.surfT > 0) surf = true; }
@@ -211,6 +226,14 @@
     var fcv = document.createElement('canvas'); fcv.width = CS_W; fcv.height = CS_H; var fc = fcv.getContext('2d'), fok = true, fbad = '';
     ['islesail', 'isleout'].forEach(function(k){ var F = MARS_FILMS[k]; if (!F || !(F.end > 20)) { fok = false; fbad += k + ':def '; return; } for (var t = 0; t < F.end; t += 0.75){ try { fc.clearRect(0, 0, CS_W, CS_H); F.scene(fc, t); F.over(fc, t); } catch (e){ fok = false; fbad += k + '@' + t + ':' + e.message + ' '; break; } } });
     out.films = fok; out.filmsBad = fbad;
+    /* their sounds: made with the game's own tones and noise, in time order, inside the film, at the moments that need them (here and in the Air Chase films) */
+    var heardK = {}, realSnd = filmSnd, sndBad = ''; filmSnd = function(k, v){ heardK[cueOf] = heardK[cueOf] || {}; heardK[cueOf][k] = (heardK[cueOf][k] | 0) + 1; return realSnd(k, v); };
+    var cueOf = '', keepCut = G.cut; G.cut = null;
+    ['islesail', 'isleout', 'skyin', 'skyout'].forEach(function(k){ var F = MARS_FILMS[k]; cueOf = k; if (!F) { sndBad += k + ':none '; return; }
+      F.cues.forEach(function(c, i){ if (!(c[0] >= 0 && c[0] < F.end) || (i && c[0] < F.cues[i - 1][0])) sndBad += k + '@' + c[0] + ' '; try { c[1](); } catch (e){ sndBad += k + ':' + e.message + ' '; } }); });
+    filmSnd = realSnd; G.cut = keepCut; var hk = function(f, ks){ return ks.every(function(x){ return heardK[f] && heardK[f][x] > 0; }); };
+    out.filmSoundsBad = sndBad; out.filmSoundKinds = Object.keys(heardK).map(function(f){ return f + ':' + Object.keys(heardK[f]).join('/'); }).join(' ');
+    out.filmSounds = !sndBad && hk('islesail', ['lap', 'wade', 'splash']) && hk('isleout', ['pour', 'glass', 'splash', 'thud']) && hk('skyin', ['thud', 'slide', 'whir']) && hk('skyout', ['bang', 'crash', 'splash', 'horn', 'thud']) && heardK.skyout.thud > 40;
     out.noEndCard = !/the end|thanks for playing|credits/i.test(IL_SAIL_CAPS.concat(IL_OUT_CAPS).map(function(c){ return c[1] + ' ' + c[2]; }).join(' ') + ' ' + Object.keys(ISLE_GLIMPSE).map(function(k){ return ISLE_GLIMPSE[k]; }).join(' ') + ' ' + Object.keys(ISLE_BRIEF).map(function(k){ return ISLE_BRIEF[k]; }).join(' '));
 
     /* the minigame: three stars give Tide Pool; an eel bites; a shell counts */
@@ -259,9 +282,9 @@
     }
   } catch (e) { out.err = String(e && e.stack || e); }
   var need = ['table', 'bossWaves', 'harder', 'cast', 'bestiary', 'uniqueLooks', 'traits', 'art', 'saveDefault', 'saveSane', 'ward', 'wardOpen', 'waves', 'pool', 'menuLocked', 'menuOpen', 'menuFilm', 'starts', 'spawns', 'hud',
-    'props', 'inside', 'noClash', 'reachAll', 'ventsOpen', 'startOpen', 'wetMap', 'wetMatches', 'dryStart', 'dryTick', 'wade', 'dryLost', 'dryLostOnce', 'dryHad', 'swimMul', 'aiOk', 'crabPlate', 'jellySplit', 'jellyOnce', 'bossOk', 'glimpse', 'glimpseGoes', 'clean', 'notClean',
+    'props', 'inside', 'noClash', 'reachAll', 'ventsOpen', 'startOpen', 'wetMap', 'wetMatches', 'dryStart', 'dryTick', 'wade', 'dryLost', 'dryLostOnce', 'dryHad', 'dryContinue', 'dryFresh', 'filmSounds', 'swimMul', 'aiOk', 'crabPlate', 'jellySplit', 'jellyOnce', 'bossOk', 'glimpse', 'glimpseGoes', 'clean', 'notClean',
     'tune', 'spotsOk', 'sight', 'sightDuck', 'sightGone', 'noSightBoss', 'doorShut', 'doorOpen', 'camTrack', 'brief', 'briefOn', 'briefGone', 'noteTake', 'noteBest', 'noteAch',
-    'enterOk', 'tell', 'coconut', 'palmBump', 'buoy', 'buoyBack', 'boat', 'wakeOn', 'prints', 'music', 'menuDraw', 'chase',
+    'enterOk', 'zeroInRoom', 'tell', 'coconut', 'palmBump', 'buoy', 'buoyBack', 'boat', 'wakeOn', 'prints', 'music', 'menuDraw', 'chase',
     'films', 'noEndCard', 'mini', 'miniBite', 'miniShell', 'miniSplash', 'miniEelCap', 'miniWard', 'photo', 'photoOld', 'backdrop', 'finish', 'finishWet', 'victory', 'guideLocked', 'guideOpen', 'ach', 'coLocked', 'coOpen', 'together', 'minimap',
     'lastWave', 'endFilm', 'endMini', 'endVictory', 'gallery', 'snap', 'snapRestore'];
   out.failed = QA.need(out, need);
