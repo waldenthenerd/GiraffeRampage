@@ -7,7 +7,8 @@
    blades bent and two scientists in the water by the skid; the coast guard comes alongside and lowers its hook; on the deck the two sit wrapped in
    blankets with their case of notes; the boat and the town helicopter head east together. It closes the chase, nothing more.
    Every frame is a pure function of time. Everything that is fixed to something (a gun to its post, a strap to its ring, a hook to its cable) is drawn
-   from the thing it hangs on.
+   from the thing it hangs on. The sounds (the rotor beat, the cargo door, the drones, the hit, the crash into the sea, the coast guard's horn) are the
+   Island films' own (filmSnd, filmRotor, filmCues in js/films/27e-film-island.js), all made, nothing recorded.
    ============================================================================================================================= */
 const SKY_IN_T = { B: 7.4, C: 14.2, END: 21 };
 const SKY_OUT_T = { B: 7.2, C: 14.6, D: 21.4, END: 27.5 };
@@ -402,7 +403,11 @@ MARS_FILMS.skyin = {
     marsFilmCaps(ctx, SKY_IN_CAPS, t, '#FFD8A0');
     const f = marsFilmFade([SKY_IN_T.B, SKY_IN_T.C], SKY_IN_T.END, t); if (f > 0.005){ ctx.fillStyle = 'rgba(0,0,0,' + f + ')'; ctx.fillRect(0, 0, CS_W, CS_H); }
   },
-  cues: [[0.4, () => SFX.click()], [4.4, () => SFX.whoosh()], [8.0, () => SFX.click()], [10.8, () => SFX.whoosh()], [14.8, () => SFX.click()], [18.2, () => SFX.whoosh()]]
+  cues: filmCues([[0.4, () => SFX.click()], [4.4, () => SFX.whoosh()], [8.0, () => SFX.click()], [10.8, () => SFX.whoosh()], [14.8, () => SFX.click()], [18.2, () => SFX.whoosh()]], [
+    [7.8, () => filmSnd('slide')], [9.4, () => filmSnd('clunk')],                                                                                          /* the cargo door running back, and stopping */
+    [9.8, () => filmSnd('whir', 0.7)], [10.3, () => filmSnd('whir', 0.9)], [10.9, () => filmSnd('whir')], [11.4, () => filmSnd('whir', 0.8)], [12.0, () => filmSnd('whir')], [12.6, () => filmSnd('whir', 0.8)], [13.2, () => filmSnd('whir', 0.6)],
+    [15.2, () => filmSnd('clunk', 1.2)], [18.6, () => filmSnd('clunk', 1.2)]                                                                                /* the gun swung on its post, and cocked */
+  ].concat(filmRotor(0.2, 7.3, 0.2, 0.17, 0.55, 0.85), filmRotor(7.4, 14.1, 0.2, 0.2, 0.35, 0.35), filmRotor(14.3, 20.8, 0.17, 0.17, 1, 0.8)))   /* her helicopter: outside, then close on LAB-1, then in its cabin */
 };
 MARS_FILMS.skyout = {
   end: SKY_OUT_T.END, starts: [0, SKY_OUT_T.B, SKY_OUT_T.C, SKY_OUT_T.D, 0, 0, 0, 0], scene: skyOutScene,
@@ -411,5 +416,9 @@ MARS_FILMS.skyout = {
     marsFilmCaps(ctx, SKY_OUT_CAPS, t, '#FFD8A0');
     const f = marsFilmFade([SKY_OUT_T.B, SKY_OUT_T.C, SKY_OUT_T.D], SKY_OUT_T.END, t); if (f > 0.005){ ctx.fillStyle = 'rgba(0,0,0,' + f + ')'; ctx.fillRect(0, 0, CS_W, CS_H); }
   },
-  cues: [[0.4, () => SFX.click()], [4.2, () => SFX.whoosh()], [7.8, () => SFX.click()], [11.0, () => SFX.whoosh()], [15.0, () => SFX.click()], [18.6, () => SFX.whoosh()], [21.8, () => SFX.click()], [25.0, () => SFX.whoosh()]]
+  cues: filmCues([[0.4, () => SFX.click()], [4.2, () => SFX.whoosh()], [7.8, () => SFX.click()], [11.0, () => SFX.whoosh()], [15.0, () => SFX.click()], [18.6, () => SFX.whoosh()], [21.8, () => SFX.click()], [25.0, () => SFX.whoosh()]], [
+    [0.4, () => filmSnd('bang')], [5.65, () => filmSnd('crash')], [5.7, () => filmSnd('splash', 1.3)], [6.2, () => filmSnd('splash', 0.7)],                 /* the hit, and LAB-1 into the sea */
+    [8.0, () => filmSnd('lap')], [9.6, () => filmSnd('lap', 0.8)], [10.4, () => filmSnd('horn')], [11.4, () => filmSnd('lap')], [13.0, () => filmSnd('clunk', 0.7)], [14.2, () => filmSnd('splash', 0.4)],   /* it floats; the coast guard's horn, and its hook */
+    [16.2, () => filmSnd('lap', 0.6)], [19.4, () => filmSnd('lap', 0.6)], [22.2, () => filmSnd('horn', 0.7)]
+  ].concat(filmRotor(0.6, 5.4, 0.13, 0.24, 0.8, 0.2), filmRotor(7.4, 14.4, 0.21, 0.21, 0.3, 0.3), filmRotor(14.8, 21.2, 0.22, 0.22, 0.18, 0.18), filmRotor(21.6, 27.3, 0.2, 0.2, 0.5, 0.5)))   /* LAB-1's dying beat, then the town helicopter's */
 };
