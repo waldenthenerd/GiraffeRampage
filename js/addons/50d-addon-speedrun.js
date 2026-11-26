@@ -36,7 +36,7 @@ function speedrunBest(kind, n){ const v = speedrunTable(speedrunLoad(), kind)[n]
 function speedrunOffer(kind, n, sec){
   if (SR.resumed || !(sec > 0)) return 0;
   const d = speedrunLoad(), tb = speedrunTable(d, kind), old = typeof tb[n] === 'number' && tb[n] > 0 ? tb[n] : 0;
-  if (!old || sec < old){ tb[n] = Math.round(sec * 1000) / 1000; speedrunSave(d); SR.newBests.push({ kind: kind, n: n, sec: sec, old: old }); if (old) speedrunCheer(kind, n, sec, old); }
+  if (!old || sec < old){ tb[n] = Math.round(sec * 1000) / 1000; speedrunSave(d); speedrunClearCache(); SR.newBests.push({ kind: kind, n: n, sec: sec, old: old }); if (old) speedrunCheer(kind, n, sec, old); }
   return old;
 }
 /* a best beaten: the clock shows that split in green for SR_PB_SHOW ms, and a rising chime plays (once, if a wave and its chapter go together) */
@@ -83,6 +83,7 @@ function speedrunActive(){ return addonOn('speedrun') && SR.on && !G.attract; }
   const baseStart = startRun;
   startRun = function(startChapter, waveOverride, snap){
     SR.on = true; SR.resumed = !!snap; SR.waveN = 0; SR.chap = 0; SR.splits = []; SR.chapters = []; SR.newBests = []; SR.pb = null;     /* before: startRun starts the first wave itself */
+    speedrunClearCache();                                                                                                           /* the HUD reads this run's bests, not the ones read in the last run */
     const r = baseStart.apply(this, arguments);
     if (G.attract) SR.on = false;
     return r;
@@ -192,10 +193,12 @@ function speedrunHUD(){
   if (e.classList.contains('pb') !== !!pb) e.classList.toggle('pb', !!pb);
   if (e.style.display !== 'block') e.style.display = 'block';
 }
-/* the HUD asks every frame, so the bests are read from storage once per wave or chapter, not per frame */
+/* the HUD asks every frame, so the bests are read from storage once per wave or chapter, not per frame; the copies are dropped when a run starts and
+   when a best is kept, so the clock never compares against a time that has since been beaten */
 const _srCache = {};
 function speedrunBestCached(kind, n){
-  const k = kind + n + ':' + (G.runSpeedLevel | 0) + ':' + SR.newBests.length;
+  const k = kind + n + ':' + (G.runSpeedLevel | 0);
   if (!(k in _srCache)) _srCache[k] = speedrunBest(kind, n);
   return _srCache[k];
 }
+function speedrunClearCache(){ for (const k in _srCache) delete _srCache[k]; }

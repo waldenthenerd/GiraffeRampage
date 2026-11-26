@@ -1,5 +1,5 @@
 /* speedrun: the Speedrun Timer add-on (js/addons/50d-addon-speedrun.js) and the "suggest an add-on" box on the Add-ons page. A beaten best flashes
-   that split green in the clock with a chime (a first time does not).
+   that split green in the clock with a chime (a first time does not), and the next run's clock measures against that new best.
    Run: node tools/qa-cloud.mjs tools/scenarios/speedrun.js --wait 60000 [--shot x.png --params "view=hud|report|page"] */
 GR.handleAction('splash-go'); Ach.check = function(){ return []; };
 var out = { errs: [] }; window.addEventListener('error', function(e){ out.errs.push(e.message); });
@@ -56,6 +56,12 @@ try {
   /* another speed keeps its own bests */
   run([3, 3], { speed: 2 }); gameOver(); b = bests(); out.speeds = b.s2 && b.s2.w[1] === 3 && b.s0.w[1] === 10;
   hideOverlay(); G.state = 'menu';
+  /* each run reads the bests afresh: a run that looked at wave 1's best (10.0) and then beat it (8.0) leaves the next run comparing against 8.0, not 10.0 */
+  GR.startRun(1); G.enemies.length = 0; P.invuln = 99; G.runTime = 5; updateHUD(); var sawOld = /\u22125\.0/.test(txt());
+  G.runTime = 8; startWave(G.wave + 1); gameOver(); hideOverlay(); G.state = 'menu';
+  GR.startRun(1); G.enemies.length = 0; P.invuln = 99; G.runTime = 9; updateHUD();
+  out.freshBest = sawOld && bests().s0.w[1] === 8 && /Wave 1/.test(txt()) && /\+1\.0/.test(txt()) && !/\u22121\.0/.test(txt());
+  gameOver(); hideOverlay(); G.state = 'menu';
   /* a resumed run sets no bests */
   var before = JSON.stringify(bests());
   GR.startRun(1); SR.resumed = true; G.runTime = 1; startWave(G.wave + 1); G.runTime = 2; startWave(G.wave + 1); gameOver();      /* what startRun(.., snap) sets */
@@ -69,7 +75,7 @@ try {
   out.suggest = !!a && a.getAttribute('href') === 'https://github.com/waldenthenerd/GiraffeRampage' && a.target === '_blank' && /suggest it on GitHub/i.test(document.querySelector('.addonsuggest').textContent);
   out.row = !!document.querySelector('[data-a="addon-t-speedrun"]');
   hideOverlay(); G.state = 'menu';
-  out.pass = out.errs.length === 0 && ['registered', 'offNoClock', 'offNoReport', 'switched', 'firstQuiet', 'pbFlash', 'pbGone', 'clock', 'splits', 'saved', 'report', 'reportHTML', 'deltaLive', 'newBest', 'deltas', 'chapterBest', 'chapterLine', 'partWay', 'speeds', 'resumed', 'offAgain', 'suggest', 'row'].every(function(k){ return out[k] === true; });
+  out.pass = out.errs.length === 0 && ['registered', 'offNoClock', 'offNoReport', 'switched', 'firstQuiet', 'pbFlash', 'pbGone', 'clock', 'splits', 'saved', 'report', 'reportHTML', 'deltaLive', 'newBest', 'deltas', 'chapterBest', 'chapterLine', 'partWay', 'speeds', 'freshBest', 'resumed', 'offAgain', 'suggest', 'row'].every(function(k){ return out[k] === true; });
 
   var v = QA.params.view;
   if (v === 'page') showAddons();
