@@ -106,7 +106,7 @@ function phGameLoop(ts){
 }
 function phGameStart(g, title, w, h, keysHtml){
   const hi = gadData().hi;
-  phFrame(title, '<div class="ph-gscore"><span id="phSc">0</span><small>Best <b id="phHi">' + hi[g.id] + '</b></small></div><canvas id="phCv" width="' + w + '" height="' + h + '"></canvas><div class="ph-keys">' + keysHtml + '</div>', 'Home');
+  phFrame(title, '<div class="ph-gscore"><span id="phSc">0</span><small>Best <b id="phHi">' + hi[g.id] + '</b></small></div><canvas id="phCv" width="' + w + '" height="' + h + '"></canvas><div class="ph-keys">' + keysHtml + '<button id="phAgain" data-a="town-gk-a" style="display:none;width:auto;padding:0 14px;font-size:15px">Again</button></div>', 'Home');
   PH.game = g; g.init(); cancelAnimationFrame(PH.raf); PH.raf = requestAnimationFrame(phGameLoop);
 }
 function phOverSound(){ PH.overAt = performance.now(); try { [494, 392, 294].forEach(function(f, i){ SFX.tone('square', f, f * 0.97, 0.11, 0.07, i * 0.1, 0, SFX.eventGain); }); SFX.tone('square', 196, 147, 0.26, 0.06, 0.3, 0, SFX.eventGain); } catch (e) {} }
@@ -116,6 +116,7 @@ function phGameEnd(g){                                 /* a best score pays 5 ge
   if (g.score > was){ hi[g.id] = g.score; const gems = (Math.floor(g.score / 1000) - Math.floor(was / 1000)) * 5; if (gems > 0){ Save.data.gems = (Save.data.gems | 0) + gems; townToast('A new best: ' + g.score + '. +' + gems + ' gems.', '#BFFF9A'); } else townToast('A new best: ' + g.score + '.', '#BFFF9A'); Save.write(); SFX.level(); }
   else phOverSound();                                  /* no best: a short handheld "game over", three notes falling */
   const el = document.getElementById('phHi'); if (el) el.textContent = hi[g.id];
+  const ag = document.getElementById('phAgain'); if (ag) ag.style.display = '';   /* the way back in by touch or mouse (Space, Enter or the pad's A do the same) */
 }
 const PH_KEYS = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd', Space: 'x', Enter: 'x' };
 window.addEventListener('keydown', function(e){
@@ -123,6 +124,28 @@ window.addEventListener('keydown', function(e){
   const k = PH_KEYS[e.code]; if (!k) return;
   e.preventDefault(); e.stopPropagation(); if (!e.repeat || k === 'd' || k === 'l' || k === 'r') PH.game.key(k);
 }, true);
+/* a controller plays the game on the screen rather than moving the menu's focus: the d-pad or left stick steers (left, right and down repeat while held,
+   as the keys do), A drops or starts again, X turns a Blocks piece, B puts the game away as it does everywhere */
+(function(){
+  const pp = Pad.poll; let held = '', rep = 0;
+  Pad.poll = function(dt){
+    const gps = navigator.getGamepads ? navigator.getGamepads() : []; let gp = null;
+    for (let i = 0; i < gps.length; i++) if (gps[i] && gps[i].connected){ gp = gps[i]; break; }
+    if (!gp || !PH.game || !document.getElementById('phCv') || !Town.panel || G.state !== 'town'){ held = ''; return pp.apply(this, arguments); }
+    const prev = this.prev, b = function(i){ const x = gp.buttons[i]; return !!(x && (x.pressed || x.value > 0.5)); }, edge = function(i){ return b(i) && !prev[i]; };
+    const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0, dx = (b(15) ? 1 : 0) - (b(14) ? 1 : 0) || (Math.abs(ax) > 0.5 ? Math.sign(ax) : 0), dy = (b(13) ? 1 : 0) - (b(12) ? 1 : 0) || (Math.abs(ay) > 0.5 ? Math.sign(ay) : 0);
+    const k = dx < 0 ? 'l' : dx > 0 ? 'r' : dy < 0 ? 'u' : dy > 0 ? 'd' : '';
+    Input.padOn = true; if (k || gp.buttons.some(function(x){ return x.pressed; })) Input.padUsed = true;
+    const g = PH.game;
+    if (k !== held){ held = k; rep = 0.18; if (k) g.key(k); }
+    else if (k && k !== 'u'){ rep -= dt || 0; if (rep <= 0){ rep = 0.07; g.key(k); } }
+    if (edge(0)) g.key('x');
+    if (edge(2) && g.id === 'blocks') g.key('u');
+    if (edge(1)) Nav.back();
+    this.dirOn = !!k; this.rep = 0.38;                     /* a direction still held when the game closes does not jump the focus at once */
+    this.prev = gp.buttons.map(function(x){ return !!x.pressed; });
+  };
+})();
 
 /* Blocks */
 const BLOCKS_SH = [[[1, 1, 1, 1]], [[1, 1], [1, 1]], [[0, 1, 0], [1, 1, 1]], [[1, 0, 0], [1, 1, 1]], [[0, 0, 1], [1, 1, 1]], [[0, 1, 1], [1, 1, 0]], [[1, 1, 0], [0, 1, 1]]];
@@ -142,7 +165,7 @@ function phBlocks(){
     },
     drop: function(){ if (G2.ok(G2.p.m, G2.p.x, G2.p.y + 1)){ G2.p.y++; return true; } G2.lock(); return false; },
     key: function(k){
-      if (G2.over){ if (k === 'x') phGameStart(phBlocks(), 'Blocks', 220, 440, PH_BTNS); return; }
+      if (G2.over){ if (k === 'x' || k === 'a') phGameStart(phBlocks(), 'Blocks', 220, 440, PH_BTNS); return; }
       const p = G2.p;
       if (k === 'l' && G2.ok(p.m, p.x - 1, p.y)) p.x--; else if (k === 'r' && G2.ok(p.m, p.x + 1, p.y)) p.x++;
       else if (k === 'u'){ const m = G2.rot(p.m); for (const dx of [0, -1, 1, -2, 2]) if (G2.ok(m, p.x + dx, p.y)){ p.m = m; p.x += dx; break; } }
@@ -181,7 +204,7 @@ function phSnake(){
     put: function(){ do { G2.leaf = [Math.floor(Math.random() * C), Math.floor(Math.random() * R)]; } while (G2.body.some(function(b){ return b[0] === G2.leaf[0] && b[1] === G2.leaf[1]; })); },
     init: function(){ G2.body = [[6, 7], [5, 7], [4, 7]]; G2.dir = [1, 0]; G2.nd = [1, 0]; G2.score = 0; G2.over = false; G2.put(); G2.at = performance.now() + 220; phGameScore(G2); },
     key: function(k){
-      if (G2.over){ if (k === 'x') phGameStart(phSnake(), 'Neck Snake', C * S, R * S, PH_PAD); return; }
+      if (G2.over){ if (k === 'x' || k === 'a') phGameStart(phSnake(), 'Neck Snake', C * S, R * S, PH_PAD); return; }
       const d = { l: [-1, 0], r: [1, 0], u: [0, -1], d: [0, 1] }[k]; if (d && !(d[0] === -G2.dir[0] && d[1] === -G2.dir[1])) G2.nd = d;
     },
     step: function(ts){
@@ -198,7 +221,7 @@ function phSnake(){
       c.fillStyle = '#6BBB45'; c.beginPath(); c.arc(G2.leaf[0] * S + S / 2, G2.leaf[1] * S + S / 2, S * 0.38, 0, TAU); c.fill();
       G2.body.forEach(function(b, i){ c.fillStyle = i ? (i % 2 ? '#E8B84A' : '#D9A030') : '#F2C65A'; c.fillRect(b[0] * S + 1, b[1] * S + 1, S - 2, S - 2); if (i % 3 === 1){ c.fillStyle = '#8A5A22'; c.fillRect(b[0] * S + 5, b[1] * S + 5, 6, 6); } });
       const h = G2.body[0]; c.fillStyle = '#2A1A0A'; c.fillRect(h[0] * S + 4, h[1] * S + 4, 3, 3); c.fillRect(h[0] * S + 11, h[1] * S + 4, 3, 3);
-      if (G2.over){ c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 90, C * S, 72); c.fillStyle = '#FFE9A0'; c.font = 'bold 22px system-ui'; c.textAlign = 'center'; c.fillText('NECK TIED IN A KNOT', C * S / 2, 122); c.font = '13px system-ui'; c.fillText('Score ' + G2.score + ' · Space for again', C * S / 2, 146); }
+      if (G2.over){ c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(0, 90, C * S, 72); c.fillStyle = '#FFE9A0'; c.font = 'bold 22px system-ui'; c.textAlign = 'center'; c.fillText('NECK TIED IN A KNOT', C * S / 2, 122); c.font = '13px system-ui'; c.fillText('Score ' + G2.score + ' · press Space or Again', C * S / 2, 146); }
     } };
   return G2;
 }
@@ -222,7 +245,7 @@ function phSnake(){
       else if (id === 'buds'){ const g = gadData(); if (gadOwn('buds')){ g.on.buds = g.on.buds === 1 ? 0 : 1; Save.write(); SFX.click(); try { Music.refresh(); } catch (e) {} } phMusic(); }
       else if (id === 'shuf'){ const g = gadData(); g.mode = g.mode === 'shuffle' ? 'one' : 'shuffle'; PH.shuf.id = ''; Save.write(); SFX.click(); try { Music.refresh(); } catch (e) {} phMusic(); }
       else if ((m = /^song-(\w+)$/.exec(id))){ if (jbHeard()[m[1]] && BAND_SONGS[m[1]]){ const g = gadData(); g.song = m[1]; g.mode = 'one'; Save.write(); SFX.pick(); try { Music.refresh(); } catch (e) {} } phMusic(); }
-      else if ((m = /^go-(\d+)$/.exec(id))){ const c = +m[1]; if (chapterUnlocked(c)) townLeaveFor(function(){ SFX.click(); try { tryFullscreen(); } catch (e) {} startRun(c); }); }
+      else if ((m = /^go-(\d+)$/.exec(id))){ const c = +m[1]; if (chapterUnlocked(c)) townLeaveFor(function(){ handleAction(c === 1 ? 'play' : 'play' + c); }); }      /* the menu's own start button for that chapter, so a chapter that opens with a film (13.5 on) plays it here too */
       return true;
     }
     m = /^town-gk-(\w)$/.exec(a);

@@ -1,8 +1,8 @@
 /* gadgets: Volt & Co. and everything it sells, and the café menu, the post office and the newspaper (js/town/44zzzzc-gadgets.js, 44zzzzd-phone.js, 44zzzzf-gadget-gear.js,
    44zzzzg-town-post.js). Save: Save.data.gad is made and checked when first read (junk, old saves with none, tiers out of range). The shop: a tier needs the one before it
    and its chapter, costs gold or gems, and is paid for once. The street: Volt & Co., the Post Office and the Newsstand stand on Market Street with nothing under them, the room
-   and its counter open the shop. The phone: P and the HUD button open it, an app list by tier, Blocks and Neck Snake play (keys, score, a best that pays gems), Run starts a
-   run, Mail and News open. The earbuds are what play the phone's song: town only at first, menus and runs at Pods Plus, shuffle at Pods Max, off while the jukebox plays or
+   and its counter open the shop. The phone: P and the HUD button open it, an app list by tier, Blocks and Neck Snake play (keys, score, a best that pays gems, Again at game over,
+   a controller that plays rather than moves the focus), Run starts a run as the menu does (a chapter's opening film first), Mail and News open. The earbuds are what play the phone's song: town only at first, menus and runs at Pods Plus, shuffle at Pods Max, off while the jukebox plays or
    when they are out. The café menu: a dish per chapter, eaten before a run it boosts that run's stats once. Mail: a letter per chapter, its gift taken once. News: a paper a
    day with a task that pays once. Photo: new filters and frames draw, and are locked until the kit is bought. Torch and goggles widen the light of a run's night.
    Picture: --params "view=shop|room|phone|news|mail|menu|street". */
@@ -65,11 +65,29 @@
       var d = cv2.getContext('2d').getImageData(170, 3, 47, 38).data, hit = 0; for (var q = 0; q < d.length; q += 4) if (d[q] === 0xFF && d[q + 1] === 0xD8 && d[q + 2] === 0x4D) hit++; out.nextPx = hit; return hit >= 16; })());
     var lines = (function(){ var T = phBlocks(); T.init(); T.grid[19] = new Array(10).fill(0); T.grid[19][4] = -1; T.p = { t: 0, m: [[1]], x: 4, y: 18 }; var s0 = T.score; T.key('d'); T.key('d'); return T.score - s0; })(); check('lineClears', lines >= 100);
     press('ArrowLeft'); check('keysCaught', true);
+    /* a game over shows Again (the way back in by touch), and a controller plays the game rather than moving the focus */
+    act('town-ph-blocks'); frames(1); var ag = document.getElementById('phAgain'); check('againHidden', !!ag && ag.style.display === 'none');
+    var B2 = PH.game; for (k = 0; k < 40 && !B2.over; k++) B2.key('x'); ag = document.getElementById('phAgain'); check('againShown', B2.over && !!ag && ag.style.display !== 'none');
+    act('town-gk-a'); check('blocksAgain', !!PH.game && PH.game !== B2 && PH.game.id === 'blocks' && !PH.game.over);
+    var fake = { connected: true, id: 'fake', axes: [0, 0, 0, 0], buttons: [] }; for (var bi = 0; bi < 17; bi++) fake.buttons.push({ pressed: false, value: 0 });
+    var realPads = navigator.getGamepads; navigator.getGamepads = function(){ return [fake]; }; Pad.prev = [];
+    var pad = function(i, on, n){ fake.buttons[i].pressed = on; fake.buttons[i].value = on ? 1 : 0; for (var q = 0; q < (n || 1); q++) Pad.poll(1 / 30); };
+    var PB = PH.game, turns = 0, tk = PB.key, fx = PB.p.x, f0 = document.activeElement; PB.key = function(kk){ if (kk === 'u') turns++; return tk(kk); };
+    pad(14, true); out.padLeftOne = PB.p.x === fx - 1; pad(14, true, 9); out.padLeftHeld = fx - PB.p.x; check('padSteers', out.padLeftOne && PB.p.x < fx - 1 && document.activeElement === f0); pad(14, false);
+    pad(12, true, 12); pad(12, false); check('padTurnOnce', turns === 1);
+    pad(2, true); pad(2, false); check('padXTurns', turns === 2);
+    var ps = PB.score; pad(0, true); pad(0, false); check('padDrops', PB.score > ps && PH.game === PB);
+    for (k = 0; k < 40 && !PB.over; k++) PB.key('x'); pad(0, true); pad(0, false); check('padAgain', PB.over && !!PH.game && PH.game !== PB && !PH.game.over);
+    var PC = PH.game; pad(1, true); pad(1, false); out.padBackPanel = Town.panel; check('padBackCloses', !Town.panel);      /* the phone fades out, so its canvas is still there for a moment */
+    var pcx = PC.p.x; pad(15, true); pad(15, false); check('padNotAfterClose', PC.p.x === pcx);
+    navigator.getGamepads = realPads; Input.padUsed = false; Input.padOn = false; Pad.prev = [];
     /* Snake */
     act('town-ph-snake'); frames(2); var S = PH.game; check('snake', !!S && S.id === 'snake' && S.body.length === 3);
     S.leaf = [S.body[0][0] + 1, S.body[0][1]]; S.at = 0; S.step(1); check('snakeEats', S.score === 10 && S.body.length === 4);
     S.key('u'); S.at = 0; S.step(2); check('snakeTurns', S.body[0][1] === S.body[1][1] - 1);
     for (k = 0; k < 40 && !S.over; k++){ S.at = 0; S.step(3 + k); } check('snakeDies', S.over);
+    ag = document.getElementById('phAgain'); check('snakeAgainShown', !!ag && ag.style.display !== 'none');
+    act('town-gk-a'); check('snakeAgain', !!PH.game && PH.game !== S && PH.game.id === 'snake' && !PH.game.over && PH.game.body.length === 3);
     /* the other apps */
     act('town-ph-scores'); check('scores', !!document.querySelector('.ph-stats'));
     act('town-ph-music'); check('musicApp', !!document.querySelector('.ph-now'));
@@ -149,6 +167,11 @@
     var key = function(code){ window.dispatchEvent(new KeyboardEvent('keydown', { code: code, bubbles: true })); window.dispatchEvent(new KeyboardEvent('keyup', { code: code, bubbles: true })); };
     G.state = 'menu'; startRun(1); frames(2); key('KeyP'); frames(1); check('pNoPause', G.state === 'playing'); key('Escape'); frames(1); check('escPauses', G.state === 'paused'); key('Escape'); frames(1); check('escResumes', G.state === 'playing');
     check('noPauseBinding', !KEY_ACTIONS.some(function(a){ return a[0] === 'pause'; }));
+    /* ---- the Run app starts a chapter the way the menu does, its opening film first (13.5 on) ---- */
+    var goFrom = function(c){ G.cut = null; G.state = 'menu'; townEnter('market', 1000, 1); frames(2); act('town-ph-go-' + c); var r = G.state === 'cutscene' && G.cut ? G.cut.kind : G.state; G.cut = null; G.state = 'menu'; return r; };
+    Save.reset(); check('goLocked', goFrom(18) === 'town');
+    for (var gc = 1; gc <= 18; gc++) Save.data['chapter' + gc + 'Complete'] = true;
+    out.goFilms = [2, 14, 18, 19].map(goFrom); check('goFilms', out.goFilms.join() === 'playing,domeflight,islesail,skyin');
     /* ---- the old things still work ---- */
     G.state = 'menu'; Save.reset(); townEnter('square', 1000, 1); frames(10); check('streetsStill', Town.near === null || !!Town.near.label);
   } catch (err){ out.err = String(err && err.stack || err); }

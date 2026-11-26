@@ -9,11 +9,13 @@
    The bosses make an entrance (ISLE_ENTER) instead of walking in from a vent: King Claw bursts out of a sand mound near her, the Stormjelly rises glowing out of a
    tide pool, Old Hammerhead's fin cuts through the shallows to her and it breaches, the Leviathan Eel's wake winds through the water before it surfaces, and
    Specimen Zero smashes out of the floor tank in the middle of the tank room, where it has been coiled under the glass all chapter (if she is not in the room,
-   a security camera's feed shows it). While it comes in a boss cannot be hit and does not attack.
+   it waits for the scientist to finish speaking, then a security camera's feed comes on with a beep and shows it). While it comes in a boss cannot be hit
+   and does not attack.
    And a hidden swimmer warns before it strikes: bubbles always rise from it, a fin and a ring show when it is about to come up, and once up it waits half a second. */
 function ilOnIsle(){ return !!G.il && G.chapter === ISLE_CHAPTER && G.biome === 'isle'; }
 function ilInView(x, y, m){ const z = G.zoom || 1, hw = G.W / z / 2 - (m || 0), hh = G.H / z / 2 - (m || 0); return Math.abs(x - G.camX) < hw && Math.abs(y - G.camY) < hh; }
 SFX.clunk = function(){ this.tone('square', 150, 70, 0.14, 0.09, 0, 0, this.abilityGain); this.burst(0.08, 0.1, 900, 300, 1, 0, 'lowpass', this.abilityGain); };
+SFX.feedBeep = function(){ this.tone('square', 1320, 1320, 0.07, 0.06, 0, 0, this.eventGain); this.tone('square', 990, 990, 0.1, 0.05, 0.11, 0, this.eventGain); };      /* a camera feed coming on: two short notes, high then lower */
 SFX.glass = function(){ this.burst(0.22, 0.14, 5200, 2600, 2, 0, 'highpass', this.abilityGain); this.tone('triangle', 2400, 1700, 0.12, 0.05, 0.02, 0, this.abilityGain); };
 
 /* where the scientist can be seen. 'win': in a lit pane of a building's front wall (x, y, w, h), 'door': standing in a doorway (ISLE_DOORS[d]), 'out': on the island */
@@ -80,7 +82,7 @@ function ilWatchTick(dt){
   for (let i = 0; i < ISLE_CAMS.length; i++){ const c = il.cam[i], cx = ISLE_CAMS[i][0], cy = ISLE_CAMS[i][1]; c.on = !P.dead && hyp(P.x - cx, P.y - cy) < 700; c.a = turnTo(c.a, c.on ? Math.atan2(P.y - cy, P.x - cx) : Math.PI / 2 + Math.sin(t * 0.5 + i * 1.7) * 0.9, (c.on ? 3 : 0.8) * dt); }
   /* the screens' short word */
   if (il.brief){ if (il.brief.wait > 0) il.brief.wait -= dt; else { il.brief.t -= dt; if (il.brief.t <= 0) il.brief = null; } }
-  if (il.feed && !il.glimpse){ il.feed.t -= dt; if (il.feed.t <= 0) il.feed = null; }
+  if (il.feed && !il.glimpse){ if (!il.feed.on){ il.feed.on = true; SFX.feedBeep(); } il.feed.t -= dt; if (il.feed.t <= 0) il.feed = null; }      /* the tank room's camera comes on with a beep */
   /* the lab notes: walk over one to take it */
   if (Save.data && !P.dead && !G.attract){
     const had = Save.data.isleNotes | 0;
@@ -327,7 +329,7 @@ function ilWetRun(x0, y0, x1, y1, side){
 function ilEnterStart(e){
   const E = ISLE_ENTER[e.type]; if (!E) return;
   const en = { k: E.k, t: 0, dur: E.dur, c: E.c, pts: [] };
-  if (E.k === 'tank'){ e.x = ISLE_FTANK.x; e.y = ISLE_FTANK.y; G.il.tankU = 0; if (hyp(P.x - e.x, P.y - e.y) > 600){ G.il.feed = { t: E.dur + 2.2, max: E.dur + 2.2 }; if (G.il.glimpse) G.il.glimpse.t = Math.min(G.il.glimpse.t, 0.4); } }      /* far from the room: the scientist's screen cuts to the tank room's camera */
+  if (E.k === 'tank'){ e.x = ISLE_FTANK.x; e.y = ISLE_FTANK.y; G.il.tankU = 0; if (hyp(P.x - e.x, P.y - e.y) > 600){ G.il.feed = { t: E.dur + 2.2, max: E.dur + 2.2 }; en.hold = !!G.il.glimpse; } }      /* far from the room: the scientist says a last word, then the screen cuts to the tank room's camera and Zero breaks out on it */
   else if (E.k === 'mound'){ const p = ilSpotNear(P.x, P.y, false, 240, 470, e.r, e.r) || ilSpotNear(P.x, P.y, false, 340, 470, e.r) || ilSpotNear(P.x, P.y, false, 240, 640, e.r * 0.6); if (p){ e.x = p.x; e.y = p.y; } }
   else if (E.k === 'pool'){
     let best = null, bd = 1e9; for (let i = 0; i < ISLE_POOLS.length; i++){ const o = ISLE_POOLS[i], d = hyp(o[0] - P.x, o[1] - P.y), seen = ilInView(o[0], o[1], 40) ? 0 : 600; if (d > 220 && d < 900 && Math.abs(d - 450) + seen < bd){ bd = Math.abs(d - 450) + seen; best = o; } }
@@ -343,7 +345,12 @@ function ilEnterStart(e){
   e.enter = en; e.untarg = true; e.hidden = false; e.atkCd = Math.max(e.atkCd || 0, E.dur + 0.5);
 }
 function ilEnterTick(e, dt){
-  const en = e.enter; en.t += dt; const u = Math.min(1, en.t / en.dur);
+  const en = e.enter;
+  if (en.hold){                                                                                     /* Zero waits under the glass while the scientist finishes speaking (and does not attack meanwhile) */
+    if (G.il && G.il.glimpse){ e.atkCd = Math.max(e.atkCd || 0, en.dur + 0.5); return; }
+    en.hold = false; if (G.il && G.il.feed && hyp(P.x - e.x, P.y - e.y) <= 600) G.il.feed = null;      /* she has come into the room meanwhile: she sees it for herself */
+  }
+  en.t += dt; const u = Math.min(1, en.t / en.dur);
   if (en.k === 'mound'){ if (Math.random() < dt * 30) addParticle(e.x + rand(-1, 1) * e.r * 0.7 * u, e.y + rand(-1, 1) * e.r * 0.5 * u, rand(-60, 60), rand(-90, -20), rand(1.6, 3.2), 0.5, '#D6C28C', { drag: 3 }); if (Math.random() < dt * 8) addShake(1.5 * u); }
   else if (en.k === 'pool'){ if (Math.random() < dt * 14) burstParticles(e.x + rand(-70, 70), e.y + rand(-40, 40), 2, '#E8DCFF', 80, 2, { glow: true }); if (Math.random() < dt * 6) ilSplash(e.x + rand(-60, 60), e.y + rand(-30, 30), 0.8); }
   else if (en.k === 'fin' || en.k === 'wake'){

@@ -5,6 +5,32 @@
    island coming out of it with the lab's lights on, and her wading ashore with something swimming under the surface), and, at the end, the escape (the tank room flooding, someone in a
    white coat running for the helipad and a white helicopter lifting off west over the water, the town helicopter coming in low to pick her up, and the two of them low over the
    sea at sundown, the white one still in sight ahead), which closes nothing. Every frame is a pure function of time. */
+/* The films' own sounds, made the way the game makes all its others (a tone, a burst of filtered noise; nothing recorded), here and in the Air Chase films
+   (js/sky/44zzzzk-sky-films.js): the sea against a hull and round her legs, a splash, water pouring in, glass, a helicopter's rotor beat, a crash, a door.
+   filmSnd(kind, v) plays one, v (0 to 1) as loud as it is; filmRotor(t0, t1, gap0, gap1, v0, v1) is a rotor's beat from t0 to t1, its beats gap0 apart at the
+   start and gap1 at the end, from v0 to v1 loud; filmCues(own, more) puts the sounds among a film's own cues, in time order. */
+const FILM_SND = {
+  lap(v){ SFX.burst(0.24, 0.06 * v, 900, 320, 0.8, 0, 'lowpass'); },                                                                                      /* the sea against the hull */
+  wade(v){ SFX.burst(0.16, 0.08 * v, 1300, 380, 0.9, 0, 'lowpass'); SFX.burst(0.08, 0.035 * v, 3200, 1500, 1.2, 0.03, 'bandpass'); },                    /* a step in the shallows */
+  splash(v){ SFX.burst(0.36, 0.14 * v, 1600, 220, 0.8, 0, 'lowpass'); SFX.burst(0.22, 0.07 * v, 3400, 1200, 1.2, 0.03, 'bandpass'); SFX.tone('sine', 220, 90, 0.2, 0.05 * v, 0, 0); },
+  pour(v){ SFX.burst(1.2, 0.07 * v, 700, 320, 0.6, 0, 'lowpass'); SFX.burst(0.9, 0.03 * v, 2400, 1600, 0.8, 0.1, 'bandpass'); },                         /* water pouring in */
+  glass(v){ SFX.burst(0.22, 0.12 * v, 5600, 2800, 2, 0, 'highpass'); SFX.tone('triangle', 2600, 1800, 0.12, 0.05 * v, 0.02, 0); SFX.tone('triangle', 3300, 2500, 0.08, 0.035 * v, 0.08, 0); },
+  thud(v){ SFX.tone('sine', 80, 46, 0.11, 0.1 * v, 0, 0); SFX.burst(0.06, 0.025 * v, 520, 200, 0.7, 0, 'lowpass'); },                                     /* one beat of a rotor */
+  bang(v){ SFX.tone('sine', 150, 40, 0.4, 0.3 * v, 0, 0); SFX.burst(0.3, 0.2 * v, 1200, 120, 0.5, 0, 'bandpass'); },                                     /* an engine hit */
+  crash(v){ SFX.tone('sine', 120, 28, 0.7, 0.42 * v, 0, 0); SFX.burst(0.55, 0.26 * v, 1400, 80, 0.5, 0, 'bandpass'); SFX.burst(0.3, 0.1 * v, 4200, 1600, 1.4, 0.05, 'highpass'); SFX.tone('sawtooth', 90, 40, 0.4, 0.06 * v, 0.04, 0); },
+  slide(v){ SFX.burst(0.8, 0.05 * v, 500, 1300, 3, 0, 'bandpass'); },                                                                                    /* a door running back on its rail */
+  clunk(v){ SFX.tone('square', 150, 70, 0.14, 0.08 * v, 0, 0); SFX.burst(0.08, 0.09 * v, 900, 300, 1, 0, 'lowpass'); },
+  whir(v){ SFX.tone('sawtooth', 380, 560, 0.35, 0.02 * v, 0, 0); SFX.tone('square', 760, 1100, 0.3, 0.008 * v, 0.02, 0); },                               /* a drone going by */
+  horn(v){ SFX.tone('sawtooth', 110, 108, 0.9, 0.06 * v, 0, 0); SFX.tone('sawtooth', 165, 162, 0.9, 0.035 * v, 0, 0); }                                     /* a boat's horn, far off */
+};
+function filmSnd(k, v){ try { if (FILM_SND[k]) FILM_SND[k](v === undefined ? 1 : v); } catch (e) {} }
+function filmRotor(t0, t1, gap0, gap1, v0, v1){
+  const out = [];
+  for (let t = t0; t < t1; ){ const f = (t - t0) / Math.max(0.01, t1 - t0), v = v0 + (v1 - v0) * f, at = Math.round(t * 1000) / 1000;
+    out.push([at, () => { if (!G.cut || G.cut.t - at < 0.15) filmSnd('thud', v); }]); t += gap0 + (gap1 - gap0) * f; }                              /* a slow frame fires the beats it missed at once: only the latest one sounds */
+  return out;
+}
+function filmCues(own, more){ return own.concat(more).sort(function(a, b){ return a[0] - b[0]; }); }
 const IL_SAIL_T = { B: 7.6, C: 15.2, END: 24 };
 const IL_OUT_T = { B: 7.2, C: 14.2, D: 24.5, END: 31 };
 const IL_SAIL_CAPS = [
@@ -132,7 +158,13 @@ MARS_FILMS.islesail = {
     marsFilmCaps(ctx, IL_SAIL_CAPS, t, '#9AF0E0');
     const f = marsFilmFade([IL_SAIL_T.B, IL_SAIL_T.C], IL_SAIL_T.END, t); if (f > 0.005){ ctx.fillStyle = 'rgba(0,0,0,' + f + ')'; ctx.fillRect(0, 0, CS_W, CS_H); }
   },
-  cues: [[0.4, () => SFX.click()], [4.6, () => SFX.whoosh()], [8.2, () => SFX.click()], [11.6, () => SFX.whoosh()], [15.8, () => SFX.click()], [19.6, () => SFX.whoosh()]]
+  cues: filmCues([[0.4, () => SFX.click()], [4.6, () => SFX.whoosh()], [8.2, () => SFX.click()], [11.6, () => SFX.whoosh()], [15.8, () => SFX.click()], [19.6, () => SFX.whoosh()]], [
+    [1.6, () => filmSnd('lap', 0.8)], [3.3, () => filmSnd('lap', 0.6)], [5.2, () => filmSnd('lap', 0.9)], [6.9, () => filmSnd('lap', 0.6)],          /* the sea slapping the boat, then quieter in the fog */
+    [9.0, () => filmSnd('lap', 0.5)], [11.0, () => filmSnd('lap', 0.4)], [13.2, () => filmSnd('lap', 0.5)],
+    [16.0, () => filmSnd('wade', 0.7)], [16.7, () => filmSnd('wade', 0.6)], [17.4, () => filmSnd('wade', 0.7)], [18.1, () => filmSnd('wade', 0.6)],    /* her steps through the shallows */
+    [18.8, () => filmSnd('wade', 0.6)], [19.5, () => filmSnd('splash', 0.8)], [20.3, () => filmSnd('wade', 0.5)], [21.0, () => filmSnd('wade', 0.5)],   /* and something big turning under the surface */
+    [22.6, () => filmSnd('splash', 0.6)]
+  ])
 };
 
 /* ---- film 2: the escape ---- */
@@ -191,5 +223,10 @@ MARS_FILMS.isleout = {
     marsFilmCaps(ctx, IL_OUT_CAPS, t, '#9AF0E0');
     const f = marsFilmFade([IL_OUT_T.B, IL_OUT_T.C, IL_OUT_T.D], IL_OUT_T.END, t); if (f > 0.005){ ctx.fillStyle = 'rgba(0,0,0,' + f + ')'; ctx.fillRect(0, 0, CS_W, CS_H); }
   },
-  cues: [[0.4, () => SFX.click()], [4.2, () => SFX.whoosh()], [7.8, () => SFX.click()], [10.6, () => SFX.whoosh()], [14.6, () => SFX.click()], [17.8, () => SFX.whoosh()], [21.4, () => SFX.click()], [24.6, () => SFX.whoosh()], [28.4, () => SFX.click()]]
+  cues: filmCues([[0.4, () => SFX.click()], [4.2, () => SFX.whoosh()], [7.8, () => SFX.click()], [10.6, () => SFX.whoosh()], [14.6, () => SFX.click()], [17.8, () => SFX.whoosh()], [21.4, () => SFX.click()], [24.6, () => SFX.whoosh()], [28.4, () => SFX.click()]], [
+    [0.3, () => filmSnd('pour', 1)], [0.9, () => filmSnd('glass', 0.9)], [2.0, () => filmSnd('pour', 0.8)], [2.7, () => filmSnd('glass', 0.6)],      /* the tank room: the sea pouring in, the tanks' glass giving */
+    [3.8, () => filmSnd('pour', 0.7)], [4.0, () => filmSnd('splash', 0.7)], [6.3, () => filmSnd('splash', 1)],                                       /* and Zero's last arm going under */
+    [20.1, () => filmSnd('wade', 0.7)], [20.7, () => filmSnd('wade', 0.6)]                                                                           /* she wades out to the ladder */
+  ].concat(filmRotor(7.8, 10.4, 0.5, 0.2, 0.2, 0.9), filmRotor(10.4, 14.0, 0.19, 0.19, 0.9, 0.25),                                                    /* LAB-1 spinning up, lifting and going */
+    filmRotor(15.4, 19.8, 0.24, 0.19, 0.15, 1), filmRotor(19.8, 24.4, 0.19, 0.19, 1, 0.6), filmRotor(24.6, 30.8, 0.2, 0.2, 0.7, 0.7)))                 /* the town helicopter coming in, waiting, and off after it */
 };

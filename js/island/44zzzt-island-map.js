@@ -68,8 +68,13 @@ function buildIsleWorld(){
   TW.floor = f; TW.n = 1; TW.ride = null; TW.open = false;
   G.buildings = IL.all.slice(); G.tower = true; G.rocket = null; G.water = null;      /* no waterhole: the whole island is water */
   towerNavBuild(f);
-  G.il = { wet: false, glimpse: null, clean: true };
+  G.il = { wet: !!G.isleWetRestore, glimpse: null, clean: true }; G.isleWetRestore = false;      /* a run carried on from the menu remembers that she has been in the water (Dry Hooves) */
 }
+/* the saved run keeps whether she has been in the water this chapter, so Continue cannot win Dry Hooves back (the world is built after the restore, so it waits in G.isleWetRestore) */
+const isleBaseRunSnapshot = runSnapshot;
+runSnapshot = function(){ const r = isleBaseRunSnapshot.apply(this, arguments); if (G.il && G.chapter === ISLE_CHAPTER) r.isleWet = !!G.il.wet; return r; };
+const isleBaseRestoreRun = restoreRun;
+restoreRun = function(r){ G.isleWetRestore = !!(r && r.isleWet); return isleBaseRestoreRun.apply(this, arguments); };
 /* where she stands when the run starts: on the sand above the boat she came in */
 function isleStart(){ return { x: 2130, y: 2760 }; }
 const isleBaseStartRun = startRun;
@@ -94,6 +99,7 @@ sceneryUpdate = function(dt){
     if (G.il && G.chapter === ISLE_CHAPTER && !G.il.wet){
       G.il.wet = true;
       if (Save.data && !Save.data.isleDry){ addText(P.x, P.y - 46, 'Dry Hooves lost', '#9AE0E0', 15, true); if (SFX.deny) SFX.deny(); }     /* the achievement goes with the first step, so say so */
+      const rs = Save.data && Save.data.runSave; if (rs && rs.chapter === ISLE_CHAPTER && !rs.isleWet){ rs.isleWet = true; Save.write(); }        /* and the saved run hears of it now, not at the next wave: quitting and carrying on does not dry her hooves */
     }
     if (Math.hypot(P.vx, P.vy) > 60 && Math.random() < dt * 9) ilSplash(P.x + rand(-10, 10), P.y + rand(-6, 10), 0.7);
   }
